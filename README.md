@@ -4,7 +4,7 @@ Notes on OpenAI's **Codex harness** (the execution engine behind the Codex agent
 surfaces built on top of it, compiled from primary sources: official blog posts, official docs,
 and the generated schemas in the [`openai/codex`](https://github.com/openai/codex) repository.
 
-Research date: 2026-09-14
+Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
 ## In one line
@@ -32,6 +32,9 @@ Repository: <https://github.com/ykylee/agent-harness-notes>
 | [04-cli-exec.md](docs/04-cli-exec.md) | `codex exec` non-interactive mode |
 | [05-agents-api.md](docs/05-agents-api.md) | Managed Agents API concepts (sessions / sandboxes / subagents) |
 | [08-agents-api-reference.md](docs/08-agents-api-reference.md) | **Agents API reference** — 33 endpoints, schemas, and 30 event types extracted from the OpenAPI spec |
+| [09-agents-api-environments.md](docs/09-agents-api-environments.md) | Agents API architecture, the three environment types, hosted sandbox config, files/artifacts, lifecycle, security |
+| [10-agents-api-tools.md](docs/10-agents-api-tools.md) | Agents API tools — function tools, MCP connections, vaults, plugins |
+| [11-agents-api-operations.md](docs/11-agents-api-operations.md) | Agents API webhooks, observability, tracing, and the cost model |
 | [06-choosing.md](docs/06-choosing.md) | Comparison of the integration paths and how to choose |
 | [07-harness-engineering.md](docs/07-harness-engineering.md) | Operating principles from OpenAI's internal "zero hand-written code" experiment |
 | [99-sources.md](docs/99-sources.md) | Source list and verification status |

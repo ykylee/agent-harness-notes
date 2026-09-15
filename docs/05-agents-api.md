@@ -4,9 +4,11 @@
 session management, context compaction, failure recovery, multi-agent coordination — and turned it
 into **an API that OpenAI itself operates**.
 
-> The **exact definitions** of endpoints, schemas, and events live in
-> [08-agents-api-reference.md](08-agents-api-reference.md).
-> This document covers concepts and usage scenarios.
+> This document covers concepts and usage scenarios. The detail lives elsewhere:
+> [08](08-agents-api-reference.md) endpoints and schemas ·
+> [09](09-agents-api-environments.md) architecture, environments, files, security ·
+> [10](10-agents-api-tools.md) functions, MCP, vaults, plugins ·
+> [11](11-agents-api-operations.md) webhooks, observability, tracing, cost.
 
 Official wording: *"application access to OpenAI's managed Codex harness through an API."*
 OpenAI handles sessions, orchestration, context management, and recovery, while the application

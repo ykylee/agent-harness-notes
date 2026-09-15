@@ -37,21 +37,44 @@ Extracted directly from it: endpoint paths/methods/operationIds, `CreateAgentSes
 
 ### Official documentation
 
-| URL | Contents |
+**All of these were read as raw Markdown** by appending `.md` to the page URL — the docs state:
+*"Markdown versions of documentation pages are available by appending `.md` to the page URL"*
+(and `/llms.txt` is the complete index). This returns source text with code samples intact instead
+of a rendered page, so these are effectively primary sources rather than summaries.
+
+| URL (append `.md` to fetch source) | Contents |
 |---|---|
-| <https://developers.openai.com/codex/app-server> (→ learn.chatgpt.com/docs/app-server) | Official App Server guide |
-| <https://developers.openai.com/codex/sdk> (→ learn.chatgpt.com/docs/codex-sdk) | SDK overview |
-| <https://developers.openai.com/codex/noninteractive> (→ learn.chatgpt.com/docs/non-interactive-mode) | `codex exec` |
-| <https://developers.openai.com/api/docs/guides/agents-api/overview> | Agents API overview |
-| <https://developers.openai.com/api/docs/guides/agents-api/sessions/manage> | Session management |
-| <https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted> | Self-hosted executor |
-| <https://developers.openai.com/api/docs/guides/agents/sandboxes> | Sandbox agents (Agents SDK) |
-| <https://developers.openai.com/api/docs/guides/agents-api/quickstart> | Agents API quickstart (curl/Python examples) |
-| <https://developers.openai.com/api/docs/guides/agents-api/multi-agent> | Multi-agent (examples in 6 languages) |
-| <https://developers.openai.com/api/docs/guides/agents-api/observability> | Observability and token usage |
-| <https://developers.openai.com/blog/codex-as-a-platform> | The "Codex as a platform" blog post |
+| `.../guides/agents-api/overview` | Agents API overview |
+| `.../guides/agents-api/quickstart` | Quickstart, API key scopes, cleanup |
+| `.../guides/agents-api/configuration` | Agent config, saved agents, per-session overrides |
+| `.../guides/agents-api/architecture` | The three pieces and three topologies |
+| `.../guides/agents-api/sessions` | Running and continuing sessions |
+| `.../guides/agents-api/sessions/manage` | Session management |
+| `.../guides/agents-api/sessions/events` | Session events |
+| `.../guides/agents-api/sessions/webhooks` | The 5 webhook events, handler setup |
+| `.../guides/agents-api/multi-agent` | Subagents (examples in 6 languages) |
+| `.../guides/agents-api/observability` | Dashboard, pagination, cost model |
+| `.../guides/agents-api/tracing` | Span types, trace reading |
+| `.../guides/agents-api/environments/openai-hosted` | Hosted sandbox config, network, expiry, pricing |
+| `.../guides/agents-api/environments/self-hosted` | Executor connection |
+| `.../guides/agents-api/environments/lifecycle` | Start/stop compute, webhook-managed sandboxes |
+| `.../guides/agents-api/environments/files` | Files, artifacts, limits |
+| `.../guides/agents-api/environments/security` | Key separation, isolation, brokering |
+| `.../guides/agents-api/tools/functions` | Function tools, required actions, recovery |
+| `.../guides/agents-api/tools/mcp` | Three connection modes, authentication |
+| `.../guides/agents-api/tools/vaults` | Vault and credential lifecycle |
+| `.../guides/agents-api/tools/plugins` | Plugin packaging and registration |
+| `.../guides/tools-skills`, `.../guides/tools-tool-search` | Skills, tool search |
+| `.../codex/app-server` (→ learn.chatgpt.com/docs/app-server) | Official App Server guide |
+| `.../codex/sdk` (→ learn.chatgpt.com/docs/codex-sdk) | SDK overview |
+| `.../codex/noninteractive` (→ learn.chatgpt.com/docs/non-interactive-mode) | `codex exec` |
+| `.../blog/codex-as-a-platform` | The "Codex as a platform" blog post |
+
+Base for the guide paths: `https://developers.openai.com/api/docs`.
 
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
+> `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec
+> covers that ground more precisely.
 
 ### Official blog posts (openai.com returned 403 here → read via a full-text mirror)
 
@@ -89,15 +112,25 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | JSON-RPC `-32001` (server overloaded) | Only mentioned in secondary sources |
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
 | Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
-| The list of 9 Agents API partner sandboxes | The secondary source (MarkTechPost) and the Agents SDK client table partially disagree (DigitalOcean and Oracle are absent from the SDK client table). Agents API environment options and Agents SDK sandbox providers **may be different lists** |
-| Request schema for `POST /agents/environments/{id}/files` | Endpoint existence confirmed; body schema not extracted |
-| Vault management endpoints (`vault_ids`, `credential_id`) | Outside the `Agents` tag, so out of scope for this extraction |
+| The list of 9 Agents API partner sandboxes | The secondary source (MarkTechPost) and the Agents SDK client table partially disagree (DigitalOcean and Oracle are absent from the SDK client table). Agents API environment options and Agents SDK sandbox providers **may be different lists**. The `environments/self-hosted` guide has a "Sandbox providers" section that should settle this — not yet extracted |
+
+### Resolved since the first pass ✅
+
+| Item | Resolution |
+|---|---|
+| `POST /agents/environments/{id}/files` body schema | It is `HostedEnvironmentFileParam` (`file_id` \| `inline`). See [08 §1.8](08-agents-api-reference.md) |
+| Vault management endpoints | 9 endpoints under `/v1/vaults`, outside the `Agents` tag. See [10 §3](10-agents-api-tools.md) |
+| Required API key scopes | `api.agents.read`, `api.agents.write`, `api.responses.write`, plus `api.vaults.*`. From the quickstart and security guides |
+| Webhook event list | 5 events, documented in `sessions/webhooks`. See [11 §2](11-agents-api-operations.md) |
+| Hosted sandbox limits and expiry | Documented in `environments/openai-hosted` and `environments/files`. See [09](09-agents-api-environments.md) |
 
 ## C. Could not be reached from this environment
 
 - `openai.com/index/*` — HTTP 403 (both WebFetch and curl with a browser UA). Worked around via mirrors
-- `developers.openai.com/api/reference/resources/agents/...` — 404.
+- `developers.openai.com/api/reference/...` — 404 to plain fetches (client-rendered).
   **Replaced by the OpenAPI spec, which is more precise anyway**
+- `.../guides/agents-api/webhooks.md` and `.../limits.md` — 404; the real paths are
+  `.../sessions/webhooks.md`, and limits are distributed across the environment guides
 
 ## D. Reproduction
 
@@ -112,7 +145,10 @@ curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84
 codex app-server generate-ts
 codex app-server generate-json-schema
 
+# Read any documentation page as raw Markdown
+curl -sL https://developers.openai.com/api/docs/guides/agents-api/tools/mcp.md
+
 # Agents API endpoints from the OpenAPI spec
 curl -sL https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -o /tmp/openapi.yaml
-grep -nE '^  /agents' /tmp/openapi.yaml
+grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
 ```

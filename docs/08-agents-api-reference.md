@@ -16,6 +16,8 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 
 - Base: `https://api.openai.com/v1`
 - **The `OpenAI-Beta: agents=v1` header is required** (public beta)
+- Required API key scopes: **`api.agents.read`**, **`api.agents.write`**, **`api.responses.write`**
+  (plus `api.vaults.read` / `api.vaults.write` to manage vaults)
 - SDK paths: `client.beta.agents.sessions.*` (JS/Python/Ruby), `client.Beta.Agents.Sessions.*` (Go),
   `client.beta().agents().sessions()` (Java)
 - Streaming responses are `text/event-stream`; non-streaming are `application/json`
@@ -95,6 +97,43 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 
 > Environments are created by sessions; there is **no endpoint to create one directly.**
 > Only templates support full CRUD.
+
+### 1.7 Vaults (under `/v1/vaults`, not `/v1/agents`)
+
+| Method | Path | operationId |
+|---|---|---|
+| GET | `/vaults` | `listVaults` |
+| POST | `/vaults` | `createVault` |
+| GET | `/vaults/{vault_id}` | `retrieveVault` |
+| DELETE | `/vaults/{vault_id}` | `deleteVault` |
+| GET | `/vaults/{vault_id}/credentials` | `listVaultCredentials` |
+| POST | `/vaults/{vault_id}/credentials` | `createVaultCredential` |
+| GET | `/vaults/{vault_id}/credentials/{credential_id}` | `retrieveVaultCredential` |
+| POST | `/vaults/{vault_id}/credentials/{credential_id}` | `rotateVaultCredential` |
+| DELETE | `/vaults/{vault_id}/credentials/{credential_id}` | `deleteVaultCredential` |
+
+Vaults hold MCP credentials for connections made **from OpenAI**. They live outside the `Agents`
+tag, which is why a scan of `/agents` paths alone misses them. Details in
+[10-agents-api-tools.md](10-agents-api-tools.md#3-vaults).
+
+### 1.8 `HostedEnvironmentFileParam` — the environment-files body
+
+`POST /agents/environments/{environment_id}/files` takes this discriminated union (also used by
+`environment.files` at session creation):
+
+```ts
+// discriminator: type
+{ type: "file_id", file_id: string, path: string }   // path = absolute destination inside /workspace
+{ type: "inline",  data: string,    path: string }   // data = standard-base64 file contents
+```
+
+The response is an `EnvironmentFileResource`:
+
+```ts
+{ object: "agent.environment.file", environment_id: string, path: string, size_bytes: number }
+```
+
+Size limits are in [09-agents-api-environments.md](09-agents-api-environments.md#4-files-and-artifacts).
 
 ## 2. `POST /agents/sessions` — create a session
 
@@ -632,3 +671,24 @@ sed -n "${L},$((L+70))p" $S/openapi.yaml
 L=$(grep -n '^    SessionEvent:' $S/openapi.yaml | cut -d: -f1)
 sed -n "${L},$((L+130))p" $S/openapi.yaml | grep -E '^        - agent\.|^        - error'
 ```
+
+## 15. Reading the official docs as Markdown
+
+Every documentation page serves a raw Markdown version — **append `.md` to the page URL**:
+
+```bash
+curl -sL https://developers.openai.com/api/docs/guides/agents-api/overview.md
+curl -sL https://developers.openai.com/api/docs/guides/agents-api/tools/mcp.md
+```
+
+This returns the source text with all code samples intact, rather than a rendered page.
+The docs also point to `/llms.txt` as a complete index.
+
+## 16. Related documents
+
+| Topic | Document |
+|---|---|
+| Concepts and scenarios | [05-agents-api.md](05-agents-api.md) |
+| Architecture, environments, files, security | [09-agents-api-environments.md](09-agents-api-environments.md) |
+| Functions, MCP, vaults, plugins | [10-agents-api-tools.md](10-agents-api-tools.md) |
+| Webhooks, observability, tracing, cost | [11-agents-api-operations.md](11-agents-api-operations.md) |
