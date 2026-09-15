@@ -90,7 +90,12 @@ Base for the guide paths: `https://developers.openai.com/api/docs`.
 | `codex-rs/model-provider-info/src/lib.rs` | `WireApi`, `ModelProviderInfo`, built-in provider list |
 | `codex-rs/responses-api-proxy/README.md` | Provider-shaped local proxy pattern |
 | `codex-rs/windows-sandbox-rs/src/`, `windows-sandbox-service/src/` | Windows sandbox module map (**inference from the source tree, not prose docs**) |
-| `openai/openai-openapi` `openapi.yaml` | `/vaults` endpoints |
+| `openai/openai-openapi` `openapi.yaml` | `/vaults` endpoints; `CreateChatCompletionRequest`, `ChatCompletionStreamResponseDelta`, `ModelResponseProperties` |
+| `codex-rs/codex-api/src/common.rs` | `ResponsesApiRequest` — the exact wire payload (17 fields) |
+| `codex-rs/core/src/client.rs` | The constant values Codex fills in (`store: false`, `include`, `tool_choice`) |
+| `codex-rs/protocol/src/models.rs` | `ResponseItem` — 18 input item variants |
+| `codex-rs/codex-api/src/sse/responses.rs` | The 25 SSE event types Codex parses |
+| `codex-rs/core/src/client_common.rs` | `Prompt` — the pre-serialization turn payload |
 
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
 > `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec

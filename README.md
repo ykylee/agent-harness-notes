@@ -41,6 +41,7 @@ Repository: <https://github.com/ykylee/agent-harness-notes>
 | [13-marketplace-and-plugins.md](docs/13-marketplace-and-plugins.md) | Marketplace catalog format, plugin manifest and distribution sources |
 | [14-windows-sandbox.md](docs/14-windows-sandbox.md) | Native Windows sandbox — elevated/unelevated modes, mechanisms, policy |
 | [15-model-providers.md](docs/15-model-providers.md) | Provider configuration, and why Chat Completions support was removed |
+| [16-responses-chat-adapter.md](docs/16-responses-chat-adapter.md) | **Feasibility study** — mapping Codex's real Responses payload onto Chat Completions |
 | [99-sources.md](docs/99-sources.md) | Source list and verification status |
 
 ## Start here

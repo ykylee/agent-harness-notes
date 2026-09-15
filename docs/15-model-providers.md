@@ -79,8 +79,11 @@ It exists for request/response dumping, not protocol translation — but it prov
 would slot into exactly this position.
 
 > Translation is not free. Responses carries reasoning items, encrypted content, and item-level
-> semantics that Chat Completions has no place for. Budget for lossy edges around reasoning
-> summaries, tool-call shapes, and streaming deltas.
+> semantics that Chat Completions has no place for.
+>
+> **[16-responses-chat-adapter.md](16-responses-chat-adapter.md) works this out against the real
+> payload**: the adapter is stateless and 13 of 17 request fields map, but retained reasoning cannot
+> survive the crossing.
 
 ## 2. Third-party providers *are* supported — within that constraint
 
