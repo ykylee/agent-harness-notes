@@ -1,10 +1,10 @@
-# 08. Agents API 레퍼런스 (OpenAPI 스펙 기준)
+# 08. Agents API Reference (from the OpenAPI Spec)
 
-> **정본 출처**: [`openai/openai-openapi`](https://github.com/openai/openai-openapi)의 `openapi.yaml`
-> (약 3.5MB, `tags: Agents`). 가이드 문서가 아니라 **스펙에서 직접 추출**했습니다.
-> 추출일 2026-09-15. 재현 방법은 문서 맨 아래.
+> **Authoritative source**: `openapi.yaml` in [`openai/openai-openapi`](https://github.com/openai/openai-openapi)
+> (~3.5MB, entries tagged `Agents`). Extracted **directly from the spec**, not from guide pages.
+> Extracted 2026-09-15. Reproduction steps at the bottom.
 
-## 0. 호출 규약
+## 0. Calling convention
 
 ```bash
 curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
@@ -14,15 +14,15 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
   -d '{ ... }'
 ```
 
-- 베이스: `https://api.openai.com/v1`
-- **`OpenAI-Beta: agents=v1` 헤더 필수** (퍼블릭 베타)
-- SDK 경로: `client.beta.agents.sessions.*` (JS/Python/Ruby), `client.Beta.Agents.Sessions.*` (Go),
+- Base: `https://api.openai.com/v1`
+- **The `OpenAI-Beta: agents=v1` header is required** (public beta)
+- SDK paths: `client.beta.agents.sessions.*` (JS/Python/Ruby), `client.Beta.Agents.Sessions.*` (Go),
   `client.beta().agents().sessions()` (Java)
-- 스트리밍 응답은 `text/event-stream`, 비스트리밍은 `application/json`
+- Streaming responses are `text/event-stream`; non-streaming are `application/json`
 
-## 1. 엔드포인트 전체 (33개)
+## 1. All endpoints (33)
 
-### 1.1 Agents — 재사용 가능한 저장된 에이전트
+### 1.1 Agents — reusable saved agents
 
 | Method | Path | operationId |
 |---|---|---|
@@ -32,9 +32,9 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | POST | `/agents/{agent_id}` | `updateAgent` |
 | DELETE | `/agents/{agent_id}` | `deleteAgent` |
 
-> **주의**: 업데이트가 `PATCH`가 아니라 **`POST /agents/{agent_id}`** 입니다.
+> **Note**: update is **`POST /agents/{agent_id}`**, not `PATCH`.
 
-### 1.2 Sessions — 실행 인스턴스
+### 1.2 Sessions — running instances
 
 | Method | Path | operationId |
 |---|---|---|
@@ -44,7 +44,7 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | POST | `/agents/sessions/{session_id}` | `updateAgentSession` |
 | DELETE | `/agents/sessions/{session_id}` | `deleteAgentSession` |
 
-### 1.3 Session 입출력
+### 1.3 Session input and output
 
 | Method | Path | operationId |
 |---|---|---|
@@ -54,9 +54,10 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | GET | `/agents/sessions/{session_id}/turns` | `listAgentSessionTurns` |
 | GET | `/agents/sessions/{session_id}/turns/{turn_id}` | `retrieveAgentSessionTurn` |
 
-> **`POST .../events`가 유일한 입력 채널입니다.** 메시지 전송, 취소, 도구 결과 반환 모두 여기로 갑니다.
+> **`POST .../events` is the only input channel.** Messages, cancellation, and tool results all go
+> through it.
 
-### 1.4 Artifacts — 완료된 턴이 발행한 파일
+### 1.4 Artifacts — files published by completed turns
 
 | Method | Path | operationId |
 |---|---|---|
@@ -65,7 +66,7 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | GET | `/agents/sessions/{session_id}/artifacts/{artifact_id}/content` | `retrieveAgentSessionArtifactContent` |
 | DELETE | `/agents/sessions/{session_id}/artifacts/{artifact_id}` | `deleteAgentSessionArtifact` |
 
-### 1.5 Subagents — 읽기 전용
+### 1.5 Subagents — read-only
 
 | Method | Path | operationId |
 |---|---|---|
@@ -76,8 +77,8 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | GET | `.../subagents/{subagent_id}/turns/{turn_id}` | `retrieveAgentSessionSubagentTurn` |
 | GET | `.../subagents/{subagent_id}/turns/{turn_id}/items` | `listAgentSessionSubagentTurnItems` |
 
-> 서브에이전트는 **생성/삭제 엔드포인트가 없습니다.** 메인 에이전트가 도구 호출로 만들고,
-> API로는 관찰만 합니다.
+> Subagents have **no create or delete endpoints.** The main agent creates them through tool calls;
+> the API only lets you observe them.
 
 ### 1.6 Environments
 
@@ -92,113 +93,115 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | POST | `/agents/environments/templates/{id}` | `updateAgentEnvironmentTemplate` |
 | DELETE | `/agents/environments/templates/{id}` | `deleteAgentEnvironmentTemplate` |
 
-> 환경은 세션이 만들며 **직접 생성하는 엔드포인트가 없습니다.** 템플릿만 CRUD 가능합니다.
+> Environments are created by sessions; there is **no endpoint to create one directly.**
+> Only templates support full CRUD.
 
-## 2. `POST /agents/sessions` — 세션 생성
+## 2. `POST /agents/sessions` — create a session
 
-### 요청 (`CreateAgentSessionParams`)
+### Request (`CreateAgentSessionParams`)
 
-| 필드 | 타입 | 필수 | 설명 |
+| Field | Type | Required | Description |
 |---|---|:---:|---|
-| `environment` | `EnvironmentParam` | ✅ | 인라인 실행 환경 또는 템플릿 참조 |
-| `agent` | `SessionAgentConfigParam` | | `agent_id`와 함께 쓰면 저장된 에이전트를 **덮어씀**. `agent_id` 없으면 `model` 필수 |
-| `agent_id` | `string` (≤64) | | 저장된 재사용 에이전트 ID. `agent` 생략 시 설정 그대로 사용 |
-| `input` | `string` \| `InputMessageParam[]` | 조건부 | 초기 입력. 문자열은 단일 user 메시지의 축약 |
-| `metadata` | `object` | | 최대 16쌍, 키 ≤64자, 값 ≤512자 |
-| `vault_ids` | `string[]` | | 세션에 제공할 vault ID |
-| `stream` | `boolean` (기본 `false`) | | SSE로 세션 이벤트 스트리밍 |
+| `environment` | `EnvironmentParam` | ✅ | An inline execution environment or a template reference |
+| `agent` | `SessionAgentConfigParam` | | With `agent_id`, supplied fields **override** the saved agent. Without `agent_id`, `model` is required |
+| `agent_id` | `string` (≤64) | | ID of a saved reusable agent. Omit `agent` to use its configuration unchanged |
+| `input` | `string` \| `InputMessageParam[]` | conditional | Initial input. A string is shorthand for a single user message |
+| `metadata` | `object` | | Up to 16 pairs, keys ≤64 chars, values ≤512 chars |
+| `vault_ids` | `string[]` | | IDs of vaults made available to the session |
+| `stream` | `boolean` (default `false`) | | Stream session events as SSE |
 
-**`input`이 필수가 되는 조건** (스펙 원문):
-> `environment.type`이 `none`일 때, 또는 `self_hosted`가 아닌 환경에서 `stream: true`일 때.
-> self-hosted 및 비스트리밍 실행 환경에서는 선택.
+**When `input` becomes required** (spec wording):
+> When `environment.type` is `none`, or when `stream` is `true` for an environment that is not
+> `self_hosted`; optional for self-hosted and non-streaming execution environments.
 
-### 응답
+### Responses
 
 - `201` + `SessionResource` (JSON)
-- `201` + `SessionEvent` 스트림 (`text/event-stream`, `stream: true`일 때)
-- 에러: `400 401 403 404 409 500 503` — 전부 `ErrorResponse-2`
+- `201` + a `SessionEvent` stream (`text/event-stream`, when `stream: true`)
+- Errors: `400 401 403 404 409 500 503` — all `ErrorResponse-2`
 
 ### `SessionAgentConfigParam`
 
-| 필드 | 타입 | 설명 |
+| Field | Type | Description |
 |---|---|---|
-| `model` | `string` | 요청한 모델명이 그대로 보존됨 |
-| `instructions` | `string \| null` | 에이전트의 **기본 base instruction에 덧붙는** 추가 지시문 |
-| `reasoning` | `ReasoningParam \| null` | 생략=현행 유지, `null`=모델 기본 effort로 리셋 |
-| `text` | `TextParam \| null` | 텍스트 생성 설정 |
-| `service_tier` | `ServiceTierParam \| null` | 모델 요청 서비스 티어 |
-| `multi_agent` | `MultiAgentConfigCurrentParam \| null` | 서브에이전트 설정 |
-| `tools` | `AgentToolConfigParam[] \| null` | 생략=상속, `null`=전부 제거 |
+| `model` | `string` | The requested model name is preserved as given |
+| `instructions` | `string \| null` | Additional instructions **appended to the agent's default base instructions** |
+| `reasoning` | `ReasoningParam \| null` | Omit to keep current settings; `null` resets to the model's default effort |
+| `text` | `TextParam \| null` | Configuration for generated text |
+| `service_tier` | `ServiceTierParam \| null` | Service tier for model requests |
+| `multi_agent` | `MultiAgentConfigCurrentParam \| null` | Subagent configuration |
+| `tools` | `AgentToolConfigParam[] \| null` | Omit to inherit; `null` clears them |
 
-> **병합 규칙 (스펙 원문)**: 생략한 필드는 `agent_id`에서 상속. 공급된 객체·배열은 **필드 전체를 치환**.
-> `null`은 nullable 필드를 리셋.
+> **Merge rules (spec wording)**: omitted fields inherit from `agent_id`. Supplied objects and
+> arrays **replace the whole field**. `null` resets nullable fields.
 
 ### `EnvironmentParam` (discriminator: `type`)
 
-**`none`** — 실행 환경 없이 에이전트만 실행
+**`none`** — run the agent with no execution environment
 ```json
 { "type": "none" }
 ```
 
 **`openai_hosted`**
-| 필드 | 설명 |
+| Field | Description |
 |---|---|
-| `environment_template_id` | 인라인 설정보다 **먼저** 적용되는 재사용 템플릿. 생략 필드는 템플릿 상속. **네트워크 오버라이드는 템플릿 정책을 넓힐 수 없음** |
-| `packages` | 설치할 패키지 (기본: 빈 목록) |
-| `setup_commands` | 순서 있는 **기밀** 셋업 명령, 최대 16개. **명령 본문은 절대 반환되지 않음** |
-| `network` | 네트워크 접근 정책 (기본: 활성) |
-| `env` | 환경 변수, 최대 1024개 (키 ≤256자) |
-| `capability_directories` | 에이전트에 노출할 capability 디렉터리, 최대 16384개 |
-| `skills` | ID 참조 또는 인라인 ZIP, 최대 **200개** |
-| `plugins` | 인라인 ZIP, 최대 **32개** |
-| `files` | 시작 전 제공할 파일, 최대 **50개** |
+| `environment_template_id` | A reusable template applied **before** inline session configuration. Omitted fields inherit the template. **Network overrides cannot broaden the template's policy** |
+| `packages` | Packages to install (default: empty lists) |
+| `setup_commands` | Ordered, **confidential** setup commands, max 16. **Command bodies are never returned** |
+| `network` | Network access policy (default: enabled) |
+| `env` | Environment variables, max 1024 (keys ≤256 chars) |
+| `capability_directories` | Directories exposing capabilities to the agent, max 16384 |
+| `skills` | Referenced by ID or provided as inline ZIPs, max **200** |
+| `plugins` | Inline ZIPs, max **32** |
+| `files` | Files available before the agent starts, max **50** |
 
 **`self_hosted`**
-| 필드 | 필수 | 설명 |
+| Field | Required | Description |
 |---|:---:|---|
-| `workspace_directory` | ✅ | 셀프호스팅 환경 내 **절대** 프로젝트 경로 |
-| `capability_directories` | | capability 디렉터리 |
+| `workspace_directory` | ✅ | **Absolute** project directory inside the self-hosted environment |
+| `capability_directories` | | Capability directories |
 
-응답 쪽 `EnvironmentResourceSelfHosted`에는 `remote_url`과 `id`가 추가로 들어옵니다 —
-이 둘을 `codex exec-server --remote <remote_url> --environment-id <id>`에 넣습니다.
+The response-side `EnvironmentResourceSelfHosted` additionally carries `remote_url` and `id` —
+feed both into `codex exec-server --remote <remote_url> --environment-id <id>`.
 
 ### `MultiAgentConfigCurrentParam`
 
-| 필드 | 필수 | 기본 | 설명 |
+| Field | Required | Default | Description |
 |---|:---:|---|---|
-| `enabled` | ✅ | — | 서브에이전트 도구 활성화 |
-| `max_concurrent_subagents` | | **6** | 동시 실행 상한 (코디네이터 제외), 최소 1 |
+| `enabled` | ✅ | — | Enable subagent tools |
+| `max_concurrent_subagents` | | **6** | Concurrency cap (excluding the coordinator), minimum 1 |
 
-### `AgentToolConfigParam` (discriminator: `type`, 5종)
+### `AgentToolConfigParam` (discriminator: `type`, 5 kinds)
 
-| type | 용도 |
+| type | Purpose |
 |---|---|
-| `function` | 커스텀 함수. `name`, `description`, `parameters`(JSON Schema) 필수 + `defer_loading`(기본 false) |
-| `mcp` | MCP 서버 |
-| `web_search` | 웹 검색 |
-| `tool_search` | 도구를 지연 탐색 (토큰 절약) |
-| `programmatic_tool_calling` | 프로그래매틱 병렬 호출 |
+| `function` | Custom function. Requires `name`, `description`, `parameters` (JSON Schema); plus `defer_loading` (default false) |
+| `mcp` | MCP server |
+| `web_search` | Web search |
+| `tool_search` | Discover tools lazily (saves tokens) |
+| `programmatic_tool_calling` | Programmatic parallel calling |
 
-**`function`의 `defer_loading: true`** → 정의를 미리 로드하지 않고 `tool_search`로 발견. 컨텍스트 절약용.
+**`defer_loading: true` on a `function`** → its definition is not preloaded and is discovered via
+`tool_search`. Saves context.
 
-**`mcp` 주요 필드**
-| 필드 | 설명 |
+**Key `mcp` fields**
+| Field | Description |
 |---|---|
-| `server_label` | 툴 콜에서 서버를 식별하는 라벨 |
+| `server_label` | Label identifying the server in tool calls |
 | `transport` | `McpTransportConfigParam` |
-| `credential_id` | vault 자격증명. 서버 URL과 일치하는 자격증명이 정확히 하나면 생략 가능 |
-| `allowed_tools` | 호출 허용 도구 목록. **생략 시 서버의 모든 도구 허용** |
-| `required` | 첫 턴 전에 초기화되어야 하는지 (기본 `false`) |
-| `request_metadata` | 요청에 포함할 메타데이터 |
-| `connection_origin` | 아웃바운드 MCP HTTP 연결 출발지 선택 |
+| `credential_id` | Vault credential. Optional when exactly one attached credential matches the server URL |
+| `allowed_tools` | Tools the agent may call. **All server tools are allowed when omitted** |
+| `required` | Whether the server must initialize before the first turn (default `false`) |
+| `request_metadata` | Metadata included with requests |
+| `connection_origin` | Selects where outbound MCP HTTP connections originate |
 
 ### `CreateSessionInputParam`
 
 ```json
-// 축약형
+// Shorthand
 "input": "Create tree.py and run it."
 
-// 전체형
+// Full form
 "input": [{
   "type": "message",
   "role": "user",
@@ -209,7 +212,7 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 }]
 ```
 
-`role`은 **`user`만** 허용됩니다.
+`role` accepts **only `user`**.
 
 ## 3. `SessionResource`
 
@@ -220,48 +223,49 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
   created_at: number,           // Unix seconds
   last_active_at: number,
   status: "idle" | "in_progress" | "requires_action" | "failed",
-  required_actions: SessionRequiredActionResource[],   // 최대 2000
+  required_actions: SessionRequiredActionResource[],   // max 2000
   error: string | null,
   agent: SessionAgentResource,
   environment: EnvironmentResource,                    // none | openai_hosted | self_hosted
   vault_ids: string[],
   metadata: Record<string, string>,
-  usage: TokenUsageResource | null,                    // best-effort, 변경될 수 있음
+  usage: TokenUsageResource | null,                    // best effort, may change
 }
 ```
 
-### `status` 의미 (스펙 원문)
+### `status` meanings (spec wording)
 
-| 값 | 의미 |
+| Value | Meaning |
 |---|---|
-| `idle` | 진행 중인 턴이 없고 입력을 받을 준비 완료. **호스팅 환경은 아직 프로비저닝 중일 수 있음** |
-| `in_progress` | 턴 처리 중 |
-| `requires_action` | 하나 이상의 required action 대기 중 |
-| `failed` | 세션 실패 |
+| `idle` | No turn in progress; ready for input. **A hosted environment may still be provisioning** |
+| `in_progress` | Processing a turn |
+| `requires_action` | Waiting for one or more required actions |
+| `failed` | The session failed |
 
-> `idle`만으로 성공을 단정하지 마세요. 공식 가이드도 "status와 에이전트 출력을 함께 확인하라"고 명시합니다.
+> Do not treat `idle` alone as success. The official guide also says to inspect both the status and
+> the agent's output.
 
 ### `required_actions` (discriminator: `type`)
 
-| type | 처리 |
+| type | How to handle |
 |---|---|
-| `function_call` | 함수를 실행하고 `turn_id` + `call_id`로 결과 제출 |
-| `environment_connection` | `environment_id`로 실행기 연결 수립 |
+| `function_call` | Run the function and return the result using `turn_id` + `call_id` |
+| `environment_connection` | Establish the executor connection using `environment_id` |
 
 ### `TokenUsageResource`
 
 ```ts
 {
   input_tokens: number,
-  input_tokens_details: InputTokensDetailsResource,     // cached 포함
+  input_tokens_details: InputTokensDetailsResource,     // includes cached
   output_tokens: number,
-  output_tokens_details: OutputTokensDetailsResource,   // reasoning 포함
+  output_tokens_details: OutputTokensDetailsResource,   // includes reasoning
   total_tokens: number,
 }
 ```
 
-> **cached 토큰은 `input_tokens`에 포함**되고, **reasoning 토큰은 `output_tokens`에 포함**됩니다.
-> 별도 가산이 아니라 내역(details)입니다.
+> **Cached tokens are included in `input_tokens`**, and **reasoning tokens are included in
+> `output_tokens`**. These are breakdowns, not additions.
 
 ## 4. `TurnResource`
 
@@ -271,57 +275,58 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
   object: "agent.session.turn",
   session_id: string,
   agent_id: string,
-  subagent_id: string | null,   // null = 메인 코디네이터가 실행
+  subagent_id: string | null,   // null = executed by the main coordinator
   status: "queued" | "in_progress" | "waiting" | "completed" | "failed" | "cancelled",
   created_at: number,
   started_at: number | null,
   completed_at: number | null,
-  error: SessionTurnErrorResource | null,   // failed일 때만 non-null
+  error: SessionTurnErrorResource | null,   // non-null only when failed
   usage: TokenUsageResource | null,
 }
 ```
 
-`waiting` = 외부 입력 대기 중.
+`waiting` = waiting for external input.
 
-서브에이전트 턴의 `created_at`은 시작 시각을 쓰고, 없으면 완료 시각 → 서브에이전트 개시 시각 순으로 폴백합니다.
+For subagent turns, `created_at` uses the start time, falling back to the completion time and then
+to the subagent opening time when earlier timestamps are unavailable.
 
-## 5. 턴 실패 코드 `SessionTurnErrorCodeResource` (17종)
+## 5. Turn failure codes — `SessionTurnErrorCodeResource` (17)
 
-| 코드 | 의미 |
+| Code | Meaning |
 |---|---|
-| `context_length_exceeded` | 모델 컨텍스트 윈도우 초과 |
-| `session_budget_exceeded` | 세션 사용량 예산 도달 |
-| `usage_limit_exceeded` | 조직의 사용량/플랜/청구 한도 도달 |
-| `credit_balance_exhausted` | API 크레딧 소진 |
-| `rate_limit_exceeded` | 레이트 리밋 초과 |
-| `server_overloaded` | 모델 서비스 일시 과부하 |
-| `cyber_policy` | 안전 정책에 의해 거부 |
-| `connection_failed` | 모델 서비스 연결 실패 |
-| `server_error` | 모델 서비스 예기치 못한 오류 |
-| `authentication_error` | 자격증명 무효 또는 권한 부족 |
-| `invalid_request` | 입력/설정 무효 |
-| `resource_not_found` | 요청한 모델/리소스 없음 |
-| `sandbox_error` | 실행 환경에서 완료 실패 |
-| `executor_version_incompatible` | **실행기 업그레이드 필요** |
-| `active_turn_not_steerable` | 요청 실행 중에는 추가 입력 불가 |
-| `request_timeout` | 모델 서비스 응답 전 타임아웃 |
-| `internal_error` | 내부 오류 |
+| `context_length_exceeded` | Exceeds the model's context window |
+| `session_budget_exceeded` | The session reached its usage budget |
+| `usage_limit_exceeded` | The organization hit a usage, plan, or billing limit |
+| `credit_balance_exhausted` | No API credits remaining |
+| `rate_limit_exceeded` | Rate limit exceeded |
+| `server_overloaded` | The model service is temporarily overloaded |
+| `cyber_policy` | Rejected by a safety policy |
+| `connection_failed` | Could not connect to the model service |
+| `server_error` | Unexpected error from the model service |
+| `authentication_error` | Invalid credentials or insufficient access |
+| `invalid_request` | Invalid input or configuration |
+| `resource_not_found` | The requested model or resource is unavailable |
+| `sandbox_error` | Could not complete in the execution environment |
+| `executor_version_incompatible` | **The executor must be upgraded** |
+| `active_turn_not_steerable` | Cannot accept more input while a request is running |
+| `request_timeout` | Timed out before the model service responded |
+| `internal_error` | Unexpected internal error |
 
-> 재시도 가능 계열(`server_overloaded`, `rate_limit_exceeded`, `connection_failed`, `request_timeout`)과
-> 설정 수정이 필요한 계열(`invalid_request`, `authentication_error`, `executor_version_incompatible`)을
-> 나눠서 처리하세요.
+> Separate the retryable family (`server_overloaded`, `rate_limit_exceeded`, `connection_failed`,
+> `request_timeout`) from the ones requiring a configuration fix (`invalid_request`,
+> `authentication_error`, `executor_version_incompatible`).
 
-## 6. `POST /agents/sessions/{id}/events` — 입력 채널
+## 6. `POST /agents/sessions/{id}/events` — the input channel
 
-### 요청 (`CreateSessionEventsParams`)
+### Request (`CreateSessionEventsParams`)
 
 ```json
-{ "events": [ /* SessionInputParam, 최대 16384개 */ ] }
+{ "events": [ /* SessionInputParam, max 16384 */ ] }
 ```
 
-### `SessionInputParam` (discriminator: `type`, 3종)
+### `SessionInputParam` (discriminator: `type`, 3 kinds)
 
-**메시지 전송 / steering**
+**Send a message / steer**
 ```json
 {
   "type": "agent.session.input.message",
@@ -331,23 +336,23 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
   }]
 }
 ```
-> 턴이 **진행 중이면 steer**, **idle이면 새 턴 시작** (대화 컨텍스트 유지).
+> **Steers** an active turn; **starts a new turn** on an idle session (conversation context preserved).
 
-**취소**
+**Cancel**
 ```json
 { "type": "agent.session.input.cancel" }
 ```
-> 진행 중인 턴만 중단. 세션과 이전 작업은 남습니다. (세션 삭제와 구분)
+> Stops only the active turn. The session and prior work remain. (Distinct from deleting the session.)
 
-**도구 결과 반환**
+**Return a tool result**
 ```json
 { "type": "agent.session.input.tool_result", ... }
 ```
-> `required_actions`의 `function_call`에 대한 응답. `turn_id` + `call_id`로 대응시킵니다.
+> The response to a `function_call` in `required_actions`. Matched via `turn_id` + `call_id`.
 
-## 7. 스트리밍 이벤트 `SessionEvent` (30종, discriminator: `type`)
+## 7. Streaming events — `SessionEvent` (30, discriminator: `type`)
 
-### 세션 수명
+### Session lifecycle
 ```
 agent.session.created
 agent.session.in_progress
@@ -357,7 +362,7 @@ agent.session.failed
 error
 ```
 
-### 환경
+### Environment
 ```
 agent.session.environment.pending
 agent.session.environment.connected
@@ -366,7 +371,7 @@ agent.session.environment.disconnected
 agent.session.environment.failed
 ```
 
-### 턴 수명
+### Turn lifecycle
 ```
 agent.session.turn.created
 agent.session.turn.in_progress
@@ -375,7 +380,7 @@ agent.session.turn.failed
 agent.session.turn.cancelled
 ```
 
-### 턴 내용 스트리밍
+### Turn content streaming
 ```
 agent.session.turn.item.added
 agent.session.turn.item.done
@@ -389,20 +394,21 @@ agent.session.turn.reasoning_summary_text.delta
 agent.session.turn.reasoning_summary_text.done
 ```
 
-### 명령 출력
+### Command output
 ```
 agent.output.command_execution_output.delta
 ```
-> 이것만 `agent.session.*`이 아니라 **`agent.output.*`** 네임스페이스입니다. 파서에서 놓치기 쉬운 지점.
+> This one alone lives in the **`agent.output.*`** namespace rather than `agent.session.*`.
+> Easy to miss in a parser.
 
-### 서브에이전트
+### Subagents
 ```
 agent.session.subagent.created
 agent.session.subagent.active
 agent.session.subagent.closed
 ```
 
-### 에러 이벤트 (`SessionEventError`)
+### The error event (`SessionEventError`)
 
 ```json
 {
@@ -417,11 +423,12 @@ agent.session.subagent.closed
   }
 }
 ```
-> `SessionErrorResource`는 "Responses API 스트리밍 에러와 동일한 공개 필드"를 가진다고 스펙에 명시되어 있습니다.
+> The spec states that `SessionErrorResource` has "the same public fields as Responses API
+> streaming errors."
 
-> 스트림은 **idle 이벤트를 넘어서도 열린 채 유지**되므로 대기 중인 작업을 놓치지 않습니다.
+> The stream **stays open across idle events**, so you don't miss queued work.
 
-## 8. 턴 아이템 `SessionTurnItemResource` (14종)
+## 8. Turn items — `SessionTurnItemResource` (14)
 
 ```
 message                  reasoning
@@ -433,7 +440,8 @@ resume_subagent_call     wait_for_subagents_call
 interrupt_subagent_call  close_subagent_call
 ```
 
-뒤쪽 6개가 **멀티에이전트 조정 행위**입니다. 스트림에서 이것들을 보면 위임이 일어나는 중입니다.
+The last six are **multi-agent coordination actions**. Seeing them in the stream means delegation
+is happening.
 
 ## 9. Artifacts
 
@@ -443,37 +451,38 @@ SessionArtifactResource = {
   object: "agent.session.artifact",
   session_id: string,
   environment_id: string,
-  turn_id: string,          // 이 아티팩트를 발행한 완료된 턴
-  path: string,             // 실행 환경 내 원래 절대 경로
+  turn_id: string,          // the completed turn that published this artifact
+  path: string,             // the original absolute path in the execution environment
   size_bytes: number,
   created_at: number,
 }
 ```
 
-> **"완료된 호스팅 세션 턴이 발행한 불변 파일"** — 에이전트가 만든 산출물(리포트, CSV, 스크린샷 등)을
-> 꺼내는 공식 경로입니다. 내용은 `GET .../artifacts/{id}/content`.
+> **"An immutable file published by a completed hosted session turn."** This is the official way to
+> retrieve what the agent produced (reports, CSVs, screenshots). Fetch contents from
+> `GET .../artifacts/{id}/content`.
 
-## 10. 페이지네이션 (모든 list 엔드포인트 공통)
+## 10. Pagination (common to every list endpoint)
 
-**쿼리 파라미터**: `limit` (≥1), `order` (`asc`/`desc`, 기본 `desc`), `after` (커서)
-`GET /agents/sessions`는 `agent_id` 필터도 받습니다. `GET .../artifacts`는 `environment_id` 필터.
+**Query parameters**: `limit` (≥1), `order` (`asc`/`desc`, default `desc`), `after` (cursor).
+`GET /agents/sessions` also takes an `agent_id` filter; `GET .../artifacts` takes `environment_id`.
 
-**응답 봉투**
+**Response envelope**
 ```ts
 {
   object: "list",
-  data: T[],              // 최대 2000
+  data: T[],              // max 2000
   first_id: string | null,
   last_id: string | null,
   has_more: boolean,
 }
 ```
 
-SDK 헬퍼: `hasNextPage()` / `getNextPage()`.
+SDK helpers: `hasNextPage()` / `getNextPage()`.
 
-## 11. 최소 동작 예제
+## 11. Minimal working examples
 
-### 세션 생성 + 스트리밍 (curl)
+### Create a session with streaming (curl)
 
 ```bash
 curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
@@ -510,7 +519,7 @@ with OpenAI() as client:
             print(event.to_json(indent=None), flush=True)
 ```
 
-### 멀티에이전트 (JavaScript)
+### Multi-agent (JavaScript)
 
 ```javascript
 import OpenAI from "openai";
@@ -532,10 +541,10 @@ for await (const event of events) {
 }
 ```
 
-### 후속 메시지 / 취소 / 결과 조회
+### Follow-up, cancellation, and retrieving results
 
 ```javascript
-// 이어서 말하기 (진행 중이면 steer, idle이면 새 턴)
+// Continue the conversation (steers an active turn, or starts a new one when idle)
 await client.beta.agents.sessions.events.create(sessionId, {
   events: [{
     type: "agent.session.input.message",
@@ -543,25 +552,25 @@ await client.beta.agents.sessions.events.create(sessionId, {
   }],
 });
 
-// 진행 중인 턴 취소 (세션은 유지)
+// Cancel the active turn (the session survives)
 await client.beta.agents.sessions.events.create(sessionId, {
   events: [{ type: "agent.session.input.cancel" }],
 });
 
-// 저장된 작업 조회
+// Retrieve saved work
 const items = await client.beta.agents.sessions.items.list(sessionId, {
   order: "asc",
   limit: 100,
 });
 
-// 어떤 에이전트가 이 명령을 실행했나
+// Which agent ran this command?
 const turn = await client.beta.agents.sessions.turns.retrieve(
   command.turn_id, { session_id: sessionId }
 );
-console.log(turn.subagent_id);   // null = 메인 코디네이터
+console.log(turn.subagent_id);   // null = the main coordinator
 ```
 
-### 셀프호스팅 환경
+### Self-hosted environment
 
 ```json
 {
@@ -571,55 +580,55 @@ console.log(turn.subagent_id);   // null = 메인 코디네이터
 ```
 
 ```bash
-# 응답의 environment.remote_url / environment.id를 사용
+# Use environment.remote_url / environment.id from the response
 codex exec-server \
   --remote "<session.environment.remote_url>" \
   --environment-id "<session.environment.id>"
 ```
 
-## 12. 서브에이전트 상속 규칙
+## 12. Subagent inheritance rules
 
-**상속되는 것**
-- 설정된 MCP 도구 + 자격증명 + `allowed_tools`
-- 웹 검색 설정
-- 환경의 파일과 CLI 도구
+**Inherited**
+- Configured MCP tools, their credentials, and `allowed_tools`
+- Web search settings
+- The environment's files and command-line tools
 
-**상속되지 않는 것**
-- **function tools를 사용할 수 없음**
+**Not inherited**
+- **Subagents cannot use function tools**
 
-**위임 판단 기준** (공식 가이드):
-> 독립적인 과업(서로 다른 문서 검토, 서로 다른 실패 원인 조사)에 서브에이전트를 쓰고,
-> 의존적인 단계와 짧은 과업은 메인 에이전트에 남기세요.
+**When to delegate** (official guidance):
+> Use subagents for independent tasks — reviewing separate documents, investigating different
+> causes of a failure. Keep dependent steps and short tasks in the main agent.
 
-## 13. 실무 체크리스트
+## 13. Practical checklist
 
-- [ ] `OpenAI-Beta: agents=v1` 헤더 누락 확인 (베타)
-- [ ] **`session_id`를 애플리케이션 DB에 저장** — 재시작·연결 끊김 후 retrieve로 복구
-- [ ] `status`가 `requires_action`이면 `required_actions` 전부 처리 후에야 진행됨
-- [ ] `agent.session.idle`만으로 성공 단정 금지 — 턴 status와 출력을 함께 확인
-- [ ] `agent.output.command_execution_output.delta`는 다른 네임스페이스 — 파서 분기 주의
-- [ ] `agent`/`agent_id` 병합 규칙: 객체·배열은 **전체 치환**, `null`은 리셋, 생략은 상속
-- [ ] `environment_template_id` + 인라인 설정 혼용 시 **네트워크 정책은 넓힐 수 없음**
-- [ ] `setup_commands` 본문은 응답에 절대 안 돌아옴 — 별도로 관리
-- [ ] `usage`는 best-effort이며 **나중에 값이 바뀔 수 있음**. 정산 근거로 쓸 때 주의
-- [ ] `executor_version_incompatible` → 셀프호스팅 실행기(`@openai/codex@alpha`) 업그레이드 경로 준비
-- [ ] 산출물은 `items`가 아니라 **`artifacts`** 로 꺼냄
-- [ ] 취소는 세션 삭제가 아니라 `agent.session.input.cancel`
+- [ ] Confirm the `OpenAI-Beta: agents=v1` header is present (public beta)
+- [ ] **Store `session_id` in your application database** — recover via retrieve after a restart or disconnect
+- [ ] When `status` is `requires_action`, nothing proceeds until every required action is handled
+- [ ] Never treat `agent.session.idle` alone as success — check the turn status and the output
+- [ ] `agent.output.command_execution_output.delta` is in a different namespace — watch your parser branches
+- [ ] `agent`/`agent_id` merge rules: objects and arrays **replace the whole field**, `null` resets, omission inherits
+- [ ] When mixing `environment_template_id` with inline settings, **network policy cannot be broadened**
+- [ ] `setup_commands` bodies are never returned in responses — manage them separately
+- [ ] `usage` is best effort and **may change later**. Be careful using it for billing
+- [ ] Prepare an upgrade path for `executor_version_incompatible` (self-hosted `@openai/codex@alpha`)
+- [ ] Retrieve produced files from **`artifacts`**, not `items`
+- [ ] To stop work, send `agent.session.input.cancel` — not a session delete
 
-## 14. 재현 방법
+## 14. Reproduction
 
 ```bash
 S=/tmp/openai-spec && mkdir -p $S
 curl -sL https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -o $S/openapi.yaml
 
-# 엔드포인트 목록
+# Endpoint list
 grep -nE '^  /agents' $S/openapi.yaml
 
-# 스키마 하나 열어보기
+# Open one schema
 L=$(grep -n '^    CreateAgentSessionParams:' $S/openapi.yaml | cut -d: -f1)
 sed -n "${L},$((L+70))p" $S/openapi.yaml
 
-# 이벤트 타입 전체
+# All event types
 L=$(grep -n '^    SessionEvent:' $S/openapi.yaml | cut -d: -f1)
 sed -n "${L},$((L+130))p" $S/openapi.yaml | grep -E '^        - agent\.|^        - error'
 ```

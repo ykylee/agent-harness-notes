@@ -7,7 +7,8 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-> **Note:** the notes under `docs/` are written in Korean. This README is the English entry point.
+> **Language:** `02-app-server-protocol.md` and `08-agents-api-reference.md` are in English.
+> The remaining notes under `docs/` are still in Korean; translation is in progress.
 
 ## In one line
 
