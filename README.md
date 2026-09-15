@@ -4,6 +4,7 @@ OpenAI가 공개한 **Codex harness**(Codex 에이전트의 실행 엔진)와 �
 1차 자료(공식 블로그 / 공식 문서 / `openai/codex` 리포지터리 생성 스키마) 기준으로 정리한 문서입니다.
 
 조사 기준일: 2026-09-14
+저장소: <https://github.com/ykylee/agent-harness-notes>
 
 ## 한 줄 요약
 
@@ -47,3 +48,19 @@ codex app-server generate-json-schema   # JSON Schema 번들
 # 3. 한 턴의 실제 JSON 트래픽 전부 구경하기
 codex debug app-server send-message-v2 "run tests and summarize failures"
 ```
+
+## 라이선스
+
+이 저장소의 **노트와 정리 글**은 [MIT License](LICENSE)를 따릅니다.
+
+다만 문서 안에는 출처를 밝힌 **인용문과 코드 예제**가 포함되어 있으며, 이들에는 각자의 조건이 적용됩니다.
+
+| 대상 | 조건 |
+|---|---|
+| 이 저장소의 노트·요약·표·주석 | MIT (이 저장소) |
+| [`openai/codex`](https://github.com/openai/codex) 에서 인용한 코드·스키마 | Apache-2.0 (OpenAI) |
+| [`openai/openai-openapi`](https://github.com/openai/openai-openapi) 에서 추출한 스펙 내용 | 해당 저장소의 라이선스 (OpenAI) |
+| OpenAI 블로그·공식 문서에서 인용한 문장 | © OpenAI. 출처 표기와 함께 인용 목적으로만 포함 |
+
+이 저장소는 OpenAI와 무관한 개인 학습 노트이며, 공식 문서를 대체하지 않습니다.
+정확한 내용은 항상 [원문](docs/99-sources.md)을 확인하세요.
