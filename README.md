@@ -51,13 +51,18 @@ codex debug app-server send-message-v2 "run tests and summarize failures"
 
 ## 라이선스
 
-이 저장소의 **노트와 정리 글**은 [MIT License](LICENSE)를 따릅니다.
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
+이 저장소의 **노트와 정리 글**은 [Creative Commons Attribution 4.0 International](LICENSE)
+(CC BY 4.0)을 따릅니다. 출처를 밝히면 자유롭게 공유·수정·상업적 이용이 가능합니다.
+
+> © 2026 ykylee · <https://github.com/ykylee/agent-harness-notes> · CC BY 4.0
 
 다만 문서 안에는 출처를 밝힌 **인용문과 코드 예제**가 포함되어 있으며, 이들에는 각자의 조건이 적용됩니다.
 
 | 대상 | 조건 |
 |---|---|
-| 이 저장소의 노트·요약·표·주석 | MIT (이 저장소) |
+| 이 저장소의 노트·요약·표·주석 | **CC BY 4.0** (이 저장소) |
 | [`openai/codex`](https://github.com/openai/codex) 에서 인용한 코드·스키마 | Apache-2.0 (OpenAI) |
 | [`openai/openai-openapi`](https://github.com/openai/openai-openapi) 에서 추출한 스펙 내용 | 해당 저장소의 라이선스 (OpenAI) |
 | OpenAI 블로그·공식 문서에서 인용한 문장 | © OpenAI. 출처 표기와 함께 인용 목적으로만 포함 |
