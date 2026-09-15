@@ -29,7 +29,21 @@ Three message kinds:
 | **Unix socket** | supported | Standard HTTP upgrade handshake |
 | **off** | — | No local transport exposed |
 
-Health probes: `/readyz`, `/healthz`.
+`--listen` accepts exactly: **`stdio://` (the default)**, `unix://`, `unix://PATH`, `ws://IP:PORT`, `off`
+(`AppServerTransport::DEFAULT_LISTEN_URL = "stdio://"`).
+
+> **There is no default WebSocket port.** The listener exists only when you pass an explicit
+> `ws://IP:PORT`. A secondary source claiming a default of `127.0.0.1:9090` is not supported by the
+> repository.
+
+Health probes `/readyz` and `/healthz` are registered as routes on the WebSocket listener.
+
+WebSocket hardening, verified in `app-server-transport/src/transport/websocket.rs`:
+- **Any request carrying an `Origin` header is rejected** (`reject_requests_with_origin_header`
+  middleware) — CSRF defense, since a browser cannot suppress `Origin`
+- Binds **localhost only**; the startup notice suggests SSH port-forwarding for remote access
+- A **non-loopback listener refuses to start without auth**: "refusing to start non-loopback websocket
+  listener {addr} without auth; configure `--ws-auth capability-token` or `--ws-auth signed-bearer-token`"
 
 In hosted environments (such as Codex Web), the container's stdin/stdout are tunneled over a
 persistent connection (WebSocket-like). In other words it "behaves like stdio even if it isn't a
@@ -148,7 +162,21 @@ It is the **unit of interruption and rollback**, and contains a sequence of item
 ### Thread — the durable container for a conversation
 
 Holds multiple turns; can be created, resumed, forked, and archived, with persisted history.
-(Per secondary sources it unloads after 30 minutes idle, but the saved conversation remains.)
+
+**Unloading is time-based and configurable.** From `config_toml.rs`:
+
+> "Seconds a thread must have no subscribers and no activity before app-server unloads it.
+> **Defaults to 60**; zero unloads immediately. Changes require a server restart."
+> — `thread_unload_delay_secs`
+
+The trigger requires **both** conditions: the unload target is
+`max(has_no_subscribers_since, is_inactive_since) + delay`. Activity or a new subscriber resets it.
+
+> A secondary source describing a *30-minute* idle unload is wrong; the default is **60 seconds**.
+
+Separately, loaded threads are also evicted by **capacity** — `V2Residency` keeps an LRU
+`VecDeque<ThreadId>` bounded by `effective_agent_max_threads`. Time-based unload and capacity-based
+eviction are two different mechanisms.
 
 ## 5. A typical turn
 
@@ -510,11 +538,28 @@ RPC-level failures use the JSON-RPC error envelope. Some domains (for example us
 attach closed-set `{type, reason}` data: `invalidRequest` / `unavailable` / `cancelled` / `failed`.
 **UIs must branch on these values rather than on message text.**
 
-Known codes:
-- `-32600` — attempting `thread/archive` / `thread/delete` on a live internal worker
-- `-32601` — unsupported method (e.g. the removed `thread/rollback`)
-- `-32001` — (secondary source) ingress queue saturated: "Server overloaded; retry later."
-  Use exponential backoff with jitter
+Codes, verified in `codex-rs/app-server/src/error_code.rs`:
+
+| Code | Constant | Used for |
+|---|---|---|
+| `-32600` | `INVALID_REQUEST_ERROR_CODE` | e.g. `thread/archive` / `thread/delete` on a live internal worker; also `server_draining_error()` → "Server is draining; retry after reconnecting" |
+| `-32601` | `METHOD_NOT_FOUND_ERROR_CODE` | Unsupported method (e.g. the removed `thread/rollback`) |
+| `-32602` | `INVALID_PARAMS_ERROR_CODE` | Invalid params |
+| `-32603` | `INTERNAL_ERROR_CODE` | Internal error |
+| `-32001` | `OVERLOADED_ERROR_CODE` | Ingress queue saturated |
+
+There is also a string code `input_too_large` (`INPUT_TOO_LARGE_ERROR_CODE`).
+
+**Backpressure is real and specified.** `CHANNEL_CAPACITY = 128` ("a balance between throughput and
+memory usage"). When `try_send` on the transport event channel returns `Full` for an incoming
+*request*, the server replies:
+
+```json
+{ "id": <request id>, "error": { "code": -32001, "message": "Server overloaded; retry later." } }
+```
+
+Use exponential backoff with jitter. Note this path applies to requests; a full queue is handled
+differently for other message kinds.
 
 ## 12. Code generation — building your own bindings
 

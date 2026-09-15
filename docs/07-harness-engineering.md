@@ -229,3 +229,16 @@ it back into the repository — **always by having Codex itself write the fix.**
 | Invariants over prescriptions | Enforce layer dependency direction; leave library choice free |
 | Continuous GC | Periodic background tasks that scan for drift and open targeted PRs |
 | Move context into the repo | Migrate decisions living in chat or doc tools into versioned artifacts in the repository |
+
+## 13. A related, separately sourced result
+
+The "Codex as a platform" post states the harness effect directly:
+
+> "Harness design can materially change results: on ARC-AGI-3, retained reasoning and context
+> compaction raised GPT-5.6 Sol's score from 13.3% to 38.3% while reducing output tokens sixfold."
+
+It links a dedicated write-up: `openai.com/index/how-two-settings-tripled-our-arc-agi-3-scores/`.
+Two harness-level settings — **retained reasoning** and **context compaction** — not a model change.
+This is the concrete claim behind treating the harness as a performance variable, and it is why
+losing retained reasoning is a capability regression rather than a cosmetic one
+(see [16 §5](16-responses-chat-adapter.md)).

@@ -138,13 +138,26 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | Item | Status |
 |---|---|
 | Exact publication date of "Codex as a platform" | Secondary sources disagree: **Aug 19 vs Aug 20**. The body text says "August 2026" |
-| GPT-5.6 Sol on ARC-AGI-3: 13.3% → 38.3%, 6× fewer output tokens | Cited from secondary sources. **Original not verified** |
-| App Server WebSocket default port `127.0.0.1:9090`, CSRF (rejecting `Origin` headers) | Only mentioned in secondary sources. Not found in the repo or official docs |
-| 30-minute idle thread unload | Only mentioned in secondary sources |
-| JSON-RPC `-32001` (server overloaded) | Only mentioned in secondary sources |
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
 | Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
 | Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
+
+### Secondary-source claims, re-checked against the repository
+
+Four of the five were settled by reading the source. **Two were wrong.**
+
+| Claim | Verdict | Evidence |
+|---|---|---|
+| JSON-RPC `-32001` "Server overloaded; retry later.", queue capacity 128 | ✅ **Confirmed exactly** | `app-server/src/error_code.rs` (`OVERLOADED_ERROR_CODE`), `app-server-transport/src/transport/mod.rs` (`CHANNEL_CAPACITY = 128`, the literal message string) |
+| ARC-AGI-3: GPT-5.6 Sol 13.3% → 38.3%, output tokens sixfold lower | ✅ **Promoted to primary** | Stated verbatim in the "Codex as a platform" post itself, which links a dedicated write-up (`openai.com/index/how-two-settings-tripled-our-arc-agi-3-scores/`) |
+| WebSocket CSRF — requests with an `Origin` header are rejected | ✅ **Confirmed** | `transport/websocket.rs`, `reject_requests_with_origin_header` middleware |
+| WebSocket **default port `127.0.0.1:9090`** | ❌ **Refuted** | `AppServerTransport::DEFAULT_LISTEN_URL = "stdio://"`. No default WS port exists; `ws://IP:PORT` is explicit. `9090` appears nowhere relevant in the repo |
+| **30-minute** idle thread unload | ❌ **Refuted** | `thread_unload_delay_secs` — "Defaults to **60**; zero unloads immediately. Changes require a server restart." Requires no subscribers **and** no activity |
+
+Corrected in [02](02-app-server-protocol.md) §2, §4, §11.
+
+Still open: the exact publication date of "Codex as a platform" (Aug 19 vs 20). The page's Markdown
+carries no publication date and `last-modified` reflects the site build, not the post.
 
 ### Resolved in the adapter pass ✅
 
