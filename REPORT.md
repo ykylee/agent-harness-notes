@@ -9,6 +9,7 @@ means for building a harness of our own.
 | Primary sources | `openai/codex` repository, `openai/openai-openapi`, official documentation |
 | Output | 17 documents, ~5,000 lines |
 | Web version | <https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo> |
+| Korean edition | [REPORT.ko.md](REPORT.ko.md) · <https://claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh> |
 
 ## Summary — one requirement collides with the platform
 

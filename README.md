@@ -10,7 +10,10 @@ Repository: <https://github.com/ykylee/agent-harness-notes>
 ## Start with the report
 
 **[REPORT.md](REPORT.md)** — the findings, the requirement assessment, the verification record, and
-the recommendations they support. Also published as a [web version](https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo).
+the recommendations they support. Korean edition: **[REPORT.ko.md](REPORT.ko.md)**.
+
+Web versions: [English](https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo) ·
+[한국어](https://claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh)
 
 ## In one line
 
