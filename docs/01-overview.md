@@ -35,8 +35,8 @@ spun up to run the agent loop and manage the persistence of one Codex thread.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Clients: Web app / CLI (TUI) / VS Code·JetBrains·Xcode / │
-│           macOS Desktop / partner products                │
+│  Clients: Web app / CLI (TUI) / VS Code·JetBrains·Xcode  │
+│           / macOS Desktop / partner products             │
 └───────────────────────────┬──────────────────────────────┘
                             │  bidirectional JSON-RPC (JSONL)
 ┌───────────────────────────▼──────────────────────────────┐

@@ -248,17 +248,17 @@ processing.
 ## 9. How it relates to the open-source harness
 
 ```
-       open source                            managed
-┌──────────────────────────┐        ┌──────────────────────────┐
-│  openai/codex (Apache-2) │        │  Agents API (run by      │
-│  ├─ codex exec           │        │  OpenAI)                 │
-│  ├─ Codex SDK            │  ───▶  │  ├─ sessions             │
-│  └─ app-server           │ same   │  ├─ hosted sandboxes     │
-│      (JSON-RPC)          │harness │  ├─ subagents            │
-└──────────────────────────┘        │  └─ auto compaction      │
-       you operate it               └──────────────────────────┘
-                                     OpenAI operates it (with versioned
-                                     access aligned to model releases)
+        open source                               managed
+┌──────────────────────────┐            ┌──────────────────────────┐
+│  openai/codex (Apache-2) │            │  Agents API              │
+│  ├─ codex exec           │            │  ├─ sessions             │
+│  ├─ Codex SDK            │ ── same ──▶│  ├─ hosted sandboxes     │
+│  └─ app-server           │   harness  │  ├─ subagents            │
+│      (JSON-RPC)          │            │  └─ auto compaction      │
+└──────────────────────────┘            └──────────────────────────┘
+       you operate it                        OpenAI operates it
+                                          with versioned access aligned
+                                          to model releases
 ```
 
 *"a managed service built on the open-source Codex harness"* — **the same harness; only the
