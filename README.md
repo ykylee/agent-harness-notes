@@ -7,6 +7,11 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
+## Start with the report
+
+**[REPORT.md](REPORT.md)** — the findings, the requirement assessment, the verification record, and
+the recommendations they support. Also published as a [web version](https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo).
+
 ## In one line
 
 > A "harness" is the **execution system** that sits between a model and a task. OpenAI opened
