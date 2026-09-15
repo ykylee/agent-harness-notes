@@ -72,6 +72,26 @@ of a rendered page, so these are effectively primary sources rather than summari
 
 Base for the guide paths: `https://developers.openai.com/api/docs`.
 
+**Codex product docs** (index: `https://learn.chatgpt.com/llms.txt`, 323 entries) — also read as `.md`:
+
+| URL | Contents |
+|---|---|
+| `learn.chatgpt.com/docs/agent-approvals-security` | Sandbox/approvals, OS-level sandbox, network isolation (34KB) |
+| `learn.chatgpt.com/docs/windows/windows-sandbox` | Native Windows sandbox modes and version matrix |
+| `learn.chatgpt.com/docs/config-file/config-reference` | Full `config.toml` + `requirements.toml` reference (112KB) |
+| `learn.chatgpt.com/docs/amazon-bedrock` | Bedrock provider configuration |
+| `developers.openai.com/plugins/build/plugins` | Plugin packaging, marketplace catalog format (29KB) |
+| `developers.openai.com/plugins` | Plugin docs index |
+
+**Repository sources read directly for this pass:**
+
+| Path | Used for |
+|---|---|
+| `codex-rs/model-provider-info/src/lib.rs` | `WireApi`, `ModelProviderInfo`, built-in provider list |
+| `codex-rs/responses-api-proxy/README.md` | Provider-shaped local proxy pattern |
+| `codex-rs/windows-sandbox-rs/src/`, `windows-sandbox-service/src/` | Windows sandbox module map (**inference from the source tree, not prose docs**) |
+| `openai/openai-openapi` `openapi.yaml` | `/vaults` endpoints |
+
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
 > `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec
 > covers that ground more precisely.
@@ -112,6 +132,7 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | JSON-RPC `-32001` (server overloaded) | Only mentioned in secondary sources |
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
 | Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
+| Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
 | The list of 9 Agents API partner sandboxes | The secondary source (MarkTechPost) and the Agents SDK client table partially disagree (DigitalOcean and Oracle are absent from the SDK client table). Agents API environment options and Agents SDK sandbox providers **may be different lists**. The `environments/self-hosted` guide has a "Sandbox providers" section that should settle this — not yet extracted |
 
 ### Resolved since the first pass ✅

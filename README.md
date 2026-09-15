@@ -37,6 +37,10 @@ Repository: <https://github.com/ykylee/agent-harness-notes>
 | [11-agents-api-operations.md](docs/11-agents-api-operations.md) | Agents API webhooks, observability, tracing, and the cost model |
 | [06-choosing.md](docs/06-choosing.md) | Comparison of the integration paths and how to choose |
 | [07-harness-engineering.md](docs/07-harness-engineering.md) | Operating principles from OpenAI's internal "zero hand-written code" experiment |
+| [12-product-surface.md](docs/12-product-surface.md) | All 104 protocol methods re-read as a build checklist for a product-grade harness |
+| [13-marketplace-and-plugins.md](docs/13-marketplace-and-plugins.md) | Marketplace catalog format, plugin manifest and distribution sources |
+| [14-windows-sandbox.md](docs/14-windows-sandbox.md) | Native Windows sandbox — elevated/unelevated modes, mechanisms, policy |
+| [15-model-providers.md](docs/15-model-providers.md) | Provider configuration, and why Chat Completions support was removed |
 | [99-sources.md](docs/99-sources.md) | Source list and verification status |
 
 ## Start here
