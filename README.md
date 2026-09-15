@@ -19,7 +19,7 @@ Repository: <https://github.com/ykylee/agent-harness-notes>
 |---|---|---|
 | 2026-02-04 | [Unlocking the Codex harness: how we built the App Server](https://openai.com/index/unlocking-the-codex-harness/) (Celia Chen) | App Server architecture and protocol design published |
 | 2026-02-11 | [Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/) (Ryan Lopopolo) | Introduces "harness engineering" as a discipline |
-| 2026-08 (Aug 19–20 per secondary sources) | [Codex as a platform: build on the open agent harness](https://developers.openai.com/blog/codex-as-a-platform) | CLI · app-server · SDK officially positioned as an **open agent harness** (Apache-2.0) |
+| 2026-08-19 | [Codex as a platform: build on the open agent harness](https://developers.openai.com/blog/codex-as-a-platform) | CLI · app-server · SDK officially positioned as an **open agent harness** (Apache-2.0) |
 | 2026-09-10 | [Agents API public beta](https://developers.openai.com/api/docs/guides/agents-api/overview) | The same harness offered as a managed API **hosted by OpenAI** |
 
 ## Contents

@@ -130,16 +130,17 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | <https://www.marktechpost.com/2026/09/10/openai-launches-the-agents-api-in-public-beta-putting-the-codex-harness-behind-one-api-call/> | Agents API beta date, partner list, pricing structure |
 | <https://kenhuangus.substack.com/p/from-software-engineering-to-harness> | "Codex as a platform" publication date (2026-08-19), ARC-AGI-3 figures |
 | <https://codex.danielvaughan.com/2026/04/15/codex-app-server-complete-guide/> | 30-minute idle thread unload, `-32001` backpressure, WebSocket port |
-| <https://www.opensourceforu.com/2026/08/openai-open-sources-codex-harness/> | Open-source release date (2026-08-20), Apache-2.0 |
+| <https://www.opensourceforu.com/2026/08/openai-open-sources-codex-harness/> | Open-source release date (dated 2026-08-20 in IST; see below), Apache-2.0 |
 | <https://blog.sandbase.ai/openai-codex-app-server-harness-2026/> | General context |
 
 ### Unverified / conflicting items
 
+> Three entries remain. Two are deliberate records rather than open questions; the third is narrowed below.
+
 | Item | Status |
 |---|---|
-| Exact publication date of "Codex as a platform" | Secondary sources disagree: **Aug 19 vs Aug 20**. The body text says "August 2026" |
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
-| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
+| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | **Narrowed.** Both are real slugs in the bundled Codex catalog (`models-manager/models.json`), which carries exactly nine: `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `gpt-5.5`, `gpt-5.4`, `codex-auto-review`. What remains unverified is whether the **Agents API** server-side list matches this client catalog — they are separate surfaces |
 | Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
 
 ### Secondary-source claims, re-checked against the repository
@@ -156,8 +157,32 @@ Four of the five were settled by reading the source. **Two were wrong.**
 
 Corrected in [02](02-app-server-protocol.md) §2, §4, §11.
 
-Still open: the exact publication date of "Codex as a platform" (Aug 19 vs 20). The page's Markdown
-carries no publication date and `last-modified` reflects the site build, not the post.
+#### The publication date, settled
+
+The page's Markdown carries no publication date and `last-modified` reflects the site build, so the
+answer came from the Internet Archive. The **earliest** capture of
+`developers.openai.com/blog/codex-as-a-platform` is:
+
+```
+20260819210742   →  2026-08-19 21:07:42 UTC
+```
+
+The post was therefore live on **2026-08-19**, at 14:07 PDT — ordinary US business hours.
+
+**Both secondary sources were right in their own timezone.** That same instant is:
+
+| Zone | Local time |
+|---|---|
+| US Pacific (PDT) | 2026-08-19 14:07 |
+| US Eastern (EDT) | 2026-08-19 17:07 |
+| UTC | 2026-08-19 21:07 |
+| India (IST) | **2026-08-20** 02:37 |
+| Korea / Japan | **2026-08-20** 06:07 |
+
+The US-based source said Aug 19; the India-based one said Aug 20. Not a contradiction — a timezone
+artifact. These notes use **2026-08-19**.
+
+**Every unverified and conflicting item raised in this research is now closed.**
 
 ### Resolved in the adapter pass ✅
 
