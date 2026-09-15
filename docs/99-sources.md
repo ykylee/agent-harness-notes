@@ -101,6 +101,9 @@ Base for the guide paths: `https://developers.openai.com/api/docs`.
 | `codex-rs/models-manager/src/manager.rs`, `src/model_info.rs` | Slug resolution: longest-prefix match, namespace strip, fallback |
 | `codex-rs/protocol/src/openai_models.rs` | `ModelInfo` field list and defaults |
 
+Also read: `.../guides/agents-api/environments/self-hosted.md` §Sandbox providers and
+`.../guides/agents/sandboxes.md` §Sandbox providers — the two provider rosters.
+
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
 > `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec
 > covers that ground more precisely.
@@ -142,7 +145,6 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
 | Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
 | Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
-| The list of 9 Agents API partner sandboxes | The secondary source (MarkTechPost) and the Agents SDK client table partially disagree (DigitalOcean and Oracle are absent from the SDK client table). Agents API environment options and Agents SDK sandbox providers **may be different lists**. The `environments/self-hosted` guide has a "Sandbox providers" section that should settle this — not yet extracted |
 
 ### Resolved in the adapter pass ✅
 
@@ -158,6 +160,7 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 |---|---|
 | "Synthesize 25 SSE events; this is the bulk of the work" | Only **12** are handled and **7** suffice. Tool-call argument streaming is ignored entirely. Streaming is smaller than estimated |
 | `AdditionalTools` listed as a droppable Responses-native variant | In `responses_lite` mode it **is** the tool list — not droppable. A second request shape was missed |
+| The two 9-entry sandbox provider lists looked contradictory | **Both sources were correct.** They are different rosters for different products — 7 shared, DigitalOcean + OCI are Agents-API-only, Unix-local + Docker are SDK-only. [09 §8](09-agents-api-environments.md) |
 | "Whether lite mode is reachable is worth pinning down" (left open) | Resolved: it is a per-model catalog flag, **true for every current-generation model**, resolved by longest-prefix slug matching, with no `config.toml` override. [16 §10.2](16-responses-chat-adapter.md) |
 
 ### Resolved since the first pass ✅

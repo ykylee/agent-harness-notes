@@ -236,3 +236,53 @@ Outbound access required: `https://api.openai.com` and `wss://codex-cloud-enviro
 | A sandbox request is blocked | Check `network` and any hosts reached through redirects |
 | A live file operation fails | Confirm the sandbox is `connected`. If it expired, create a new session and supply the inputs again |
 | A status or file-list request returns `5xx` | Retry with increasing delays and a deadline. Keep the request ID if the error persists |
+
+## 8. Two provider lists that are easy to confuse
+
+There are **two different rosters**, each with nine entries — which is exactly why they look like a
+contradiction. They belong to different products.
+
+### Agents API — self-hosted environment providers
+
+Cloud providers that host an environment the **managed harness** connects to. Each has its own setup
+guide at `.../api/docs/guides/agents-api/environments/providers/<name>`.
+
+| Provider | Guide slug |
+|---|---|
+| Modal | `modal` |
+| Cloudflare | `cloudflare` |
+| Vercel | `vercel` |
+| Daytona | `daytona` |
+| Blaxel | `blaxel` |
+| E2B | `e2b` |
+| Runloop | `runloop` |
+| **DigitalOcean** | `digitalocean` |
+| **Oracle Cloud Infrastructure (OCI)** | `oci` |
+
+### Agents SDK — sandbox clients
+
+Client classes you instantiate when running the **harness in your own infrastructure**.
+
+| Provider | SDK client |
+|---|---|
+| **Unix-local** | `UnixLocalSandboxClient` |
+| **Docker** | `DockerSandboxClient` |
+| Blaxel | `BlaxelSandboxClient` |
+| Cloudflare | `CloudflareSandboxClient` |
+| Daytona | `DaytonaSandboxClient` |
+| E2B | `E2BSandboxClient` |
+| Modal | `ModalSandboxClient` |
+| Runloop | `RunloopSandboxClient` |
+| Vercel | `VercelSandboxClient` |
+
+### The delta
+
+| | Providers |
+|---|---|
+| **Both lists** | Blaxel, Cloudflare, Daytona, E2B, Modal, Runloop, Vercel (7) |
+| **Agents API only** | DigitalOcean, Oracle Cloud Infrastructure |
+| **Agents SDK only** | Unix-local, Docker — local runtimes, not cloud partners |
+
+So the earlier conflict was not an error in either source: DigitalOcean and OCI really are absent from
+the SDK client table, and Unix-local and Docker really are absent from the Agents API list. **Pick the
+roster that matches who runs the harness**, not the one that matches the provider you already use.

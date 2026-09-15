@@ -77,7 +77,9 @@ When a session returns `requires_action`, the response contains an array of pend
 
 1. **OpenAI-hosted** — running on Codex/ChatGPT infrastructure
 2. **Self-hosted** — connect your own environment via `codex exec-server`
-3. **Partner providers** — Blaxel, Cloudflare, Daytona, DigitalOcean, E2B, Modal, Oracle, Runloop, Vercel
+3. **Partner providers** (self-hosted environments) — Modal, Cloudflare, Vercel, Daytona, Blaxel, E2B,
+   Runloop, DigitalOcean, Oracle Cloud Infrastructure (OCI). Each has its own setup guide at
+   `.../agents-api/environments/providers/<name>`
 4. **No sandbox**
 
 ### The architectural boundary (important)
@@ -188,6 +190,10 @@ result = await Runner.run(
 ### Switching providers
 
 Change the run configuration only — the agent definition stays the same.
+
+> **This is a different list from the Agents API's.** These are SDK sandbox *clients* you drive from
+> your own process; the Agents API list above is cloud providers that host a *self-hosted environment*
+> for the managed harness. See [09 §8](09-agents-api-environments.md).
 
 | Provider | Client |
 |---|---|
