@@ -96,6 +96,7 @@ Base for the guide paths: `https://developers.openai.com/api/docs`.
 | `codex-rs/protocol/src/models.rs` | `ResponseItem` — 18 input item variants |
 | `codex-rs/codex-api/src/sse/responses.rs` | The 25 SSE event types Codex parses |
 | `codex-rs/core/src/client_common.rs` | `Prompt` — the pre-serialization turn payload |
+| `codex-rs/tools/src/tool_spec.rs`, `tools/src/responses_api.rs` | `ToolSpec` (5 variants), `ResponsesApiTool`, `ResponsesApiNamespace`, `FreeformTool` |
 
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
 > `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec
@@ -139,6 +140,21 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | Values appearing in doc examples. The list of available models needs separate verification |
 | Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
 | The list of 9 Agents API partner sandboxes | The secondary source (MarkTechPost) and the Agents SDK client table partially disagree (DigitalOcean and Oracle are absent from the SDK client table). Agents API environment options and Agents SDK sandbox providers **may be different lists**. The `environments/self-hosted` guide has a "Sandbox providers" section that should settle this — not yet extracted |
+
+### Resolved in the adapter pass ✅
+
+| Item | Resolution |
+|---|---|
+| `response.new_tool_event`, `response.metadata` | Neither needs a Chat-side source. `new_tool_event` is unhandled (its test is named `"unknown"`); `metadata` carries only OpenAI-platform side channels. [16 §9.1](16-responses-chat-adapter.md) |
+| `stream_options.reasoning_summary_delivery` | Never sent to a non-OpenAI provider — gated on `is_openai()`, a literal provider-name comparison. [16 §9.2](16-responses-chat-adapter.md) |
+| `ResponsesApiTools` shape | `ToolSpec` has 5 variants. Function tools re-wrap mechanically (flat → nested), but **namespaces need bidirectional name rewriting** and **freeform tools lose their grammar**. [16 §9.3](16-responses-chat-adapter.md) |
+
+### Corrections this pass made to earlier claims
+
+| Earlier claim | Correction |
+|---|---|
+| "Synthesize 25 SSE events; this is the bulk of the work" | Only **12** are handled and **7** suffice. Tool-call argument streaming is ignored entirely. Streaming is smaller than estimated |
+| `AdditionalTools` listed as a droppable Responses-native variant | In `responses_lite` mode it **is** the tool list — not droppable. A second request shape was missed |
 
 ### Resolved since the first pass ✅
 
