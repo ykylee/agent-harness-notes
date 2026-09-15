@@ -1,17 +1,17 @@
 # 03. Codex SDK (TypeScript / Python)
 
-SDK는 **`codex` CLI를 자식 프로세스로 띄우고 stdin/stdout으로 JSONL 이벤트를 교환**하는 래퍼입니다.
-JSON-RPC 클라이언트를 직접 만들 필요 없이 네이티브 라이브러리 인터페이스를 제공합니다.
+The SDKs are wrappers that **spawn the `codex` CLI as a child process and exchange JSONL events
+over stdin/stdout**. They give you a native library interface without writing a JSON-RPC client.
 
 ## 1. TypeScript SDK
 
-### 설치
+### Installation
 
 ```bash
 npm install @openai/codex-sdk    # Node.js 18+
 ```
 
-### 기본
+### Basics
 
 ```typescript
 import { Codex } from "@openai/codex-sdk";
@@ -24,16 +24,16 @@ console.log(turn.finalResponse);
 console.log(turn.items);
 ```
 
-같은 `Thread` 인스턴스에 `run()`을 반복 호출하면 대화가 이어집니다.
+Call `run()` repeatedly on the same `Thread` instance to continue that conversation.
 
 ```typescript
 const nextTurn = await thread.run("Implement the fix");
 ```
 
-### 스트리밍
+### Streaming
 
-`run()`은 턴이 끝날 때까지 이벤트를 버퍼링합니다. 중간 진행(도구 호출, 스트리밍 응답, 파일 변경)을
-받으려면 `runStreamed()`:
+`run()` buffers events until the turn finishes. To react to intermediate progress — tool calls,
+streaming responses, file change notifications — use `runStreamed()`:
 
 ```typescript
 const { events } = await thread.runStreamed("Diagnose the test failure and propose a fix");
@@ -50,10 +50,10 @@ for await (const event of events) {
 }
 ```
 
-> 이벤트 이름이 App Server의 `item/completed`가 아니라 **`item.completed`(점 표기)**임에 주의.
-> SDK는 별도 이벤트 표면을 씁니다.
+> Note the event names use **dot notation (`item.completed`)**, not the App Server's
+> `item/completed`. The SDK exposes its own event surface.
 
-### 구조화된 출력
+### Structured output
 
 ```typescript
 const schema = {
@@ -70,7 +70,7 @@ const turn = await thread.run("Summarize repository status", { outputSchema: sch
 console.log(turn.finalResponse);
 ```
 
-Zod에서 변환할 때는 `zod-to-json-schema`의 `target: "openAi"`:
+Converting from Zod requires `zod-to-json-schema` with `target: "openAi"`:
 
 ```typescript
 const schema = z.object({
@@ -83,9 +83,9 @@ const turn = await thread.run("Summarize repository status", {
 });
 ```
 
-### 이미지 첨부
+### Attaching images
 
-텍스트 항목은 최종 프롬프트로 합쳐지고, 이미지 항목은 CLI의 `--image`로 전달됩니다.
+Text entries are concatenated into the final prompt; image entries are passed to the CLI via `--image`.
 
 ```typescript
 const turn = await thread.run([
@@ -95,9 +95,9 @@ const turn = await thread.run([
 ]);
 ```
 
-### 스레드 재개
+### Resuming a thread
 
-스레드는 `~/.codex/sessions`에 영속화됩니다.
+Threads are persisted in `~/.codex/sessions`.
 
 ```typescript
 const savedThreadId = process.env.CODEX_THREAD_ID!;
@@ -105,9 +105,9 @@ const thread = codex.resumeThread(savedThreadId);
 await thread.run("Implement the fix");
 ```
 
-### 작업 디렉터리
+### Working directory
 
-기본은 현재 디렉터리이며, **복구 불가능한 오류를 막기 위해 Git 리포지터리일 것을 요구**합니다.
+Defaults to the current directory, and **requires a Git repository to avoid unrecoverable errors.**
 
 ```typescript
 const thread = codex.startThread({
@@ -116,7 +116,7 @@ const thread = codex.startThread({
 });
 ```
 
-### CLI 환경 통제 (Electron 등 샌드박스 호스트용)
+### Controlling the CLI environment (for sandboxed hosts like Electron)
 
 ```typescript
 const codex = new Codex({
@@ -124,12 +124,13 @@ const codex = new Codex({
 });
 ```
 
-SDK는 그 위에 필요한 변수(`CODEX_API_KEY` 등)를 주입합니다.
-`baseUrl`을 설정하면 `--config openai_base_url=...` 오버라이드로 전달됩니다.
+The SDK injects its required variables (such as `CODEX_API_KEY`) on top of what you provide.
+If you set `baseUrl`, it is passed as a `--config openai_base_url=...` override.
 
-### `--config` 오버라이드
+### `--config` overrides
 
-JSON 객체를 받아 점 표기 경로로 평탄화하고 TOML 리터럴로 직렬화해 반복 `--config key=value` 플래그로 전달:
+A JSON object is flattened into dotted paths, serialized as TOML literals, and passed as repeated
+`--config key=value` flags:
 
 ```typescript
 const codex = new Codex({
@@ -140,7 +141,7 @@ const codex = new Codex({
 });
 ```
 
-점 표기로 표현 불가능한 키는 `configOverrides`로 raw TOML 전달:
+Keys that cannot be expressed as dotted paths go through `configOverrides` as raw TOML:
 
 ```typescript
 const codex = new Codex({
@@ -149,19 +150,21 @@ const codex = new Codex({
 });
 ```
 
-**우선순위**: 구조화 `config` → raw `configOverrides` → SDK 관리 설정(`baseUrl`) 및 thread 옵션 (뒤가 이김).
+**Precedence**: structured `config` → raw `configOverrides` → SDK-managed settings (`baseUrl`) and
+thread options (later wins).
 
 ## 2. Python SDK
 
-### 설치
+### Installation
 
 ```bash
 pip install openai-codex    # Python 3.10+
 ```
 
-`openai-codex-cli-bin` 런타임 의존성이 자동 설치되며, 안정 SDK 릴리스는 대응하는 안정 CLI 릴리스를 추적합니다.
+The matching `openai-codex-cli-bin` runtime dependency installs automatically; stable SDK releases
+track the corresponding stable CLI release.
 
-### 기본
+### Basics
 
 ```python
 from openai_codex import Codex
@@ -172,10 +175,10 @@ with Codex() as codex:
     print(result.final_response)
 ```
 
-`thread.run(...)`은 `TurnResult`(최종 응답 + 수집된 items + 토큰 사용량)를 반환합니다.
-평문 문자열은 `TextInput(...)`의 축약형입니다.
+`thread.run(...)` returns a `TurnResult` containing the final response, collected items, and token
+usage. Plain strings are shorthand for `TextInput(...)`.
 
-### 샌드박스 프리셋
+### Sandbox presets
 
 ```python
 from openai_codex import Codex, Sandbox
@@ -186,53 +189,54 @@ with Codex() as codex:
     review = thread.run("Review the diff only.", sandbox=Sandbox.read_only)
 ```
 
-| 프리셋 | 의미 |
+| Preset | Meaning |
 |---|---|
-| `Sandbox.read_only` | 읽기만 |
-| `Sandbox.workspace_write` | 워크스페이스 + 설정된 쓰기 가능 루트에 쓰기 (일반적 기본값) |
-| `Sandbox.full_access` | 파일시스템 제약 없음 |
+| `Sandbox.read_only` | Read files without allowing writes |
+| `Sandbox.workspace_write` | Read, and write inside the workspace and configured writable roots (the normal default) |
+| `Sandbox.full_access` | No filesystem restrictions |
 
-**턴 단위 오버라이드는 이후 턴에도 적용**됩니다 (App Server의 sticky 시맨틱과 동일).
+**A turn-level override also applies to subsequent turns** — the same sticky semantics as the
+App Server.
 
-### 스트리밍 / steering / interrupt
+### Streaming / steering / interrupting
 
-`Thread.run(...)`은 완료까지 대기합니다.
-스트리밍·steer·interrupt가 필요하면 `Thread.turn(...)`으로 **`TurnHandle`**을 받으세요.
+`Thread.run(...)` waits for completion. When you need to stream, steer, or interrupt, use
+`Thread.turn(...)` to get a **`TurnHandle`**.
 
-### 신뢰할 수 없는 입력 — `ExternalMessage`
+### Untrusted input — `ExternalMessage`
 
-다른 에이전트/도구/애플리케이션에서 온 **신뢰할 수 없는 콘텐츠**는
-`ExternalMessage`로 전달해야 합니다.
+**Untrusted content** from another agent, tool, or application must be passed as an
+`ExternalMessage`.
 
-> 이것은 도구 수준 권한은 유지하되 **사용자 승인/권한을 부여하지 않습니다.**
-> 평문 문자열과 `TextInput`은 *사용자 입력*을 의미합니다.
+> It retains tool-level authority and **does not establish user authorization or approval.**
+> Plain strings and `TextInput` represent *user* input.
 
-프롬프트 인젝션 대응이 타입 레벨로 들어와 있는 부분이라 실무에서 반드시 지켜야 합니다.
+This is prompt-injection defense expressed at the type level — worth honoring strictly in practice.
 
-### 인증
+### Authentication
 
 ```python
-# ChatGPT 브라우저 로그인
+# ChatGPT browser login
 with Codex() as codex:
     login = codex.login_chatgpt()
     print(login.auth_url)
     print(login.wait().success)
 
-# 디바이스 코드
+# Device code
 with Codex() as codex:
     login = codex.login_chatgpt_device_code()
     print(login.verification_url, login.user_code)
     login.wait()
 
-# API 키
+# API key
 with Codex() as codex:
     codex.login_api_key("sk-...")
     print(codex.account().account)
 ```
 
-기존 Codex 인증이 있으면 자동 재사용됩니다.
+Existing Codex authentication is reused automatically.
 
-### 비동기
+### Async
 
 ```python
 import asyncio
@@ -247,7 +251,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-### 스레드 재개
+### Resuming a thread
 
 ```python
 with Codex() as codex:
@@ -255,21 +259,23 @@ with Codex() as codex:
     print(thread.run("Continue where we left off.").final_response)
 ```
 
-### 내장 도움말
+### Built-in help
 
 ```python
 import openai_codex
 from openai_codex import Codex, CodexConfig
 help(openai_codex); help(Codex); help(CodexConfig)
-# 또는 python -m pydoc openai_codex
+# or: python -m pydoc openai_codex
 ```
 
-## 3. SDK vs App Server
+## 3. SDK vs. App Server
 
-블로그의 솔직한 평가:
+A candid assessment from the blog post:
 
-> Codex SDK는 App Server보다 **먼저 출시**되었기 때문에 현재 지원 언어가 적고 표면적이 좁다.
-> 개발자 수요가 있다면 App Server 프로토콜을 감싸는 추가 SDK를 만들어,
-> JSON-RPC 바인딩을 직접 쓰지 않고도 harness 표면을 더 넓게 커버하게 할 수 있다.
+> Since the Codex SDK **shipped earlier** than the App Server, it currently supports fewer languages
+> and a smaller surface area. If there is developer interest, we may add additional SDKs that wrap
+> the App Server protocol so teams can cover more of the harness surface without writing JSON-RPC
+> bindings.
 
-즉 **SDK ⊂ App Server** 관계이며, 앞으로 SDK가 App Server 위로 재구축될 가능성이 언급되어 있습니다.
+In other words the relationship is **SDK ⊂ App Server**, with the possibility that the SDKs get
+rebuilt on top of the App Server later.

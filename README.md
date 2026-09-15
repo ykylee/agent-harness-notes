@@ -7,9 +7,6 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-> **Language:** `02-app-server-protocol.md` and `08-agents-api-reference.md` are in English.
-> The remaining notes under `docs/` are still in Korean; translation is in progress.
-
 ## In one line
 
 > A "harness" is the **execution system** that sits between a model and a task. OpenAI opened

@@ -1,156 +1,162 @@
-# 05. Agents API — 관리형(호스팅) Codex Harness
+# 05. Agents API — the Managed (Hosted) Codex Harness
 
-**2026-09-10 퍼블릭 베타.** 지금까지 Codex를 돌려온 제어 계층(세션 관리, 컨텍스트 컴팩션,
-실패 복구, 멀티 에이전트 조정)을 **OpenAI가 직접 운영하는 API**로 떼어낸 것.
+**Public beta on 2026-09-10.** OpenAI extracted the control layer it had been using to run Codex —
+session management, context compaction, failure recovery, multi-agent coordination — and turned it
+into **an API that OpenAI itself operates**.
 
-> 엔드포인트·스키마·이벤트의 **정확한 정의는 [08-agents-api-reference.md](08-agents-api-reference.md)** 에 있습니다.
-> 이 문서는 개념과 사용 시나리오를 다룹니다.
+> The **exact definitions** of endpoints, schemas, and events live in
+> [08-agents-api-reference.md](08-agents-api-reference.md).
+> This document covers concepts and usage scenarios.
 
-공식 표현: *"application access to OpenAI's managed Codex harness through an API."*
-OpenAI가 세션·오케스트레이션·컨텍스트 관리·복구를 담당하고,
-애플리케이션은 **도구를 제공하고 실행 환경을 고른다.**
+Official wording: *"application access to OpenAI's managed Codex harness through an API."*
+OpenAI handles sessions, orchestration, context management, and recovery, while the application
+**provides tools and chooses the execution environment.**
 
-## 1. 핵심 객체
+## 1. Core objects
 
-| 객체 | 정의 |
+| Object | Definition |
 |---|---|
-| **Agent** | 모델 + 지시문(instructions) + 도구 + MCP 서버 |
-| **Environment** | 선택적 샌드박스/컴퓨터. 파일 접근, skill 로딩, 명령 실행 |
-| **Session** | 과업을 수행하고 입력에 반응하는 **지속되는 에이전트 인스턴스** |
-| **Events / Items** | 세션에 보내는 입력과 세션이 만드는 출력 |
+| **Agent** | Model + instructions + tools + MCP servers |
+| **Environment** | An optional sandbox or computer: file access, skill loading, command execution |
+| **Session** | A **persistent instance of an agent** that works on tasks and responds to input |
+| **Events / Items** | Inputs sent to a session and outputs it produces |
 
-## 2. 세션 수명주기
+## 2. Session lifecycle
 
-1. 에이전트 설정과 함께 **세션 생성**
-2. 사용자 입력으로 **과업 부여**
-3. **스트리밍 또는 웹훅**으로 진행 관찰
-4. 추가 과업 전달 또는 진행 중인 턴 **steer**
+1. **Create a session** with the agent configuration
+2. **Provide a task** via user input
+3. Monitor progress through **streaming or webhooks**
+4. Send additional tasks, or **steer** the current turn
 
-## 3. 관리형 harness가 제공하는 것
+## 3. What the managed harness provides
 
-- 샌드박스에서 명령/코드 실행
-- skills 및 지시문 적용
-- 도구 또는 MCP로 외부 데이터 연결
-- **작업 도중 steering**
-- 컨텍스트 한계 근처에서 **자동 컴팩션** ("automatically compacts earlier context as a session nears its limit")
-- **서브에이전트**에 하위 과업 위임
-- 세션 재개
-- **Tool search** — 도구 정의를 선택적으로 로드해 토큰 절감
-- **프로그래매틱 툴 콜링** — 병렬 실행
+- Command and code execution in a sandbox
+- Applying skills and instructions
+- Connecting external data via tools or MCP
+- **Steering mid-work**
+- **Automatic compaction** as a session nears its context limit
+  ("automatically compacts earlier context as a session nears its limit")
+- **Subagent** delegation
+- Session resumption
+- **Tool search** — loading tool definitions selectively to save tokens
+- **Programmatic tool calling** — parallel execution
 
-## 4. 엔드포인트 (SDK 기준)
+## 4. Endpoints (as used through the SDKs)
 
-SDK: JavaScript, Python, Go, Java, Ruby, curl 6종 예제 제공.
+SDKs: examples are provided in JavaScript, Python, Go, Java, Ruby, and curl.
 
 ```javascript
-// 세션 생성
+// Create a session
 client.beta.agents.sessions.create({ /* agent, environment, input */ })
 ```
 
-| 작업 | 설명 |
+| Operation | Description |
 |---|---|
-| create | 에이전트 설정 + 환경 + 초기 입력으로 세션 생성 |
-| list | 페이지네이션 (`hasNextPage()`, `getNextPage()` 헬퍼) |
-| retrieve | ID로 상태 / 에이전트 설정 / 환경 / **required actions** 조회 |
-| delete | 논리 삭제 (비동기 정리 가능). 대화를 남기고 현재 작업만 멈추려면 **turn cancel** |
+| create | Create a session from an agent configuration, environment, and initial input |
+| list | Paginated (`hasNextPage()`, `getNextPage()` helpers) |
+| retrieve | Inspect status, agent configuration, environment, and **required actions** by ID |
+| delete | Logical deletion (cleanup may be asynchronous). To stop current work but keep the conversation, **cancel the turn** instead |
 
-> **세션 ID를 애플리케이션 데이터스토어에 저장**하는 것이 전제입니다.
-> 재시작·연결 끊김 후에는 세션을 retrieve해서 밀린 작업을 확인하세요.
+> The API assumes you **store the session ID in your application's data store.**
+> After a restart or disconnect, retrieve the session to identify pending work.
 
-### `requires_action` 처리
+### Handling `requires_action`
 
-세션이 `requires_action` 상태를 반환하면 응답에 대기 중 액션 배열이 들어옵니다.
+When a session returns `requires_action`, the response contains an array of pending actions.
 
-| 액션 | 처리 |
+| Action | How to handle |
 |---|---|
-| **Function calls** | 지정 함수를 실행하고 `turn_id` + `call_id`로 결과 반환 |
-| **Environment connections** | `environment_id`로 외부 환경에 연결 수립 |
+| **Function calls** | Execute the specified function and return the result using `turn_id` + `call_id` |
+| **Environment connections** | Establish the connection using `environment_id` |
 
-## 5. 실행 환경 (샌드박스)
+## 5. Execution environments (sandboxes)
 
-### 옵션
+### Options
 
-1. **OpenAI 호스팅** — Codex/ChatGPT 인프라 사용
-2. **셀프호스팅** — `codex exec-server`로 내 환경에 연결
-3. **파트너 제공자** — Blaxel, Cloudflare, Daytona, DigitalOcean, E2B, Modal, Oracle, Runloop, Vercel
-4. **샌드박스 없음**
+1. **OpenAI-hosted** — running on Codex/ChatGPT infrastructure
+2. **Self-hosted** — connect your own environment via `codex exec-server`
+3. **Partner providers** — Blaxel, Cloudflare, Daytona, DigitalOcean, E2B, Modal, Oracle, Runloop, Vercel
+4. **No sandbox**
 
-### 아키텍처 경계 (중요)
+### The architectural boundary (important)
 
-> **harness(컨트롤 플레인)** — 에이전트 루프, 모델 호출, 라우팅
-> **compute(실행 플레인)** — 파일, 명령, 상태
+> **harness (control plane)** — the agent loop, model calls, routing
+> **compute (execution plane)** — files, commands, state
 
-이 경계 덕분에 **민감한 오케스트레이션은 신뢰 인프라에 남기고, 샌드박스는 제공자별 실행만** 담당합니다.
+This boundary is what allows **sensitive orchestration to stay in trusted infrastructure while
+sandboxes handle provider-specific execution.**
 
-### 셀프호스팅 연결 절차
+### Connecting a self-hosted environment
 
 ```bash
-# 1. 워크스페이스 준비
+# 1. Prepare the workspace
 mkdir -p /workspace
 npm install -g @openai/codex@alpha
 ```
 
-네트워크: `https://api.openai.com` 과 `wss://codex-cloud-environments.chatgpt.com`으로의
-**아웃바운드**만 열면 됩니다 (모든 연결이 내 환경 → OpenAI 방향).
+Networking: you only need **outbound** access to `https://api.openai.com` and
+`wss://codex-cloud-environments.chatgpt.com` (all connections flow from your environment to OpenAI).
 
-인증: 플랫폼 대시보드 Agents 탭에서 **제한된 executor 키**를 발급해 `CODEX_API_KEY`로 주입.
+Authentication: generate a **restricted executor key** in the platform dashboard's Agents tab and
+supply it as `CODEX_API_KEY`.
 
 ```bash
-# 2. 세션 생성 시 environment를 self_hosted로
+# 2. Create the session with a self_hosted environment
 #    { "type": "self_hosted", "workspace_directory": "/workspace" }
 
-# 3. 내 환경 안에서 실행기 기동
+# 3. Start the executor inside your environment
 codex exec-server \
   --remote "<session.environment.remote_url>" \
   --environment-id "<session.environment.id>"
 ```
 
-실행기는 environment ID와 제한된 API 키로 등록하고 **WebSocket으로 명령을 받아 결과를 반환**합니다.
+The executor registers using the environment ID and the restricted API key, then **connects over
+WebSocket to receive commands and return results.**
 
-연결 상태 이벤트: `agent.session.environment.pending` → `connected` / `failed`.
+Connection state events: `agent.session.environment.pending` → `connected` / `failed`.
 
-## 6. 샌드박스 에이전트 (Agents SDK 쪽)
+## 6. Sandbox agents (the Agents SDK side)
 
-> 아래는 **Agents SDK로 harness를 내 인프라에서 돌리는** 경로입니다.
-> Agents API(관리형)와 구분하세요.
+> What follows is the path for **running the harness in your own infrastructure with the Agents SDK**.
+> Keep it distinct from the managed Agents API.
 
-### 언제 샌드박스를 쓰나
+### When to use a sandbox
 
-- 과업이 단일 프롬프트가 아니라 **문서 디렉터리**를 요구할 때
-- 에이전트가 나중에 검사할 파일을 써야 할 때
-- 명령·패키지·스크립트가 개입할 때
-- 산출물(Markdown, CSV, 스크린샷, 웹사이트)을 만들 때
-- 노출된 포트에서 서비스/프리뷰가 떠야 할 때
-- 사람 검토를 위해 멈췄다가 **같은 워크스페이스에서 재개**할 때
+- The task requires a **directory of documents**, not a single prompt
+- The agent must write files for later inspection
+- Commands, packages, or scripts are involved
+- The work produces artifacts (Markdown, CSV, screenshots, websites)
+- Services or previews must run on exposed ports
+- Work pauses for human review and then **resumes in the same workspace**
 
-짧은 모델 응답만 필요하면 샌드박스는 불필요합니다.
+Skip the sandbox when you only need a brief model response.
 
-### Manifest — 시작 워크스페이스 정의
+### Manifest — defining the starting workspace
 
-| 항목 | 설명 |
+| Entry | Description |
 |---|---|
-| File / Dir 엔트리 | 작은 합성 입력, 헬퍼 파일 |
-| 로컬 경로 | 호스트 파일을 샌드박스로 실체화 |
-| Git 리포 | 워크스페이스로 fetch |
-| 클라우드 마운트 | S3, GCS, R2, Azure Blob, Box, FileMounts |
-| 환경 변수 | 기동 시 필요한 값 |
-| OS 계정 | 지원 제공자 한정, 사용자/그룹 |
+| File / Dir entries | Small synthetic inputs, helper files |
+| Local paths | Host files materialized into the sandbox |
+| Git repos | Repositories fetched into the workspace |
+| Cloud mounts | S3, GCS, R2, Azure Blob, Box, FileMounts |
+| Environment variables | Values needed at startup |
+| OS accounts | Users and groups, for supported providers |
 
-경로는 **워크스페이스 상대경로**여야 하며 절대경로/이스케이프 시퀀스 불가.
+Paths must be **workspace-relative**, with no absolute paths or escape sequences.
 
 ### Capabilities
 
-`SandboxAgent` 기본값: filesystem + shell + compaction.
+`SandboxAgent` defaults: filesystem + shell + compaction.
 
-| Capability | 목적 |
+| Capability | Purpose |
 |---|---|
-| `Shell` | 명령 실행, 대화형 입력 |
-| `Filesystem` | 파일 편집, 이미지 검사 |
-| `Skills` | skill 탐색/실체화 |
-| `Memory` | 실행 간 교훈 유지 |
-| `Compaction` | 장기 실행용 컨텍스트 트리밍 |
+| `Shell` | Command execution, interactive input |
+| `Filesystem` | File editing, image inspection |
+| `Skills` | Skill discovery and materialization |
+| `Memory` | Retain lessons across runs |
+| `Compaction` | Context trimming for long-running flows |
 
-### 실행
+### Running
 
 ```javascript
 const manifest = new Manifest({ entries: { /* ... */ } });
@@ -177,11 +183,11 @@ result = await Runner.run(
 )
 ```
 
-### 제공자 전환
+### Switching providers
 
-에이전트 정의를 바꾸지 않고 **run 설정만** 바꿔 제공자를 갈아끼웁니다.
+Change the run configuration only — the agent definition stays the same.
 
-| 제공자 | 클라이언트 |
+| Provider | Client |
 |---|---|
 | Unix-local | `UnixLocalSandboxClient` |
 | Docker | `DockerSandboxClient` |
@@ -193,64 +199,67 @@ result = await Runner.run(
 | Runloop | `RunloopSandboxClient` |
 | Vercel | `VercelSandboxClient` |
 
-개발은 Unix-local, 컨테이너 격리는 Docker로 시작 권장.
+Start with Unix-local for development, Docker for container isolation.
 
-### 상태 3종과 해석 순서
+### Three kinds of state, and their resolution order
 
-| 개념 | 내용 |
+| Concept | Contents |
 |---|---|
-| **RunState** | harness 쪽 모델 아이템, 도구 상태, 승인 |
-| **Session state** | 재연결용으로 직렬화된 샌드박스 세션 |
-| **Snapshot** | 새 세션을 시드하기 위해 저장한 워크스페이스 내용 |
+| **RunState** | Harness-side model items, tool state, approvals |
+| **Session state** | A serialized sandbox session for reconnection |
+| **Snapshot** | Saved workspace contents for seeding a fresh session |
 
-해석 순서: **살아있는 세션 → 재개된 RunState → 명시적 직렬화 상태 → 새 세션**
+Resolution order: **live session → resumed RunState → explicit serialized state → fresh session**
 
-### Sandbox Memory
+### Sandbox memory
 
-메시지 히스토리와 **별도로** 재사용 가능한 교훈을 실행 간 유지합니다.
-
-```
-memory_summary.md      # 상위 요약
-MEMORY.md              # 통합 교훈
-raw_memories/          # 실행별 요약
-rollout_summaries/     # 상세 롤아웃
-```
-
-### 조합
-
-- **Handoffs** — 워크스페이스 중심 과업을 샌드박스 에이전트로 라우팅
-- **Tools** — 샌드박스 에이전트를 독립 설정을 가진 중첩 도구로 호출
-
-## 7. 관측
-
-`platform.openai.com/logs?api=agents`에서 세션 ID로 검색하면
-**턴, 도구 호출, 서브에이전트**를 들여다볼 수 있습니다.
-
-연속 모델 호출이 같은 프롬프트 프리픽스를 공유하면 **프롬프트 캐싱**이 이전 처리를 재사용합니다.
-
-## 8. 가격 / 제약
-
-- **Agents API 자체의 추가 서비스 요금 없음.** 과금은 별도로 누적:
-  - 모델 토큰
-  - OpenAI 제공 도구
-  - OpenAI 호스팅 샌드박스의 **컨테이너 시간**
-- 데이터 레지던시: **미국만**
-- **Zero Data Retention 미지원.** 셀프호스팅 샌드박스를 써도 ZDR 자격이 생기지 않음
-- 문서 예제에 등장하는 모델: `gpt-6-astra` (SDK 예제), `gpt-5.6-terra` (Codex SDK 예제)
-
-## 9. 관계 정리
+Persists reusable lessons across runs, **separately from** message history.
 
 ```
-        오픈소스                              관리형
+memory_summary.md      # high-level summary
+MEMORY.md              # consolidated lessons
+raw_memories/          # per-run summaries
+rollout_summaries/     # detailed rollouts
+```
+
+### Composition
+
+- **Handoffs** — route workspace-heavy tasks to sandbox agents
+- **Tools** — call sandbox agents as nested tools with independent configurations
+
+## 7. Observability
+
+Search by session ID at `platform.openai.com/logs?api=agents` to inspect **turns, tool calls, and
+subagents.**
+
+When successive model calls share the same prompt prefix, **prompt caching** reuses the earlier
+processing.
+
+## 8. Pricing and constraints
+
+- **No additional service fee for the Agents API itself.** Billing accrues separately across:
+  - model tokens
+  - OpenAI-provided tools
+  - **container time** for OpenAI-hosted sandboxes
+- Data residency: **US only**
+- **Zero Data Retention is not supported.** Using a self-hosted sandbox does not confer ZDR eligibility
+- Models appearing in the docs' examples: `gpt-6-astra` (SDK examples), `gpt-5.6-terra` (Codex SDK examples)
+
+## 9. How it relates to the open-source harness
+
+```
+       open source                            managed
 ┌──────────────────────────┐        ┌──────────────────────────┐
-│  openai/codex (Apache-2) │        │  Agents API (OpenAI 운영) │
-│  ├─ codex exec           │        │  ├─ sessions             │
-│  ├─ Codex SDK            │  ───▶  │  ├─ 호스팅 샌드박스        │
-│  └─ app-server           │  같은   │  ├─ 서브에이전트           │
-│      (JSON-RPC)          │ harness │  └─ 자동 컴팩션           │
-└──────────────────────────┘        └──────────────────────────┘
-       내가 운영                   OpenAI가 운영 (모델 릴리스에 맞춰
-                                   버전 관리된 접근 제공)
+│  openai/codex (Apache-2) │        │  Agents API (run by      │
+│  ├─ codex exec           │        │  OpenAI)                 │
+│  ├─ Codex SDK            │  ───▶  │  ├─ sessions             │
+│  └─ app-server           │ same   │  ├─ hosted sandboxes     │
+│      (JSON-RPC)          │harness │  ├─ subagents            │
+└──────────────────────────┘        │  └─ auto compaction      │
+       you operate it               └──────────────────────────┘
+                                     OpenAI operates it (with versioned
+                                     access aligned to model releases)
 ```
 
-*"a managed service built on the open-source Codex harness"* — 즉 **같은 harness, 운영 주체만 다름.**
+*"a managed service built on the open-source Codex harness"* — **the same harness; only the
+operator differs.**
