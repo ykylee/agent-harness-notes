@@ -97,6 +97,9 @@ Base for the guide paths: `https://developers.openai.com/api/docs`.
 | `codex-rs/codex-api/src/sse/responses.rs` | The 25 SSE event types Codex parses |
 | `codex-rs/core/src/client_common.rs` | `Prompt` — the pre-serialization turn payload |
 | `codex-rs/tools/src/tool_spec.rs`, `tools/src/responses_api.rs` | `ToolSpec` (5 variants), `ResponsesApiTool`, `ResponsesApiNamespace`, `FreeformTool` |
+| `codex-rs/models-manager/models.json` | Which models set `use_responses_lite` |
+| `codex-rs/models-manager/src/manager.rs`, `src/model_info.rs` | Slug resolution: longest-prefix match, namespace strip, fallback |
+| `codex-rs/protocol/src/openai_models.rs` | `ModelInfo` field list and defaults |
 
 > Note: `developers.openai.com/codex/*` currently 308-redirects to `learn.chatgpt.com/docs/*`.
 > `developers.openai.com/api/reference/...` pages returned 404 to plain fetches; the OpenAPI spec
@@ -155,6 +158,7 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 |---|---|
 | "Synthesize 25 SSE events; this is the bulk of the work" | Only **12** are handled and **7** suffice. Tool-call argument streaming is ignored entirely. Streaming is smaller than estimated |
 | `AdditionalTools` listed as a droppable Responses-native variant | In `responses_lite` mode it **is** the tool list — not droppable. A second request shape was missed |
+| "Whether lite mode is reachable is worth pinning down" (left open) | Resolved: it is a per-model catalog flag, **true for every current-generation model**, resolved by longest-prefix slug matching, with no `config.toml` override. [16 §10.2](16-responses-chat-adapter.md) |
 
 ### Resolved since the first pass ✅
 

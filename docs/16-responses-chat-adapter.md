@@ -491,8 +491,67 @@ In lite mode:
 silently drop both. Since `AdditionalTools` was listed in §3 as a Responses-native variant with no
 mapping, this is a correction: in lite mode it is **not droppable** — it *is* the tool list.
 
-Whether lite mode is reachable for your provider depends on the model catalog entry
-(`model_info.use_responses_lite`), which is worth pinning down before implementation.
+#### When lite mode is actually on
+
+`use_responses_lite` is a **per-model catalog flag**, not a config setting. From
+`codex-rs/models-manager/models.json`:
+
+| Model | `use_responses_lite` |
+|---|:---:|
+| `gpt-6-astra` | **true** |
+| `gpt-5.6-sol` | **true** |
+| `gpt-5.6-terra` | **true** |
+| `gpt-5.6-luna` | **true** |
+| `gpt-daybreak-blue-latest` | **true** |
+| `gpt-daybreak-red-latest` | **true** |
+| `codex-auto-review` | **true** |
+| `gpt-5.5` | false |
+| `gpt-5.4` | false |
+
+**Every current-generation model is lite; only the older ones use the classic shape.** Lite is the
+forward direction, so an adapter that handles only the classic shape is writing against the legacy path.
+
+#### How a slug resolves to that flag
+
+`construct_model_info_from_candidates` tries three things in order:
+
+1. **Longest-prefix match** — `find_model_by_longest_prefix` keeps any candidate where
+   `model.starts_with(&candidate.slug)`, and the **longest matching slug wins**
+2. **One-level namespace strip** — `find_model_by_namespaced_suffix` splits a single
+   `namespace/model` slug (namespace must be `[A-Za-z0-9_-]+`, suffix must contain no further `/`)
+   and retries the prefix match
+3. **Fallback** — `model_info_from_slug`, which logs
+   `warn!("Unknown model {slug} is used. This will use fallback model metadata.")`,
+   sets `used_fallback_model_metadata: true`, and leaves `use_responses_lite: false`
+
+#### The trap
+
+**Prefix matching means a slug that merely starts with a catalog slug inherits its flags.**
+
+```
+"gpt-6-astra-turbo"        → prefix-matches "gpt-6-astra"  → use_responses_lite = true
+"myprovider/gpt-6-astra"   → namespace strip → same match  → use_responses_lite = true
+"llama-3.3-70b"            → no match → fallback           → use_responses_lite = false
+```
+
+So naming a third-party model with an OpenAI-shaped prefix **silently changes the request shape**
+the adapter receives. Conversely, an unrelated name lands in the fallback — which gives the classic
+shape but also a generic `context_window` of 272,000 and a warning on every resolution.
+
+#### There is no config knob — use `model_catalog_json`
+
+`with_config_overrides` touches only `context_window`, `auto_compact_token_limit`, the truncation
+policy, and base instructions / personality. **`use_responses_lite` cannot be overridden from
+`config.toml`.**
+
+The control point is **`model_catalog_json`** — a path to a JSON model catalog loaded at startup
+(and overridable per profile). Supplying your own catalog entry for each third-party model is the
+way to pin the request shape *and* fix the context window at the same time. Candidates can also
+arrive from the provider's own remote model list.
+
+**Recommendation for the adapter:** ship a `model_catalog_json` with explicit entries for every
+model you support, each with `use_responses_lite` set deliberately. Do not rely on prefix-match
+luck, and do not rely on the fallback — its metadata is wrong for most non-OpenAI models.
 
 ## 11. Net effect on the verdict
 

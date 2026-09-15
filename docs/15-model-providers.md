@@ -169,7 +169,7 @@ return an error **without changing configuration or saved credentials**.
 | `model_context_window` | Context tokens for the active model |
 | `model_auto_compact_token_limit` | Threshold triggering automatic compaction |
 | `model_auto_compact_token_limit_scope` | `total` (default) \| `body_after_prefix` |
-| `model_catalog_json` | Path to a JSON model catalog loaded at startup; a selected profile file can override it per profile |
+| `model_catalog_json` | Path to a JSON model catalog loaded at startup; a selected profile file can override it per profile. **The only way to control per-model flags such as `use_responses_lite`** — see [16 §10.2](16-responses-chat-adapter.md) |
 | `review_model` | Optional model override used by `/review` |
 
 The repo also ships `codex-rs/models-manager/models.json` — a bundled catalog, which is what
