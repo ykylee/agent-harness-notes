@@ -20,6 +20,7 @@
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
 - TASK-2026-09-22-agent-harness-notes-005 wiki concepts 계층 구성: done
+- TASK-2026-09-22-agent-harness-notes-006 docs 수정 시 위키 재색인 강제: done
 
 ## 현재 `in_progress` 작업
 
@@ -41,12 +42,12 @@
 
 ## Next Actions
 
-- [ ] TASK-002: 조사 기준일 2026-09-15 이후 `openai/codex` 변경분 대조. 재조사의 첫 수는 새 사실 수집이 아니라 기존 사실의 드리프트 확인이다.
+- [ ] TASK-002 (첫 실전 대상 — 이 작업이 docs/ 를 고치면 pre-commit 훅이 재색인을 요구할 것이다): 조사 기준일 2026-09-15 이후 `openai/codex` 변경분 대조. 재조사의 첫 수는 새 사실 수집이 아니라 기존 사실의 드리프트 확인이다.
 - [ ] TASK-003: Agents API 서버측 모델 목록과 클라이언트 카탈로그 9종의 일치 여부 — `99-sources.md`에 유일하게 미확인으로 남은 항목.
 - [ ] TASK-004: `windows-sandbox-rs` 내부 구조를 모듈명 추론에서 소스 독해로 승격.
 
 ## Risks & Blockers
 
 - `openai/codex`는 빠르게 움직인다. 기존 문서의 결론을 뒤집는 수정은 사용자 확인을 거친다 (PROJECT_PROFILE §5).
-- 위키 페이지의 `last_ingested_from` 이 원 문서를 가리킨다. `docs/` 를 고치면 해당 concept 페이지를 재ingest 해야 한다 — 지금은 이 동기화를 강제하는 장치가 없다.
+- (해소) `docs/` ↔ concept 페이지 동기화는 이제 집행된다 — `.githooks/pre-commit` 이 차단하고, Claude Code `PostToolUse` 훅이 편집 즉시 알린다. **clone 마다 `git config core.hooksPath .githooks` 가 필요하다** (git 은 훅 경로를 버전 관리하지 않는다). 공동 작업이 되면 CI 로 옮긴다.
 - 로드맵(`roadmap/`)은 bootstrap 초안 그대로 4개 마일스톤이 전부 `planned`이다. 이 저장소는 SDLC 단계로 나누기 어려운 조사물이라 현 단계 선언을 보류했다 — 소유자 판단이 필요하다.

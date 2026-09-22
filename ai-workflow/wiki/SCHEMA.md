@@ -283,7 +283,7 @@ updated: YYYY-MM-DD
 
 | # | 제약 |
 |---|---|
-| 1 | **위키는 `docs/` 의 대체가 아니라 재색인이다.** 사실의 SSOT 는 `docs/` 에 남고, 위키는 같은 사실을 개념 축으로 다시 건다. 두 곳이 갈리면 `docs/` 가 이긴다 |
+| 1 | **위키는 `docs/` 의 대체가 아니라 재색인이다.** 사실의 SSOT 는 `docs/` 에 남고, 위키는 같은 사실을 개념 축으로 다시 건다. 두 곳이 갈리면 `docs/` 가 이긴다. 이 제약은 선언이 아니라 **집행된다** — `scripts/check_wiki_freshness.py` 와 `.githooks/pre-commit` 이 원 문서만 바뀐 커밋을 막는다 ([PROJECT_PROFILE §5](../../docs/PROJECT_PROFILE.md)) |
 | 2 | **등급을 잃지 않고 옮긴다.** 원문이 추론(inferred)·반증(refuted)으로 표시한 것은 위키 페이지에서도 그 등급을 유지한다. 등급을 떼면 그 순간 거짓이 된다 — [[concepts/primary-source-verification]] |
 
 ## §8 다음에 읽을 문서  {#s8-next}
@@ -299,4 +299,5 @@ updated: YYYY-MM-DD
 | Date | Version | Change | Author |
 |---|---|---|---|
 | 2026-06-12 | 0.1.0 | kit 원본 초안. 5 page types, ingest/query/lint workflow, R1~R7·A1~A4·V-1~V-8·P1~P4 cross-reference | standard_ai_workflow kit |
+| 2026-09-22 | 0.1.2 | 재색인 제약을 집행 장치에 연결 (pre-commit + PostToolUse 훅) | agent-harness-notes |
 | 2026-09-22 | 0.1.1 | agent-harness-notes 도입. 이 저장소에 없는 `.omo/plans` 참조 제거, §7 을 실제 상태로 교체, 재색인·등급 보존 제약 2건 추가 | agent-harness-notes |

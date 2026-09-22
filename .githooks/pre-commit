@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# docs/ 를 고쳤는데 대응 concept 페이지를 함께 담지 않은 커밋을 막는다.
+# 매핑의 출처는 concept 페이지의 last_ingested_from — scripts/check_wiki_freshness.py 참조.
+#
+# 설치: git config core.hooksPath .githooks
+# 우회: git commit --no-verify  (재색인을 나중에 할 의도가 분명할 때만)
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+checker="$root/scripts/check_wiki_freshness.py"
+[ -x "$checker" ] || exit 0
+
+if ! python3 "$checker" --staged; then
+  echo
+  echo "위키는 docs/ 의 재색인이다 — 원 문서만 바뀌면 위키가 조용히 낡는다."
+  echo "(ai-workflow/wiki/SCHEMA.md §7)"
+  exit 1
+fi

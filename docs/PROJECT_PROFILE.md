@@ -28,8 +28,8 @@
 ## 3. 기본 명령 (Commands)
 - 설치: 해당 없음 — 의존성 없는 마크다운 저장소
 - 로컬 실행: 해당 없음 — 실행 대상이 없다
-- 빠른 테스트: `grep -rn "](" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인
-- 격리 테스트: 해당 없음
+- 빠른 테스트: `python3 scripts/check_wiki_freshness.py --show-uncovered` — 위키 재색인이 원 문서를 따라갔는지 검사
+- 격리 테스트: `grep -rn "](" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인
 - 실행 확인: 1차 출처 URL 재확인 — OpenAI 문서 페이지는 URL 끝에 `.md` 를 붙이면 원본 마크다운을 돌려준다
 
 ## 4. 검증 포인트 (Validation)
@@ -40,10 +40,38 @@
   - 추론으로 채운 부분은 문서 안에서 **추론이라고 명시**한다 (예: `14-windows-sandbox.md` 의 Windows 내부 구조).
   - 사실이 바뀌면 `docs/99-sources.md` 의 검증 표를 같은 커밋에서 갱신한다.
   - 영문 문서를 고치면 `REPORT.ko.md` 의 대응 부분도 같은 커밋에서 맞춘다.
+  - **`docs/` 를 고치면 그 문서를 ingest 한 위키 concept 페이지를 같은 커밋에서 재ingest 한다.**
+    대응 관계의 출처는 concept 페이지 frontmatter 의 `last_ingested_from` 이고, 검사는
+    `scripts/check_wiki_freshness.py` 가 한다. 강제 지점은 §5.
 - UI 변경: 해당 없음
 - 배포/운영: 해당 없음 — 변경은 main 에 직접 커밋한다
 
-## 5. 예외 규칙 (Policy)
+## 5. 위키 재색인 강제 (Enforcement)
+
+`ai-workflow/wiki/` 는 `docs/` 의 재색인이다. 원 문서만 바뀌고 재색인이 따라가지 않으면 위키가
+조용히 낡는다. 대응 관계는 concept 페이지의 `last_ingested_from` 한 곳에만 있고, 세 지점에서 읽힌다.
+
+| 지점 | 무엇을 하나 | 성격 |
+|---|---|---|
+| `git commit` (`.githooks/pre-commit`) | staged 된 원 문서의 concept 페이지가 함께 staged 되지 않았으면 **커밋을 막는다** | **차단** |
+| Claude Code `PostToolUse` (`.claude/settings.json`) | `docs/` 편집 직후 재색인 대상 페이지를 에이전트 컨텍스트에 알린다 | 알림 (편집을 막지 않음) |
+| 수동 / 세션 종료 | `python3 scripts/check_wiki_freshness.py` — git 이력 기준 전체 감사 | 감사 |
+
+```bash
+# 최초 1회 — clone 마다 필요하다 (git 은 훅 경로를 버전 관리하지 않는다)
+git config core.hooksPath .githooks
+
+# 전체 감사 + 어떤 concept 페이지도 다루지 않는 문서까지
+python3 scripts/check_wiki_freshness.py --show-uncovered
+```
+
+우회: 사실이 바뀌지 않은 편집(오타·서식)이나 재색인을 나중으로 미루려는 의도가 분명하면
+`git commit --no-verify`. 의도가 분명할 때만 쓴다.
+
+한계: pre-commit 훅은 `core.hooksPath` 를 설정한 clone 에서만 돈다. 이 저장소는 단독 관리이므로
+서버측 강제는 두지 않았다 — 공동 작업으로 바뀌면 CI 에서 `--staged` 대신 기본 모드를 돌린다.
+
+## 6. 예외 규칙 (Policy)
 - 병합: 단독 저장소이므로 상태 문서 충돌은 발생하지 않는다. 충돌 시 `backlog/tasks/` 를 SSOT 로 본다.
 - 승인: 기존 문서의 **결론을 뒤집는** 수정(확정→반증 등)은 사용자 확인을 거친다.
 - 제약:

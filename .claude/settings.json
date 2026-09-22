@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/scripts/check_wiki_freshness.py\" --hook 2>/dev/null || true",
+            "statusMessage": "위키 재색인 확인 중",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
