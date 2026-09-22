@@ -1,0 +1,63 @@
+{
+  "schema_version": "1",
+  "generated_at": "2026-09-22",
+  "purpose_digest": "OpenAI Codex 하네스의 **실제 계약**(App Server JSON-RPC 프로토콜, SDK, Agents API)을",
+  "purpose_digest_rev": "2026-09-22",
+  "source_of_truth": {
+    "project_profile_path": "docs/PROJECT_PROFILE.md",
+    "session_handoff_path": "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
+    "work_backlog_index_path": null,
+    "daily_backlog_dir": "ai-workflow/memory/active/study/browser-agents/backlog",
+    "tasks_dir": "ai-workflow/memory/active/study/browser-agents/backlog/tasks",
+    "sessions_dir": "ai-workflow/memory/active/study/browser-agents/sessions",
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "repository_assessment_path": null
+  },
+  "project": {
+    "project_name": "Codex Harness — Study Notes",
+    "document_home": "README.md` (문서 목차), `docs/` (본문 16편)",
+    "operations_path": null,
+    "backlog_path": "ai-workflow/memory/active/main/backlog/",
+    "handoff_path": null,
+    "environment_path": "ai-workflow/memory/active/repository_assessment.md"
+  },
+  "commands": {
+    "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — 위키 재색인이 원 문서를 따라갔는지 검사",
+    "isolated_tests": "grep -rn \"](\" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인",
+    "runtime_checks": null
+  },
+  "session": {
+    "current_baseline": "브랜치 `study/browser-agents` 1차 세션 (2026-09-22) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제다.",
+    "current_axis": "브랜치 `study/browser-agents` 1차 세션 (2026-09-22) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제다.",
+    "current_focus": null,
+    "in_progress_items": [],
+    "blocked_items": [],
+    "planned_items": [],
+    "recent_done_items": [
+      "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
+    ],
+    "unknown_status_items": [],
+    "environment_constraints": []
+  },
+  "backlog": {
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "task_count": 1,
+    "in_progress_items": [],
+    "blocked_items": [],
+    "done_items": [
+      "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
+    ]
+  },
+  "next_documents": [
+    "docs/PROJECT_PROFILE.md",
+    "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
+    "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "ai-workflow/memory/active/study/browser-agents/state.json",
+    "ai-workflow/memory/active/study/browser-agents/backlog"
+  ],
+  "repository_assessment": {
+    "path": null,
+    "present": false
+  },
+  "schema_version_memory_entries": "1"
+}

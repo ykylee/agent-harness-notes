@@ -7,6 +7,11 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
+> **Other studies in this repository** — `study/browser-agents` branch:
+> [browser-agents/](browser-agents/README.md), a separate investigation into browser-type agent
+> tools (Aside, Comet, Dia, Browser Use). Different subject, same verification discipline.
+> Scope relationship: [browser-agents/SCOPE.md](browser-agents/SCOPE.md).
+
 ## Start with the report
 
 **[REPORT.md](REPORT.md)** — the findings, the requirement assessment, the verification record, and
