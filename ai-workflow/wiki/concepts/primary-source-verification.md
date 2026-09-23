@@ -64,6 +64,10 @@ depending on **how the documentation site renders.**
 > static technique. On failure, fall back to the rendered page or the framework payload (a Next.js
 > flight payload, for instance).
 
+> This record, and the two traps in §3.6, were **carried back into the Codex study's report**
+> ([`REPORT.md`](../../../REPORT.md) § Method, and its Korean edition). A rule learned in one study
+> belongs in both.
+
 ## §3.6 Two newly recorded traps  {#s3-6-traps}
 
 ### Mistaking inheritance for a product feature

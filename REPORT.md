@@ -11,6 +11,15 @@ means for building a harness of our own.
 | Web version | <https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo> |
 | Korean edition | [REPORT.ko.md](REPORT.ko.md) · <https://claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh> |
 
+> **Scope note (2026-09-23).** This is the report for **the Codex study.** The repository has since
+> widened to *agent harnesses generally* and holds a second investigation —
+> [`browser-agents/`](browser-agents/README.md), covering browser-type agents (Aside, Comet, Dia,
+> Neon, Browser Use). The two are crossed in **[`SYNTHESIS.md`](SYNTHESIS.md)**, which separates the
+> design axes that depend on the execution surface from the ones that do not.
+>
+> Nothing below was invalidated by that study. **Several findings gained external corroboration**,
+> collected in [§ External corroboration](#external-corroboration-what-the-browser-study-confirmed).
+
 ## Summary — one requirement collides with the platform
 
 Codex removed `wire_api = "chat"`. The `WireApi` enum now has a single variant, `Responses`, and the
@@ -100,6 +109,36 @@ Two widely repeated facts turned out to be wrong, and one disagreement turned ou
 | Two nine-entry sandbox provider lists contradict each other | **Resolved** | Different products: 7 shared, DigitalOcean and OCI are API-only, Unix-local and Docker are SDK-only |
 | Windows sandbox internals (ACL, WFP, token restriction) | **Inferred** | Read from module names in the source tree, not prose docs. Labelled as such throughout |
 
+## External corroboration: what the browser study confirmed
+
+The Codex study was a reading of one vendor's repository. A second study, of browser-type agents,
+later examined products built by other people — and several of the recommendations below turned up
+**independently implemented in a third-party system.** That is stronger evidence than internal
+consistency.
+
+The strongest case is **Aside**, a Chromium-fork AI browser whose daemon binary was extracted and
+read ([`browser-agents/09`](browser-agents/09-aside-browser-internals.md)):
+
+```js
+CODEX_TOOL_CALL_PROVIDERS = new Set([`openai`, `openai-codex`, `opencode`])
+// nearby: supportsAdditionalTools, supportsToolSearch, supportsMidConvoSystemMessages
+```
+
+| Finding here | What the browser study showed |
+|---|---|
+| **The wire protocol boundary is the first decision** (rec. 1) | `openai-codex` is registered **as a model provider id** in a third-party harness. The boundary is not theoretical — other people cross it |
+| **`responses_lite` is a second request shape an adapter must handle** ([docs/16 §10.2](docs/16-responses-chat-adapter.md)) | The same daemon carries a **`supportsAdditionalTools` capability flag.** A third-party harness absorbed Codex's two request shapes exactly as recommended |
+| **Model a provider as data, not code branches** (rec. 2, 4) | Aside carries **16+ provider ids** as data, with user-supplied subscriptions and API keys. Multi-provider is a real design point, not a hypothetical |
+| **Make retained reasoning a per-provider capability** (rec. 3) | The capability-flag pattern is already how that daemon expresses per-provider differences. The shape recommended here is the shape in use |
+| **Approval must be a protocol primitive** | Confirmed, and **extended** — Aside's approval prompts carry a button array *and* a numbered text fallback, because they are designed to render in a chat channel. App Server's approvals assume a client UI |
+| **Permission expressiveness** | Aside's policy engine matches **tool globs plus per-argument eq/regex**, going beyond `ExecPolicyAmendment`'s shape. Worth copying back |
+
+One thing the browser study **did not** corroborate, because it could not: nothing there speaks to
+retained reasoning. Browser agents in scope do not expose that layer.
+
+For the combined build checklist across both studies, see
+[`SYNTHESIS.md` §5](SYNTHESIS.md).
+
 ## Recommendations
 
 1. **Settle the wire protocol boundary first.** It determines whether Codex core is reusable at all.
@@ -115,6 +154,15 @@ Two widely repeated facts turned out to be wrong, and one disagreement turned ou
 5. **Adopt the portable plugin schema.** Namespace your own additions rather than inventing a format.
 6. **Plan the privileged Windows service early.** It gates the stronger sandbox mode.
 
+Two more, added after the browser study and grounded in systems other people shipped:
+
+7. **Design approval prompts so a channel can render them.** Buttons plus a numbered text fallback,
+   with a hint that a plain reply also works. Remote and asynchronous approval becomes possible for
+   free; a client-UI assumption forecloses it.
+8. **Reach for tool globs with per-argument matchers** in permission policy. "Allow `bash`" is too
+   coarse; "allow `bash` when the first argument matches this regex" is the level that is actually
+   useful — and a third party already ships it.
+
 ## Method
 
 Most corrections came from reading generated schemas and Rust source rather than prose. The method
@@ -125,10 +173,34 @@ One practical discovery paid for itself repeatedly: **appending `.md` to any Ope
 returns the raw Markdown source.** It turned lossy page summaries into primary text with code samples
 intact, and surfaced fourteen guide pages we did not know existed.
 
+**That technique generalises — but not universally.** Applied later to other vendors: Aside ✅ (a
+`/llms.txt` index plus `.md` originals, 16 documents), Opera ✅, **Dia ❌** (every path returns the
+same client-rendered shell). Try it first; fall back to the rendered page when it fails.
+
+The browser study also added two verification rules worth carrying back here:
+
+- **Do not mistake inheritance for a product feature.** Post-quantum symbols appear in any Chromium
+  fork, because Chromium ships X25519MLKEM768 TLS by default. File location had to be separated
+  before a finding could be attributed to the product.
+- **Cross-check primary sources against each other.** A vendor's own documentation index and its
+  product FAQ contradicted each other on whether planning runs locally. The more specific source wins,
+  and the contradiction itself gets recorded.
+
 Three items remain open by design: a corrected secondary-source error kept on the record, the Windows
 internals labelled as inference, and the Agents API server-side model list, which is a different
 surface from the client catalog. See [99-sources.md](docs/99-sources.md).
 
+## Read next
+
+| Interest | Path |
+|---|---|
+| Codex detail | [`docs/`](docs/) — 16 documents |
+| Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
+| **Both, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) |
+
 ---
 
 Findings reflect the state of `openai/codex` on 2026-09-15 — a fast-moving repository.
+External corroboration added 2026-09-23.
