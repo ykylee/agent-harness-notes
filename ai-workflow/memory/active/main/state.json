@@ -38,6 +38,7 @@
       "TASK-2026-09-22-agent-harness-notes-004"
     ],
     "recent_done_items": [
+      "TASK-2026-09-23-main-014 — 두 번째 공급자로 주입 결론 검증 및 정정",
       "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정",
       "TASK-2026-09-23-main-012 — 주입 방어 실측을 노트 저장소로 편입",
       "TASK-2026-09-23-main-011 — SYNTHESIS 구현 피드백 절 편입",
@@ -46,15 +47,14 @@
       "TASK-2026-09-23-main-008 — 브랜치 병합 및 메모리 아카이브",
       "TASK-2026-09-22-agent-harness-notes-006 — docs 수정 시 위키 재색인 강제",
       "TASK-2026-09-22-agent-harness-notes-005 — wiki concepts 계층 구성",
-      "TASK-2026-09-22-agent-harness-notes-001 — 표준 AI 워크플로우 초기 도입",
-      "TASK-2026-09-23-browser-agents-007 문서 언어 영어 통일"
+      "TASK-2026-09-22-agent-harness-notes-001 — 표준 AI 워크플로우 초기 도입"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-23.md",
-    "task_count": 6,
+    "task_count": 7,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -63,7 +63,8 @@
       "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영",
       "TASK-2026-09-23-main-011 — SYNTHESIS 구현 피드백 절 편입",
       "TASK-2026-09-23-main-012 — 주입 방어 실측을 노트 저장소로 편입",
-      "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정"
+      "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정",
+      "TASK-2026-09-23-main-014 — 두 번째 공급자로 주입 결론 검증 및 정정"
     ]
   },
   "next_documents": [
