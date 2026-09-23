@@ -1,0 +1,74 @@
+{
+  "schema_version": "1",
+  "generated_at": "2026-09-23",
+  "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
+  "purpose_digest_rev": "2026-09-23",
+  "source_of_truth": {
+    "project_profile_path": "docs/PROJECT_PROFILE.md",
+    "session_handoff_path": "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
+    "work_backlog_index_path": null,
+    "daily_backlog_dir": "ai-workflow/memory/active/study/browser-agents/backlog",
+    "tasks_dir": "ai-workflow/memory/active/study/browser-agents/backlog/tasks",
+    "sessions_dir": "ai-workflow/memory/active/study/browser-agents/sessions",
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
+    "repository_assessment_path": null
+  },
+  "project": {
+    "project_name": null,
+    "document_home": null,
+    "operations_path": null,
+    "backlog_path": null,
+    "handoff_path": null,
+    "environment_path": null
+  },
+  "commands": {
+    "quick_tests": null,
+    "isolated_tests": null,
+    "runtime_checks": null
+  },
+  "session": {
+    "current_baseline": "브랜치 `study/browser-agents` (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안으로 시작했다가 융합 결정으로 공용 PURPOSE 확장으로 해소**됐다.",
+    "current_axis": "브랜치 `study/browser-agents` (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안으로 시작했다가 융합 결정으로 공용 PURPOSE 확장으로 해소**됐다.",
+    "current_focus": null,
+    "in_progress_items": [],
+    "blocked_items": [],
+    "planned_items": [],
+    "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-007 — 문서 언어 영어 통일",
+      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합",
+      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
+      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
+      "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
+      "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
+      "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
+    ],
+    "unknown_status_items": [],
+    "environment_constraints": []
+  },
+  "backlog": {
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
+    "task_count": 6,
+    "in_progress_items": [],
+    "blocked_items": [],
+    "done_items": [
+      "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
+      "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
+      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
+      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
+      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합",
+      "TASK-2026-09-23-browser-agents-007 — 문서 언어 영어 통일"
+    ]
+  },
+  "next_documents": [
+    "docs/PROJECT_PROFILE.md",
+    "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
+    "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
+    "ai-workflow/memory/active/study/browser-agents/state.json",
+    "ai-workflow/memory/active/study/browser-agents/backlog"
+  ],
+  "repository_assessment": {
+    "path": null,
+    "present": false
+  },
+  "schema_version_memory_entries": "1"
+}

@@ -1,31 +1,31 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md
-related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution]
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/09-aside-browser-internals.md
+related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
-# Provider as Data — 프로바이더를 코드 분기가 아니라 데이터로
+# Provider as Data — model providers as data, not code branches
 
-- 문서 목적: `ModelProviderInfo` 가 프로바이더를 어떻게 데이터로 표현하는지, 그 중 커스텀 하네스가 그대로 베낄 만한 설계가 무엇인지 정리한다.
-- 범위: 내장 목록이 짧은 이유, 전체 필드, 커맨드 기반 인증, 설정 deny-list, in-flight thread 처리
-- 1차 출처: `codex-rs/model-provider-info/src/lib.rs` (710줄 직접 독해)
-- 최종 수정일: 2026-09-22
+- Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
+- Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
+- Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
+- Updated: 2026-09-23
 
 ## §1 TL;DR  {#s1-tldr}
 
-| # | 항목 | 값 |
+| # | Item | Value |
 |---|---|---|
-| 1 | 내장 프로바이더 | 5개 (`openai`, `amazon-bedrock`, `amazon-bedrock-runtime`, `ollama`, `lmstudio`) |
-| 2 | 내장이 짧은 이유 | **의도적** — 어떤 서드파티를 번들할지 심판하지 않겠다는 선언 |
-| 3 | 확장 지점 | `config.toml` 의 `model_providers` |
-| 4 | 제약의 정체 | 벤더가 아니라 **wire protocol** ([[concepts/wire-protocol-boundary]]) |
-| 5 | 가장 재사용성 높은 아이디어 | **커맨드 기반 토큰 발급** |
-| 6 | 반드시 베낄 보안 경계 | 프로젝트 로컬 설정의 **프로바이더·인증·텔레메트리 키 deny-list** |
+| 1 | Built-in providers | five (`openai`, `amazon-bedrock`, `amazon-bedrock-runtime`, `ollama`, `lmstudio`) |
+| 2 | Why so few | **deliberate** — a declaration not to adjudicate which third parties get bundled |
+| 3 | Extension point | `model_providers` in `config.toml` |
+| 4 | The real constraint | the wire protocol, not the vendor ([[concepts/wire-protocol-boundary]]) |
+| 5 | Most reusable idea | **command-backed token minting** |
+| 6 | Security boundary to copy | a **deny-list** on provider, auth and telemetry keys in project-local config |
 
-## §2 내장이 짧은 것은 설계다  {#s2-builtin-short}
+## §2 The short built-in list is a design choice  {#s2-builtin-short}
 
 ```rust
 // We do not want to be in the business of adjucating which third-party
@@ -34,54 +34,54 @@ updated: 2026-09-22
 // `model_providers` in config.toml to add their own providers.
 ```
 
-**다중 프로바이더는 1급 설계 지점이다.** 제약은 벤더가 아니라 wire protocol 이다.
+**Multi-provider is a first-class design point.** The constraint is the wire protocol, not the vendor.
 
-## §3 `ModelProviderInfo` 전체 모양  {#s3-shape}
+## §3 The full shape of `ModelProviderInfo`  {#s3-shape}
 
-| 필드 | 용도 |
+| Field | Purpose |
 |---|---|
-| `name` | 표시 이름. **비-OpenAI 경로를 가르는 레버이기도 하다** ([[concepts/stateless-conversation-wire]] §5) |
-| `base_url` | OpenAI 호환 API 의 base URL |
-| `env_key` / `env_key_instructions` | API 키를 담은 환경변수와 그 안내 문구 |
-| `experimental_bearer_token` | 리터럴 `Authorization: Bearer` 값. `env_key` 대비 **비권장**이나 프로그램적으로 필요 |
-| `auth` | **커맨드 기반** bearer 토큰 (§4) |
-| `aws` | AWS SigV4 설정 |
-| `wire_api` | Responses (유일 값) |
-| `query_params` / `http_headers` | base URL 에 붙는 쿼리, 리터럴 추가 헤더 |
-| `env_http_headers` | 헤더 이름 → **환경변수**. 미설정이거나 비면 생략 |
-| `request_max_retries` / `stream_max_retries` / `stream_idle_timeout_ms` / `websocket_connect_timeout_ms` | 재시도·타임아웃 손잡이 |
-| `requires_openai_auth` | 로그인 화면을 띄우고 `auth.json` 에 자격증명을 저장할지 |
-| `supports_websockets` / `supports_standalone_web_search` | **capability 플래그** |
+| `name` | display name. **Also the lever that selects the non-OpenAI path** ([[concepts/stateless-conversation-wire]] §5) |
+| `base_url` | base URL for the provider's OpenAI-compatible API |
+| `env_key` / `env_key_instructions` | the environment variable holding the key, and help text for it |
+| `experimental_bearer_token` | a literal `Authorization: Bearer` value. **Discouraged** versus `env_key`, but needed programmatically |
+| `auth` | **command-backed** bearer token (§4) |
+| `aws` | AWS SigV4 configuration |
+| `wire_api` | Responses (the only value) |
+| `query_params` / `http_headers` | query parameters appended to the base URL; literal extra headers |
+| `env_http_headers` | header name → **environment variable**. Omitted when unset or empty |
+| `request_max_retries` / `stream_max_retries` / `stream_idle_timeout_ms` / `websocket_connect_timeout_ms` | retry and timeout knobs |
+| `requires_openai_auth` | whether to show the login screen and store credentials in `auth.json` |
+| `supports_websockets` / `supports_standalone_web_search` | **capability flags** |
 
-> **capability 와 identity 를 분리한다.** `supports_websockets`, `supports_standalone_web_search` 는
-> UI 가 **읽어야 할 프로바이더별 사실**이지 가정할 것이 아니다. [[concepts/retained-reasoning]] §5 는
-> 여기에 `supports_retained_reasoning` 을 더하라고 권한다.
+> **Separate capability from identity.** `supports_websockets` and
+> `supports_standalone_web_search` are **per-provider facts the UI must read**, not assume.
+> [[concepts/retained-reasoning]] §5 argues for adding `supports_retained_reasoning` alongside them.
 
-## §4 커맨드 기반 인증 — 가장 베낄 만한 것  {#s4-command-auth}
+## §4 Command-backed auth — the most reusable idea  {#s4-command-auth}
 
-클라우드 CLI 나 사내 브로커가 토큰을 발급하는 프로바이더용.
+For providers whose tokens are minted by an external tool (cloud CLIs, internal brokers).
 
-| 키 | 용도 |
+| Key | Purpose |
 |---|---|
-| `model_providers.<id>.auth.command` | 실행 파일 |
-| `...auth.args` | 인자 |
-| `...auth.cwd` | 작업 디렉터리 |
-| `...auth.timeout_ms` | 호출당 타임아웃 |
-| `...auth.refresh_interval_ms` | 재발급 주기 |
+| `model_providers.<id>.auth.command` | executable to run |
+| `...auth.args` | arguments |
+| `...auth.cwd` | working directory |
+| `...auth.timeout_ms` | per-invocation timeout |
+| `...auth.refresh_interval_ms` | how often to re-mint |
 
-> 이것이 프로바이더 설계 전체에서 **커스텀 하네스에 가장 재사용성 높은 아이디어**다 —
-> "프로바이더 X 의 별난 인증을 지원하라"를 "토큰을 출력하는 무언가를 셸로 부르라"로 바꾼다.
+> This is **the most reusable idea in the whole provider design** for a custom harness — it turns
+> "support provider X's bespoke auth" into "shell out to something that prints a token."
 
-### §4.1 AWS 의 상호 배타 규칙  {#s4-1-aws}
+### §4.1 AWS's mutual exclusion  {#s4-1-aws}
 
 `aws.region` · `aws.profile` · `aws.credential_export`.
-**`credential_export` 와 `profile` 은 동시에 설정할 수 없다.** `credential_export` 가 설정돼 있으면
-Bedrock 셋업과 로그인은 **설정이나 저장된 자격증명을 바꾸지 않은 채** 에러를 반환한다.
+**`credential_export` and `profile` cannot both be set.** When `credential_export` is configured,
+Bedrock setup and login return an error **without changing configuration or saved credentials.**
 
-## §5 반드시 베낄 보안 경계 — 설정 deny-list  {#s5-deny-list}
+## §5 The security boundary to copy — a config deny-list  {#s5-deny-list}
 
-프로젝트 범위 `.codex/config.toml` 은 머신 로컬의 프로바이더·인증·알림·프로파일·텔레메트리 키를
-**덮어쓸 수 없다.** 프로젝트 로컬 파일에 나타나면 Codex 가 무시하는 키:
+Project-scoped `.codex/config.toml` **cannot** override machine-local provider, auth, notification,
+profile or telemetry keys. Codex ignores these when they appear in a project-local file:
 
 ```
 openai_base_url   chatgpt_base_url   apps_mcp_product_sku
@@ -89,34 +89,55 @@ model_provider    model_providers    notify
 profile           profiles           experimental_realtime_ws_base_url   otel
 ```
 
-> 클론한 저장소가 내 에이전트의 모델 트래픽을 돌리거나 텔레메트리를 빼돌릴 수 있어서는 안 된다.
-> **프로젝트별 설정을 읽는 커스텀 하네스는 같은 deny-list 가 필요하다.**
+> A cloned repository must never be able to redirect your agent's model traffic or exfiltrate
+> telemetry. **Any custom harness that reads per-project config needs the same deny-list.**
 
-## §6 정책 변경과 in-flight thread  {#s6-in-flight}
+## §6 Policy changes and in-flight threads  {#s6-in-flight}
 
-> 기존 thread 는 자기 프로바이더 설정을 유지한다. 관리형 `model_provider` / `model_providers` 요건이
-> 더 이상 맞지 않거나 로드할 수 없으면 **입력 계열 RPC 가 거부된다** — turn start/steer, review,
-> compaction, 수동 queue start, 활성 goal 갱신. **interrupt, realtime stop, goal pause/clear 는
-> 계속 가능하다.** 사용자·프로젝트 설정 변경만으로는 기존 thread 가 무효화되지 않는다.
+> Existing threads retain their provider configuration. When managed `model_provider` /
+> `model_providers` requirements no longer match, or cannot be loaded, **input-family RPCs are
+> rejected** — turn start/steer, review, compaction, manual queue start, active goal updates.
+> **Interrupt, realtime stop and goal pause/clear remain available.** User and project configuration
+> changes alone do not invalidate existing threads.
 
-> 베낄 패턴: 기업 정책 변경이 **돌고 있는 대화를 조용히 다른 모델로 옮겨서는 안 된다.**
-> *입력* 경로를 실패시키되 *제어* 경로는 열어 둔다.
+> A pattern worth copying: an enterprise policy change **must not silently move a running
+> conversation onto a different model.** Fail the *input* path while leaving *control* paths open.
 
-realtime 연결은 별도 라우팅 설정을 쓰며 이 검사에서 면제된다.
+Realtime connections use separate routing configuration and are exempt from this check.
 
-## §7 다중 프로바이더 하네스 체크리스트  {#s7-checklist}
+## §5.5 Observation — two cases pointing opposite ways  {#s5-5-two-directions}
 
-- [ ] **wire protocol 경계를 가장 먼저** 정한다 — Codex core 재사용 가능 여부가 여기서 갈린다
-- [ ] Chat Completions 가 필요하면 어댑터를 **fork 가 아니라 프로바이더 모양의 프록시**로 설계한다
-- [ ] 프로바이더를 **코드 분기가 아니라 데이터**(`ModelProviderInfo` 모양)로 모델링한다
-- [ ] 커맨드 기반 토큰 발급을 **첫날부터** 지원한다
-- [ ] capability 와 identity 를 분리한다
-- [ ] 프로바이더마다 자기 재시도·타임아웃 손잡이를 준다 (로컬 Ollama 와 호스팅 API 는 다르다)
-- [ ] 프로젝트 로컬 설정이 프로바이더·인증·텔레메트리 키를 못 쓰게 막는다
-- [ ] 프로바이더 정책이 바뀔 때 **in-flight thread** 를 어떻게 할지 정한다 — 입력 거부, 제어 유지
+`ModelProviderInfo` only says "a provider is data." Browser-type agents diverge on **who chooses it.**
 
-## §8 다음에 읽을 문서  {#s8-next}
+| Product | Chooser | Implementation |
+|---|---|---|
+| **Aside** | **the user** | 16+ provider ids. **Reuses an existing subscription over OAuth** (ChatGPT, Claude, Copilot) plus BYO API keys |
+| **Opera Neon** | **the product** | "Opera's AI engine, **model-agnostic**" **routes** each task to a model. The user chooses only in Chat |
+| Dia | the product | fixed: GPT (OpenAI Azure) · Claude (Anthropic, Vertex, AWS) · Gemini (Vertex) |
 
-- [[concepts/wire-protocol-boundary]] — 이 데이터 모델이 놓인 제약
-- [[concepts/retained-reasoning]] — capability 플래그로 다뤄야 할 대상
-- 원문: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md)
+> 📌 **"Model-agnostic" names two opposite product designs.** Aside gives the user sovereignty; Neon
+> chooses on their behalf. When designing a custom harness these are **different products** — the
+> first removes model cost from the adoption barrier, the second makes the product answerable for
+> quality.
+>
+> The choice is bound to the planning location in [[concepts/control-plane-execution-plane]].
+> Planning has to be local for a user's own subscription to be usable.
+
+## §7 Checklist for a multi-provider harness  {#s7-checklist}
+
+- [ ] **Settle the wire protocol boundary first** — it decides whether Codex core is reusable at all
+- [ ] If Chat Completions is required, design the adapter as **a provider-shaped proxy, not a fork**
+- [ ] Model providers **as data** (`ModelProviderInfo`-shaped), not as code branches
+- [ ] Support **command-backed token minting from day one**
+- [ ] Separate capability from identity
+- [ ] Give each provider its own retry and timeout knobs (a local Ollama and a hosted API differ)
+- [ ] Deny project-local config the ability to set provider, auth or telemetry keys
+- [ ] Decide what happens to **in-flight threads** when provider policy changes — reject input, keep control
+- [ ] Decide **who chooses the model**, and know which product that makes you
+
+## §8 Read next  {#s8-next}
+
+- [[concepts/wire-protocol-boundary]] — the constraint this data model sits under
+- [[concepts/retained-reasoning]] — a capability that should be a flag
+- [[concepts/control-plane-execution-plane]] — where planning runs, which this follows
+- Original: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md)
