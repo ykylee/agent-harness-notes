@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-09-23 세션 종료 — 저장소 범위가 '에이전트 하네스 조사'로 확장됐고 브랜치 정리까지 끝났다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영. `study/browser-agents` 브랜치는 병합 후 삭제했고 메모리는 `memory/archived/` 로 옮겼다. **남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.**",
-    "current_axis": "**2026-09-23 세션 종료 — 저장소 범위가 '에이전트 하네스 조사'로 확장됐고 브랜치 정리까지 끝났다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영. `study/browser-agents` 브랜치는 병합 후 삭제했고 메모리는 `memory/archived/` 로 옮겼다. **남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.**",
+    "current_baseline": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.",
+    "current_axis": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.",
     "current_focus": null,
     "in_progress_items": [],
     "blocked_items": [],

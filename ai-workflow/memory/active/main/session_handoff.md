@@ -6,12 +6,13 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (세션 종료)
+- Updated: 2026-09-23 (세션 종료 — 조사 결론의 하류 구현 착수)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
-- **2026-09-23 세션 종료 — 저장소 범위가 '에이전트 하네스 조사'로 확장됐고 브랜치 정리까지 끝났다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영. `study/browser-agents` 브랜치는 병합 후 삭제했고 메모리는 `memory/archived/` 로 옮겼다. **남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.**
+- **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.
+- **조사 결론이 별도 저장소에서 구현되기 시작했다 — `ykylee/heddle` (private).** 이 저장소의 범위 밖이므로(`PURPOSE.md` 제외 영역: "하네스의 실제 구현·포크·재배포") 여기서 추적하지 않는다. 링크만 남긴다. 다만 **두 저장소의 막힌 지점이 같다**: 둘 다 디스플레이 있는 macOS/Windows 기기를 기다린다.
 
 ## Work Status
 
@@ -48,6 +49,7 @@
 - **내용 문서 전체 영어**. 규칙과 예외는 `docs/PROJECT_PROFILE.md` §6.
 - **`REPORT`(영/한)에 외부 증거 절 추가** — 권고 여럿이 서드파티 시스템에서 독립 구현된 것으로 확인됐다.
 - 브랜치 병합(`--no-ff`)·삭제, 고아 메모리를 `memory/archived/` 로 아카이브.
+- **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. 이 사실은 조사 문서에 역으로 반영할 가치가 있을 수 있다(아래 Next Actions).
 
 ## Next Actions
 
@@ -63,8 +65,8 @@
 - [ ] 브라우저 GUI 1차 확인 — **macOS/Windows 기기 필요.** 리눅스 빌드가 없다
 
 **저장소**
-- [ ] `study/browser-agents` 브랜치 정리 여부 결정 (병합 완료, 원격에 남아 있음)
-- [ ] `REPORT.md`/`REPORT.ko.md` 가 Codex 조사만 다룬다 — 범위 확장을 반영할지 결정
+- [ ] `SYNTHESIS.md` 에 **구현 피드백 절**을 넣을지 결정. `heddle` 에서 조사 결론 중 5건이 실측에 반박당했다(토큰 예산 3.6배 초과, `scope` 의 역할, 기본 정책의 사용 불가능성 등). 조사 노트가 구현 결과를 되먹이면 근거 등급이 한 칸 올라가지만, **저장소 범위를 다시 건드리는 결정**이라 `PURPOSE.md` 와 같이 판단해야 한다
+- [ ] 위 결정이 '넣는다'면 `perception-model` 개념 페이지도 함께 재색인 (pre-commit 훅이 강제한다)
 
 ## Risks & Blockers
 
