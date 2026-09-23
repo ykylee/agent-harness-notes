@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/09-aside-browser-internals.md + browser-agents/11-dia-and-neon.md
+last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/09-aside-browser-internals.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4
 related_pages: [concepts/indirect-prompt-injection, concepts/perception-model, concepts/approval-gate, concepts/control-plane-execution-plane, concepts/primary-source-verification]
 created: 2026-09-23
 updated: 2026-09-23
@@ -26,7 +26,7 @@ it straight out.**
 |---|---|---|---|
 | **URL blocking** | Comet | **blocks** access to credential pages such as `chrome://password-manager`, and `file://` | **enumerative** — a new path defeats it |
 | **Value hiding** | **Aside** | the browser fills the field **without giving the agent the raw password** | **fundamental** — removes the secret from what the agent can observe |
-| **Element hiding** | **Dia** | password fields and **irreversible action buttons** are "invisible to the agentic system" | **fundamental, and broader** — reaches past credentials |
+| **Element hiding** | **Dia** | password fields and **irreversible action buttons** are "invisible to the agentic system" | **fundamental, and broader** — reaches past credentials. ⚠️ the grade is for the *mechanism*; §7.1 measures how easily the implementation of it leaks |
 | (for contrast) transmission limits | Opera Neon | credentials and payment details are **not sent to Opera's servers** | **a different layer** — agent visibility is a separate question |
 
 > 📌 **Value hiding and element hiding are two solutions to one problem.** Aside hides the **value**;
@@ -108,7 +108,54 @@ Good design does not guarantee good defaults.
 - [ ] **Set defaults narrow**
 - [ ] Keep an **audit log** of credential access
 
-## §7 Read next  {#s7-next}
+## §7 Measured — what "hide the element" and "hide the value" cost in practice  {#s7-measured}
+
+Ingested from [`SYNTHESIS.md` §6.4](../../../SYNTHESIS.md). Both approaches in §2 were implemented
+and attacked. Two findings, and the second is not about fields at all.
+
+### §7.1 "Element hiding" and "value hiding" both need a definition of *which* element  {#s7-1-which}
+
+§2 grades element hiding as **fundamental**. That grade holds only for the choice of mechanism. The
+implementation is where it is won or lost:
+
+| Test used | Result |
+|---|---|
+| `type === "password"` | 🚨 **leaks.** `<input type="text" autocomplete="current-password">` and a field masked only by `-webkit-text-security` both handed the value to the model |
+| the field's declared behaviour — `autocomplete` token, computed text-security, then a name hint | ✅ holds against the same attacks |
+
+> 📌 **A page that wants the value out does not attack the shield — it declares the field
+> differently.** The first three signals cost nothing to honour, because they are declarations the
+> page already makes to the browser and to password managers. A type check is not a weaker version of
+> this; it is a different and much smaller claim.
+
+### §7.2 The credential that is not in a field  {#s7-2-url}
+
+With every field on the page correctly shielded, the secret still reached the model — **in the page
+URL**, printed in the snapshot header.
+
+```
+# http://host/reset?token=hunter2&user=a%40b.com
+```
+
+Password-reset tokens, OAuth `code`, magic links and session ids live in URLs as a matter of routine.
+
+> 📌 This retroactively explains a Dia defence that looks like a footnote in §5 of
+> [[concepts/indirect-prompt-injection]]: **"Dia won't pass URLs to the LLM verbatim."** Read as a
+> product note it seems fussy. Measured, it is a credential channel — and the only one on this page
+> that no amount of field shielding reaches.
+>
+> 📌 The failure was **inconsistency between renderers**, not a missing rule: the approval prompt had
+> shortened URLs for months while the snapshot header printed them whole. The same value was
+> dangerous in one renderer and harmless in another. A rule each call site must remember is a rule
+> one call site will forget.
+
+### §7.3 What this does not cover  {#s7-3-limits}
+
+Shielding by behaviour is still a list of signals. A field that declares nothing — no
+`autocomplete`, no masking, a neutral name — is invisible to all of them. And shielding stops the
+*model* seeing the value; it says nothing about where the page itself sends it.
+
+## §8 Read next  {#s8-next}
 
 - [[concepts/indirect-prompt-injection]] — why the agent must not hold the secret
 - [[concepts/perception-model]] — element hiding is an operation on the perception layer

@@ -139,6 +139,19 @@ retained reasoning. Browser agents in scope do not expose that layer.
 For the combined build checklist across both studies, see
 [`SYNTHESIS.md` §5](SYNTHESIS.md).
 
+### And one recommendation that was later measured, not just corroborated
+
+Rec. 7 — **approval prompts a channel can render** — stopped being an argument from design taste when the
+conclusions of both studies were implemented and the injection defences around that gate were
+attacked ([`SYNTHESIS.md` §6.4](SYNTHESIS.md)). Sixteen attacks, five through: the perception-layer
+filters fell, the gate did not.
+
+> 📌 Assuming the model had been completely persuaded by injected page content, the action was still
+> refused and the page never changed. **The gate is the only defence in the stack that is not a
+> heuristic an attacker can study**, because it sits outside the model's control loop. That is an
+> argument for making approval a protocol primitive rather than a UI feature — and it is now
+> measured rather than reasoned.
+
 ## Recommendations
 
 1. **Settle the wire protocol boundary first.** It determines whether Codex core is reusable at all.

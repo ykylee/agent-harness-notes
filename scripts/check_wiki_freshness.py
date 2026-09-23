@@ -131,9 +131,14 @@ def check_paths(root: Path, mapping: dict[str, list[str]], paths: list[str]) -> 
             except ValueError:
                 continue
         norm.append(str(pp))
+    given = set(norm)
     hits = []
-    for src in sorted(set(norm) & rev.keys()):
-        hits.append({"source": src, "pages": sorted(rev[src])})
+    for src in sorted(given & rev.keys()):
+        # 이미 같이 손본 concept 페이지는 빼고 보고한다. 조언 모드가 이미
+        # 처리된 일을 계속 경고하면 읽히지 않게 되고, 그러다 진짜를 놓친다.
+        pending = sorted(set(rev[src]) - given)
+        if pending:
+            hits.append({"source": src, "pages": pending})
     return hits
 
 

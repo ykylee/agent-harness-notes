@@ -172,6 +172,11 @@ and security maintenance appears among the stated reasons for retiring Atlas.
 > LLM-generated URLs, will not pass URLs to the LLM verbatim, and makes password fields and
 > irreversible action buttons "invisible to the agentic system." It also **states what remains.**
 
+> ⚠️ **Two of those defences were implemented and then attacked** ([§6.4](#64-the-defences-attacked)).
+> "Do not pass URLs verbatim" reads like a minor precaution and is **load-bearing** — it is a
+> credential channel. "Sensitive elements are invisible" is **evadable by invisible characters** if
+> it is a word heuristic, which is all a published description can tell you it is.
+
 ### 3.3 Credential shielding
 
 | Approach | Product | Assessment |
@@ -299,13 +304,60 @@ it failed **three times, the same way each time**:
 This generalises past the browser. Codex's `conversationId` / `itemId` identifiers face the same
 question the moment a harness process can restart while a client still holds them.
 
-### 6.4 What this does not license
+### 6.4 The defences, attacked
+
+§3.2 records that indirect prompt injection is unsolved and that **nobody in the research verified
+their own defences.** Implementing Dia's published defences made it possible to attack them. Sixteen
+attacks; **five got through.**
+
+> **What this does and does not measure.** No model was in the loop, so this says nothing about
+> whether a model obeys injected instructions. It measures the half that is structural and therefore
+> decidable: whether page-controlled text can forge harness-controlled text, whether a shielded field
+> stays shielded, and whether the gate holds once perception has already lost.
+
+| Defence, as the research described it | What attacking it showed |
+|---|---|
+| "Password fields are invisible to the agentic system" (Dia) | **Implemented as a test of the input's *type*, it leaks.** `<input type="text" autocomplete="current-password">` and a CSS-masked field both handed their value to the model. A page that wants the value out does not have to attack anything — it declares the field differently. The test has to be the field's *behaviour* |
+| "Dia won't pass URLs to the LLM verbatim" | **The most underrated line in the research.** Every field on the page was correctly shielded and the credential still reached the model, in the page URL printed in the snapshot header. Password-reset tokens, OAuth `code` and magic links live there. Read as a product footnote this looks fussy; it is a credential channel |
+| "Irreversible action buttons are invisible" (Dia, no published definition) | A word heuristic is beaten by **invisible characters**: `De<U+200B>lete account` and fullwidth `Ｄelete account` both render as ordinary buttons to the matcher and as "Delete account" to a person. Folding the text first (NFKC, strip format characters) closes those. **A confirm reading "Yes, I am sure" closes nothing** — there is no wording to match, because the destruction is in the dialogue, not the label |
+| Page text as a vector for forging the harness's own output | **Held.** Newlines in `document.title` did not forge tree nodes, a forged approval prompt did not render as one, and forged refs did not enter the ref table — escaping already covers this |
+| "Do not turn off the approval gate" (§8 of the concept page) | **Held, and it is the one carrying the weight.** Assuming the model was fully persuaded, the click was still refused and the page never changed; navigation to an attacker origin was gated and the prompt named the origin |
+
+> 📌 **Perception-layer defences are depth; the gate is the defence.** Every defence above the gate
+> is a heuristic an attacker can study and route around, and three of the five breaches were exactly
+> that. The policy gate is different in kind because it sits **outside the model's control loop** —
+> persuading the model completely changes nothing on the page. Treating perception filtering as the
+> protection would have been the real design error.
+
+> ⚠️ **What this says about Dia is inference, not measurement.** What was attacked is *this
+> repository's implementation of Dia's published descriptions.* Dia publishes no definition of
+> "irreversible action button," so whether its version folds text is unknown. The transferable
+> finding is about the shape of the defence, not about their code.
+
+### 6.5 Two green checks that were lying
+
+Both probe bugs reported "defended" while the attack was succeeding, and both survived review.
+
+| | |
+|---|---|
+| A hand-rolled request object used the wrong field shape, so the URL rendered into a field nothing read | reported a breach that did not exist |
+| The attack fixture's `data:` URL carried no `charset`, so the browser decoded UTF-8 as Latin-1 | **the unicode-evasion attacks were never delivered.** The probe compared mojibake against mojibake and passed |
+
+> 📌 **A green check from a test that never ran the attack is worse than no test**, because it
+> retires the question. Neither was found by reading the assertions — both looked correct — but by
+> printing what the page actually contained. This is the same failure as the documentation/code
+> divergence in [§7](#7-on-method), arriving from the other direction.
+
+### 6.6 What this does not license
 
 The feedback covers the axes that were built: perception, action, policy, approval, secrets. It says
-nothing about capability distribution (§2.5), exposing a harness to other harnesses (§2.6), or
-indirect prompt injection (§3.2) — **the last of which is the field's central risk and remains the
-least tested claim in this repository.** Defences against it were designed here and have not been
-attacked.
+nothing about capability distribution (§2.5) or exposing a harness to other harnesses (§2.6).
+
+Indirect prompt injection (§3.2) is **no longer the untouched claim it was** — §6.4 attacked the
+defences and five of them failed. But only the structural half is measured. **Whether a model obeys
+injected instructions is untested here**, and that is the half the field actually loses on. Nothing
+in §6.4 should be read as evidence that injection is handled; it is evidence that five specific
+defences were weaker than their descriptions.
 
 ## 7. On method
 
@@ -332,7 +384,7 @@ Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered). *
 | The Codex harness itself | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
-| **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed |
+| **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, and five defences breached under attack |
 | Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)

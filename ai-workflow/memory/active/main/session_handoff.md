@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (SYNTHESIS §6 구현 피드백 편입)
+- Updated: 2026-09-23 (주입 방어 실측 편입)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -16,6 +16,7 @@
 
 ## Work Status
 
+- TASK-2026-09-23-main-012 주입 방어 실측을 노트 저장소로 편입: done
 - TASK-2026-09-23-main-011 SYNTHESIS 구현 피드백 절 편입: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: planned
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
@@ -47,6 +48,7 @@
 - **조사가 둘이 됐다** — `browser-agents/` 14편 신설. Aside 는 제품 문서 1차 확보 후 **CLI·브라우저 바이너리까지 정적 분석**했다.
 - **위키 개념 13 → 16종** — 기존 8종에 브라우저 근거 추가, 신규 3종(`perception-model`·`indirect-prompt-injection`·`credential-shielding`).
 - **`SYNTHESIS.md` 신설** — 핵심 주장은 **표면 무관 축과 표면 고유 축의 구분**이다.
+- **주입 방어를 처음으로 공격했다 (§6.4)** — 조사가 "이 분야의 중심 위험인데 누구도 자기 방어를 검증하지 않았다"고 기록한 바로 그 지점. Dia 의 공개 방어를 구현해 공격했더니 **16건 중 5건 관통**. 차폐가 입력 *타입* 만 봤고, 필드를 다 막아도 비밀이 **URL** 로 샜고, 보이지 않는 문자가 단어 경계를 이겼다. **인지 계층 방어는 전부 공격자가 연구할 수 있는 휴리스틱이고, 게이트만 모델의 통제 루프 바깥에 있다.**
 - **`SYNTHESIS.md` §6 구현 피드백 편입** — 이 저장소에서 가장 강한 근거 등급이 생겼다: 다른 모든 주장은 남의 산출물을 **읽은** 것이고 §6 은 **실행한** 것이다. 반박 5건·확인 6건. 개념 페이지 3종(`perception-model`·`approval-gate`·`primary-source-verification`)과 `PURPOSE.md` §0.1 경계를 함께 갱신했다. **구현 코드는 여전히 이 저장소 밖이다 — 들어온 것은 측정뿐이다.**
 - **내용 문서 전체 영어**. 규칙과 예외는 `docs/PROJECT_PROFILE.md` §6.
 - **`REPORT`(영/한)에 외부 증거 절 추가** — 권고 여럿이 서드파티 시스템에서 독립 구현된 것으로 확인됐다.
@@ -68,7 +70,9 @@
 
 **저장소**
 - [x] ~~`SYNTHESIS.md` 구현 피드백 절 편입~~ — TASK-011 완료. `PURPOSE.md` §0.1 에 "측정만 편입, 코드는 아님" 경계를 명시했다
-- [ ] **간접 프롬프트 주입 방어가 이 저장소 최대의 미검증 주장으로 남았다.** §6.4 에 적었듯 방어책은 설계만 됐고 한 번도 공격당한 적 없다. 구현이 다른 축들을 검증하면서 이 축만 홀로 남은 상태 — 다음 조사의 1순위 후보
+- [x] ~~간접 프롬프트 주입 방어 검증~~ — TASK-012. Dia 의 공개 방어를 구현해 공격했다. **16건 중 5건 관통.** 결과는 `SYNTHESIS.md` §6.4
+- [ ] **남은 절반: 모델이 루프에 있을 때.** §6.4 는 구조적인 절반만 쟀다 — 페이지가 하네스 텍스트를 위조할 수 있는가, 차폐가 유지되는가, 게이트가 버티는가. **모델이 주입된 지시를 따르는가는 여전히 미측정**이고, 이 분야가 실제로 지는 쪽은 그 절반이다
+- [ ] Dia 의 "되돌릴 수 없는 버튼"에 공개 정의가 없다 — 우리 측정은 *서술의 구현* 을 공격한 것이라 Dia 코드에 대한 평가가 아니다. 1차 출처가 생기면 이 경계를 갱신할 것
 - [ ] `SYNTHESIS.md` §6 은 heddle 의 2026-09-23 시점 실측이다. heddle 이 진행되면 여기도 드리프트한다
 
 ## Risks & Blockers

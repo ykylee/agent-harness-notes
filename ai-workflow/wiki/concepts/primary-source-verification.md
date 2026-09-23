@@ -185,6 +185,21 @@ with a payment and a consent iframe.**
 > had survived reading were refuted by implementation. Where a claim can be cheaply built, that is a
 > stronger check than another source.
 
+### §9.1 A third grade, and where it now appears  {#s9-1-third-grade}
+
+The grade ladder in this repository used to end at *read from a primary artifact*. It now has a rung
+above it — **attacked, and it failed or held** — and two documents carry claims at that rung:
+
+| Document | Claim now measured |
+|---|---|
+| [`SYNTHESIS.md` §6.4](../../../SYNTHESIS.md) | Dia's published defences: 16 attacks, 5 through |
+| [`REPORT.md`](../../../REPORT.md) external-corroboration section | Rec. 7 (approval a channel can render) moved from corroborated to measured — the gate held where the perception filters did not |
+
+> ⚠️ The rung cuts both ways, and the caveat belongs on this page rather than only where the claims
+> are. **Attacking an implementation of a published description grades the description, not the
+> vendor.** Dia publishes no definition of "irreversible action button," so the measurement bounds
+> what such a description can be relied on to mean — it does not report on their code.
+
 ## §10 Read next  {#s10-next}
 
 - [[concepts/os-sandbox-policy]] §6 — where the inferred grade is actually applied
