@@ -7,25 +7,25 @@ created: 2026-09-22
 updated: 2026-09-23
 ---
 
-# Wire Protocol Boundary — 코어 재사용 가능성을 가르는 경계
+# Wire Protocol Boundary — what decides whether the core is reusable
 
-- 문서 목적: Codex core 가 어떤 wire protocol 을 전제하는지, 그 전제가 커스텀 하네스에 무엇을 강제하는지 정리한다.
-- 범위: `WireApi` 의 현재 상태, 세 가지 탈출로, 프록시 선례, 두 가지 요청 형태
-- 1차 출처: `codex-rs/model-provider-info/src/lib.rs` (710줄 직접 독해), `codex-rs/core/src/client.rs`
-- 최종 수정일: 2026-09-22
+- Purpose: which wire protocol Codex core presumes, and what that presumption forces on a custom harness.
+- Scope: the current state of `WireApi`, three ways out, the in-repo proxy precedent, and the two request shapes
+- Primary sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly), `codex-rs/core/src/client.rs`
+- Updated: 2026-09-23
 
 ## §1 TL;DR  {#s1-tldr}
 
-| # | 항목 | 값 |
+| # | Item | Value |
 |---|---|---|
-| 1 | `WireApi` 의 변형 수 | **정확히 1개 — `Responses`** |
-| 2 | Chat Completions | **제거됨.** 설정하면 명시적 에러 |
-| 3 | 함의 | `codex app-server` 를 그대로 감싸서 Chat Completions 하네스를 얻을 수 **없다** |
-| 4 | 권장 탈출로 | **프로바이더 모양의 프록시** (fork 아님) |
-| 5 | 요청 형태 | **둘이다** — classic 과 `responses_lite` |
-| 6 | 첫 결정 | 이 경계를 **가장 먼저** 정한다. 나머지가 전부 여기 딸린다 |
+| 1 | Variants of `WireApi` | **exactly one — `Responses`** |
+| 2 | Chat Completions | **removed.** Configuring it produces an explicit error |
+| 3 | Consequence | you **cannot** get a Chat Completions harness by wrapping `codex app-server` as is |
+| 4 | Recommended way out | **a provider-shaped proxy**, not a fork |
+| 5 | Request shapes | **there are two** — classic and `responses_lite` |
+| 6 | First decision | settle this boundary **first.** Everything else is downstream |
 
-## §2 Chat Completions 는 사라졌다  {#s2-chat-removed}
+## §2 Chat Completions is gone  {#s2-chat-removed}
 
 ```rust
 pub enum WireApi {
@@ -35,7 +35,7 @@ pub enum WireApi {
 }
 ```
 
-옛 값을 설정하면 의도적으로 설계된 에러가 난다:
+Configuring the old value produces a deliberately designed error:
 
 ```
 `wire_api = "chat"` is no longer supported.
@@ -43,20 +43,20 @@ How to fix: set `wire_api = "responses"` in your provider config.
 More info: https://github.com/openai/codex/discussions/7782
 ```
 
-제거는 enum 을 넘어섰다 — `ollama-chat` 프로바이더 id 도 함께 퇴역했고, `ollama` 는 이제
-`WireApi::Responses` 로 동작한다.
+The removal went past the enum — the `ollama-chat` provider id was retired too, and `ollama` now runs
+as `WireApi::Responses`.
 
-## §3 세 가지 탈출로  {#s3-escape-routes}
+## §3 Three ways out  {#s3-escape-routes}
 
-| 방법 | 어떻게 | 비용 |
+| Approach | How | Cost |
 |---|---|---|
-| **앞단 어댑터** | `/v1/responses` 를 받아 상위 `/v1/chat/completions` 로 번역하는 로컬 프록시. `model_providers` 항목이 이를 가리키게 한다 | 낮음~중간. 번역 충실도는 내 책임 |
-| **wire API 재추가** | fork 해서 `Chat` 변형과 요청/응답 매핑을 복원 | 중간~높음. upstream 과 영구 분기 |
-| **모델 계층 자체 소유** | 프로토콜 설계만 가져오고 코어는 직접 작성 | 높음. 대신 wire protocol 제약이 아예 없다 |
+| **An adapter in front** | run a local proxy that accepts `/v1/responses` and translates to `/v1/chat/completions` upstream; point a `model_providers` entry at it | low to medium. Translation fidelity is yours |
+| **Re-add the wire API** | fork and restore a `Chat` variant plus its request/response mapping | medium to high. Permanent divergence from upstream |
+| **Own the model layer** | take the protocol design and write your own core | high, but no wire-protocol constraint at all |
 
-## §4 프록시 선례 — 이 모양이 동작한다는 증거  {#s4-proxy-precedent}
+## §4 The proxy precedent — evidence the shape works  {#s4-proxy-precedent}
 
-저장소가 직접 `codex-responses-api-proxy` 를 싣고 있다.
+The repository itself ships `codex-responses-api-proxy`.
 
 ```toml
 [model_providers.codex-responses-api-proxy]
@@ -65,77 +65,79 @@ base_url = 'http://127.0.0.1:60001/v1'
 wire_api = 'responses'
 ```
 
-이 프록시의 목적은 요청/응답 덤프이지 프로토콜 번역이 아니다. 그러나 모양을 증명한다 —
-**`base_url` 에서 Responses 를 말하는 것은 무엇이든 유효한 프로바이더다.** Responses→Chat 어댑터는
-정확히 이 자리에 꽂힌다.
+Its purpose is request/response dumping rather than protocol translation, but it proves the shape —
+**anything that speaks Responses at a `base_url` is a valid provider.** A Responses→Chat adapter
+slots into exactly that position.
 
-## §5 요청 형태는 하나가 아니다 — `responses_lite`  {#s5-responses-lite}
+## §5 There is more than one request shape — `responses_lite`  {#s5-responses-lite}
 
-`model_info.use_responses_lite` 가 켜지면 요청이 다르게 조립된다.
+When `model_info.use_responses_lite` is set, the request is assembled differently.
 
-| 항목 | classic | lite |
+| Item | classic | lite |
 |---|---|---|
-| 최상위 `instructions` | base instructions 문자열 | **빈 문자열** |
-| 최상위 `tools` | 도구 JSON | **`None`** |
-| 도구·지시의 실제 위치 | 최상위 필드 | input 배열 앞에 `ResponseItem::AdditionalTools { role: "developer", tools }` + base-instructions 메시지를 prepend |
-| item id | — | thread id + 직렬화 payload 에 대한 `Uuid::v5` (재시도·재개에도 동일) |
+| top-level `instructions` | the base-instructions string | **empty** |
+| top-level `tools` | tool JSON | **`None`** |
+| where tools and instructions actually go | top-level fields | the input array is prefixed with `ResponseItem::AdditionalTools { role: "developer", tools }` and a base-instructions message |
+| item ids | — | `Uuid::v5` over the thread id and serialised payload (stable across retries and resumed sessions) |
 
-> ⚠️ 어댑터는 **두 형태를 모두 처리해야** 한다. 아니면 도구도 지시도 없는 요청을 보고 둘 다 조용히
-> 버린다. `AdditionalTools` 는 lite 모드에서 **버릴 수 있는 항목이 아니라 그 자체가 도구 목록**이다.
+> ⚠️ **An adapter must handle both shapes**, or it will see a request with no tools and no
+> instructions and silently drop both. `AdditionalTools` is **not droppable in lite mode — it *is*
+> the tool list.**
 
-### §5.1 어느 모델이 lite 인가  {#s5-1-which-models}
+### §5.1 Which models are lite  {#s5-1-which-models}
 
-`codex-rs/models-manager/models.json` 의 9개 항목 기준:
+From the nine entries in `codex-rs/models-manager/models.json`:
 
-| `use_responses_lite` | 모델 |
+| `use_responses_lite` | Models |
 |---|---|
 | **true** | `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `codex-auto-review` |
 | false | `gpt-5.5`, `gpt-5.4` |
 
-**현세대 모델은 전부 lite 다.** classic 만 처리하는 어댑터는 레거시 경로를 향해 쓰는 셈이다.
+**Every current-generation model is lite.** An adapter that handles only the classic shape is writing
+against the legacy path.
 
-### §5.2 slug → flag 해석과 그 함정  {#s5-2-slug-matching}
+### §5.2 How a slug resolves to that flag  {#s5-2-slug-matching}
 
-`construct_model_info_from_candidates` 는 순서대로 세 가지를 시도한다.
+`construct_model_info_from_candidates` tries three things in order:
 
-| 순서 | 방법 |
+| Order | Method |
 |---|---|
-| 1 | **최장 접두 일치** — `model.starts_with(&candidate.slug)` 인 후보 중 가장 긴 slug 가 이긴다 |
-| 2 | **한 단계 namespace 제거** — `namespace/model` 을 분리해 재시도 |
-| 3 | **fallback** — 경고 로그, `used_fallback_model_metadata: true`, `use_responses_lite: false`, 일반 `context_window` 272,000 |
+| 1 | **longest-prefix match** — among candidates where `model.starts_with(&candidate.slug)`, the longest slug wins |
+| 2 | **one-level namespace strip** — split a `namespace/model` slug and retry the prefix match |
+| 3 | **fallback** — warn, set `used_fallback_model_metadata: true`, `use_responses_lite: false`, generic `context_window` of 272,000 |
 
 ```
-"gpt-6-astra-turbo"        → "gpt-6-astra" 에 접두 일치 → use_responses_lite = true
-"myprovider/gpt-6-astra"   → namespace 제거 후 동일 일치 → use_responses_lite = true
-"llama-3.3-70b"            → 일치 없음 → fallback        → use_responses_lite = false
+"gpt-6-astra-turbo"        → prefix-matches "gpt-6-astra"  → use_responses_lite = true
+"myprovider/gpt-6-astra"   → namespace strip, same match   → use_responses_lite = true
+"llama-3.3-70b"            → no match → fallback           → use_responses_lite = false
 ```
 
-> **함정**: 서드파티 모델에 OpenAI 모양의 접두를 붙여 이름 지으면 **요청 형태가 조용히 바뀐다.**
-> `config.toml` 에는 이를 덮어쓸 키가 없다 — 통제점은 **`model_catalog_json`** 뿐이다.
-> 지원하는 모델마다 명시적 항목을 담은 카탈로그를 실어라. 접두 일치의 운에 기대지 말고,
-> fallback 에도 기대지 마라.
+> **The trap**: naming a third-party model with an OpenAI-shaped prefix **silently changes the
+> request shape.** `config.toml` has no key to override it — the only control point is
+> **`model_catalog_json`.** Ship a catalog with an explicit entry for every model you support. Do not
+> rely on prefix-match luck, and do not rely on the fallback.
 
+## §5.5 Observation — Aside implements this branching  {#s5-5-aside}
 
-## §5.5 관측 — Aside 가 이 분기를 실제로 구현하고 있다  {#s5-5-aside}
-
-`responses_lite` 가 이론적 함정이 아니라는 증거다. Aside 브라우저의 데몬 바이너리에서:
+Evidence that `responses_lite` is not a theoretical trap. In Aside's browser daemon binary:
 
 ```js
 CODEX_TOOL_CALL_PROVIDERS = new Set([`openai`, `openai-codex`, `opencode`])
 AZURE_TOOL_CALL_PROVIDERS  = new Set([`openai`, `openai-codex`, `opencode`, `azure-openai-responses`])
-// 인접: supportsAdditionalTools, supportsToolSearch, supportsMidConvoSystemMessages
+// nearby: supportsAdditionalTools, supportsToolSearch, supportsMidConvoSystemMessages
 ```
 
-> 📌 **`openai-codex` 가 모델 프로바이더 id 로 등록돼 있고**, `supportsAdditionalTools` 플래그가
-> 함께 있다. `AdditionalTools` 는 lite 모드에서 도구 목록을 싣는 항목이다(§5).
-> 즉 서드파티 하네스가 **Codex 의 두 요청 형태를 프로바이더별 capability 플래그로 흡수**했다.
+> 📌 **`openai-codex` is registered as a model provider id**, with a `supportsAdditionalTools` flag
+> beside it. `AdditionalTools` is the item that carries the tool list in lite mode (§5). In other
+> words **a third-party harness absorbed Codex's two request shapes as a per-provider capability
+> flag.**
 >
-> 이 저장소의 두 조사가 코드 수준에서 만나는 지점이고, §5 의 "어댑터는 두 형태를 모두
-> 처리해야 한다"는 권고가 현실에서 그대로 요구됐음을 보여준다.
+> This is where this repository's two studies meet at the level of source, and it shows the
+> recommendation in §5 — that an adapter must handle both shapes — being demanded in practice.
 
-## §6 다음에 읽을 문서  {#s6-next}
+## §6 Read next  {#s6-next}
 
-- [[concepts/stateless-conversation-wire]] — 어댑터를 쉽게 만드는 쪽
-- [[concepts/retained-reasoning]] — 어댑터가 잃는 것
-- [[concepts/provider-as-data]] — 프로바이더를 코드가 아니라 데이터로 모델링하기
-- 원문: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md), [`docs/16-responses-chat-adapter.md`](../../../docs/16-responses-chat-adapter.md)
+- [[concepts/stateless-conversation-wire]] — what makes an adapter easy
+- [[concepts/retained-reasoning]] — what an adapter loses
+- [[concepts/provider-as-data]] — modelling providers as data rather than code branches
+- Originals: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md), [`docs/16-responses-chat-adapter.md`](../../../docs/16-responses-chat-adapter.md)

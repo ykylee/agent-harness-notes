@@ -1,145 +1,164 @@
-# 06. 교차 분석 — 4개 축
+# 06. Cross-cutting analysis — four axes
 
-> 제품별 서술을 가로질러 **설계 결정의 축**만 뽑았다. "직접 만든다면 무엇을 먼저 정해야 하나"의
-> 관점이다. 각 축의 근거는 [02](02-aside.md)·[04](04-comet-architecture.md)·[05](05-comparables.md) 에 있다.
-
-## 1. 축 하나: 제어 표면을 어디에 두는가
-
-**가장 먼저 정해야 하고, 나머지 전부가 여기에 딸린다.**
-
-| 선택 | 얻는 것 | 치르는 것 |
-|---|---|---|
-| **네이티브 브라우저** | 브라우저 크롬 수준 UX(분할 탭), 전체 권한 모델, 자격증명 소유 | **Chromium 추격이라는 상시 부채**, 사용자 마이그레이션 요구 |
-| **확장** | 사용자 이동 불필요, 유지보수 부채 없음, 즉시 배포 | 확장 API 가 허용하는 것만. 브라우저 UI 를 못 바꿈 |
-| **라이브러리** | 완전한 통제, 헤드리스 확장, 프로그램적 조합 | 사람이 쓰는 제품이 아님 |
-
-### 이 축의 실증
-
-- **Atlas 종료(2026-08-09)** 가 네이티브의 비용을 보여줬다. 보안 유지보수가 종료 사유에 포함됐다.
-- **Aside 의 변경로그**가 같은 비용의 다른 얼굴이다 — 주 수회 릴리스, 1~2주마다 Chromium 갱신.
-- **Comet 은 둘을 섞었다** — 네이티브 브라우저를 내되 실제 제어는 확장 3개로 구현. 겉과 속이 다르다.
-
-> 📌 **경계가 흐리다는 것이 중요한 발견이다.** "네이티브 브라우저를 만든다"고 해서 제어까지
-> 네이티브 코드로 한다는 뜻이 아니다. Comet 처럼 Chromium 확장 계층을 제어 표면으로 쓰면
-> 브라우저 배포는 네이티브로, 에이전트 로직은 확장으로 갈라 **갱신 주기를 분리**할 수 있다
-> (Comet 의 확장은 서버에서 자동 갱신된다).
-
-## 2. 축 둘: 에이전트가 페이지를 어떻게 보는가
-
-네 가지 방식이 실제로 쓰이고 있고, **각각 고유한 실패 모드**를 갖는다.
-
-| 방식 | 채택 | 장점 | 실패 모드 |
-|---|---|---|---|
-| **원본 DOM** | (거의 안 씀) | 정보 손실 없음 | 2MB+ — 토큰 예산 붕괴 |
-| **접근성 트리** | Comet (`Accessibility.getFullAXTree` → YAML) | 이미 의미론이 정리됨, 토큰 효율 | 접근성 구현이 나쁜 사이트에서 무너짐 |
-| **스크린샷** | Atlas (computer-use 모델) | 렌더된 실제 모습, 시각 요소 | **팝업·드롭다운이 별도 서피스로 렌더돼 합성이 필요**, 좌표 정밀도 |
-| **DOM 증류 + SoM** | Browser Use | 2MB→1.5~3k 토큰, **인덱스 참조로 좌표 오차 제거** | 증류가 버린 것은 영영 안 보임 |
-
-### 스크린샷 방식의 함정 — Atlas 가 남긴 기록
-
-Atlas 엔지니어링 포스트가 문제를 구체적으로 남겼다. computer-use 모델은 **스크린샷 한 장**을
-받는데, 드롭다운 같은 UI 는 메인 탭 경계 **바깥의 별도 윈도우**로 렌더된다. Atlas 는 이
-팝업들을 **올바른 좌표로 메인 이미지에 합성**해 넣어야 했다.
-
-> 📌 "화면을 찍어서 모델에 준다"는 개념적으로 단순하지만 **브라우저의 실제 렌더링은 한 장의
-> 이미지가 아니다.** 이 방식을 고르면 합성 문제를 직접 풀어야 한다. 트리 기반 방식에는
-> 이 문제가 애초에 없다.
-
-### 인식과 동작을 같은 체계로 묶을 것인가
-
-여기서 갈린다.
-
-| | 인식 | 동작 | 결과 |
-|---|---|---|---|
-| **Comet** | 접근성 트리 (의미) | `ComputerBatch` 픽셀 좌표 (기하) | **비대칭.** 유연하지만 좌표 오차에 취약 |
-| **Browser Use** | SoM 인덱스 | `click_element(index=14)` | **대칭.** 좌표 오차라는 실패 모드가 없음. 정밀도 95%+ |
-| **Aside** | 접근성 트리 + 가상 ref (`e31`) | `page.locator('e31')` | **대칭.** Comet 과 인식 기반은 같은데 동작에서 갈린다 |
-
-> 📌 **대칭 쪽이 구조적으로 견고하다.** 본 것과 가리키는 것이 같은 이름 공간이면 "본 것과 다른
-> 곳을 눌렀다"가 발생할 수 없다. 커스텀 하네스를 만든다면 여기서 시작하는 것이 안전하다.
+> Cutting across the per-product write-ups to isolate **the design decisions themselves**, from the
+> angle of "what would I have to decide first if I built one?" Evidence for each axis is in
+> [02](02-aside.md), [04](04-comet-architecture.md) and [05](05-comparables.md).
 >
-> ✅ **이 판단은 이후 코드레벨 확인으로 뒷받침됐다.** Aside 도 대칭을 택했고
-> ([08 §3.1](08-aside-code-level.md)), 시각 폴백인 `annotatedScreenshot` 조차 **ref ID 를 박은
-> 박스**로 이름 공간을 유지한다. 비대칭을 택한 것은 조사 범위에서 Comet 하나다.
+> Crossed with the Codex study in [`SYNTHESIS.md`](../SYNTHESIS.md).
 
-## 3. 축 셋: 계획이 어디서 도는가
+## 1. Axis one: where the control surface sits
 
-| 위치 | 채택 | 함의 |
+**Decide this first; everything else hangs off it.**
+
+| Choice | What you get | What you pay |
 |---|---|---|
-| **서버** | Comet (백엔드가 계획하고 명령 발행) | 중앙 통제·갱신 용이. **사용자 데이터가 서버 경유**. 모델 선택권 제한 |
-| **로컬 주장** | Aside | 로컬 우선 마케팅. BYO 구독/키로 모델 주권 제공 |
-| **클라우드 모델** | **Opera Neon** | 실행은 로컬 브라우저, **계획은 클라우드 LLM**. 제품 FAQ 가 명시 |
-| 서버 경유 | Dia | AI 요청이 자사 서버를 거쳐 파트너 모델로 |
-| **호출자** | Browser Use | 전적으로 통합자의 몫 |
+| **Native browser** | browser-chrome-level UX (split tabs), a full permission model, ownership of credentials | **the standing debt of chasing Chromium**, and a user migration to ask for |
+| **Extension** | no migration, no maintenance debt, immediate distribution | only what extension APIs permit; cannot change browser UI |
+| **Library** | complete control, headless scaling, programmatic composition | not a product a person uses |
 
-> ⚠️ **"로컬"이라는 단어를 벤더가 어느 면에 쓰는지 확인하라.** Opera 의 `llms.txt` 는
-> "All AI processes run locally on the device" 라고 하는데, 제품 FAQ 는 "Neon Do runs locally...
-> **However, it uses cloud-based LLMs to generate the plans**" 라고 한다. 같은 회사의 두 1차
-> 출처가 어긋난다 — 실행이 로컬인 것이지 계획이 로컬인 것이 아니다. [11 §3.1](11-dia-and-neon.md)
+### Evidence for this axis
 
-> 이 축이 **프라이버시 서사와 모델 경제를 동시에 결정한다.** Aside 가 사용자의 기존
-> ChatGPT/Claude 구독을 OAuth 로 끌어 쓰게 한 것([02 §9](02-aside.md))은 계획을 로컬에 두는
-> 선택과 짝을 이룬다 — 서버에서 계획한다면 사용자 구독을 쓸 이유가 없다.
+- **Atlas's retirement (2026-08-09)** showed the cost of native. Security maintenance was among the
+  stated reasons.
+- **Aside's changelog** is the same cost in another form — several releases a week, Chromium every
+  one to two weeks.
+- **Comet mixed the two** — ships a native browser while implementing control as three extensions.
+  **And so does Aside** ([09 §3](09-aside-browser-internals.md)).
 
-> ⚠️ Aside 의 "local-first" 는 **랜딩 페이지 주장**이고 무엇이 서버로 가는지 문서가 명시하지
-> 않는다. 프라이버시 문서는 로컬 데이터 삭제 방법만 말하고 **서버 전송 여부는 말하지 않는다.**
-> 미확인으로 둔다 ([99](99-sources.md) §4).
+> 📌 **That the boundary is blurry is the important finding.** "Building a native browser" does not
+> mean control is implemented in native code. Using the Chromium extension layer as the control
+> surface — as Comet and Aside both do — lets you ship the browser natively while keeping agent logic
+> in extensions, **separating their release cadences.** Comet's extensions auto-update from the
+> server; Aside runs shell `1.0.x` against extensions and CLI at `1.26.x`.
 
-## 4. 축 넷: 자격증명을 어떻게 다루는가
+## 2. Axis two: how the agent sees the page
 
-이 분야에서 가장 날카로운 설계 차이다. 에이전트가 로그인 뒤편에서 일하려면 자격증명이 필요한데,
-에이전트는 프롬프트 주입에 취약하다([07](07-security.md)). 두 접근이 있다.
+Four approaches are genuinely in use, and each has **its own failure mode.**
 
-| 접근 | 채택 | 원리 |
+| Approach | Adopted by | Strength | Failure mode |
+|---|---|---|---|
+| **Raw DOM** | (effectively nobody) | no information loss | 2MB+ — the token budget collapses |
+| **Accessibility tree** | Comet (`Accessibility.getFullAXTree` → YAML), Aside (injected script) | semantics already settled, token-efficient | collapses on sites with poor accessibility |
+| **Screenshot** | Atlas (computer-use model) | the actual rendered appearance, visual elements | **popups and dropdowns render as separate surfaces and need compositing**; coordinate precision |
+| **DOM distillation + SoM** | Browser Use | 2MB → 1.5–3k tokens, **index references remove coordinate error** | whatever distillation discarded is gone for good |
+
+### The screenshot trap — what Atlas left on record
+
+The Atlas engineering post recorded the problem concretely. The computer-use model takes **one
+screenshot**, but UI such as dropdowns renders in **a separate window outside the main tab's
+bounds.** Atlas had to **composite those popups back into the main image at the right coordinates.**
+
+> 📌 "Capture the screen and hand it to the model" is conceptually simple, but **a browser's actual
+> rendering is not a single image.** Choose this and you must solve compositing yourself. Tree-based
+> approaches never meet the problem.
+
+### Do perception and action share a namespace?
+
+This is where it divides.
+
+| | Perception | Action | Result |
+|---|---|---|---|
+| **Comet** | accessibility tree (semantics) | `ComputerBatch` pixel coordinates (geometry) | **asymmetric.** Flexible but exposed to coordinate error |
+| **Browser Use** | SoM indices | `click_element(index=14)` | **symmetric.** No coordinate-error failure mode. 95%+ precision |
+| **Aside** | accessibility tree plus virtual refs (`e31`) | `page.locator('e31')` | **symmetric.** Same perceptual basis as Comet, different action layer |
+
+> 📌 **Symmetry is structurally more robust.** When what you saw and what you point at share a
+> namespace, "clicked somewhere other than what I saw" cannot happen. Starting here is the safe
+> choice for a custom harness.
+>
+> ✅ **This judgement was later supported at code level.** Aside also chose symmetry
+> ([08 §3.1](08-aside-code-level.md)), and even its visual fallback `annotatedScreenshot` preserves
+> the namespace with **boxes carrying ref IDs.** Comet is the only asymmetric case in this study.
+
+## 3. Axis three: where planning runs
+
+| Location | Adopted by | Implications |
 |---|---|---|
-| **URL 차단** | Comet | `chrome://password-manager` 등 자격증명 페이지 접근을 **차단**. `file://` 도 차단 |
-| **값 은닉** | Aside | 에이전트에게 **원문 비밀번호를 주지 않고** 브라우저가 채운다 |
+| **Server** | Comet (backend plans and issues commands) | central control, easy updates. **User data passes through a server.** Model choice constrained |
+| **Local daemon** | **Aside** (`127.0.0.1:21420`, 353MB) | confirmed structurally. Gives model sovereignty through BYO subscription/keys |
+| **Cloud model** | **Opera Neon** | execution is the local browser, **planning is a cloud LLM**. The product FAQ says so |
+| Via own servers | Dia | AI requests pass through its servers to partner models |
+| **Caller** | Browser Use | entirely the integrator's business |
 
-> 📌 **값 은닉 쪽이 근본적이다.** URL 차단은 "알려진 경로를 막는" 열거형 방어라 새 경로가
-> 생기면 뚫린다. 값 은닉은 **에이전트의 관측 범위에서 비밀을 아예 제거**하므로 경로와 무관하다.
+> ⚠️ **Check which side a vendor means by "local."** Opera's `llms.txt` says "All AI processes run
+> locally on the device"; the product FAQ says "Neon Do runs locally… **However, it uses cloud-based
+> LLMs to generate the plans**." Two first-party sources from the same company disagree — execution
+> is local, planning is not. [11 §3.1](11-dia-and-neon.md)
 
-### Aside 설계에서 베낄 두 가지
+> This axis **decides the privacy story and the model economics at once.** Aside letting users pull
+> in their existing ChatGPT/Claude subscriptions over OAuth ([02 §9](02-aside.md)) pairs with keeping
+> planning local — if you planned on a server there would be no reason to use the user's subscription.
 
-1. **권한 등급과 자격증명 노출을 다른 축으로 분리.** `Full access` 모드에서도 비밀번호는 숨겨진다.
-   "가장 센 권한 = 전부 볼 수 있음"이 아니다. 자동완성 전에 접근 정책과 **대상 URL 을 함께 검증**한다.
-2. **격리 모드가 자격증명까지 일관되게 적용.** 시크릿 세션에서는 에이전트가 금고를 쓸 수 없다.
+> ✅ **Verified**: Aside's "local-first" has structural grounding. The 353MB daemon does the planning
+> ([09 §5](09-aside-browser-internals.md)). What goes to a server is still unconfirmed — static
+> analysis cannot answer that.
 
-> ⚠️ 다만 Aside 의 AI 접근 정책 기본값은 **가장 느슨한 `Always allow`** 다. 설계는 좋은데
-> 기본값 방향은 반대다.
+## 4. Axis four: how credentials are handled
 
-## 5. 부차 축: 반복되는 위임을 어떻게 재사용 단위로 만드는가
+The sharpest design difference in the field. Working behind a login needs credentials, and agents are
+vulnerable to prompt injection ([07](07-security.md)). Two approaches:
 
-세 제품이 같은 문제를 다르게 푼다. **공통 과제라는 신호다.**
-
-| 제품 | 이름 | 축 |
+| Approach | Adopted by | Principle |
 |---|---|---|
-| Dia | **Skills** | 이름으로 호출하는 재사용 루틴 |
-| Opera Neon | **Skills** | 페이지 맥락 기반 사전 제작 동작 |
-| Aside | **Routines** | **시간** 축 — cron(새 작업) vs heartbeat(기존 대화 이어가기) |
+| **URL blocking** | Comet | **blocks** access to credential pages such as `chrome://password-manager`; also `file://` |
+| **Value hiding** | Aside | the browser fills the field **without giving the agent the raw password** |
+| **Element hiding** | Dia | password fields and irreversible action buttons are **removed from the agent's perception** |
 
-> 📌 **갱신 (2026-09-23)**: Neon 의 공식 명칭은 Skills 가 아니라 **Cards** 이고, 축도 다르다 —
-> "이런 **종류의 작업**은 이렇게 다뤄라"를 담고 덱으로 묶인다. 즉 **방법론**이지 스케줄이 아니다.
-> Aside 의 Routines(시간)와 **직교한다** — 한 제품이 둘 다 가질 수 있고 아직 아무도 그러지 않았다.
-> [11 §3.4](11-dia-and-neon.md)
+> 📌 **Hiding the value is the more fundamental move.** URL blocking is enumerative — it fails when a
+> new path appears. Value hiding **removes the secret from the agent's observable range entirely**,
+> independent of path.
+>
+> 📌 **Dia's element hiding reaches further still** — extending past credentials to irreversible
+> action buttons. [11 §2](11-dia-and-neon.md).
 
-> 📌 Aside 의 cron/heartbeat 구분이 이 중 가장 정확하다. 반복 작업에는 "새로 시작"과 "이어하기"
-> 라는 다른 의미가 있고, 보통의 스케줄러는 전자만 준다. 대화 맥락을 가진 에이전트에게는 후자가
-> 필요하다. 또 Aside 는 **반복 작업을 스캔해 루틴을 제안**한다 — 사용자가 재사용 단위를
-> 발견하지 못하는 문제를 도구가 먼저 푼다.
+### Two things to copy from Aside's design
 
-## 6. 커스텀 브라우저 에이전트를 만든다면 — 결정 순서
+1. **Keep permission level and credential exposure on separate axes.** Passwords stay hidden even in
+   `full-access` mode. "Highest privilege" does not mean "can see everything." Access policy **and
+   target URL** are both checked before autofill.
+2. **Apply isolation modes consistently through credentials.** The agent cannot use the vault in an
+   incognito session.
 
-1. **제어 표면을 먼저 정하라** (§1). 나머지가 전부 여기 딸린다. 브라우저를 만들 자원이 없으면
-   확장으로 시작하라 — Atlas 도 감당하지 못한 부채다.
-2. **인식과 동작을 같은 이름 공간으로 묶어라** (§2). SoM 인덱스 방식이 좌표 오차라는 실패 모드를
-   구조적으로 제거한다.
-3. **스크린샷을 기본 인식으로 고르지 마라.** 고른다면 팝업 합성 문제를 설계에 포함시켜라.
-4. **자격증명은 값 은닉으로** 가라 (§4). URL 차단은 열거형 방어다.
-5. **권한 등급과 비밀 노출을 다른 축으로** 두라. 최고 권한이 최고 노출을 뜻하지 않게.
-6. **격리 모드를 자격증명까지 일관 적용**하라.
-7. **재사용 단위를 제공하고, 그것을 자동 제안하라** (§5). 사용자는 스스로 발견하지 못한다.
-8. **결정적 경로를 남겨라.** Aside 의 `repl` 처럼, 모델이 약한 곳에서 내려갈 수 있어야 한다.
-9. **자기 도구를 MCP 로 노출하라.** 최종 제품이 아니라 다른 하네스의 실행 표면이 될 수 있다.
-   — ✅ Aside(`aside mcp`)와 Opera Neon(**MCP 서버**)이 독립적으로 같은 결론에 도달했다.
-   이 분야의 수렴 지점으로 보인다. [11 §3.3](11-dia-and-neon.md)
-10. **페이지 내용을 사용자 지시와 분리하라** — [07](07-security.md). 이것은 선택이 아니다.
+> ⚠️ Aside's AI access policy nonetheless defaults to the loosest setting, `Always allow`. The design
+> is good; the default points the other way.
+
+## 5. A secondary axis: turning repeated delegation into a unit of reuse
+
+Three products solved the same problem differently. **That is a signal it is a shared problem.**
+
+| Product | Name | Axis |
+|---|---|---|
+| Dia | **Skills** | reusable routines invoked by name |
+| Opera Neon | **Cards** | prebuilt actions grounded in page context |
+| Aside | **Routines** | **time** — cron (a new task) vs. heartbeat (continuing an existing chat) |
+
+> 📌 **Update (2026-09-23)**: Neon's official name is **Cards**, not Skills, and its axis differs —
+> it holds "handle **this kind of task** like this" and groups into decks. It is **methodology, not
+> scheduling**, and therefore **orthogonal** to Aside's Routines. One product could have both; none
+> does yet. [11 §3.4](11-dia-and-neon.md)
+
+> 📌 Aside's cron/heartbeat split is the most precise of the three. Recurring work carries two
+> different meanings — "start fresh" and "continue" — and most schedulers give only the first. An
+> agent with conversational context needs the second. Aside goes further and **scans for recurring
+> work to propose routines**, solving the problem that users do not discover their own reusable units.
+
+## 6. If you were building one — decision order
+
+1. **Decide the control surface first** (§1). Everything else hangs off it. Without the resources to
+   build a browser, start with an extension — it is a debt Atlas could not carry either.
+2. **Put perception and action in one namespace** (§2). SoM-style indexing structurally removes the
+   coordinate-error failure mode.
+3. **Do not pick screenshots as the primary perception.** If you do, build the popup compositing
+   problem into the design.
+4. **Shield credentials by hiding the value** (§4). URL blocking is enumerative.
+5. **Keep permission level and secret exposure on separate axes.** Highest privilege must not mean
+   highest exposure.
+6. **Apply isolation modes consistently through credentials.**
+7. **Provide a unit of reuse and suggest it automatically** (§5). Users do not find it themselves.
+8. **Keep a deterministic path.** Like Aside's `repl`, you need somewhere to drop to where the model
+   is weak.
+9. **Expose your own tool over MCP.** You may be an execution surface for another harness rather than
+   a final product.
+   — ✅ Aside (`aside mcp`) and Opera Neon (**an MCP server**) reached this independently. It looks
+   like a convergence point for the field. [11 §3.3](11-dia-and-neon.md)
+10. **Separate page content from user instruction** — [07](07-security.md). This is not optional.

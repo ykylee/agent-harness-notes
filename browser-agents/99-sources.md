@@ -1,198 +1,203 @@
-# 99. 출처와 검증 기록
+# 99. Sources and verification record
 
-> 이 저장소의 [인식 방법](../ai-workflow/wiki/concepts/primary-source-verification.md)을 그대로
-> 적용한다: **커밋된 아티팩트 > 산문**, 2차 출처는 1차 대조 전 확정 금지, 추론은 추론이라 표기,
-> 반증은 지우지 않고 보존. 조사일 2026-09-22.
+> Applies this repository's [method of knowing](../ai-workflow/wiki/concepts/primary-source-verification.md)
+> unchanged: **committed artifacts over prose**, no secondary source settled before cross-checking,
+> inference labelled as inference, refutations kept rather than deleted. Researched 2026-09-22/23.
 
-## 1. 등급 어휘
+## 1. Grade vocabulary
 
-| 등급 | 의미 |
+| Grade | Meaning |
 |---|---|
-| ✅ **확인** | 1차 출처(제품 문서 원본, 소스, 리버싱)에서 직접 읽음 |
-| 🔧 **관측된 구현** | 리버싱으로 드러난 것. 벤더가 보증한 명세는 아님 |
-| 📣 **자체보고** | 벤더 자신이 발표한 수치·주장. 독립 검증 없음 |
-| 📰 **2차** | 언론·블로그. 1차 대조 전 |
-| ⚠️ **미확인** | 확인 시도했으나 닿지 못함 |
-| ❌ **반증** | 틀린 것으로 확인 |
+| ✅ **confirmed** | read directly from a primary source (product documentation originals, source, binaries) |
+| 🔧 **observed implementation** | revealed by reverse engineering. Not a vendor-guaranteed specification |
+| 📣 **self-reported** | a figure or claim published by the vendor itself. No independent verification |
+| 📰 **secondary** | press or blog. Not yet cross-checked against a primary source |
+| ⚠️ **unverified** | attempted but not reached |
+| ❌ **refuted** | confirmed wrong |
 
-## 2. 1차 출처
+## 2. Primary sources
 
-### Aside — 제품 문서 전체를 원본 마크다운으로
+### Aside — the whole product documentation as raw Markdown
 
-**`docs.aside.com` 은 `/llms.txt` 를 전체 색인으로 제공하고, 각 페이지에 `.md` 를 붙이면
-원본 마크다운을 돌려준다.** 렌더된 페이지 요약이 아니라 1차 텍스트다.
+**`docs.aside.com` publishes `/llms.txt` as a full index, and appending `.md` to any page returns the
+original Markdown.** That is primary text, not a summary of a rendered page.
 
-> 📌 이것은 이 저장소의 기존 조사가 OpenAI 문서에서 발견한 것과 **같은 수법**이다
-> ([`docs/99-sources.md`](../docs/99-sources.md)). 문서 사이트에 `.md` 와 `/llms.txt` 를 먼저 시도하라.
+> 📌 The same technique this repository's existing study found in OpenAI's documentation
+> ([`docs/99-sources.md`](../docs/99-sources.md)). Try `.md` and `/llms.txt` on a documentation site
+> first.
 >
-> **적용 성적 (2026-09-23)**: Aside ✅ (문서 16종) · Opera ✅ (`www.opera.com/llms.txt`) ·
-> **Dia ❌** (모든 경로가 동일한 SPA 셸). **만능이 아니라 문서 사이트의 렌더링 방식에 달렸다.**
-> 실패 시에는 렌더된 페이지로 돌아가야 한다 — [11 §1](11-dia-and-neon.md).
+> **Record (2026-09-23)**: Aside ✅ (16 documents) · Opera ✅ (`www.opera.com/llms.txt`) ·
+> **Dia ❌** (every path returns the same SPA shell). **Not universal — it depends on how the
+> documentation site renders.** On failure, fall back to the rendered page —
+> [11 §1](11-dia-and-neon.md).
 
-| 읽은 문서 | 추출한 것 |
+| Document read | What it gave |
 |---|---|
-| `/llms.txt` | 전체 문서 색인 18항목 |
-| `help/get-started.md` | 시스템 요구사항, 가져오기, 온보딩 |
-| `help/security.md` | **권한 3구역, Allow/Ask/Deny, 세션 모드 3종, 자격증명 은닉** |
-| `help/tasks.md` | 작업 모드, 권한, Queue/Steer, 파일 결과 |
-| `help/password-manager.md` | Vault 정책 3종, 생체 잠금 의미 |
-| `help/passwords.md` | 자동완성 설정, 가져오기 9종, AI 접근 정책 기본값 |
-| `help/memory.md` | 입력원, 보존 3종, 설정 3섹션 |
-| `help/browser-basics.md` | **전체 단축키, 분할 탭, 라쏘, Ask AI** |
-| `help/side-panel.md` | 페이지 첨부 모델, 탭별 초안 |
-| `help/ultrabrowse.md` | 모델 선택기 내 위치, 용례 |
-| `help/automation.md` | **cron / heartbeat 루틴, 제안 기능, 한도** |
-| `help/ai.md` | 프로바이더 3갈래, OAuth 구독, API 키 7종 |
-| `help/privacy.md` | 로컬 데이터 삭제 항목, 분석 공유 기본 on |
-| `help/subscription.md` | 플랜 구성 |
-| `changelog/native.md` | **버전, 플랫폼, 릴리스 주기, Chromium 추격** |
-| `aside.com/pricing` | 가격 4단계 |
+| `/llms.txt` | the full 18-item documentation index |
+| `help/get-started.md` | system requirements, import, onboarding |
+| `help/security.md` | **three permission zones, Allow/Ask/Deny, three session modes, credential hiding** |
+| `help/tasks.md` | task modes, permissions, Queue/Steer, file results |
+| `help/password-manager.md` | three vault policies, what biometric unlock means |
+| `help/passwords.md` | autofill settings, nine import sources, the AI access default |
+| `help/memory.md` | inputs, three retention settings, three settings sections |
+| `help/browser-basics.md` | **all keyboard shortcuts, split tabs, lasso, Ask AI** |
+| `help/side-panel.md` | the page-attachment model, per-tab drafts |
+| `help/ultrabrowse.md` | its place in the model picker, use cases |
+| `help/automation.md` | **cron / heartbeat routines, suggestions, limits** |
+| `help/ai.md` | three provider routes, OAuth subscriptions, seven API-key providers |
+| `help/privacy.md` | local data deletion items, analytics sharing on by default |
+| `help/subscription.md` | plan composition |
+| `changelog/native.md` | **versions, platforms, release cadence, Chromium chasing** |
+| `aside.com/pricing` | four price tiers |
 
-### 기타 1차·준1차
+### Other primary and near-primary sources
 
-| 출처 | 성격 | 쓴 곳 |
+| Source | Character | Used in |
 |---|---|---|
-| Zenity Labs, "Perplexity Comet: A Reversing Story" | 🔧 리버싱 | [04](04-comet-architecture.md) 전체 |
-| Brave, "Agentic Browser Security: Indirect Prompt Injection in Perplexity Comet" | ✅ 보안 연구 원문 | [07](07-security.md) |
-| `leaderboard.steel.dev` Online-Mind2Web | ✅ 3자 리더보드 | §3 |
-| `github.com/OSU-NLP-Group/Online-Mind2Web` | ✅ 벤치마크 정본 | §3 |
-| `www.diabrowser.com/security` | ✅ Dia 보안 문서 | [11 §2](11-dia-and-neon.md) |
-| `www.opera.com/llms.txt` | ✅ Opera 제품 색인 | [11 §3](11-dia-and-neon.md) |
-| `operaneon.com/faq` (Next.js 페이로드) | ✅ Neon FAQ 답변 | [11 §3](11-dia-and-neon.md) |
-| Wikipedia — Comet, ChatGPT Atlas | 📰 (날짜는 출처 표기됨) | [01](01-landscape.md), [04](04-comet-architecture.md) |
+| Zenity Labs, "Perplexity Comet: A Reversing Story" | 🔧 reverse engineering | all of [04](04-comet-architecture.md) |
+| Brave, "Agentic Browser Security: Indirect Prompt Injection in Perplexity Comet" | ✅ original security research | [07](07-security.md) |
+| `leaderboard.steel.dev` Online-Mind2Web | ✅ third-party leaderboard | §3 |
+| `github.com/OSU-NLP-Group/Online-Mind2Web` | ✅ canonical benchmark | §3 |
+| `www.diabrowser.com/security` | ✅ Dia security documentation | [11 §2](11-dia-and-neon.md) |
+| `www.opera.com/llms.txt` | ✅ Opera product index | [11 §3](11-dia-and-neon.md) |
+| `operaneon.com/faq` (Next.js payload) | ✅ Neon FAQ answers | [11 §3](11-dia-and-neon.md) |
+| Wikipedia — Comet, ChatGPT Atlas | 📰 (dates are sourced) | [01](01-landscape.md), [04](04-comet-architecture.md) |
 
-## 3. 벤치마크 주장 — 판정
+## 3. Benchmark claims — adjudicated
 
-**Aside 는 3개 벤치마크 1위를 주장한다.** 검증 결과:
+**Aside claims first place on three benchmarks.** Verification:
 
-| 주장 | 판정 | 근거 |
+| Claim | Verdict | Basis |
 |---|---|---|
-| Online-Mind2Web **99.0%** (297/300), Browser Use 97.7% | 📣 **자체보고** | 수치가 **Aside 자신의 GitHub 저장소**에 있고, **Aside 자신의 설정으로 채점**됐다. 감사된 리더보드가 아니다 |
-| **3자 리더보드에 Aside 없음** | ✅ 확인 | `leaderboard.steel.dev` 의 Online-Mind2Web 목록에 Aside 항목이 **존재하지 않는다.** 1위는 Browser Use Cloud 97.0% (커스텀 에이전트 채점, 2026-03) |
-| BU Bench V1 1위 | 📣 자체보고 | BU Bench V1 = WebBenchREAD·Online-Mind2Web 2·InteractionTests·GAIA·BrowseComp 에서 20개씩 뽑은 100개 과제 |
-| Odyssey 1위 (OpenAI·Anthropic 등 상대로) | 📣 **자체보고, 그리고 경합** | Browser Use 는 **Odysseys 87.4% 로 자기가 선두**라고 발표한다. 양쪽이 같은 벤치마크에서 각자 1위를 주장 |
+| Online-Mind2Web **99.0%** (297/300), Browser Use 97.7% | 📣 **self-reported** | The figures sit in **Aside's own GitHub repository**, graded by **Aside's own setup.** Not an audited leaderboard |
+| **Aside is absent from the third-party leaderboard** | ✅ confirmed | There is **no Aside entry** in `leaderboard.steel.dev`'s Online-Mind2Web listing. First place is Browser Use Cloud at 97.0% (custom agentic judge, 2026-03) |
+| First on BU Bench V1 | 📣 self-reported | BU Bench V1 = 100 tasks, 20 each from WebBenchREAD, Online-Mind2Web 2, InteractionTests, GAIA and BrowseComp |
+| First on Odyssey (against OpenAI, Anthropic and others) | 📣 **self-reported, and contested** | Browser Use publishes **its own claim of leading Odysseys at 87.4%.** Both claim first place on the same benchmark |
 
-> ⚠️ **이 분야 벤치마크 수치를 제품 비교에 쓰지 마라.** 채점 방식이 제각각이다 — Steel 리더보드
-> 자체가 "judge methodology varies" 를 경고하며 방법론 확인 없이 비교하지 말라고 적는다.
-> Online-Mind2Web 정본도 WebJudge(o4-mini) / WebJudge(GPT-4o) / WebVoyager 별로 다른 점수를 낸다.
+> ⚠️ **Do not use this field's benchmark numbers to compare products.** Grading methods vary — the
+> Steel leaderboard itself warns that "judge methodology varies" and says not to compare without
+> examining it. The canonical Online-Mind2Web produces different scores under WebJudge(o4-mini),
+> WebJudge(GPT-4o) and WebVoyager.
 >
-> 그리고 이 벤치마크가 **존재하는 이유 자체**가 "이전 웹 에이전트 벤치마크들이 현실 조건에서
-> 성능을 극적으로 과대평가한다"는 문제의식이었다.
+> And the benchmark **exists in the first place** because earlier web-agent benchmarks "dramatically
+> overestimate agent performance" under realistic conditions.
 
-### 벤치마크 사양 (정본 확인)
+### Benchmark specification (canonical)
 
-| 항목 | 값 |
+| Item | Value |
 |---|---|
-| Online-Mind2Web | 136개 라이브 사이트에서 **300개 과제** |
-| 난이도 분할 | Easy 1–5스텝 83개 / Medium 6–10스텝 143개 / Hard 11+스텝 74개 |
-| 채점 | WebJudge 자동(핵심포인트 식별 → 핵심 스크린샷 선택 → 결과 판정) 또는 사람. WebJudge(o4-mini)의 사람 판정 일치율 **85.7%** |
-| v2 스키마 | 2026-05-23 도입 (사람 평가 용이화) |
+| Online-Mind2Web | **300 tasks** across 136 live websites |
+| Difficulty split | Easy 1–5 steps (83) / Medium 6–10 (143) / Hard 11+ (74) |
+| Grading | WebJudge automatic (key-point identification → key-screenshot selection → outcome judgment) or human. WebJudge(o4-mini) agrees with human judgment **85.7%** of the time |
+| v2 schema | introduced 2026-05-23 to ease human evaluation |
 
-## 4. Aside — 미확인·불일치 항목
+## 4. Aside — unverified and inconsistent items
 
-| 항목 | 상태 |
+| Item | Status |
 |---|---|
-| 하드웨어 기반 E2E 암호화 | ✅ **부분 해소 (2026-09-23)** — Vault 확장이 **libsodium** 을 싣고 실제 호출부에서 `crypto_pwhash`(ARGON2ID13) · `crypto_aead_xchacha20poly1305_ietf_*` · `crypto_box_seal` 을 쓴다. [09 §7](09-aside-browser-internals.md) |
-| **Secure Enclave** | ✅ **해소** — `kSecAttrTokenIDSecureEnclave`, `CanCreateSecureEnclaveKeyPairBlocking`. [10 §3.1](10-aside-enforcement-and-native.md) |
-| **포스트양자 암호** | ✅ **해소** — **ML-KEM-768**(`crypto_kem_mlkem768_*`)이 Vault 앱 코드와 데몬에 있다. Chromium TLS 상속이 아님을 파일 위치로 확인. [10 §3.2](10-aside-enforcement-and-native.md) |
-| **감사 로깅** | ✅ **해소** — `appendAuditEvent`, `getPasswordAuditLogsDir`. [10 §3.3](10-aside-enforcement-and-native.md) |
-| 메모리가 **"plain markdown"** 으로 저장돼 편집 가능 | ✅ **해소 (2026-09-23)** — CLI 번들이 "distills user's context into **plain-Markdown files**" 라고 명시하고 `aside memory show MEMORY.md` · `aside memory path` 가 존재. 단 **직접 편집은 금지**된다. [08 §4](08-aside-code-level.md) |
-| "local-first", 서버로 무엇이 가는가 | ⚠️ 프라이버시 문서는 **로컬 삭제 방법만** 말하고 서버 전송 여부는 말하지 않는다 |
-| **Max 크레딧 배수** | ❌ **문서 내부 불일치** — 헬프는 "30x", 가격 페이지는 "40x". 어느 쪽이 최신인지 판정 불가 |
-| **플랫폼 요구사항** | ❌ **문서 내부 불일치, 그리고 문서가 불완전** — `get-started.md` 는 macOS 15+ 만, 변경로그는 Windows 정식 지원을 기록. 게다가 **CLI 는 Linux x64·arm64 를 1급 지원**하는데 어느 문서에도 없다 (설치 스크립트 실측). [08 §2](08-aside-code-level.md) |
-| 크레딧 1단위의 정의 | ⚠️ **어느 문서에도 없다** |
-| 승인 UI 의 실제 형태 | ⚠️ 모달인지 인라인인지, 일괄 승인이 되는지 문서에 없음 |
-| 회사 정보 (YC 기수, 팀 규모, 창업자) | ⚠️ 2차 출처가 "YC Fall 2025 / 3인 / 2024 설립"이라 하나 **내부 모순**(F25 배치와 2024 설립). 1차 미확인 — 본문에서 사실로 쓰지 않았다 |
-| 인식·동작 방식 | ✅ **해소 (2026-09-23)** — CLI 번들 추출로 확인. 접근성 트리 + 가상 ref ID, `{tree, diff}` 반환, ref 기반 Playwright locator. [08 §3](08-aside-code-level.md) |
-| 전송 계층 | ✅ **해소** — CLI 는 로컬 데몬(`127.0.0.1:21420`, canary `21421`)에 붙는다. 데몬이 353MB Node SEA 로 계획을 돈다. [09 §5](09-aside-browser-internals.md) |
-| Vault 구현 | ✅ 위 항목 참조 |
-| 권한 강제의 집행 지점 | ✅ **해소** — zod 정책 스키마(도구 glob + 인자 eq/regex, browser/network 매처, 4버킷) 와 `resolvePermission`/`checkPermission` 확인. [10 §1](10-aside-enforcement-and-native.md) |
-| 승인 UI 의 형태 | ✅ **해소** — suspension 3종. **채팅 채널 렌더를 전제로 설계**됐다. [10 §1.5](10-aside-enforcement-and-native.md) |
-| `Aside Computer Use` | ✅ **부분 해소** — 네이티브 바이너리. 시스템 전역 AX 트리·이벤트 탭·화면캡처·Vision·연락처. 호출 흐름은 미추적. [10 §2](10-aside-enforcement-and-native.md) |
-| "local-first" 주장 | ✅ **구조적 근거 확인** — 계획이 로컬 데몬에 있어 BYO 모델 키가 성립한다. 다만 서버로 무엇이 가는지는 정적 분석의 한계 |
+| Hardware-backed E2E encryption | ✅ **Resolved (2026-09-23)** — the Vault extension ships **libsodium** and its real call sites use `crypto_pwhash` (ARGON2ID13), `crypto_aead_xchacha20poly1305_ietf_*` and `crypto_box_seal`. [09 §7](09-aside-browser-internals.md) |
+| **Secure Enclave** | ✅ **Resolved** — `kSecAttrTokenIDSecureEnclave`, `CanCreateSecureEnclaveKeyPairBlocking`. [10 §3.1](10-aside-enforcement-and-native.md) |
+| **Post-quantum cryptography** | ✅ **Resolved** — **ML-KEM-768** (`crypto_kem_mlkem768_*`) in both the Vault application code and the daemon. Separated from Chromium TLS inheritance by file location. [10 §3.2](10-aside-enforcement-and-native.md) |
+| **Audit logging** | ✅ **Resolved** — `appendAuditEvent`, `getPasswordAuditLogsDir`. [10 §3.3](10-aside-enforcement-and-native.md) |
+| Memory stored as **"plain markdown"** and editable | ✅ **Resolved (2026-09-23)** — the CLI bundle states "distills user's context into **plain-Markdown files**" and ships `aside memory show MEMORY.md` and `aside memory path`. Direct editing is **forbidden**, though. [08 §4](08-aside-code-level.md) |
+| "local-first" — what goes to a server | ✅ **Structurally grounded** — planning runs in the local daemon, which is what makes BYO model keys work. What is transmitted remains beyond static analysis |
+| **Max credit multiplier** | ❌ **Internal inconsistency** — the help documentation says "30x," the pricing page says "40x." Which is current cannot be determined |
+| **Platform requirements** | ❌ **Inconsistent, and incomplete** — `get-started.md` gives only macOS 15+ while the changelog records official Windows support. And **the CLI supports Linux x64/arm64 as a first-class target**, which no document mentions (measured from the install script). [08 §2](08-aside-code-level.md) |
+| What one credit is | ⚠️ **Defined in no document** |
+| Perception and action | ✅ **Resolved (2026-09-23)** — accessibility tree plus virtual ref IDs, returning `{tree, diff}`, with ref-based Playwright locators. [08 §3](08-aside-code-level.md) |
+| Transport | ✅ **Resolved** — the CLI attaches to a local daemon (`127.0.0.1:21420`, canary `21421`); a 353MB Node SEA daemon does the planning. [09 §5](09-aside-browser-internals.md) |
+| Permission enforcement | ✅ **Resolved** — the zod policy schema (tool globs plus argument eq/regex, browser and network matchers, four buckets) and `resolvePermission`/`checkPermission`. [10 §1](10-aside-enforcement-and-native.md) |
+| The shape of the approval UI | ✅ **Resolved** — three suspension kinds, **designed to render in a chat channel.** [10 §1.5](10-aside-enforcement-and-native.md) |
+| `Aside Computer Use` | ✅ **Partly resolved** — a native binary reaching the system-wide accessibility tree, an event tap, screen capture, Vision and Contacts. Control flow not traced. [10 §2](10-aside-enforcement-and-native.md) |
+| Company details (YC batch, team size, founders) | ⚠️ Secondary sources say "YC Fall 2025 / three people / founded 2024," which is **internally inconsistent** (an F25 batch with a 2024 founding). Not primary-confirmed — not stated as fact in the body |
 
-> 📌 이 표의 "미공개"가 많았던 이유는 **제품이 미성숙해서가 아니라 아무도 뜯어보지 않았기
-> 때문**이었다. 2026-09-23 에 직접 뜯어서 절반이 해소됐다 — [08](08-aside-code-level.md).
-> 정보량 차이를 성숙도 차이로 읽으면 안 된다는 원래 경고가 실증된 셈이다.
+> 📌 Many of these cells started as "not published." That was **not because the product was immature
+> but because nobody had taken it apart.** Opening it on 2026-09-23 resolved most of them —
+> [08](08-aside-code-level.md), [09](09-aside-browser-internals.md),
+> [10](10-aside-enforcement-and-native.md). The original warning not to read a difference in
+> available information as a difference in maturity proved itself.
 
-## 4.5 이 조사가 스스로 뒤집은 것
+## 4.5 What this study overturned about itself
 
-| 앞선 서술 | 판정 |
+| Earlier statement | Verdict |
 |---|---|
-| "Comet 은 Aside 와 **정반대 구조**" ([04 §1](04-comet-architecture.md)) | ❌ **반증.** Aside 의 에이전트도 MV3 확장이다. 둘은 같은 구조적 선택을 했고, 실제 차이는 **계획 위치**다. 원문은 지우지 않고 정정 표시를 달았다 |
-| "`opencode` 가 데몬에 100회 출현" (초기 탐색) | ❌ **오탐.** 대부분 ANSI 색상 변수 `openCodes` 였다. 실제 의미 있는 출현은 프로바이더 id 와 `x-opencode-*` 헤더 |
-| "입력 분리를 문서화한 제품이 없다" ([07 §8](07-security.md)) | ❌ **부분 반증.** Dia 가 구체적으로 문서화하고 있었다 — URL 원문 미전달, 비밀번호·비가역 버튼을 에이전트 인식에서 제거. [11 §2.3](11-dia-and-neon.md) |
-| "Opera Neon 의 재사용 단위는 Skills" ([05 §3](05-comparables.md)) | ❌ **반증.** 2차 출처를 따른 오류. 공식 명칭은 **Cards** 이고 축도 다르다(작업 유형 ≠ 호출 루틴). [11 §3.4](11-dia-and-neon.md) |
-| Neon "모든 AI 처리가 로컬" (`opera.com/llms.txt`) | ❌ **벤더 자신의 두 1차 출처가 모순.** 제품 FAQ 가 "계획은 클라우드 LLM" 이라고 명시한다. 더 구체적인 쪽을 채택했다. [11 §3.1](11-dia-and-neon.md) |
+| "Comet is the **exact opposite structure** to Aside" ([04 §1](04-comet-architecture.md)) | ❌ **Refuted.** Aside's agent is an MV3 extension too. They made the same structural choice; the real difference is **planning location.** The original text is kept with a correction marker |
+| "`opencode` appears 100 times in the daemon" (initial scan) | ❌ **False positive.** Most were the ANSI colour variable `openCodes`. The meaningful occurrences are the provider id and the `x-opencode-*` headers |
+| "No product documents input separation" ([07 §8](07-security.md)) | ❌ **Partly refuted.** Dia documents it concretely — no verbatim URL passing, password fields and irreversible buttons removed from the agent's perception. [11 §2.3](11-dia-and-neon.md) |
+| "Opera Neon's unit of reuse is Skills" ([05 §3](05-comparables.md)) | ❌ **Refuted.** An error inherited from a secondary source. The official name is **Cards**, and the axis differs (task type, not named invocation). [11 §3.4](11-dia-and-neon.md) |
+| Neon "all AI processes run locally" (`opera.com/llms.txt`) | ❌ **The vendor's own two primary sources contradict each other.** The product FAQ states that planning uses cloud LLMs. The more specific source was taken. [11 §3.1](11-dia-and-neon.md) |
 
-> 📌 첫 항목은 **1차 자료가 늘어나자 자기 결론이 뒤집힌** 사례다. 이 저장소가 반증을 지우지
-> 않는 이유가 여기 있다 — 지웠다면 왜 그렇게 생각했는지도 사라진다.
+> 📌 The first entry is a case of **a conclusion being overturned as primary material accumulated.**
+> That is why this repository does not delete refutations — deleting them would also delete the
+> reason the earlier belief was held.
 
-## 5. Comet — 등급
+## 5. Comet — grade
 
-[04](04-comet-architecture.md) 의 내용은 전부 🔧 **관측된 구현**이다. Zenity 의 리버싱 결과이며
-Perplexity 가 보증한 명세가 아니다. 다음이 따라 나온다:
+Everything in [04](04-comet-architecture.md) is 🔧 **observed implementation** — Zenity's reverse
+engineering, not a specification Perplexity guarantees. It follows that:
 
-- 벤더가 예고 없이 바꿀 수 있다. 확장은 서버에서 자동 갱신된다
-- 리버싱 시점 이후 변경분은 반영돼 있지 않다
-- 그럼에도 **마케팅 문구보다는 진실에 가깝다** — 이 저장소의 기본 입장
+- the vendor can change it without notice; extensions auto-update from the server
+- changes after the reverse-engineering date are not reflected
+- it is nevertheless **closer to the truth than marketing copy** — this repository's default stance
 
-## 6. Atlas — 확인과 미확인
+## 6. Atlas — confirmed and unconfirmed
 
-| 항목 | 등급 |
+| Item | Grade |
 |---|---|
-| 출시 2025-10-21 macOS, 종료 **2026-08-09** | ✅ 여러 출처 일치 |
-| 기능이 ChatGPT·Codex 로 흡수, 30일 정리 기간, 북마크 수동 내보내기 | 📰 |
-| 종료 사유 — **통합**(CNBC 2026-03-19) vs **보안 유지보수**(OpenAI 헬프센터) | ⚠️ **둘 다 공개돼 있고 무게는 밝혀지지 않았다.** 본문에서 병기했다 |
-| OWL 아키텍처, 스크린샷 팝업 합성 | 📰 (OpenAI 엔지니어링 포스트 경유 보도. 원문 직접 확인 실패) |
+| Released 2025-10-21 (macOS), retired **2026-08-09** | ✅ several sources agree |
+| Features absorbed into ChatGPT and Codex, 30-day wind-down, manual bookmark export | 📰 |
+| Reason — **consolidation** (CNBC 2026-03-19) vs. **security maintenance** (OpenAI help centre) | ⚠️ **Both are published and the weighting is not stated.** Both are recorded in the body |
+| The OWL architecture, screenshot popup compositing | 📰 (reported via an OpenAI engineering post; the original was not read directly) |
 
-⚠️ **OpenAI 헬프센터 원문(`help.openai.com/.../evolving-atlas-into-chatgpt...`)은 HTTP 403 으로
-직접 읽지 못했다.** 종료 관련 서술은 전부 2차 경유다.
+⚠️ **The OpenAI help centre page (`help.openai.com/.../evolving-atlas-into-chatgpt...`) returned HTTP
+403 and could not be read directly.** Everything about the retirement is via secondary sources.
 
-## 7. 조사 방법과 그 한계
+## 7. Method, and its limits
 
-### 쓴 방법
+### What was used
 
-1. 제품 문서에 **`.md` 접미사와 `/llms.txt`** 를 먼저 시도 → Aside 문서 전체를 1차 텍스트로 확보
-2. 리버싱·보안 연구를 **마케팅 페이지보다 우선**
-3. 벤더 벤치마크 주장을 **3자 리더보드와 대조** → §3 의 판정이 나옴
-4. 문서 간 **내부 불일치를 적극적으로 찾음** → §4 에 2건
-5. **(2026-09-23) 바이너리를 직접 열었다** — Linux CLI 를 설치해 Node SEA 페이로드를
-   추출, 난독화되지 않은 ESM 번들 67,774줄을 확보. 재현 절차는 [08 §1](08-aside-code-level.md)
-6. **(2026-09-23) Chromium 상속과 제품 고유 기능을 갈랐다** — 포스트양자 심볼이 나왔을 때
-   "Chromium 은 원래 X25519MLKEM768 TLS 를 기본 탑재한다"는 사실 때문에 **파일 위치를 먼저
-   확인**했다. Aside 자신의 코드(Vault·데몬)에 있음을 확인한 뒤에야 확정으로 적었다.
-7. **(2026-09-23) 브라우저 DMG 도 열었다** — 실행하지 않고 정적 분석. 내부 확장 3종의 manifest,
-   데몬의 Node SEA 페이로드(258,965줄), Vault 암호 호출부. 재현은 [09 §1](09-aside-browser-internals.md)
+1. Try **the `.md` suffix and `/llms.txt`** on product documentation first → Aside's entire
+   documentation obtained as primary text
+2. Prefer **reverse engineering and security research over marketing pages**
+3. **Cross-check vendor benchmark claims against a third-party leaderboard** → the verdicts in §3
+4. **Actively look for internal inconsistencies between documents** → two found in §4
+5. **(2026-09-23) Opened the binaries.** Installed the Linux CLI, extracted the Node SEA payload,
+   obtained an unobfuscated ESM bundle of 67,774 lines. Reproduction in [08 §1](08-aside-code-level.md)
+6. **(2026-09-23) Separated Chromium inheritance from product features.** When post-quantum symbols
+   appeared, the fact that **Chromium ships X25519MLKEM768 TLS by default** meant **checking file
+   location first.** Only after confirming they were in Aside's own code (Vault and daemon) was it
+   written as settled
+7. **(2026-09-23) Opened the browser DMG too** — statically, without running it. The three internal
+   extensions' manifests, the daemon's Node SEA payload (258,965 lines) and the Vault's cryptographic
+   call sites. Reproduction in [09 §1](09-aside-browser-internals.md)
 
-### 하지 못한 것 — 정직하게
+### What was not done — plainly
 
-| 항목 | 이유 |
+| Item | Why |
 |---|---|
-| **GUI 를 직접 보지 못했다** | 조사 환경이 헤드리스 리눅스이고 **Aside 브라우저는 리눅스 빌드가 없다**. CLI 는 설치·분석했으나(§08) 브라우저 UI 는 여전히 미확인. 실제 UI·애니메이션·진행 상태 표현·승인 모달의 생김새는 확인 불가. [03](03-aside-design-ux.md) 은 **문서가 규정한 상호작용 모델**에 한정된다 |
-| 로그인하지 않았다 | `aside login` 은 사용자 계정 자격증명이 필요한 행위라 하지 않았다. 따라서 `skills list` 의 실제 목록, `memory` 내용, 원격 호스트 동작은 미확인 |
-| 데몬 전수 분석은 안 했다 | 권한 집행은 확인했으나([10](10-aside-enforcement-and-native.md)) 에이전트 루프 상세는 미탐색 |
-| 동적 분석을 못 했다 | 서버 통신 내용, 실제 실행 경로는 정적 분석의 한계 밖 |
-| 시각 디자인 언어 (색·타이포·간격) | 위와 같은 이유. **추정으로 채우지 않았다** |
-| Aside 의 내부 구조 | 문서에 없고 공개 분석도 없다 |
-| Dia·Neon 의 아키텍처 | 1차 자료 부재. 2차 요약 수준에서 멈췄다 |
-| 원 연구 논문 (워싱턴대 등) | 2차 보도만 확인 |
+| **The GUI was never seen** | The research environment is headless Linux and **Aside's browser has no Linux build.** The CLI was installed and analysed (§08) but the browser UI remains unverified. Actual UI, animation, progress representation and the appearance of approval modals cannot be confirmed. [03](03-aside-design-ux.md) is limited to **the interaction model the documentation specifies** |
+| No login | `aside login` would use the user's account credentials and was not requested. So the real `skills list`, memory contents and remote-host behaviour are unverified |
+| The daemon was not exhaustively analysed | Permission enforcement was confirmed ([10](10-aside-enforcement-and-native.md)) but the agent loop's details were not explored |
+| No dynamic analysis | What goes to a server, and the real execution path, lie beyond static analysis |
+| Dia and Neon binaries | Not analysed. Nothing there is verified to Aside's standard |
+| Original research papers (University of Washington and others) | Only secondary reporting was checked |
 
-### 다음 조사에서 할 것
+### Next
 
-- [x] ~~`aside repl`/`mcp` 표면 확인~~ → [08](08-aside-code-level.md) 에서 규격까지 확보
-- [ ] **macOS/Windows 기기에서** Aside 브라우저 GUI 확인 (승인 흐름, 진행 상태 표현) — 리눅스에서는 불가
-- [ ] 브라우저 바이너리를 CLI 와 같은 방식으로 열기 — 권한 강제·Vault 가 거기 있다
-- [ ] Aside 의 네트워크 트래픽 관찰 → "local-first" 주장의 실증 (§4)
-- [ ] `aside skills list` 실제 목록 확인 (로그인 필요)
-- [ ] 워싱턴대 2026-06 연구 원문 확보
-- [x] ~~Dia / Opera Neon 1차 문서 탐색~~ → [11](11-dia-and-neon.md)
-- [ ] Neon 의 Tasks 상세 — FAQ 답변을 끝까지 추출하지 못했다
-- [ ] Dia·Neon 의 **바이너리 분석** — 현재는 문서를 믿은 상태다. Aside 수준의 검증 비대칭이 남아 있다
+- [x] ~~`aside repl`/`mcp` surface~~ → specification obtained in [08](08-aside-code-level.md)
+- [x] ~~Open the browser binary~~ → [09](09-aside-browser-internals.md)
+- [x] ~~Permission enforcement / `Aside Computer Use` / Secure Enclave and post-quantum~~ → [10](10-aside-enforcement-and-native.md)
+- [x] ~~Dia and Opera Neon primary documentation~~ → [11](11-dia-and-neon.md)
+- [ ] Trace `Aside Computer Use`'s control flow (symbols only so far)
+- [ ] Dynamic observation — what goes to a server. Beyond static analysis
+- [ ] **Confirm the browser GUI on a macOS/Windows machine** — impossible on Linux
+- [ ] Details of Neon's Tasks — the FAQ answers were not extracted completely
+- [ ] **Analyse Dia's and Neon's binaries** — they are currently taken on documentation. The
+  verification asymmetry remains
 
-## 8. 유효기간
+## 8. Shelf life
 
-이 분야는 **분기 단위로 뒤집힌다.** 조사 기간 중에만 해도: Atlas 가 종료됐고(2026-08),
-Comet 이 전면 무료화됐고(2026-03), Aside 가 Windows 를 냈다. 재조사의 첫 수는 새 사실 수집이
-아니라 **기존 사실의 드리프트 확인**이다 — 특히 §4 의 불일치 항목과 [01 §4](01-landscape.md) 의
-가격·플랫폼 표.
+This field **overturns quarterly.** During the research period alone: Atlas was retired (2026-08),
+Comet went fully free (2026-03), and Aside shipped Windows. The first move of a re-investigation is
+not gathering new facts but **checking existing facts for drift** — especially the inconsistent items
+in §4 and the price and platform table in [01 §4](01-landscape.md).

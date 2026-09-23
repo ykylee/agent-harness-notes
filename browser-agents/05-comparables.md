@@ -1,150 +1,154 @@
-# 05. 비교군 — Atlas · Dia · Neon · 확장형 · 라이브러리
+# 05. Comparables — Atlas · Dia · Neon · extensions · libraries
 
-> Aside([02](02-aside.md))·Comet([04](04-comet-architecture.md))만큼의 1차 자료가 없는 제품들이다.
-> 깊이가 얕은 항목은 얕은 대로 두고 추정으로 메우지 않았다. 등급은 [99](99-sources.md).
+> These lack the primary material available for Aside ([02](02-aside.md)) and Comet
+> ([04](04-comet-architecture.md)). Where the depth is shallow it is left shallow rather than filled
+> in by guesswork. Grades in [99](99-sources.md).
 
-## 1. ChatGPT Atlas — 종료됨 (그래서 더 배울 게 있다)
+## 1. ChatGPT Atlas — retired, and instructive for it
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 출시 | **2025-10-21**, macOS 한정 (Windows/iOS/Android "coming soon" 이었으나 미출시) |
-| 엔진 | Chromium / Blink |
-| 종료 | **2026-08-09** — 출시 10개월 미만 |
-| 이후 | 브라우저 기반 에이전트 기능이 ChatGPT 와 Codex 로 흡수 |
-| 에이전트 모드 | Plus/Pro 유료. AI 에게 **커서를 주고 브라우저 UI 를 파란색으로 강조** |
-| 벤치마크 | Online-Mind2Web 71.0% (OpenAI 자체보고, 2026-03) |
+| Released | **2025-10-21**, macOS only (Windows/iOS/Android were "coming soon" and never shipped) |
+| Engine | Chromium / Blink |
+| Retired | **2026-08-09** — under ten months |
+| After | browser-based agentic capabilities absorbed into ChatGPT and Codex |
+| Agent mode | paid (Plus/Pro). Gives the AI **a cursor and tints the browser UI blue** |
+| Benchmark | Online-Mind2Web 71.0% (OpenAI self-reported, 2026-03) |
 
-### 아키텍처에서 남는 것 — OWL
+### What survives architecturally — OWL
 
-Atlas 는 **OWL 이라는 자체 아키텍처로 Chromium 런타임과 앱을 분리**했다고 엔지니어링 포스트에
-기술됐다. 대부분의 Chromium 파생 브라우저는 웹 엔진을 앱에 직접 임베드해 UI 와 렌더링 엔진이
-강하게 결합되는데, 그 결합이 특정 능력을 어렵게 만든다는 문제의식이다.
+Atlas is described in an engineering post as separating the application from the Chromium runtime
+with **its own architecture called OWL.** Most Chromium derivatives embed the web engine directly in
+the app, coupling UI tightly to the rendering engine — and that coupling makes certain capabilities
+very hard.
 
-**에이전트 모드의 구체적 문제와 해법 하나가 기록으로 남아 있다:**
+**One concrete problem and its fix are on the record for agent mode:**
 
-> 에이전트 모드를 구동하는 computer-use 모델은 **브라우저 스크린샷 한 장**을 입력으로 받는다.
-> 그런데 드롭다운 메뉴 같은 일부 UI 는 메인 탭 경계 **바깥의 별도 윈도우**로 렌더된다.
-> Atlas 는 이 팝업 윈도우들을 **올바른 좌표로 메인 페이지 이미지에 합성**해 넣는다.
-> 모델이 한 프레임에서 전체 맥락을 보게 하기 위해서다.
+> The computer-use model that powers agent mode takes **a single screenshot of the browser** as
+> input. But some UI, such as dropdown menus, renders in **a separate window outside the main tab's
+> bounds.** Atlas **composites those popup windows back into the main page image at their correct
+> coordinates**, so the model sees the whole context in one frame.
 
-> 📌 **스크린샷 기반 인식의 구조적 함정을 보여주는 사례다.** "화면을 찍어 모델에 준다"는 단순해
-> 보이지만, 브라우저의 실제 렌더링은 한 장의 이미지가 아니다. 네이티브 팝업·드롭다운·모달이
-> 별도 서피스로 뜬다. 스크린샷 방식을 택하면 **이 합성 문제를 직접 풀어야 한다.**
-> 접근성 트리(Comet)나 DOM 증류(Browser Use)를 택하면 이 문제가 애초에 없다 — [06 §2](06-architecture-axes.md).
+> 📌 **A case study in the structural trap of screenshot-based perception.** "Capture the screen and
+> hand it to the model" sounds simple, but a browser's actual rendering is not one image — native
+> popups, dropdowns and modals surface separately. Choose screenshots and **you must solve the
+> compositing problem yourself.** Choose an accessibility tree (Comet) or DOM distillation (Browser
+> Use) and the problem never arises — [06 §2](06-architecture-axes.md).
 
-### 종료가 남긴 교훈
+### What the retirement teaches
 
-1. **브라우저는 제품이 아니라 상시 부채다.** 보안 유지보수가 종료 사유에 들어갔다.
-2. **에이전트 능력은 브라우저를 소유하지 않아도 된다.** OpenAI 는 브라우저를 버리고 기능만 가져갔다.
-3. 자원이 가장 많은 회사조차 **소비자 브라우저 유지가 수지에 안 맞았다.** 3인 팀이 Chromium 을
-   1~2주마다 따라가는 Aside([02 §7](02-aside.md))를 이 맥락에서 봐야 한다.
+1. **A browser is not a product but a standing debt.** Security maintenance entered the stated reasons.
+2. **Agent capability does not require owning a browser.** OpenAI discarded the browser and kept the features.
+3. Even the best-resourced company found **maintaining a consumer browser did not pay.** Read Aside's
+   three-person team chasing Chromium every week or two ([02 §7](02-aside.md)) in that light.
 
-> 📌 **Dia 와 Opera Neon 은 이후 1차 출처로 심화했다 — [11](11-dia-and-neon.md).**
-> 아래는 개요이고, 프롬프트 주입 방어·계획 위치·Cards 의 실체는 그쪽에 있다.
+## 2. Dia — the Arc team, under Atlassian
 
-## 2. Dia — Arc 팀, Atlassian 산하
+> 📌 **Dia and Opera Neon were later deepened from primary sources — [11](11-dia-and-neon.md).**
+> What follows is an overview; the injection defences, planning location and the reality of Cards
+> are there.
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 개발 | The Browser Company (Arc 제작), **Atlassian 인수 6.1억 달러, 2025-10 완료** |
-| 플랫폼 | **macOS 14+ Apple Silicon 한정.** 인수 후에도 Windows 빌드 미발표 |
-| 가격 | 무료 / Dia Pro $20월 (무제한 채팅 + Skills) |
-| 핵심 | 페이지 옆에 상주하는 채팅, **열린 탭들을 가로질러 읽는다** |
-| **Skills** | 이름으로 호출하는 재사용 가능한 AI 루틴 |
-| 차별점 주장 | 로컬 암호화, AI 접근 대상에 대한 세분화된 통제 |
+| Developer | The Browser Company (makers of Arc); **acquired by Atlassian for $610M, closed 2025-10** |
+| Platforms | **macOS 14+, Apple Silicon only.** No Windows build announced even post-acquisition |
+| Pricing | free / Dia Pro $20/mo (unlimited chat plus Skills) |
+| Core | chat riding alongside the page, **reading across open tabs** |
+| **Skills** | reusable AI routines invoked by name |
+| Claimed differentiator | local encryption, granular control over what the AI may access |
 
-> 📌 **Skills** 가 구조적으로 흥미롭다. 일회성 프롬프트가 아니라 **이름 붙은 재사용 단위**를
-> 사용자가 만든다. Opera Neon 도 같은 이름의 개념을 갖고 있고(§3), Aside 의 Routines([02 §10](02-aside.md))도
-> 같은 문제를 스케줄 쪽에서 푼다. **"반복되는 위임을 어떻게 재사용 단위로 만드나"** 가 이
-> 분야의 공통 과제임을 보여준다.
+> 📌 **Skills** is structurally interesting: not a one-off prompt but a **named reusable unit** the
+> user builds. Opera Neon has a comparable concept (§3), and Aside's Routines ([02 §10](02-aside.md))
+> attack the same problem from the scheduling side. **"How do you turn a repeated delegation into a
+> reusable unit"** is a shared problem for this field.
 
-> 인수 후 포지셔닝이 "지식노동자를 위한 브라우저"로 옮겨갔다. 소비자 브라우저 경쟁에서 빠져
-> 기업 워크플로우로 간 것으로 보인다 — Atlas 종료와 같은 방향의 움직임이다.
+> Post-acquisition positioning shifted to "the browser for knowledge workers" — out of the consumer
+> browser race and into enterprise workflow, the same direction as Atlas's retirement.
 
 ## 3. Opera Neon
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 엔진 | Chromium |
-| 시점 | **2025-05 제한 공개** — 소비자 브라우저 중 에이전트 기능을 먼저 실은 축 |
-| 가격 | $19.90/월 |
-| 특징 | Neon Do(실행) · Tasks(진행 작업) · **Cards**(재사용 프롬프트). ⚠️ 2차 출처가 "Skills"라 부른 것은 공식 명칭이 아니다 — [11 §3.4](11-dia-and-neon.md) |
+| Engine | Chromium |
+| Timing | **limited release 2025-05** — among the first consumer browsers to ship agentic features |
+| Pricing | $19.90/mo |
+| Features | Neon Do (action) · Tasks (ongoing work) · **Cards** (reusable prompts). ⚠️ What secondary sources called "Skills" is not the official name — [11 §3.4](11-dia-and-neon.md) |
 
-> 병렬 작업을 전면에 내세운 것이 다른 제품과 다르다. 대부분은 "작업 하나를 끝까지"에 집중하는데
-> Neon 은 여러 개를 동시에 굴리는 쪽을 판다.
+> Putting parallel work up front distinguishes it: most products concentrate on "one task to
+> completion," Neon sells running several at once.
 
-## 4. 확장형 — Claude for Chrome · Gemini in Chrome
+## 4. Extensions — Claude for Chrome and Gemini in Chrome
 
-**브라우저를 만들지 않는다.** 사용자가 쓰던 Chrome 에 붙는다.
+**They do not build a browser.** They attach to the Chrome the user already has.
 
 ### Claude for Chrome
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 형태 | 공식 Chrome 확장 |
-| 성격 | 페이지를 보는 사이드바 **겸** 에이전트 — 클릭·입력·양식 작성·다중 탭 작업 |
-| 이력 | 2025-08 1,000명 파일럿 → 2025-12 유료 전 플랜(Pro/Max/Team/Enterprise) |
-| 제약 | **Google Chrome 에서만** |
+| Form | official Chrome extension |
+| Character | a sidebar that sees the page **and** an agent — clicking, typing, filling forms, working across tabs |
+| History | 1,000-user pilot 2025-08 → all paid plans (Pro/Max/Team/Enterprise) 2025-12 |
+| Constraint | **Google Chrome only** |
 
 ### Gemini in Chrome
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 형태 | Chrome 내장 |
-| 배포 | Workspace 사용자 일반 공급, 미국 AI Pro/Ultra 에 **auto browse** |
-| 능력 | 양식 자동 작성 (예: PDF 의 정보로 채우기) |
+| Form | built into Chrome |
+| Distribution | generally available to Workspace users; **auto browse** for US AI Pro/Ultra |
+| Capability | form filling (for example from information in a PDF) |
 
-> 📌 **구조적 이점**: 사용자 마이그레이션이 필요 없다. 브라우저 유지보수 부채도 없다
-> (Chrome 팀이 진다). Atlas 종료 이후 이 접근이 상대적으로 유리해 보인다.
+> 📌 **Structural advantage**: no user migration, and no browser maintenance debt (the Chrome team
+> carries it). After Atlas's retirement this approach looks comparatively favourable.
 >
-> **구조적 한계**: 확장 API 가 허용하는 것만 할 수 있다. 브라우저 자체를 바꿀 수 없으니
-> Aside 의 분할 탭 같은 **브라우저 크롬 수준 UX** 는 불가능하다. 그리고 Gemini in Chrome 은
-> **Chrome 점유율이 곧 배포 채널**이라는 비대칭 이점을 갖는다 — 경쟁사가 복제할 수 없는 종류다.
+> **Structural limit**: only what the extension APIs permit. You cannot change the browser itself, so
+> **browser-chrome-level UX** like Aside's split tabs is impossible. And Gemini in Chrome enjoys an
+> asymmetric advantage no competitor can copy — **Chrome's market share is the distribution channel.**
 
-## 5. Browser Use — 라이브러리 축
+## 5. Browser Use — the library axis
 
-**사람이 쓰는 제품이 아니다. 코드가 브라우저를 모는 라이브러리다.**
+**Not a product a person uses. A library in which code drives the browser.**
 
-| 축 | 내용 |
+| Axis | Detail |
 |---|---|
-| 형태 | 오픈소스 Python 라이브러리 |
-| 규모 | GitHub **~108,000 stars** (2026-08) |
-| 위치 | Online-Mind2Web 리더보드 **1위 97.0%** (Browser Use Cloud, 커스텀 에이전트 채점, 2026-03), Odysseys 87.4% |
-| 모델 | LiteLLM 경유 다중 프로바이더 |
+| Form | open-source Python library |
+| Scale | **~108,000 GitHub stars** (2026-08) |
+| Standing | Online-Mind2Web leaderboard **first at 97.0%** (Browser Use Cloud, custom agentic judge, 2026-03); Odysseys 87.4% |
+| Models | many providers via LiteLLM |
 
-### 에이전트 루프 (O-P-A-V)
+### The agent loop (O-P-A-V)
 
-`Agent` 가 작업 단위다. task · LLM · `BrowserSession` 을 넘기면 매 스텝:
+`Agent` is the unit of work. Hand it a task, an LLM and a `BrowserSession`, and each step:
 
-| 단계 | 동작 |
+| Step | Action |
 |---|---|
-| **Observe** | DOM 을 가지치고 SoM 주석 스크린샷 촬영 |
-| **Reason** | 사용자 목표 vs 현재 상호작용 상태 평가 |
-| **Plan** | 원자적 동작 선택 (Click / Type / Scroll / Tab) |
-| **Act** | Playwright CDP 로 입력 디스패치 |
-| **Verify** | 네트워크 유휴·DOM 변이 대기 후 상태 검증 |
+| **Observe** | prune the DOM and capture a SoM-annotated screenshot |
+| **Reason** | evaluate the user goal against the current interactive state |
+| **Plan** | select an atomic action (Click / Type / Scroll / Tab) |
+| **Act** | dispatch input through Playwright CDP |
+| **Verify** | wait for network idle and DOM mutation, then verify state |
 
-실패 시 자가 치유 재시도 또는 폴백.
+On failure, a self-healing retry or fallback.
 
-### DOM 트리 증류
+### DOM tree distillation
 
-| 항목 | 값 |
+| Item | Value |
 |---|---|
-| 제거 | 스크립트, 스타일, SVG, 숨은 요소 |
-| 추출 | 상호작용 노드(`button`, `input`, `a`, `select`), 바운딩 박스, 뷰포트 가시성 |
-| 축약 | 의미 없는 래퍼 `<div>` 체인을 접고, 의미 있는 텍스트나 상호작용 접근성 속성을 가진 노드만 보존 |
-| **결과** | **2MB+ 원본 → 1,500~3,000 토큰** (5~15KB) |
+| Removed | scripts, styles, SVGs, hidden elements |
+| Extracted | interactive nodes (`button`, `input`, `a`, `select`), bounding boxes, viewport visibility |
+| Collapsed | non-semantic wrapper `<div>` chains; only nodes with meaningful text or interactive accessibility attributes survive |
+| **Result** | **2MB+ raw → 1,500–3,000 tokens** (5–15KB) |
 
-### Set-of-Mark 시각 그라운딩
+### Set-of-Mark visual grounding
 
-픽셀 좌표를 예측하게 하지 않는다.
+The model is never asked to predict pixel coordinates.
 
-1. JS 로 모든 상호작용 후보의 바운딩 박스를 얻고
-2. **번호 배지(`[1]`, `[2]`, `[15]`)** 가 달린 밝은 색 박스를 그리고
-3. 주석된 스크린샷을 찍고
-4. 모델은 좌표가 아니라 **인덱스를 참조하는 고수준 동작**을 낸다 — `click_element(index=14)`
+1. JavaScript gets the bounding box of every interactive candidate
+2. Brightly coloured boxes carrying **numeric badges (`[1]`, `[2]`, `[15]`)** are painted
+3. An annotated screenshot is captured
+4. The model emits **high-level actions referencing indices**, not coordinates — `click_element(index=14)`
 
-동작 실행 정밀도가 **95% 이상**으로 올라간다고 기술된다.
+Action execution precision is reported **above 95%**.
 
 ```
 click_element(index=14)
@@ -153,29 +157,32 @@ scroll_down(amount=500)
 switch_tab(tab_id=1)
 ```
 
-### 정체 감지
+### Stagnation detection
 
-같은 요소를 **3회 연속 클릭**해도 DOM 토폴로지가 바뀌지 않으면 워치독이 페이지를 강제 새로고침하고,
-모달 감지나 스크롤 필요 같은 대안 전략으로 유도하는 맥락 피드백을 주입한다.
+If **three consecutive clicks** on an element leave the DOM topology unchanged, a watchdog forces a
+clean page reload and injects contextual feedback steering the model toward alternative strategies
+such as modal detection or scrolling.
 
-### 토큰 예산
+### Token budget
 
-스텝당 평균 **800~2,500 토큰**. 스크린샷은 ~1280px 폭으로 압축해 이미지당 수백 토큰 수준.
+**800–2,500 tokens per step** on average. Screenshots compress to ~1280px wide, keeping per-image
+consumption to a few hundred tokens.
 
-> 📌 **이 축이 가장 투명하다.** 오픈소스이기 때문에 인식·동작·복구 전략이 전부 읽힌다.
-> 소비자 브라우저들이 공개하지 않는 것을 여기서 배울 수 있다. 특히 **SoM 인덱스 방식**은
-> Comet 의 픽셀 좌표 `ComputerBatch`([04 §6](04-comet-architecture.md))나 Atlas 의 스크린샷
-> 합성(§1)보다 구조적으로 견고해 보인다 — 좌표 오차라는 실패 모드 자체가 없다.
+> 📌 **This axis is the most transparent.** Being open source, its perception, action and recovery
+> strategies are all readable — you can learn here what the consumer browsers do not publish. The
+> **SoM index approach** in particular looks structurally more robust than Comet's pixel-coordinate
+> `ComputerBatch` ([04 §6](04-comet-architecture.md)) or Atlas's screenshot compositing (§1): the
+> failure mode of coordinate error simply does not exist.
 
-## 6. 한 표로
+## 6. In one table
 
 | | Aside | Comet | Atlas | Dia | Neon | Claude/Chrome | Browser Use |
 |---|---|---|---|---|---|---|---|
-| 분류 | A | A(확장구현) | A **종료** | A | A | B | C |
-| 플랫폼 | mac, Win | 4종 | macOS | **mac/AS 한정** | 데스크톱 | Chrome | 라이브러리 |
-| 계획 위치 | 로컬 주장 | **서버** | — | — | — | 서버 | **호출자** |
-| 인식 방식 | 미공개 | 접근성 트리 | 스크린샷 합성 | 미공개 | 미공개 | 미공개 | **DOM증류+SoM** |
-| 재사용 단위 | Routines | — | — | **Skills** | **Skills** | — | 코드 |
-| 개발자 표면 | **CLI/MCP/REPL** | — | — | — | — | — | **전부** |
-| BYO 모델 | **구독/키** | Max만 선택 | — | — | — | — | **전부** |
-| 내부 공개도 | 문서 상세 | **리버싱됨** | 일부 | 낮음 | 낮음 | 낮음 | **오픈소스** |
+| Class | A | A (extensions) | A **retired** | A | A | B | C |
+| Platforms | mac, Win | 4 | macOS | **mac/AS only** | desktop | Chrome | library |
+| Planning | **local daemon** | **server** | — | server | **cloud LLM** | server | **caller** |
+| Perception | **a11y tree + refs** | a11y tree | screenshot compositing | — | — | — | **DOM distill + SoM** |
+| Unit of reuse | Routines | — | — | **Skills** | **Cards** | — | code |
+| Developer surface | **CLI/MCP/REPL** | — | — | — | **MCP** | — | **all of it** |
+| BYO model | **subscription/key** | Max only | — | — | — | — | **all of it** |
+| Internals known | **binary analysed** | **reverse-engineered** | partial | low | low | low | **open source** |

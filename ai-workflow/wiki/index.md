@@ -2,62 +2,78 @@
 
 # Master Knowledge Index
 
-> 형식과 규칙은 [`./SCHEMA.md`](./SCHEMA.md). ingest 가 page 를 만들 때마다 항목이 추가된다.
-> 원 소스는 `docs/`(Codex 하네스)와 `browser-agents/`(브라우저형 에이전트) — 위키는 **두 조사를
-> 개념 축으로 재색인**한 계층이다. 교차 종합은 [`SYNTHESIS.md`](../../SYNTHESIS.md).
+> Format and rules in [`./SCHEMA.md`](./SCHEMA.md). Entries are added as ingests create pages.
+> The sources are `docs/` (the Codex harness) and `browser-agents/` (browser-type agents) — this
+> wiki **re-indexes both by concept.** The cross-study synthesis is [`SYNTHESIS.md`](../../SYNTHESIS.md).
 >
-> **표면 고유 축**(인식·주입·자격증명)과 **표면 무관 축**(승인·프로바이더·capability·plane)의
-> 구분은 [[concepts/harness]] §7.6 참조.
+> For the split between **surface-specific** axes (perception, injection, credentials) and
+> **surface-independent** ones (approval, providers, capability, planes), see [[concepts/harness]] §7.6.
 
 ## Concepts
 
 ### [[concepts/harness]] {#harness}
-모델과 과업 사이의 실행 시스템. 내부 구성요소, 4계층 개방 구조, 표면 104 메서드 중 루프는 20%.
+The execution system between a model and a task. Internal components, the four-layer opening, and the
+split between surface-specific and surface-independent axes.
 
 ### [[concepts/harness-engineering]] {#harness-engineering}
-손으로 쓴 코드 0으로 5개월. 병목은 모델이 아니라 환경이었다 — legibility, 기계적 집행, 지속적 GC.
+Five months with no hand-written code. The bottleneck was the environment, not the model — legibility,
+mechanical enforcement, continuous garbage collection.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
-대화 원시형 셋. item 생명주기, thread 언로드(60초)와 용량 축출, turn override 의 sticky 의미론.
+The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity
+eviction, the sticky semantics of turn overrides.
 
 ### [[concepts/approval-gate]] {#approval-gate}
-승인을 UI 편의가 아니라 프로토콜 원시형으로. 서버→클라이언트 요청 10종, 구현하지 않으면 turn 이 멈춘다.
+Approval as a protocol primitive rather than a UI convenience. Ten server→client requests; without
+them the turn stalls.
 
 ### [[concepts/wire-protocol-boundary]] {#wire-protocol-boundary}
-`WireApi` 변형은 하나뿐 — Responses. 코어 재사용 가능성을 가르는 경계와 `responses_lite` 라는 두 번째 요청 형태.
+`WireApi` has one variant — Responses. The boundary deciding whether the core is reusable, and
+`responses_lite` as a second request shape.
 
 ### [[concepts/stateless-conversation-wire]] {#stateless-conversation-wire}
-`store: false` + `previous_response_id` 부재 = 세션 저장소·id 레지스트리·만료 처리 전부 면제.
+`store: false` plus no `previous_response_id` exempts you from session stores, id registries and
+expiry handling.
 
 ### [[concepts/retained-reasoning]] {#retained-reasoning}
-유지된 추론은 최적화가 아니라 설계의 하중 부재. Chat Completions 로 건너가면 구조적으로 사라진다.
+Retained reasoning is load-bearing design, not an optimisation. It disappears structurally when
+crossing to Chat Completions.
 
 ### [[concepts/control-plane-execution-plane]] {#control-plane-execution-plane}
-harness(루프·라우팅)와 compute(파일·명령)의 분리, 그리고 그 경계가 강제하는 키 분리.
+Separating the harness (loop, routing) from compute (files, commands), and the key separation that
+boundary forces.
 
 ### [[concepts/execution-environment-topology]] {#execution-environment-topology}
-`none` / `openai_hosted` / `self_hosted` 세 형태, 파일·아티팩트 비대칭, self-hosted 생명주기, 프로바이더 명단 두 개.
+`none` / `openai_hosted` / `self_hosted`, the file-artifact asymmetry, the self-hosted lifecycle, the
+two provider rosters.
 
 ### [[concepts/os-sandbox-policy]] {#os-sandbox-policy}
-정책 4값과 OS별 기전. Windows 두 모드, 네트워크의 독립된 두 스위치, OS package identity 로부터의 권한.
+Four policy values and per-OS mechanisms. Two Windows modes, two independent network switches,
+authority from OS package identity.
 
 ### [[concepts/capability-distribution]] {#capability-distribution}
-plugin·marketplace·skill 유통. 벤더 중립 manifest, 카탈로그와 설치본의 분리, install ≠ enable ≠ share.
+Circulating plugins, marketplaces and skills. The vendor-neutral manifest, catalog versus installed
+artifact, install ≠ enable ≠ share.
 
 ### [[concepts/provider-as-data]] {#provider-as-data}
-프로바이더를 코드 분기가 아니라 데이터로. 커맨드 기반 토큰 발급, 프로젝트 로컬 설정 deny-list.
+Providers as data, not code branches. Command-backed token minting, and the deny-list on
+project-local configuration.
 
 ### [[concepts/perception-model]] {#perception-model}
-에이전트가 화면을 보는 방식. 네 가지 표현, **인식·동작 이름 공간의 대칭**, 비용 사다리, diff.
+How an agent sees a screen. Four representations, **symmetry between perception and action**, the
+cost ladder, diffs.
 
 ### [[concepts/indirect-prompt-injection]] {#indirect-prompt-injection}
-이 부류 고유의 구조적 위험. 공격 사슬, 완화 4범주와 제품별 실태, 미해결 상태.
+The structural risk of this class. The attack chain, four mitigation categories and where products
+stand, the unsolved status.
 
 ### [[concepts/credential-shielding]] {#credential-shielding}
-비밀을 주지 않고 로그인시키기. 값 은닉 / 요소 은닉 / URL 차단, 권한 등급과 노출의 분리.
+Logging in without handing over the secret. Value hiding / element hiding / URL blocking, and
+separating permission level from exposure.
 
 ### [[concepts/primary-source-verification]] {#primary-source-verification}
-이 저장소의 인식 방법. 등급 어휘, 반증의 보존, `llms.txt` 수법의 성적과 함정.
+This repository's method of knowing. Grade vocabulary, preserving refutations, the record and traps
+of the `llms.txt` technique.
 
 ## Topics
 

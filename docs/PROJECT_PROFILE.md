@@ -2,84 +2,104 @@
 
 # Project Workflow Profile
 
-- 문서 목적: 프로젝트 특화 규칙과 실행/검증 기준을 정의한다.
-- 범위: 프로젝트 개요, 문서 구조, 기본 명령, 검증 포인트, 예외 규칙
-- 대상 독자: 개발자, 운영자, AI agent, 프로젝트 온보딩 담당자
-- 상태: draft
-- 최종 수정일: 2026-09-22
-- 관련 문서: [공통 표준](../ai-workflow/core/global_workflow_standard.md)
+- Purpose: define project-specific rules and the execution/validation criteria.
+- Scope: project overview, document layout, standard commands, validation points, policy exceptions
+- Audience: developers, operators, AI agents, anyone onboarding
+- Status: draft
+- Updated: 2026-09-23
+- Related: [PURPOSE](../ai-workflow/memory/active/PURPOSE.md), [SYNTHESIS](../SYNTHESIS.md)
 
-## 1. 프로젝트 개요
-- 프로젝트명: Codex Harness — Study Notes
-- 프로젝트 목적: OpenAI Codex 하네스(App Server / SDK / Agents API)를 1차 출처 기반으로 조사·검증하고 문서로 남긴다
-- 주요 이해관계자: ykylee (단독 조사자 겸 관리자)
-- 성격: **코드가 없는 조사 문서 저장소.** 산출물은 `docs/` 의 마크다운 문서와 `REPORT.md` / `REPORT.ko.md` 이며,
-  빌드·배포·런타임이 존재하지 않는다. 따라서 "테스트"는 실행이 아니라 **출처 재검증**을 뜻한다.
+## 1. Project overview
+- Name: Codex Harness — Study Notes
+- Purpose: investigate agent harnesses against primary sources and record the findings. Codex is the
+  first case; browser-type agents are the contrast group.
+- Stakeholders: ykylee (sole researcher and maintainer)
+- Nature: **a research repository with no code.** The deliverables are the Markdown documents under
+  `docs/` and `browser-agents/`, plus `REPORT.md` / `REPORT.ko.md` and `SYNTHESIS.md`. There is no
+  build, no deploy, no runtime. "Testing" here therefore means **re-verifying sources**, not running
+  anything.
 
-## 2. 문서 구조 (Path)
-- 문서 위키 홈: `README.md` (문서 목차), `docs/` (본문 16편)
-- 최종 보고서: `REPORT.md` (영문), `REPORT.ko.md` (한국어)
-- 출처·검증 기록: `docs/99-sources.md`
-- 운영 문서 홈: `ai-workflow/memory/active/`
-- 백로그 위치: `ai-workflow/memory/active/main/backlog/`
-- 세션 인계 문서: `ai-workflow/memory/active/main/session_handoff.md`
-- 환경 기록 위치: `ai-workflow/memory/active/repository_assessment.md`
+## 2. Document layout
+- Index: `README.md`; Codex study: `docs/` (16 documents)
+- Browser-agent study: `browser-agents/` (13 documents)
+- Cross-study synthesis: `SYNTHESIS.md`
+- Reports: `REPORT.md` (English), `REPORT.ko.md` (Korean)
+- Source and verification records: `docs/99-sources.md`, `browser-agents/99-sources.md`
+- Concept re-index: `ai-workflow/wiki/` (16 concepts)
+- Operational home: `ai-workflow/memory/active/`
+- Backlog: `ai-workflow/memory/active/<branch>/backlog/`
+- Session handoff: `ai-workflow/memory/active/<branch>/session_handoff.md`
 
-## 3. 기본 명령 (Commands)
-- 설치: 해당 없음 — 의존성 없는 마크다운 저장소
-- 로컬 실행: 해당 없음 — 실행 대상이 없다
-- 빠른 테스트: `python3 scripts/check_wiki_freshness.py --show-uncovered` — 위키 재색인이 원 문서를 따라갔는지 검사
-- 격리 테스트: `grep -rn "](" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인
-- 실행 확인: 1차 출처 URL 재확인 — OpenAI 문서 페이지는 URL 끝에 `.md` 를 붙이면 원본 마크다운을 돌려준다
+## 3. Standard commands
+- Install: none — a Markdown repository with no dependencies
+- Run locally: none — there is nothing to run
+- Quick test: `python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept
+  re-index has kept up with its source documents
+- Isolated test: `grep -rn "](" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken
+  relative links
+- Smoke check: re-fetch a primary source. Appending `.md` to an OpenAI (and many other) documentation
+  URL returns the raw Markdown; `/llms.txt` is often a full index.
 
-## 4. 검증 포인트 (Validation)
-- 코드 변경: 해당 없음
-- 문서 변경:
-  - **주장 하나에 출처 하나.** 근거 없는 문장을 새로 넣지 않는다.
-  - 2차 출처(블로그·요약 기사)의 주장은 `openai/codex` 저장소의 생성 스키마·Rust 소스로 대조하기 전에는 확정으로 적지 않는다.
-  - 추론으로 채운 부분은 문서 안에서 **추론이라고 명시**한다 (예: `14-windows-sandbox.md` 의 Windows 내부 구조).
-  - 사실이 바뀌면 `docs/99-sources.md` 의 검증 표를 같은 커밋에서 갱신한다.
-  - 영문 문서를 고치면 `REPORT.ko.md` 의 대응 부분도 같은 커밋에서 맞춘다.
-  - **`docs/` 를 고치면 그 문서를 ingest 한 위키 concept 페이지를 같은 커밋에서 재ingest 한다.**
-    대응 관계의 출처는 concept 페이지 frontmatter 의 `last_ingested_from` 이고, 검사는
-    `scripts/check_wiki_freshness.py` 가 한다. 강제 지점은 §5.
-- UI 변경: 해당 없음
-- 배포/운영: 해당 없음 — 변경은 main 에 직접 커밋한다
+## 4. Validation points
+- Code changes: none
+- Document changes:
+  - **One claim, one source.** Do not add a sentence that has no grounding.
+  - A secondary-source claim is not written as settled until it has been checked against a primary
+    artifact — generated schemas, source, or a binary.
+  - Anything filled in by inference is **labelled as inference** in the document itself.
+  - When a fact changes, update the matching verification table in the same commit.
+  - Editing an English document means updating the matching part of `REPORT.ko.md` in the same commit.
+  - **Editing a document under `docs/` or `browser-agents/` means re-ingesting the wiki concept pages
+    that cite it.** The mapping lives in each concept page's `last_ingested_from`; the check is
+    `scripts/check_wiki_freshness.py`. Enforcement points are in §5.
+- UI changes: none
+- Deploy/ops: none — changes are committed directly to the working branch
 
-## 5. 위키 재색인 강제 (Enforcement)
+## 5. Enforcing wiki re-ingest
 
-`ai-workflow/wiki/` 는 `docs/` 의 재색인이다. 원 문서만 바뀌고 재색인이 따라가지 않으면 위키가
-조용히 낡는다. 대응 관계는 concept 페이지의 `last_ingested_from` 한 곳에만 있고, 세 지점에서 읽힌다.
+`ai-workflow/wiki/` is a re-index of `docs/` and `browser-agents/`. If a source document changes and
+the re-index does not follow, the wiki goes quietly stale. The mapping exists in exactly one place —
+each concept page's `last_ingested_from` — and is read at three points.
 
-| 지점 | 무엇을 하나 | 성격 |
+| Point | What it does | Kind |
 |---|---|---|
-| `git commit` (`.githooks/pre-commit`) | staged 된 원 문서의 concept 페이지가 함께 staged 되지 않았으면 **커밋을 막는다** | **차단** |
-| Claude Code `PostToolUse` (`.claude/settings.json`) | `docs/` 편집 직후 재색인 대상 페이지를 에이전트 컨텍스트에 알린다 | 알림 (편집을 막지 않음) |
-| 수동 / 세션 종료 | `python3 scripts/check_wiki_freshness.py` — git 이력 기준 전체 감사 | 감사 |
+| `git commit` (`.githooks/pre-commit`) | **Blocks the commit** if a staged source document's concept pages are not staged with it | **Blocking** |
+| Claude Code `PostToolUse` (`.claude/settings.json`) | Tells the agent which pages need re-ingest right after an edit | Advisory (does not block the edit) |
+| Manual / session close | `python3 scripts/check_wiki_freshness.py` — full audit against git history | Audit |
 
 ```bash
-# 최초 1회 — clone 마다 필요하다 (git 은 훅 경로를 버전 관리하지 않는다)
+# Once per clone — git does not version the hooks path
 git config core.hooksPath .githooks
 
-# 전체 감사 + 어떤 concept 페이지도 다루지 않는 문서까지
+# Full audit, plus documents no concept page covers
 python3 scripts/check_wiki_freshness.py --show-uncovered
 ```
 
-우회: 사실이 바뀌지 않은 편집(오타·서식)이나 재색인을 나중으로 미루려는 의도가 분명하면
-`git commit --no-verify`. 의도가 분명할 때만 쓴다.
+Bypass: `git commit --no-verify`, for edits that change no facts (typos, formatting) or when the
+re-ingest is deliberately deferred. Use it only when that intent is clear.
 
-한계: pre-commit 훅은 `core.hooksPath` 를 설정한 clone 에서만 돈다. 이 저장소는 단독 관리이므로
-서버측 강제는 두지 않았다 — 공동 작업으로 바뀌면 CI 에서 `--staged` 대신 기본 모드를 돌린다.
+Limitation: the pre-commit hook only runs in a clone that has set `core.hooksPath`. This repository
+is maintained by one person, so there is no server-side enforcement — if that changes, move the
+default-mode check into CI.
 
-## 6. 예외 규칙 (Policy)
-- 병합: 단독 저장소이므로 상태 문서 충돌은 발생하지 않는다. 충돌 시 `backlog/tasks/` 를 SSOT 로 본다.
-- 승인: 기존 문서의 **결론을 뒤집는** 수정(확정→반증 등)은 사용자 확인을 거친다.
-- 제약:
-  - 조사 기준일은 `openai/codex` 2026-09-15 스냅샷이다. 빠르게 움직이는 저장소이므로 재조사 시 드리프트를 먼저 확인한다.
-  - 날짜는 타임존 때문에 1차 출처끼리도 갈린다. 게시일은 UTC 기준으로 적고 필요하면 환산표를 남긴다.
-- 기타: 문서 본문은 영어, 커밋 메시지와 운영 문서는 한국어로 쓴다 (기존 이력의 컨벤션).
+## 6. Policy exceptions
+- Merging: single-maintainer repository, so state-document conflicts do not arise. If one does,
+  `backlog/tasks/` is the source of truth.
+- Approval: a change that **overturns an existing conclusion** (settled → refuted, and so on) is
+  confirmed with the user first.
+- Constraints:
+  - The Codex study reflects `openai/codex` as of 2026-09-15; the browser-agent study reflects
+    2026-09-22/23. Both move fast. The first move of any re-investigation is checking the existing
+    facts for drift, not collecting new ones.
+  - Dates diverge between primary sources because of time zones. Record publication dates in UTC and
+    add a conversion table where it matters.
+- **Language: document bodies are English. Commit messages and operational documents
+  (`session_handoff.md`, backlog tasks) are Korean.** This includes `docs/`, `browser-agents/`,
+  `SYNTHESIS.md`, the wiki concept pages, this profile, and `PURPOSE.md`. Settled 2026-09-23;
+  the browser-agent study was drafted in Korean and translated, the same path the Codex study took.
 
-## 다음에 읽을 문서
-- [세션 인계 문서](../ai-workflow/memory/active/main/session_handoff.md)
-- [작업 백로그](../ai-workflow/memory/active/main/backlog/)
-- [출처·검증 기록](99-sources.md)
+## Read next
+- [Session handoff](../ai-workflow/memory/active/main/session_handoff.md)
+- [Backlog](../ai-workflow/memory/active/main/backlog/)
+- [Source and verification record](99-sources.md)
+- [Cross-study synthesis](../SYNTHESIS.md)

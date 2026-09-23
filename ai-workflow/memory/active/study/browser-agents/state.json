@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "generated_at": "2026-09-23",
-  "purpose_digest": "에이전트 하네스의 **실제 계약**을 블로그 요약이 아니라 **생성 스키마·소스·바이너리**에서",
+  "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
   "purpose_digest_rev": "2026-09-23",
   "source_of_truth": {
     "project_profile_path": "docs/PROJECT_PROFILE.md",
@@ -14,16 +14,16 @@
     "repository_assessment_path": null
   },
   "project": {
-    "project_name": "Codex Harness — Study Notes",
-    "document_home": "README.md` (문서 목차), `docs/` (본문 16편)",
+    "project_name": null,
+    "document_home": null,
     "operations_path": null,
-    "backlog_path": "ai-workflow/memory/active/main/backlog/",
+    "backlog_path": null,
     "handoff_path": null,
-    "environment_path": "ai-workflow/memory/active/repository_assessment.md"
+    "environment_path": null
   },
   "commands": {
-    "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — 위키 재색인이 원 문서를 따라갔는지 검사",
-    "isolated_tests": "grep -rn \"](\" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인",
+    "quick_tests": null,
+    "isolated_tests": null,
     "runtime_checks": null
   },
   "session": {
@@ -34,6 +34,7 @@
     "blocked_items": [],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-007 — 문서 언어 영어 통일",
       "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합",
       "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
       "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
@@ -46,7 +47,7 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
-    "task_count": 5,
+    "task_count": 6,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -54,7 +55,8 @@
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
       "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
       "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
-      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합"
+      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합",
+      "TASK-2026-09-23-browser-agents-007 — 문서 언어 영어 통일"
     ]
   },
   "next_documents": [

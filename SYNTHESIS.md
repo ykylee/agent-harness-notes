@@ -1,251 +1,255 @@
-# SYNTHESIS — 에이전트 하네스, 두 조사의 교차
+# SYNTHESIS — Agent harnesses, where two studies cross
 
-> 이 저장소는 두 조사를 담는다. **[`docs/`](docs/)** 는 OpenAI Codex 하네스를 생성 스키마와
-> Rust 소스에서 읽었고, **[`browser-agents/`](browser-agents/README.md)** 는 브라우저형 에이전트를
-> 제품 문서와 바이너리에서 읽었다. 이 문서는 **둘을 가로질러** 무엇이 하네스 일반의 성질이고
-> 무엇이 실행 표면 고유인지 가른다.
+> This repository holds two investigations. **[`docs/`](docs/)** read the OpenAI Codex harness out of
+> generated schemas and Rust source; **[`browser-agents/`](browser-agents/README.md)** read
+> browser-type agents out of product documentation and binaries. This document crosses them to
+> separate what belongs to harnesses in general from what belongs to a particular execution surface.
 >
-> 개념 단위 정리는 [`ai-workflow/wiki/`](ai-workflow/wiki/index.md), 근거 등급은 각 조사의
-> `99-sources.md` 에 있다. 최종 수정일 2026-09-23.
+> Concept-level notes live in [`ai-workflow/wiki/`](ai-workflow/wiki/index.md); evidence grades live
+> in each study's `99-sources.md`. Updated 2026-09-23.
 
-## 1. 하네스란 무엇인가 — 두 조사의 교집합
+## 1. What a harness is — the intersection
 
-OpenAI 의 정의는 표면을 전제하지 않는다.
+OpenAI's own definition presumes no surface:
 
 > "A capable agent is more than a prompt and a model response. It needs a way to understand a task,
 > maintain context over time, inspect relevant information, call tools, expose progress, handle
 > failures, **request human approval when necessary**, and return a useful result."
 
-**하네스는 모델과 과업 사이에 앉은 실행 시스템이다.** 그 정의에 "셸"도 "브라우저"도 없다.
-그래서 Codex 와 Aside 는 **같은 추상의 두 사례**다.
+**A harness is the execution system that sits between a model and a task.** That definition contains
+neither "shell" nor "browser." Codex and Aside are therefore **two instances of one abstraction.**
 
-| | Codex | 브라우저형 에이전트 |
+| | Codex | Browser-type agents |
 |---|---|---|
-| 실행 표면 | **셸 · 파일시스템** | **브라우저 · OS** |
-| 관찰 대상 | 명령 출력, diff, 파일 | **페이지** |
-| 주요 위험 | 파괴적 명령 | **간접 프롬프트 주입** |
-| 배포 형태 | 바이너리 · SDK · 관리형 API | 브라우저 포크 · 확장 · 라이브러리 |
+| Execution surface | **shell · filesystem** | **browser · OS** |
+| What it observes | command output, diffs, files | **pages** |
+| Principal risk | destructive commands | **indirect prompt injection** |
+| Distribution | binary · SDK · managed API | browser fork · extension · library |
 
-> 📌 **표면이 다르면 위험도 다르다.** Codex 는 "이 명령을 실행해도 되는가"를 묻고,
-> 브라우저 에이전트는 "**이 페이지가 나에게 거짓말을 하는가**"를 물어야 한다. 후자는 전자에
-> 없던 문제다 — 셸 출력은 공격자가 쓰지 않지만 웹 페이지는 공격자가 쓴다.
+> 📌 **A different surface means a different risk.** Codex asks "may I run this command?" A browser
+> agent has to ask "**is this page lying to me?**" That question did not exist for the former — shell
+> output is not written by an attacker, but a web page is.
 
-## 2. 표면과 무관한 축 — 이 저장소의 재사용 가능한 자산
+## 2. Surface-independent axes — this repository's reusable asset
 
-두 조사를 겹쳐 보면 **표면이 무엇이든 그대로 적용되는 축**이 드러난다.
-새 하네스를 설계할 때 여기서 시작하면 된다.
+Overlay the two studies and a set of axes emerges that applies **whatever the surface is.** This is
+where to start when designing a new harness.
 
-### 2.1 승인을 프로토콜 원시형으로
+### 2.1 Approval as a protocol primitive
 
 | | Codex | Aside | Dia |
 |---|---|---|---|
-| 방향 | 서버 → 클라이언트 요청 10종 | 데몬의 **suspension** | 실효 동작 전 승인 |
-| 효과 | **turn 이 멈춘다** | 동일 | 동일 |
-| 어휘 | `accept` / `acceptForSession` / `decline` / `cancel` + 정책 수정 변형 | **`Allow once` 만** — "No lasting permission will be granted" | — |
-| 미구현 시 | **turn 이 정지한 채 끝나지 않는다** | — | — |
+| Direction | server → client, 10 request types | daemon **suspension** | approval before effectful actions |
+| Effect | **the turn stops** | same | same |
+| Vocabulary | `accept` / `acceptForSession` / `decline` / `cancel` plus amendment-carrying variants | **`Allow once` only** — "No lasting permission will be granted" | — |
+| If unimplemented | **the turn stalls and never completes** | — | — |
 
-> 📌 **Aside 가 한 걸음 더 갔다.** 승인 프롬프트가 버튼 배열과 **번호 목록 텍스트 폴백**을
-> 함께 만들고, 힌트가 "or just reply with your answer" 다 — **채팅 채널에서 렌더되는 것을
-> 전제**한 설계다. App Server 의 승인은 클라이언트 UI 를 가정한다. **원격·비동기 승인이
-> 필요하면 Aside 쪽 모양이 답이다.**
+> 📌 **Aside went one step further.** Its approval prompt builds a button array *and* a **numbered
+> text fallback**, and every hint reads "or just reply with your answer" — it is designed to be
+> **rendered in a chat channel.** App Server's approvals assume a client UI. **If you need remote or
+> asynchronous approval, Aside's shape is the answer.**
 >
-> 반대로 Aside 에는 `acceptForSession` 에 해당하는 UI 가 없다. 보수적으로 잡은 것이다.
+> Conversely, Aside exposes no UI equivalent of `acceptForSession`. That is a deliberately
+> conservative choice.
 
-### 2.2 권한을 선언적 정책으로
+### 2.2 Permissions as declarative policy
 
 | | Codex | Aside |
 |---|---|---|
-| 기본 어휘 | 샌드박스 4값 + `ExecPolicyAmendment`(승인 시점) | **zod 스키마**로 선언 |
-| 매칭 | — | `tool`(glob + **인자별 eq/regex**) · `browser`(read/modify/download + URL glob) · `network`(도메인 glob) |
-| 버킷 | — | `allow`/`approved`/`deny`/`ask` + `default` |
+| Base vocabulary | four sandbox values plus `ExecPolicyAmendment` at approval time | declared as a **zod schema** |
+| Matching | — | `tool` (glob plus **per-argument eq/regex**) · `browser` (read/modify/download plus URL glob) · `network` (domain glob) |
+| Buckets | — | `allow` / `approved` / `deny` / `ask` plus `default` |
 
-> 📌 **"bash 허용"이 아니라 "bash 중 첫 인자가 이 정규식에 맞는 것만"** — Aside 의 표현력이
-> 더 구체적이다. 커스텀 하네스가 베낄 값이 여기 있다.
+> 📌 Not "allow bash" but **"allow bash only when the first argument matches this regex."** Aside's
+> expressiveness is the more concrete of the two, and it is the part worth copying.
 >
-> 📌 두 조사가 **같은 원칙**에 도달한다: **권한 등급과 방어 해제는 다른 축이다.**
-> Aside 는 `full-access` 에서도 샌드박스가 켜져 있고 비밀번호는 숨겨진다.
-> Codex 는 프로젝트 로컬 설정이 프로바이더·인증·텔레메트리 키를 덮어쓰지 못하게 한다.
+> 📌 Both studies arrive at the **same principle**: **permission level and defence removal are
+> different axes.** Aside keeps the sandbox on and passwords hidden even under `full-access`. Codex
+> refuses to let project-local config override provider, auth or telemetry keys.
 
-### 2.3 프로바이더를 데이터로
+### 2.3 Providers as data
 
-`ModelProviderInfo` 가 제시한 "프로바이더는 코드 분기가 아니라 데이터"는 그대로 유효하다.
-브라우저 조사가 더하는 것은 **누가 고르는가**다.
+`ModelProviderInfo`'s premise — a provider is data, not a code branch — holds. What the browser study
+adds is **who chooses.**
 
-| 제품 | 선택 주체 |
+| Product | Chooser |
 |---|---|
-| Codex | 설정 (`model_providers`) |
-| **Aside** | **사용자** — 기존 ChatGPT·Claude 구독을 OAuth 로 재사용 + BYO 키 |
-| **Opera Neon** | **제품** — Opera AI 엔진이 작업에 맞게 라우팅 |
+| Codex | configuration (`model_providers`) |
+| **Aside** | **the user** — reuse an existing ChatGPT/Claude subscription over OAuth, or bring a key |
+| **Opera Neon** | **the product** — Opera's AI engine routes each task to a model |
 
-> 📌 **"model-agnostic" 이 정반대 두 설계를 가리킨다.** 전자는 도입 장벽에서 모델 비용을 빼고,
-> 후자는 품질 책임을 제품이 진다. 이 선택은 §2.4 와 묶여 있다.
+> 📌 **"Model-agnostic" names two opposite designs.** The first removes model cost from the adoption
+> barrier; the second makes the product answerable for quality. This choice is tied to §2.4.
 
-### 2.4 control plane / execution plane
+### 2.4 Control plane / execution plane
 
-Agents API 가 선언한 경계 — **harness(루프·라우팅·모델) 대 compute(파일·명령·상태)** — 가
-브라우저형에서 **제품마다 다른 자리에** 그어져 있다.
+The boundary the Agents API declares — **harness (loop, routing, model calls) vs. compute (files,
+commands, state)** — is drawn **in a different place by each browser product.**
 
-| 제품 | 계획 | 실행 |
+| Product | Planning | Execution |
 |---|---|---|
-| Comet | **서버** (Perplexity 백엔드) | 로컬 확장 |
-| **Aside** | **로컬 데몬** (`127.0.0.1:21420`) | 로컬 브라우저 |
-| Opera Neon | **클라우드 LLM** | 로컬 브라우저 |
-| Dia | 자사 서버 → 파트너 모델 | 로컬 |
+| Comet | **server** (Perplexity backend) | local extension |
+| **Aside** | **local daemon** (`127.0.0.1:21420`) | local browser |
+| Opera Neon | **cloud LLM** | local browser |
+| Dia | own servers → partner models | local |
 
-> 📌 **이 축이 모델 경제를 결정한다.** 계획이 로컬이어야 사용자 구독을 쓸 수 있다.
-> Aside 의 BYO 구독은 로컬 데몬의 귀결이지 마케팅 선택이 아니다.
+> 📌 **This axis decides the model economics.** Planning has to be local for a user's own
+> subscription to be usable. Aside's BYO-subscription is a consequence of the local daemon, not a
+> marketing choice.
 >
-> ⚠️ **"로컬"을 벤더가 어느 면에 쓰는지 확인하라.** Opera 의 `llms.txt` 는 "All AI processes
-> run locally" 라 하고, 제품 FAQ 는 "**계획은 클라우드 LLM**"이라 한다. 같은 회사의 두 1차
-> 출처가 어긋난다.
+> ⚠️ **Check which side a vendor means by "local."** Opera's `llms.txt` says "All AI processes run
+> locally"; the product FAQ says "**it uses cloud-based LLMs to generate the plans.**" Two
+> first-party sources from the same company disagree.
 
-### 2.5 capability 배포와 재사용 단위
+### 2.5 Capability distribution and units of reuse
 
-Codex 의 plugin/marketplace 는 **배포**의 단위다. 브라우저형은 그와 별개로
-**"반복되는 위임을 어떻게 재사용 단위로 만드나"** 를 각자 풀었고, **세 축이 직교한다.**
+Codex's plugins and marketplaces are units of **distribution.** Separately from that, the browser
+products each solved **"how do you turn a repeated delegation into a reusable unit?"** — and the
+three axes are **orthogonal.**
 
-| 제품 | 이름 | 축 |
+| Product | Name | Axis |
 |---|---|---|
-| Opera Neon | **Cards** | **작업 유형** — "이런 종류의 일은 이렇게" |
-| Dia | Skills | **호출** — 이름으로 부름 |
-| Aside | **Routines** | **시간** — cron(새 작업) / heartbeat(대화 이어가기) |
+| Opera Neon | **Cards** | **task type** — "handle this kind of work like this" |
+| Dia | Skills | **invocation** — called by name |
+| Aside | **Routines** | **time** — cron (start a new task) / heartbeat (wake an existing chat) |
 
-> 📌 **아직 아무도 셋을 다 갖지 않았다.** 특히 cron/heartbeat 구분은 Aside 에만 있다 —
-> 대화 맥락을 가진 에이전트에게 "새로 시작"과 "이어하기"는 다른 의미인데, 보통의
-> 스케줄러는 전자만 준다.
+> 📌 **Nobody has all three yet.** The cron/heartbeat distinction in particular exists only in Aside
+> — for an agent that carries conversational context, "start fresh" and "continue" mean different
+> things, and ordinary schedulers only offer the first.
 
-### 2.6 자기 자신을 다른 하네스에 노출하기
+### 2.6 Exposing yourself to other harnesses
 
-| 제품 | 노출 방식 |
+| Product | How |
 |---|---|
-| Codex | `codex mcp-server`, App Server 프로토콜, `item/tool/call` |
+| Codex | `codex mcp-server`, the App Server protocol, `item/tool/call` |
 | **Aside** | **`aside mcp`** — "Install the aside-browser skill into your coding agents (Codex, Claude Code, Cursor, OpenCode)" |
-| **Opera Neon** | **MCP 서버** — "external AI tools can connect to your live Neon browser session" |
+| **Opera Neon** | **MCP server** — "external AI tools can connect to your live Neon browser session" |
 
-> 📌 **독립적으로 같은 결론에 도달했다.** 세 제품 모두 자신을 최종 제품이 아니라 **다른
-> 하네스의 실행 표면**으로 노출한다. 이 분야의 수렴 지점으로 보인다.
+> 📌 **They reached this independently.** All three expose themselves not as a final product but as
+> **an execution surface for another harness.** It looks like a convergence point for the field.
 
-## 3. 표면 고유의 축 — 브라우저 조사가 새로 낳은 것
+## 3. Surface-specific axes — what the browser study produced
 
-Codex 조사에는 대응물이 없다. **셸 하네스에는 이 문제가 애초에 없기 때문이다.**
+The Codex study has no counterpart to these, **because a shell harness does not have the problem.**
 
-### 3.1 인식 모델
+### 3.1 Perception model
 
-원본 DOM 은 2MB+ 다. **토큰 예산이 먼저 무너진다.** 네 가지 방식이 쓰이고,
-가장 중요한 갈림은 **인식과 동작이 같은 이름 공간인가**다.
+A raw DOM is 2MB or more. **The token budget breaks before anything else does.** Four approaches are
+in use, and the decisive split is **whether perception and action share a namespace.**
 
-| 제품 | 인식 | 동작 | 대칭 |
+| Product | Perception | Action | Symmetric |
 |---|---|---|---|
-| Aside | 접근성 트리 + 가상 ref (`e31`) | `page.locator('e31')` | ✅ |
-| Browser Use | SoM 배지 (`[14]`) | `click_element(index=14)` | ✅ |
-| Comet | 접근성 트리 | **픽셀 좌표** | ❌ |
+| Aside | accessibility tree plus virtual refs (`e31`) | `page.locator('e31')` | ✅ |
+| Browser Use | Set-of-Mark badges (`[14]`) | `click_element(index=14)` | ✅ |
+| Comet | accessibility tree | **pixel coordinates** | ❌ |
 
-> 📌 **대칭이면 "본 것과 다른 곳을 눌렀다"가 구조적으로 불가능하다.**
-> 그리고 Aside 의 `snapshot()` 은 `{tree, diff}` 를 돌려줘 **동작 후에는 변화분만** 읽게 한다 —
-> 대화가 길어져도 비용이 선형으로 늘지 않는다.
+> 📌 **When they are symmetric, "clicked somewhere other than what I saw" is structurally
+> impossible.** And Aside's `snapshot()` returns `{tree, diff}`, so after an action only the delta is
+> read — cost stops growing linearly with conversation length.
 
-### 3.2 간접 프롬프트 주입
+### 3.2 Indirect prompt injection
 
-> 사용자가 한 일은 **"이 페이지 요약해줘"를 누른 것뿐**이다. 그 결과 Gmail 의 OTP 가
-> 공격자에게 갔다 (Brave 의 Comet 실증).
+> All the user did was **click "summarize this page."** The result was an OTP from Gmail landing in an
+> attacker's hands (Brave's demonstration against Comet).
 
-**동일 출처 정책이 무력해진다** — 에이전트는 사용자 권한으로 출처를 가로지른다.
-2026 현재 **해결되지 않았다.** OpenAI 자신이 "unlikely to ever be fully 'solved'" 라 적었고,
-Atlas 종료 사유에 보안 유지보수가 들어갔다.
+**The same-origin policy stops helping** — the agent crosses origins with the user's own authority.
+As of 2026 this is **unsolved.** OpenAI itself wrote that it is "unlikely to ever be fully 'solved',"
+and security maintenance appears among the stated reasons for retiring Atlas.
 
-> 📌 조사 범위에서 **구체적 방어를 문서화한 것은 Dia 뿐**이다 — LLM 생성 URL 추종 금지,
-> URL 원문 미전달, 비밀번호·비가역 버튼을 "invisible to the agentic system". 그리고
-> **남는 한계도 스스로 적는다.**
+> 📌 In this study's scope, **only Dia documents concrete defences** — it will not follow
+> LLM-generated URLs, will not pass URLs to the LLM verbatim, and makes password fields and
+> irreversible action buttons "invisible to the agentic system." It also **states what remains.**
 
-### 3.3 자격증명 은닉
+### 3.3 Credential shielding
 
-| 접근 | 채택 | 평가 |
+| Approach | Product | Assessment |
 |---|---|---|
-| URL 차단 | Comet | **열거형** — 새 경로가 생기면 뚫린다 |
-| **값 은닉** | Aside | 근본적 |
-| **요소 은닉** | Dia | 근본적, 그리고 **자격증명을 넘어 확장**(비가역 버튼까지) |
+| URL blocking | Comet | **enumerative** — a new path defeats it |
+| **Value hiding** | Aside | fundamental |
+| **Element hiding** | Dia | fundamental, and **broader than credentials** (irreversible buttons too) |
 
-## 4. 두 조사가 코드에서 만나는 지점
+## 4. Where the two studies meet in code
 
-추상적 유사성이 아니다. **Aside 브라우저의 데몬 바이너리 안에 Codex 가 있다.**
+This is not an abstract resemblance. **Codex is inside Aside's daemon binary.**
 
 ```js
 CODEX_TOOL_CALL_PROVIDERS = new Set([`openai`, `openai-codex`, `opencode`])
-// 인접: supportsAdditionalTools, supportsToolSearch
+// nearby: supportsAdditionalTools, supportsToolSearch
 ```
 
-`openai-codex` 가 **모델 프로바이더 id 로 등록돼 있고**, `supportsAdditionalTools` 플래그가
-함께 있다. `AdditionalTools` 는 Codex 의 `responses_lite` 모드에서 **도구 목록을 싣는 항목**이다
+`openai-codex` is registered **as a model provider id**, with a `supportsAdditionalTools` flag beside
+it. `AdditionalTools` is the item that carries the tool list in Codex's `responses_lite` mode
 ([`docs/16`](docs/16-responses-chat-adapter.md) §10.2).
 
-> 📌 **서드파티 하네스가 Codex 의 두 요청 형태를 프로바이더별 capability 플래그로 흡수했다.**
-> `docs/16` 이 "어댑터는 두 형태를 모두 처리해야 한다"고 권고했는데, 현실에서 정확히 그것이
-> 요구됐음을 보여준다. 두 조사가 독립적으로 시작해 같은 코드에서 만났다.
+> 📌 **A third-party harness absorbed Codex's two request shapes as a per-provider capability flag.**
+> `docs/16` recommended that "an adapter must handle both shapes"; here is a real system in which
+> exactly that was required. Two studies begun independently met at the same source.
 
-## 5. 만든다면 — 통합 체크리스트
+## 5. If you were building one — a combined checklist
 
-### 5.1 표면을 정하기 전에 (표면 무관)
+### 5.1 Before choosing a surface (surface-independent)
 
-- [ ] **승인을 프로토콜 원시형으로** 두라. 구현하지 않으면 turn 이 멈춘다
-- [ ] 승인 프롬프트를 **채널 렌더 가능한 모양**으로 만들라 — 버튼 + 텍스트 폴백
-- [ ] 권한을 **선언적 정책**으로. 도구 glob + 인자별 매처까지 표현력을 두라
-- [ ] **권한 등급과 방어 해제를 분리**하라. 최고 권한이 샌드박스·비밀 해제를 뜻하지 않게
-- [ ] 격리 모드를 **자격증명까지 일관** 적용하라
-- [ ] 프로바이더를 **데이터로** 모델링하고, **누가 고르는가**를 의식적으로 정하라
-- [ ] **커맨드 기반 토큰 발급**을 첫날부터 (bespoke 인증을 전부 흡수한다)
-- [ ] **계획 위치를 먼저 정하라** — 모델 경제와 프라이버시 서사가 여기서 갈린다
-- [ ] **재사용 단위**를 주고, 그것을 **자동 제안**하라. 사용자는 스스로 발견하지 못한다
-- [ ] **자기 도구를 MCP 로 노출**하라. 최종 제품이 아니라 실행 표면이 될 수 있다
-- [ ] **결정적 경로를 남겨라** (Aside 의 `repl`). 모델이 약한 곳에서 내려갈 수 있어야 한다
+- [ ] Make **approval a protocol primitive.** Without it the turn stalls.
+- [ ] Shape approval prompts so they can **render in a channel** — buttons plus a text fallback.
+- [ ] Express permissions as **declarative policy.** Reach at least tool globs with per-argument matchers.
+- [ ] **Separate permission level from defence removal.** Highest privilege must not mean sandbox off and secrets visible.
+- [ ] Apply isolation modes **consistently through credentials.**
+- [ ] Model providers **as data**, and decide deliberately **who chooses** among them.
+- [ ] Support **command-backed token minting** from day one; it absorbs most bespoke auth schemes.
+- [ ] **Decide where planning runs first** — model economics and the privacy story both follow from it.
+- [ ] Provide a **unit of reuse**, and **suggest it automatically.** Users do not discover it themselves.
+- [ ] **Expose your own tool over MCP.** You may be an execution surface, not a final product.
+- [ ] **Keep a deterministic path** (Aside's `repl`) for where the model is weak.
 
-### 5.2 표면을 정한 뒤 (브라우저·OS 인 경우)
+### 5.2 After choosing a browser/OS surface
 
-- [ ] **인식과 동작을 같은 이름 공간으로** 묶어라. 좌표 예측을 시키지 마라
-- [ ] **diff 를 1급으로** 제공하라. 매 스텝 전체 트리는 비용이 감당되지 않는다
-- [ ] 스크린샷을 기본 인식으로 고르지 마라. 고른다면 **팝업 합성 문제**를 설계에 포함하라
-- [ ] **읽기 비용 사다리**를 만들라 — 상호작용만 → 전체 → 대기 → 주석 스크린샷
-- [ ] **정체 감지 워치독**을 두라. 에이전트는 자기가 멈춘 줄 모른다
-- [ ] **페이지 내용을 사용자 지시와 분리**하라. 선택이 아니다
-- [ ] 위험 요소(비밀번호 필드, 비가역 버튼)를 **인식에서 제거**하라
-- [ ] 자격증명은 **값 은닉**으로. URL 차단은 열거형 방어다
-- [ ] **기본값을 좁게** 잡아라 — 암호를 잘 짜는 것과 기본값은 다른 일이다
+- [ ] Put **perception and action in one namespace.** Do not make the model predict coordinates.
+- [ ] Offer **diffs as a first-class result.** A full tree every step is not affordable.
+- [ ] Do not pick screenshots as the primary perception. If you do, design for the **popup compositing problem.**
+- [ ] Build a **reading cost ladder** — interactive-only → full → wait → annotated screenshot.
+- [ ] Add a **stagnation watchdog.** An agent cannot tell that it is stuck.
+- [ ] **Separate page content from user instruction.** This is not optional.
+- [ ] **Remove dangerous elements from perception** — password fields, irreversible buttons.
+- [ ] Shield credentials by **hiding the value.** URL blocking is enumerative.
+- [ ] **Set defaults narrow.** Good cryptography and good defaults are different jobs.
 
-### 5.3 외피를 고를 때
+### 5.3 Choosing a shell
 
-| 선택 | 치르는 것 |
+| Choice | What it costs |
 |---|---|
-| 브라우저 포크 | **Chromium 추격이라는 상시 부채.** OpenAI 조차 Atlas 를 10개월 만에 접었다 |
-| 확장 | 확장 API 가 허용하는 것만. 브라우저 크롬 UX 불가 |
-| 라이브러리 | 사람이 쓰는 제품이 아님 |
+| Browser fork | **a standing debt of chasing Chromium.** Even OpenAI retired Atlas within ten months |
+| Extension | only what extension APIs permit; no browser-chrome UX |
+| Library | not a product a person uses |
 
-> ⚠️ **겉 분류와 속 구조가 다를 수 있다.** Comet 도 Aside 도 네이티브 브라우저를 표방하지만
-> 에이전트는 둘 다 MV3 확장이다. 외피는 배포 단위이고 제어는 확장 계층에 있다 —
-> 덕분에 갱신 주기를 분리할 수 있다.
+> ⚠️ **The outer classification can differ from the inner structure.** Both Comet and Aside present
+> as native browsers, yet both implement the agent as an MV3 extension. The shell is a distribution
+> unit; control lives in the extension layer — which is what lets their release cadences diverge.
 
-## 6. 방법에 대하여
+## 6. On method
 
-두 조사가 같은 규율을 썼고, 브라우저 조사에서 **두 가지가 추가로 배워졌다.**
+Both studies used the same discipline, and the browser study **added two lessons.**
 
-| 규율 | 내용 |
+| Discipline | Detail |
 |---|---|
-| 커밋된 아티팩트 > 산문 | 생성 스키마·Rust 소스 / 제품 문서 원본·바이너리 |
-| 2차 출처는 대조 전 확정 금지 | Codex: 5건 중 2건이 틀렸다 / 브라우저: 벤더 자체보고 벤치마크 판정 |
-| 추론은 추론이라 표기 | Windows 샌드박스 / Aside 의 `approved` 버킷 |
-| 반증을 지우지 않음 | 각 조사의 `99-sources.md` |
-| **(신규) 상속을 고유 기능으로 오인하지 말 것** | 포크 제품의 포스트양자 심볼 — **Chromium 이 원래 갖고 있다.** 파일 위치를 먼저 갈라야 했다 |
-| **(신규) 1차 출처끼리도 대조할 것** | Opera 의 `llms.txt` 와 제품 FAQ 가 모순. 더 구체적인 쪽 채택 |
+| Committed artifacts over prose | generated schemas and Rust source / product-document originals and binaries |
+| No secondary source is settled before cross-checking | Codex: two of five were wrong / browser: adjudicating vendor self-reported benchmarks |
+| Inference is labelled as inference | the Windows sandbox / Aside's `approved` bucket |
+| Refutations are kept, not deleted | each study's `99-sources.md` |
+| **(new) Do not mistake inheritance for a product feature** | post-quantum symbols in a fork — **Chromium already ships them.** The file location had to be separated first |
+| **(new) Cross-check primary sources against each other** | Opera's `llms.txt` contradicts its product FAQ. The more specific one wins |
 
-그리고 실무 수법 하나: **문서 사이트에 `.md` 와 `/llms.txt` 를 먼저 시도하라.**
-성적은 OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌**(클라이언트 렌더). **만능이 아니다.**
+And one practical technique: **try `.md` and `/llms.txt` on a documentation site first.**
+Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered). **It is not universal.**
 
-## 7. 읽는 순서
+## 7. Reading order
 
-| 관심 | 경로 |
+| Interest | Path |
 |---|---|
-| Codex 하네스 자체 | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
-| 브라우저형 에이전트 | [`browser-agents/README.md`](browser-agents/README.md) |
-| **개념 단위** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16종 |
-| 어떤 주장을 믿어도 되나 | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) |
+| The Codex harness itself | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
+| Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
+| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) |
 
-> ⚠️ **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지 검증했고, Dia·Neon 은 제품 문서를
-> 믿은 상태이며, Comet 은 3자 리버싱에 의존한다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다.
+> ⚠️ **Evidence grade differs cell by cell.** Aside was verified down to its binaries; Dia and Neon
+> rest on product documentation; Comet relies on third-party reverse engineering. Do not read the
+> comparison tables without that asymmetry in mind.

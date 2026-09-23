@@ -1,96 +1,101 @@
-# 01. 판세 — 브라우저형 에이전트 2026
+# 01. The field — browser-type agents in 2026
 
-> 조사일 2026-09-22. 이 분야는 15개월 만에 연구 데모에서 대중 제품이 됐고, 지금도 매주 움직인다.
-> 아래 날짜는 전부 1차 또는 교차 확인된 것이며, 등급은 [99-sources.md](99-sources.md) 에 있다.
+> Researched 2026-09-22. This field went from research demo to mass-market product in fifteen months
+> and still moves weekly. Every date below is primary or cross-confirmed; grades are in
+> [99-sources.md](99-sources.md).
 
-## 1. 세 가지 분류 — 제어 표면이 기준이다
+## 1. Three classes — the criterion is the control surface
 
-"브라우저 에이전트"라는 한 단어에 성격이 전혀 다른 셋이 섞여 있다. 가르는 기준은 모델도
-기능도 아니고 **에이전트가 브라우저를 어디서 잡는가**다.
+Three quite different things hide inside the single phrase "browser agent." What separates them is
+neither the model nor the feature set but **where the agent grips the browser.**
 
-| 분류 | 제어 표면 | 대표 | 사용자에게 보이는 것 |
+| Class | Control surface | Examples | What the user sees |
 |---|---|---|---|
-| **A. 네이티브 AI 브라우저** | 브라우저 자체를 만든다 | Aside, Comet, Dia, Opera Neon, (구)Atlas | 일상 브라우저를 갈아탄다 |
-| **B. 확장/부착형** | 기존 브라우저에 붙는다 | Claude for Chrome, Gemini in Chrome | 쓰던 Chrome 에 패널이 생긴다 |
-| **C. 라이브러리·인프라** | 코드가 헤드리스 브라우저를 몬다 | Browser Use, Stagehand, Skyvern | 사람이 아니라 프로그램이 쓴다 |
+| **A. Native AI browser** | builds the browser itself | Aside, Comet, Dia, Opera Neon, (former) Atlas | you switch your daily browser |
+| **B. Extension / attached** | attaches to an existing browser | Claude for Chrome, Gemini in Chrome | a panel appears in the Chrome you already use |
+| **C. Library / infrastructure** | code drives a headless browser | Browser Use, Stagehand, Skyvern | a program uses it, not a person |
 
-이 선택이 **권한·자격증명·보안 경계를 전부 결정한다.** 자세한 것은
+This choice **determines permissions, credentials and the security boundary entirely.** Details in
 [06-architecture-axes.md](06-architecture-axes.md).
 
-> 주의: A 와 B 의 경계는 구현상 생각보다 흐리다. Comet 은 **네이티브 브라우저인데 내부 구현은
-> 확장 3개**다 ([04](04-comet-architecture.md)). 겉의 분류와 속의 구조가 다를 수 있다.
+> Caution: the line between A and B is blurrier in implementation than it looks. Comet is **a native
+> browser implemented as three extensions** ([04](04-comet-architecture.md)) — and so is Aside
+> ([09 §3](09-aside-browser-internals.md)). The outer classification and the inner structure can
+> differ.
 
-## 2. 연표
+## 2. Timeline
 
-| 날짜 | 사건 | 의미 |
+| Date | Event | Significance |
 |---|---|---|
-| 2025-05 | Opera Neon 제한 공개 | 소비자 브라우저 중 에이전트 기능을 먼저 실은 축 |
-| 2025-07-09 | **Comet** 출시 (Windows/macOS) | Perplexity 가 브라우저로 내려옴. 초기엔 유료 구독자 한정 |
-| 2025-07-25 ~ 08-20 | Brave 의 Comet 간접 프롬프트 주입 공개 | 이 분야 고유 위험이 **공개 실증**된 시점 ([07](07-security.md)) |
-| 2025-08 | Claude for Chrome 파일럿 (1,000명) | 확장형 축의 본격화 |
-| 2025-10 | Comet 무료화 | 가격이 경쟁축에서 빠짐 |
-| 2025-10-21 | **ChatGPT Atlas** 출시 (macOS 한정) | OpenAI 참전 |
-| 2025-10 | Arc/Dia 팀, Atlassian 에 인수 (6.1억 달러, 10월 완료) | 소비자 브라우저 → 지식노동자 도구로 재정위 |
-| 2025-12 | Claude for Chrome 유료 전 플랜 개방 | |
-| 2026-03-18 | Comet iOS | 4개 플랫폼 확보 |
-| 2026-03 | Comet 전면 무료화 (에이전트 모드 포함) | |
-| **2026-08-09** | **ChatGPT Atlas 종료** | 아래 §3 |
-| 2026-09 (현재) | Aside 등 신규 진입 계속 | |
+| 2025-05 | Opera Neon limited release | Among the first consumer browsers to ship agentic features |
+| 2025-07-09 | **Comet** released (Windows/macOS) | Perplexity moves down into the browser. Paid subscribers only at first |
+| 2025-07-25 – 08-20 | Brave discloses indirect prompt injection in Comet | The moment this class's specific risk was **publicly demonstrated** ([07](07-security.md)) |
+| 2025-08 | Claude for Chrome pilot (1,000 users) | The extension axis gets serious |
+| 2025-10 | Comet goes free | Price drops out of the competitive picture |
+| 2025-10-21 | **ChatGPT Atlas** released (macOS only) | OpenAI enters |
+| 2025-10 | Arc/Dia team acquired by Atlassian ($610M, closed October) | Repositioned from consumer browser to knowledge-worker tool |
+| 2025-12 | Claude for Chrome opens to all paid plans | |
+| 2026-03-18 | Comet on iOS | Four platforms |
+| 2026-03 | Comet fully free, agent mode included | |
+| **2026-08-09** | **ChatGPT Atlas retired** | §3 below |
+| 2026-09 (now) | New entrants such as Aside keep arriving | |
 
-## 3. Atlas 종료 — 이 분야를 읽는 방식을 바꾼다
+## 3. Atlas's retirement changes how to read this field
 
-**OpenAI 는 자사 브라우저 ChatGPT Atlas 를 2026-08-09 에 중단했다.** 출시 10개월이 안 됐다.
-브라우저 기반 에이전트 기능은 ChatGPT 와 Codex 로 흡수됐고, 사용자에게는 30일 정리 기간과
-북마크 수동 내보내기가 안내됐다 (북마크·방문기록·열린 탭은 자동 이전되지 않았다).
+**OpenAI discontinued its own browser, ChatGPT Atlas, on 2026-08-09**, less than ten months after
+release. The browser-based agentic capabilities were absorbed into ChatGPT and Codex; users were
+given a 30-day wind-down and told to export bookmarks by hand (bookmarks, history and open tabs did
+not transfer automatically).
 
-공개된 사유 두 갈래:
+Two stated reasons, from different kinds of source:
 
-| 사유 | 출처 성격 |
+| Reason | Source character |
 |---|---|
-| Atlas · ChatGPT 앱 · Codex 를 **하나의 데스크톱 앱으로 통합** | 2차 (CNBC, 2026-03-19 보도) |
-| **브라우저는 지속적인 보안 유지보수를 요구**한다 — 중단된 브라우저에 사용자를 남기고 싶지 않았다 | OpenAI 헬프센터 (403 으로 직접 확인 실패, 2차 경유) |
+| Consolidating Atlas, the ChatGPT app and Codex into **one desktop application** | secondary (CNBC, reported 2026-03-19) |
+| **A browser demands ongoing security maintenance** — they did not want users left on a discontinued one | OpenAI help centre (direct fetch failed with 403; obtained via secondary) |
 
-이것이 중요한 이유 셋:
+Why this matters, three ways:
 
-1. **비교글 대부분이 낡았다.** "Atlas vs Comet vs Dia" 형식의 2026년 글이 아직도 대량으로
-   검색되지만, 그중 다수는 Atlas 가 살아 있다는 전제 위에 있다. 날짜를 먼저 본다.
-2. **브라우저를 만드는 것은 유지보수 부채다.** 제품 기능이 아니라 **Chromium 을 따라가는
-   상시 비용**이 자원이 가장 많은 회사에서도 문제가 됐다. Aside 의 변경로그가 1~2주마다
-   Chromium 을 올리고 있는 것([02](02-aside.md) §7)이 같은 비용의 다른 얼굴이다.
-3. **보안이 종료 사유에 들어갔다.** 프롬프트 주입이 미해결이라는 사실([07](07-security.md))과
-   겹쳐 읽어야 한다.
+1. **Most comparison articles are stale.** Plenty of 2026 pieces in the "Atlas vs Comet vs Dia" shape
+   are still surfacing, and many assume Atlas is alive. Check the date first.
+2. **Building a browser is a maintenance debt.** Not a product feature but **the standing cost of
+   chasing Chromium** — a cost that became a problem even at the best-resourced company. Aside's
+   changelog bumping Chromium every week or two ([02 §7](02-aside.md)) is the same cost wearing a
+   different face.
+3. **Security entered the reasons for retirement.** Read that together with the fact that prompt
+   injection remains unsolved ([07](07-security.md)).
 
-> ⚠️ Atlas 종료의 정확한 사유 배분은 **미확인**이다. 통합과 보안 중 어느 쪽이 주된 것인지는
-> 공개 문서가 둘 다 말하고, 무게는 밝히지 않았다. 여기서는 양쪽을 병기한다.
+> ⚠️ The exact weighting of Atlas's reasons is **unverified.** Public documents give both
+> consolidation and security and do not say which dominated. Both are recorded here.
 
-## 4. 현재 살아 있는 주요 제품 (2026-09 스냅샷)
+## 4. What is still alive (snapshot, 2026-09)
 
-| 제품 | 분류 | 플랫폼 | 가격 | 특징 한 줄 |
+| Product | Class | Platforms | Price | One line |
 |---|---|---|---|---|
-| **Aside** | A | macOS 15+, Windows | 무료 / $20 / $200 | 로그인된 사이트에서 사람처럼 일하는 것에 전면 베팅 |
-| **Comet** | A (내부는 확장) | Win/mac/iOS/Android | 무료 (Comet Plus $5) | 4플랫폼·무료. 검색 자산과 결합 |
-| **Dia** | A | **macOS 14+ Apple Silicon 한정** | 무료 / Pro $20 | Skills(재사용 루틴). 로컬 암호화 강조 |
-| **Opera Neon** | A | 데스크톱 | $19.90/월 | 병렬 작업·프로젝트 단위 |
-| **Claude for Chrome** | B | Chrome 한정 | 유료 Claude 플랜 | 쓰던 브라우저 유지 |
-| **Gemini in Chrome** | B | Chrome | Workspace / AI Pro·Ultra | 점유율이 곧 배포 채널 |
-| **Browser Use** | C | 라이브러리 | OSS | GitHub ~108k stars. 리더보드 최상위 |
+| **Aside** | A | macOS 15+, Windows | free / $20 / $200 | Bets entirely on working like a person inside sites you are logged into |
+| **Comet** | A (extensions inside) | Win/mac/iOS/Android | free (Comet Plus $5) | Four platforms, free. Coupled to a search asset |
+| **Dia** | A | **macOS 14+, Apple Silicon only** | free / Pro $20 | Skills (reusable routines). Emphasises local encryption |
+| **Opera Neon** | A | desktop | $19.90/mo | Parallel work, project-level management |
+| **Claude for Chrome** | B | Chrome only | paid Claude plans | Keep the browser you have |
+| **Gemini in Chrome** | B | Chrome | Workspace / AI Pro·Ultra | Market share *is* the distribution channel |
+| **Browser Use** | C | library | OSS | ~108k GitHub stars. Top of the leaderboard |
 
-가격·플랜은 **조사 시점 스냅샷**이다. 이 분야는 가격이 분기 단위로 바뀐다 (Comet 은 1년 만에
-유료→무료로 갔다). 추적 대상이 아니라고 [SCOPE.md](SCOPE.md) 에 적어 뒀다.
+Prices and plans are a **snapshot at the time of research.** This field repriced quarterly — Comet
+went from paid to free within a year. [SCOPE.md](SCOPE.md) records that tracking them is out of scope.
 
-## 5. 경쟁축이 옮겨간 자리
+## 5. Where the competitive axis moved
 
-초기(2025)에는 "요약·사이드바 채팅"이 차별점이었다. 2026 현재 그건 전부가 갖고 있다.
-지금 갈리는 것은:
+Early on (2025) the differentiator was "summaries and a sidebar chat." By 2026 everyone has that.
+What separates products now:
 
-| 축 | 질문 |
+| Axis | The question |
 |---|---|
-| **완주율** | 다단계 작업을 끝까지 끝내는가, 중간에 멈추는가 — Aside 가 "Today's AI browsers... never complete a task" 로 정면 공격하는 지점 |
-| **로그인 뒤편** | 인증된 사이트에서 일할 수 있는가. 통합(integration) 목록이 아니라 브라우저 자체가 표면이 되는가 |
-| **자격증명 취급** | 에이전트에게 비밀번호를 보여주는가, 보여주지 않고 채우는가 ([06](06-architecture-axes.md) §4) |
-| **신뢰 경계** | 페이지 내용을 사용자 지시와 분리하는가 ([07](07-security.md)) |
-| **로컬 우선** | 메모리·이력이 기기에 남는가, 서버로 가는가 |
+| **Completion rate** | Does it finish a multi-step task or stop halfway — the point Aside attacks head-on with "Today's AI browsers… never complete a task" |
+| **Behind the login** | Can it work inside authenticated sites? Is the surface an integration list or the browser itself? |
+| **Credential handling** | Does the agent see your password, or does something fill it without showing it? ([06 §4](06-architecture-axes.md)) |
+| **Trust boundary** | Is page content separated from user instruction? ([07](07-security.md)) |
+| **Local-first** | Do memory and history stay on the device, or go to a server? |
 
-> 벤치마크 점수는 **경쟁축으로 쓰기 어렵다.** 이 분야 벤치마크는 대부분 벤더 자체보고이고
-> 채점 방식이 제각각이라 직접 비교가 성립하지 않는다. Aside 의 주장을 예로 [99](99-sources.md) §3
-> 에서 등급을 매겼다.
+> Benchmark scores are **hard to use as a competitive axis.** Most in this field are vendor
+> self-reported with inconsistent grading, so direct comparison does not hold. Aside's claims are
+> graded as an example in [99](99-sources.md) §3.

@@ -7,48 +7,48 @@ created: 2026-09-22
 updated: 2026-09-23
 ---
 
-# Capability Distribution — plugin · marketplace · skill 의 유통 체계
+# Capability Distribution — how plugins, marketplaces and skills circulate
 
-- 문서 목적: 능력(skill·MCP)을 포장·배포·설치·활성화하는 체계를 정리하고, 커스텀 하네스가 자기 형식을 발명하기 전에 알아야 할 것을 짚는다.
-- 범위: 한 문단 모델, 이식 가능 manifest, 카탈로그 형식, 설치 캐시, 세 동사, 프로토콜 표면
-- 1차 출처: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
-- 최종 수정일: 2026-09-22
+- Purpose: how capabilities (skills and MCP) are packaged, distributed, installed and enabled — and what to know before inventing your own format.
+- Scope: the model in a paragraph, the portable manifest, catalog format, the install cache, three verbs, the protocol surface
+- Primary sources: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
+- Updated: 2026-09-23
 
 ## §1 TL;DR  {#s1-tldr}
 
-| # | 항목 | 값 |
+| # | Item | Value |
 |---|---|---|
-| 1 | **plugin** | skill · MCP 설정 · 또는 둘 다를 포장한 폴더. **능력의 단위** |
-| 2 | **marketplace** | plugin 을 나열하고 각각의 출처를 적은 JSON 카탈로그. **배포와 정책의 단위** |
-| 3 | 식별자 | `plugin-name@marketplace-name` — config · 프로토콜 · UI 전부에서 동일 |
-| 4 | manifest | **벤더 중립 개방 스키마** (`agent-plugins.org`). Claude 호환 manifest 도 수용 |
-| 5 | 세 동사 | **install ≠ enable ≠ share** |
-| 6 | 실패 의미론 | 항목 하나가 풀리지 않으면 **그 항목만 건너뛴다**. 카탈로그 전체를 죽이지 않는다 |
+| 1 | **plugin** | a folder packaging skills, MCP configuration, or both. **The unit of capability** |
+| 2 | **marketplace** | a JSON catalog listing plugins and where to fetch each. **The unit of distribution and policy** |
+| 3 | Identifier | `plugin-name@marketplace-name` — the same in config, protocol and UI |
+| 4 | Manifest | a **vendor-neutral open schema** (`agent-plugins.org`). Claude-compatible manifests are accepted too |
+| 5 | Three verbs | **install ≠ enable ≠ share** |
+| 6 | Failure semantics | an unresolvable entry is **skipped**, not allowed to fail the catalog |
 
-## §2 형식을 발명하기 전에  {#s2-open-schema}
+## §2 Before you invent a format  {#s2-open-schema}
 
 ```json
 { "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json", ... }
 ```
 
-`agent-plugins.org` 는 벤더 중립 스키마 호스트이고, Codex 는 **Claude 호환 manifest** 와 레거시
-경로(`$REPO_ROOT/.claude-plugin/marketplace.json`)를 명시적으로 받아들인다.
+`agent-plugins.org` is a vendor-neutral schema host, and Codex explicitly accepts **Claude-compatible
+manifests** and a legacy path (`$REPO_ROOT/.claude-plugin/marketplace.json`).
 
-> 자기 plugin 형식을 발명하면 **이미 존재하는 패키지를 소비할 능력을 포기**하는 것이다. 이식 가능
-> manifest 를 채택하고 자기 추가분을 namespace 된 `extensions.<your-org>` 객체로 두는 쪽이 싸다 —
-> OpenAI 가 `extensions.com.openai` 로 하는 바로 그것이다.
+> Inventing your own plugin format means **giving up the ability to consume packages that already
+> exist.** Adopting the portable manifest and namespacing your additions under
+> `extensions.<your-org>` is cheaper — which is exactly what OpenAI does with `extensions.com.openai`.
 
-### §2.1 root 와 overlay 의 분할  {#s2-1-root-overlay}
+### §2.1 The root/overlay split  {#s2-1-root-overlay}
 
-| 위치 | 담는 것 |
+| Location | Holds |
 |---|---|
-| **root** (`plugin.json`) | 정체성과 메타데이터 — `name`, `version`, `description`, `author`, `license`, `keywords` |
-| **overlay** (`extensions.com.openai`) | 표현·MCP 매핑·생명주기 훅 — `interface`, `apps`, `hooks` |
+| **root** (`plugin.json`) | identity and metadata — `name`, `version`, `description`, `author`, `license`, `keywords` |
+| **overlay** (`extensions.com.openai`) | presentation, MCP mappings, lifecycle hooks — `interface`, `apps`, `hooks` |
 
-**흉내 낼 가치가 있는 분할이다.** `name` 은 안정적 **kebab-case** 여야 한다 — 호스트가 plugin
-식별자이자 컴포넌트 namespace 로 쓴다.
+**A split worth imitating.** `name` must be stable **kebab-case** — hosts use it as the plugin
+identifier *and* the component namespace.
 
-## §3 카탈로그 형식  {#s3-catalog}
+## §3 Catalog format  {#s3-catalog}
 
 ```json
 {
@@ -63,45 +63,46 @@ updated: 2026-09-23
 }
 ```
 
-| 필드 | 규칙 |
+| Field | Rule |
 |---|---|
-| 최상위 `name` | marketplace 식별. plugin id 의 `@marketplace` 쪽이 된다 |
+| top-level `name` | identifies the marketplace. Becomes the `@marketplace` half of a plugin id |
 | `plugins[].policy.installation` | `AVAILABLE` \| `INSTALLED_BY_DEFAULT` \| `NOT_AVAILABLE` |
-| `plugins[].policy.authentication` | 설치 시점 인증인지 최초 사용 시점인지 (`ON_INSTALL`) |
+| `plugins[].policy.authentication` | whether auth happens on install or first use (`ON_INSTALL`) |
 
-### §3.1 source 종류 4가지  {#s3-1-sources}
+### §3.1 Four source kinds  {#s3-1-sources}
 
-| 종류 | 형태 |
+| Kind | Shape |
 |---|---|
-| `local` | `{ "source": "local", "path": "./plugins/my-plugin" }` — marketplace root 기준 상대경로. 평문 문자열도 허용 |
-| `url` (git, 저장소 루트) | `{ "source": "url", "url": "...git", "ref": "main" }` |
+| `local` | `{ "source": "local", "path": "./plugins/my-plugin" }` — relative to the marketplace root; a plain string is also accepted |
+| `url` (git, repo root) | `{ "source": "url", "url": "...git", "ref": "main" }` |
 | `git-subdir` | `{ "source": "git-subdir", "url": "...", "path": "./plugins/x", "ref": "main" }` |
 | `npm` | `{ "source": "npm", "package": "@example/codex-plugin", "version": "^1.2.0", "registry": "..." }` |
 
-- git 항목은 **`ref` 또는 `sha`** 선택자를 받는다
-- npm: `version` 은 버전·dist tag·범위를 받지만 **경로나 URL 선택자는 안 된다**. `registry` 는
-  **자격증명·쿼리·프래그먼트가 박히지 않은 HTTPS** 여야 한다
-- **패키지는 lifecycle script 를 돌리지 않고 내려받는다**
+- Git entries accept a **`ref` or `sha`** selector
+- npm: `version` accepts versions, dist tags and ranges but **not path or URL selectors**. `registry`
+  must be **HTTPS without embedded credentials, query or fragment**
+- **The package is downloaded without running lifecycle scripts**
 
-### §3.2 베낄 만한 실패 의미론  {#s3-2-failure}
+### §3.2 Failure semantics worth copying  {#s3-2-failure}
 
-> 항목의 source 를 풀 수 없으면 **그 plugin 항목을 건너뛰지, marketplace 전체를 실패시키지 않는다.**
+> If a source cannot be resolved, Codex **skips that plugin entry rather than failing the whole
+> marketplace.**
 
-항목 하나가 팀 전체 카탈로그를 무너뜨려서는 안 된다.
+One bad entry must not take down a team's entire catalog.
 
-## §4 카탈로그와 설치본의 분리  {#s4-catalog-vs-installed}
+## §4 Separating the catalog from the installed artifact  {#s4-catalog-vs-installed}
 
-| 카탈로그 위치 | 범위 |
+| Catalog location | Scope |
 |---|---|
-| `$REPO_ROOT/.agents/plugins/marketplace.json` | 저장소 |
-| `~/.agents/plugins/marketplace.json` | 개인 |
-| `$REPO_ROOT/.claude-plugin/marketplace.json` | 레거시 호환 |
+| `$REPO_ROOT/.agents/plugins/marketplace.json` | repository |
+| `~/.agents/plugins/marketplace.json` | personal |
+| `$REPO_ROOT/.claude-plugin/marketplace.json` | legacy compatibility |
 
-설치 캐시: `~/.codex/plugins/cache/$MARKETPLACE_NAME/$PLUGIN_NAME/$VERSION/`
+Install cache: `~/.codex/plugins/cache/$MARKETPLACE_NAME/$PLUGIN_NAME/$VERSION/`
 
-local plugin 의 `$VERSION` 은 문자열 `local` 이고, **호스트는 marketplace 항목이 아니라 캐시 경로의
-설치본을 읽는다.** 원본 폴더를 고치면 refresh 가 필요하다 — **"카탈로그"와 "설치된 산출물"의 의도적
-분리**다.
+For a local plugin `$VERSION` is the literal `local`, and **the host loads the installed copy from
+the cache path rather than the marketplace entry.** Editing the source folder therefore requires a
+refresh — **a deliberate separation of "catalog" from "installed artifact."**
 
 ## §5 install ≠ enable ≠ share  {#s5-three-verbs}
 
@@ -110,27 +111,28 @@ local plugin 의 `$VERSION` 은 문자열 `local` 이고, **호스트는 marketp
 enabled = true
 ```
 
-> marketplace refresh 중 Codex 는 **`enabled = false` 인 plugin 의 파일도 설치·갱신할 수 있다.**
-> 정책과 payload 가 독립이도록 한 것이다. (연결된 서비스는 여전히 인증을 요구한다.)
+> During a marketplace refresh Codex can install or refresh files for plugins **even when
+> `enabled = false`**, keeping policy and payload independent. (Connected services still require
+> authentication.)
 
-install/enable 상태는 사용자(`~/.codex/config.toml`) · 저장소 · 클라우드 관리 · 시스템 설정을 가로질러
-해석된다. **출하 전에 우선순위를 정해 둬야 한다.**
+Install and enable state resolves across user (`~/.codex/config.toml`), repository, cloud-managed and
+system configuration. **Decide the precedence order before you ship.**
 
-## §6 Agents API 쪽의 적재 방법  {#s6-agents-api}
+## §6 How the Agents API loads them  {#s6-agents-api}
 
-| 환경 | 방법 |
+| Environment | Method |
 |---|---|
-| **self-hosted** | plugin 을 환경에 복사하고 **절대 경로**를 `environment.capability_directories` 에 추가. **plugin root**(= `.codex-plugin/plugin.json` 을 담은 디렉터리)를 고른다 |
-| **openai-hosted** | `environment.plugins` 에 **plugin 당 ZIP 하나**. 각 ZIP 은 `.codex-plugin/plugin.json` 을 가진 plugin 폴더 하나를 담아야 하고, **요청의 name/description 이 manifest 와 일치**해야 한다 |
+| **self-hosted** | copy the plugin into the environment and add its **absolute path** to `environment.capability_directories`. Select the **plugin root** (the directory containing `.codex-plugin/plugin.json`) |
+| **openai-hosted** | **one ZIP per plugin** in `environment.plugins`. Each ZIP holds one plugin folder containing `.codex-plugin/plugin.json`, and **the request's name and description must match the manifest** |
 
-> 여러 plugin 이면 각 root 를 나열한다. **부모 디렉터리가 중첩된 skill 은 발견하지만, 자식 plugin 의
-> MCP 설정을 전부 로드하지는 않는다.**
-> 세션마다 자기 환경을 갖고, **루트 에이전트와 그 subagent 가 그 환경을 공유한다.**
+> For multiple plugins, list each root. **A parent directory can discover nested skills but does not
+> load every child plugin's MCP configuration.**
+> Each session gets its own environment, and **the root agent and its subagents share it.**
 
-경로 규칙(모든 곳에서 반복되므로 한 곳에서 강제하라): **`./` 로 시작, plugin 안에 머무를 것,
-`..` 성분 없을 것.**
+Path rules (repeated everywhere, so enforce them once): **start with `./`, stay inside the plugin,
+contain no `..` components.**
 
-## §7 프로토콜 표면  {#s7-protocol}
+## §7 Protocol surface  {#s7-protocol}
 
 ```
 marketplace/add        marketplace/remove      marketplace/upgrade
@@ -144,45 +146,46 @@ skills/list            skills/extraRoots/set   skills/config/write
 hooks/list
 ```
 
-| 항목 | 놓치기 쉬운 이유 |
+| Item | Why it is easy to miss |
 |---|---|
-| **`plugin/reconcile`** | 카탈로그는 드리프트한다. "설치 상태를 설정 상태에 맞춰라"를 **시작 시 암묵적으로** 하는 대신 명시적 연산으로 둬야 한다 |
-| **`plugin/share/*`** | 설치와 별개 관심사 — 워크스페이스에 게시하고 체크아웃하는 것은 marketplace 소비와 다르다 |
-| `skills/extraRoots/set` | 클라이언트가 런타임에 skill 탐색 root 를 추가. plugin 과 독립 |
+| **`plugin/reconcile`** | catalogs drift. "Make installed state match configured state" needs to be an explicit operation, not something done implicitly at startup |
+| **`plugin/share/*`** | a separate concern from installing — publishing to a workspace and checking out are not marketplace consumption |
+| `skills/extraRoots/set` | lets a client add skill search roots at runtime, independent of plugins |
 
-> ⚠️ 현재 `disabledPluginIds` 는 **선택을 저장할 뿐 실제로 capability 를 걸러내지 않는다.**
+> ⚠️ `disabledPluginIds` currently **saves the selection without actually filtering capabilities.**
 
+## §8.5 Observation — three orthogonal axes of reuse  {#s8-5-reuse-axes}
 
-## §8.5 관측 — 재사용 단위의 세 축은 직교한다  {#s8-5-reuse-axes}
+Plugins and marketplaces are the unit of **distribution.** Separately, browser-type agents each
+solved **"how do you turn a repeated delegation into a reusable unit?"** — on three different axes.
 
-plugin/marketplace 는 **배포**의 단위다. 브라우저형 에이전트는 그와 별개로
-**"반복되는 위임을 어떻게 재사용 단위로 만드나"** 를 각자 풀었고, 셋의 축이 서로 다르다.
-
-| 제품 | 이름 | 축 | 내용 |
+| Product | Name | Axis | Contents |
 |---|---|---|---|
-| **Opera Neon** | **Cards** | **작업 유형** | "이런 종류의 일은 이렇게 다뤄라". 덱으로 묶이고 Chat·Do·Research 전반에서 동작 |
-| Dia | Skills | **호출** | 이름으로 부르는 재사용 루틴 |
-| **Aside** | **Routines** | **시간** | `cron`(새 작업 시작) vs `heartbeat`(기존 대화를 깨워 이어감) |
+| **Opera Neon** | **Cards** | **task type** | "handle this kind of work like this." Grouped into decks, working across Chat, Do and Research |
+| Dia | Skills | **invocation** | reusable routines called by name |
+| **Aside** | **Routines** | **time** | `cron` (start a new task) vs. `heartbeat` (wake an existing chat and continue) |
 
-> 📌 **세 축이 직교한다.** 한 제품이 셋을 다 가질 수 있는데 아직 아무도 그러지 않았다.
-> 특히 Aside 의 cron/heartbeat 구분은 다른 둘에 없다 — 대화 맥락을 가진 에이전트에게
-> "새로 시작"과 "이어하기"는 다른 의미인데, 보통의 스케줄러는 전자만 준다.
+> 📌 **The three axes are orthogonal.** One product could have all three; none does yet. Aside's
+> cron/heartbeat distinction in particular has no counterpart — recurring work carries two different
+> meanings, and ordinary schedulers give only the first. An agent with conversational context needs
+> the second.
 >
-> Aside 는 **반복 작업을 스캔해 루틴을 제안**하기까지 한다. 사용자가 재사용 단위를
-> 스스로 발견하지 못하는 문제를 도구가 먼저 푼다.
+> Aside goes further and **scans for recurring work to propose routines**, solving ahead of the user
+> the problem that they do not discover their own reusable units.
 
-## §8.6 관측 — 벤더가 손으로 만든 사이트 스킬  {#s8-6-builtin-skills}
+## §8.6 Observation — hand-built site skills  {#s8-6-builtin-skills}
 
-Aside 는 Slack·Gmail·Notion·Google Docs/Sheets/Search·YouTube·LinkedIn·iMessage 에 대해
-**내장 스킬**을 싣고, 가이드가 "범용 `snapshot()` 으로 몰기 전에 스킬부터 확인하라"고 지시한다.
+Aside ships **built-in skills** for Slack, Gmail, Notion, Google Docs/Sheets/Search, YouTube,
+LinkedIn and iMessage, and its guide instructs agents to "check for one before driving a site through
+`snapshot()` by hand."
 
-> ⚠️ 이것은 "통합 목록이 아니라 브라우저 자체가 표면"이라는 이 부류의 서사를 **부분적으로
-> 뒤집는다.** 범용 브라우징은 폴백이고 주요 사이트엔 전용 경로가 있다. 실용적 선택이지만,
-> **벤더 자체보고 벤치마크 점수와 함께 읽어야 한다** — 벤치마크 과제가 그 사이트들을
-> 포함한다면 점수는 범용 능력이 아니라 스킬 커버리지를 재는 것일 수 있다.
+> ⚠️ This **partially overturns** the narrative that the surface is the browser itself rather than an
+> integration list. Generic browsing is the fallback; major sites have a dedicated path. Pragmatic —
+> but **read it alongside vendor self-reported benchmarks**: if the benchmark tasks include those
+> sites, the score may be measuring skill coverage rather than general capability.
 
-## §8 다음에 읽을 문서  {#s8-next}
+## §9 Read next  {#s9-next}
 
-- [[concepts/execution-environment-topology]] — plugin 이 적재되는 환경
-- [[concepts/harness]] §7 — capability system 이 표면에서 차지하는 비중
-- 원문: [`docs/13-marketplace-and-plugins.md`](../../../docs/13-marketplace-and-plugins.md), [`docs/10-agents-api-tools.md`](../../../docs/10-agents-api-tools.md) §4
+- [[concepts/execution-environment-topology]] — the environment plugins load into
+- [[concepts/harness]] §7 — the capability system's share of the surface
+- Originals: [`docs/13-marketplace-and-plugins.md`](../../../docs/13-marketplace-and-plugins.md), [`docs/10-agents-api-tools.md`](../../../docs/10-agents-api-tools.md) §4

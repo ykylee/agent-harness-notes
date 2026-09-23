@@ -3,88 +3,111 @@ purpose_version: 1
 last_purpose_review: 2026-09-23
 ---
 
-# Purpose — 이 저장소의 Why
+# Purpose — why this repository exists
 
-## 0. 범위 확장 기록 (2026-09-23)
+## 0. Scope extension, 2026-09-23
 
-이 저장소는 **OpenAI Codex 하네스 조사**로 시작했고, 원래 제외 영역에
-"OpenAI 외 벤더의 하네스 비교 조사 — 별도 저장소의 일"이 있었다.
+This repository began as an investigation into the **OpenAI Codex harness**, and its excluded areas
+originally read "comparative research on non-OpenAI vendors' harnesses — work for a separate
+repository."
 
-브라우저형 에이전트 조사(`browser-agents/`)가 **같은 추상의 다른 사례**임이 드러나면서
-그 선언이 유지될 수 없게 됐다. 결정적 근거 둘:
+The browser-agent study (`browser-agents/`) turned out to be **another instance of the same
+abstraction**, which made that exclusion untenable. Two decisive reasons:
 
-1. **직접 접촉** — Aside 데몬이 `openai-codex`·`opencode` 를 모델 프로바이더 id 로 갖고,
-   `CODEX_TOOL_CALL_PROVIDERS` 집합과 `supportsAdditionalTools` 플래그로 **Codex 의
-   `responses_lite` 요청 형태 분기를 구현**한다. 두 조사가 코드 수준에서 만난다.
-2. **개념 공유** — 위키 개념 13종 중 8종이 양쪽 증거로 보강된다. 승인 게이트, 프로바이더
-   데이터화, capability 배포, control/execution plane 은 실행 표면과 무관한 축이었다.
+1. **They meet in code.** Aside's daemon registers `openai-codex` and `opencode` as model provider
+   ids, and carries a `CODEX_TOOL_CALL_PROVIDERS` set plus a `supportsAdditionalTools` flag — it
+   **implements Codex's `responses_lite` request-shape branching**. The two studies touch at the
+   level of source.
+2. **They share concepts.** Eight of the sixteen wiki concepts are now supported by evidence from
+   both. Approval gates, providers-as-data, capability distribution and the control/execution plane
+   turned out to be axes that do not depend on the execution surface at all.
 
-따라서 저장소 성격을 **"에이전트 하네스 조사"** 로 재정의한다. Codex 는 여전히 1순위
-사례이고, 나머지는 그 추상을 시험하는 대조군이다.
+The repository is therefore redefined as **an investigation into agent harnesses**. Codex remains the
+first case; the rest are the contrast group that tests the abstraction.
 
-**바뀐 것은 범위이지 방법이 아니다.** §5 의 규율은 그대로다.
+**What changed is the scope, not the method.** The discipline in §5 is unchanged.
 
-
-- 문서 목적: 이 저장소가 *왜* 존재하고 어디로 가는지(directional intent)를 정의한다. AI agent 가 session-start / backlog-update 시 읽어 작업 분류와 scope 판정에 사용한다.
-- 범위: 4-element (Goals / Key Questions / Research Scope / Evolving Thesis)
-- 대상 독자: AI agent, 저장소 관리자
-- 상태: active — 2026-09-23 에 **범위를 에이전트 하네스 일반으로 확장**했다 (아래 §0)
-- 최종 수정일: 2026-09-23
-- 관련 문서: [PROJECT_PROFILE.md](../../../docs/PROJECT_PROFILE.md), [99-sources.md](../../../docs/99-sources.md)
+- Purpose: define *why* this repository exists and where it is going (directional intent). AI agents
+  read it at session-start and backlog-update to classify work and judge scope.
+- Scope: the four elements (Goals / Key Questions / Research Scope / Evolving Thesis)
+- Audience: AI agents, repository maintainer
+- Status: active — scope extended to agent harnesses generally on 2026-09-23 (§0)
+- Updated: 2026-09-23
+- Related: [PROJECT_PROFILE.md](../../../docs/PROJECT_PROFILE.md), [99-sources.md](../../../docs/99-sources.md), [SYNTHESIS.md](../../../SYNTHESIS.md)
 
 ## 1. Goals
 
-- **G1**: 에이전트 하네스의 **실제 계약**을 블로그 요약이 아니라 **생성 스키마·소스·바이너리**에서
-  읽어 기록한다. 1순위는 OpenAI Codex(App Server JSON-RPC, SDK, Agents API)이고,
-  브라우저형 에이전트가 대조군이다.
-- **G2**: 자체 하네스를 만든다면 무엇을 구현해야 하는지 — 메서드·이벤트·승인 흐름·인식 모델·
-  샌드박스·자격증명·플러그인 — **구축 체크리스트로 환산 가능한 형태**로 남긴다.
-- **G3**: 모든 주장에 검증 상태(1차 확인 / 추론 / 반증)를 붙이고, 틀린 2차 출처는 **지우지 않고 반증으로 보존**한다.
-  반증의 기록이 이 저장소의 신뢰를 만든다.
-- **G4**: 영문 본문과 한국어 보고서를 같은 사실 위에서 동기 유지한다.
-- **G5**: 실행 표면이 다른 하네스들(셸/파일시스템 대 브라우저/OS)을 **같은 개념 축으로 재색인**해,
-  무엇이 표면 고유이고 무엇이 하네스 일반의 성질인지 가른다.
+- **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
+  and binaries** rather than blog summaries. OpenAI Codex first (App Server JSON-RPC, SDK, Agents
+  API), with browser-type agents as the contrast group.
+- **G2**: leave behind, in a form that **converts into a build checklist**, what you would have to
+  implement to build your own harness — methods, events, approval flow, perception model, sandbox,
+  credentials, plugins.
+- **G3**: attach a verification status to every claim (confirmed / inferred / refuted), and **keep
+  wrong secondary sources on the record as refutations rather than deleting them.** The record of
+  what was wrong is what makes the rest trustworthy.
+- **G4**: keep the English bodies and the Korean report resting on the same facts.
+- **G5**: re-index harnesses with different execution surfaces (shell/filesystem vs. browser/OS)
+  **onto the same conceptual axes**, so it is clear which properties belong to a surface and which
+  belong to harnesses in general.
 
 ## 2. Key Questions
 
-- **Q1**: Codex 하네스에서 모델과 실행부의 경계(wire protocol)는 정확히 어디인가? 코어를 재사용할 수 있는가?
-- **Q2**: 관리형 Agents API 와 오픈소스 App Server 는 같은 하네스인가, 다른 표면인가? 어디까지 일치하는가?
-- **Q3**: Responses 페이로드를 Chat Completions 로 되돌리는 어댑터는 fork 없이 가능한가?
-- **Q4**: 어떤 주장이 1차 출처로 확정되고, 어떤 것이 아직 추론인가? 그 경계를 문서가 스스로 말하는가?
-- **Q5**: 하네스의 설계 축 중 **실행 표면에 따라 달라지는 것**과 **표면과 무관한 것**은 각각 무엇인가?
+- **Q1**: where exactly is the boundary between model and execution (the wire protocol) in the Codex
+  harness? Is the core reusable at all?
+- **Q2**: are the managed Agents API and the open-source App Server the same harness or different
+  surfaces? How far do they agree?
+- **Q3**: is an adapter that maps Responses payloads back onto Chat Completions possible without a
+  fork?
+- **Q4**: which claims are settled by a primary source and which are still inference? Does the
+  document say so itself?
+- **Q5**: among the design axes of a harness, which **depend on the execution surface** and which do
+  not?
 
 ## 3. Research Scope
 
-### 포함 영역
+### Included
 
-- `openai/codex` 저장소의 생성 스키마·Rust 소스 독해
-- App Server JSON-RPC 프로토콜 (메서드 / 알림 / 승인 / 전송 계층 / 오류 코드)
-- Agents API (엔드포인트, 환경 유형, 샌드박스, 도구, 웹훅·관측·비용)
-- CLI `codex exec`, TypeScript / Python SDK
-- 모델 프로바이더 설정, Responses↔Chat Completions 어댑터 타당성
-- Windows 네이티브 샌드박스, 마켓플레이스·플러그인 배포 형식
-- 하네스 엔지니어링 운영 원칙 (OpenAI 내부 실험 기록)
-- 출처 검증 기록과 반증 이력 (`99-sources.md`)
-- **브라우저형 에이전트의 제어 표면·인식 모델·자격증명 설계** (`browser-agents/`)
-- **에이전트 하네스 일반의 공통 축** — 개념층(`ai-workflow/wiki/concepts/`)과 교차 종합(`SYNTHESIS.md`)
+- Reading the generated schemas and Rust source of `openai/codex`
+- The App Server JSON-RPC protocol (methods / notifications / approvals / transports / error codes)
+- Agents API (endpoints, environment types, sandboxes, tools, webhooks, observability, cost)
+- CLI `codex exec`, the TypeScript and Python SDKs
+- Model provider configuration, and the feasibility of a Responses↔Chat Completions adapter
+- The native Windows sandbox, marketplace and plugin distribution formats
+- Harness engineering operating principles (OpenAI's internal experiment)
+- Source verification records and the history of refutations (`99-sources.md`)
+- **Control surface, perception model and credential design of browser-type agents**
+  (`browser-agents/`)
+- **The axes shared by agent harnesses generally** — the concept layer
+  (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)
 
-### 제외 영역
+### Excluded
 
-- **하네스의 실제 구현·포크·재배포** — 이 저장소는 조사 노트이지 코드베이스가 아니다
-- **특정 벤더 제품의 기능 추적·리뷰** — 조사 시점 스냅샷만 기록한다. 가격·기능 변화를 쫓지 않는다
-- 모델 자체의 성능 벤치마크 재현 (벤더 자체보고 점수는 **판정 대상**이지 비교 근거가 아니다)
-- 사내 제품 설계 문서 — 여기의 결론을 가져다 쓰되, 여기에 쓰지 않는다
-- 2차 출처만으로 확정한 서술 — 1차 대조 전에는 "미확인"으로만 남긴다
+- **Actually implementing, forking or redistributing a harness** — these are research notes, not a
+  codebase
+- **Tracking or reviewing a specific vendor's product features** — only a snapshot at the time of
+  investigation is recorded. Price and feature changes are not chased.
+- Reproducing model benchmarks (a vendor's self-reported score is something to **adjudicate**, not a
+  basis for comparison)
+- Internal product design documents — take conclusions from here, do not write them here
+- Anything asserted from a secondary source alone — it stays "unverified" until checked against a
+  primary one
 
 ## 4. Evolving Thesis
 
-*현재까지의 working hypothesis (바뀔 수 있다):*
+*Working hypotheses so far; these can change.*
 
-- 하네스는 모델과 과업 사이의 **실행 시스템**이며, OpenAI 는 이를 바이너리·SDK·관리형 API 의 3계층으로 열었다.
-- 문서화된 산문보다 **커밋된 아티팩트**(생성 스키마, 소스, 기본값)가 진실에 가깝다. 산문은 드리프트한다.
-- 어댑터는 fork 가 아니라 **프로바이더 형태의 프록시**로 붙일 때만 공짜다. 상태를 갖는 순간 그 이점이 사라진다.
-- 조사 기준일은 빠르게 낡는다. 재조사의 첫 수는 새 사실 수집이 아니라 **기존 사실의 드리프트 확인**이다.
-- 하네스의 설계 축 중 **표면과 무관한 것**(승인·권한·프로바이더·capability 배포)과 **표면 고유인 것**
-  (인식 모델·프롬프트 주입·자격증명 은닉)은 가를 수 있다. 전자가 이 저장소의 재사용 가능한 자산이다.
-- **문서 사이트에 `.md`·`/llms.txt` 를 먼저 시도하라**는 수법은 일반 기법이지만 만능이 아니다 —
-  클라이언트 렌더 사이트에서는 실패한다.
+- A harness is the **execution system** that sits between a model and a task. OpenAI opened theirs in
+  three layers: a binary, SDKs and a managed API.
+- **Committed artifacts** — generated schemas, source, defaults, binaries — are closer to the truth
+  than prose. Prose drifts.
+- An adapter is only free when it attaches as a **provider-shaped proxy** rather than a fork. The
+  moment it holds state, that advantage is gone.
+- Research baselines go stale quickly. The first move of a re-investigation is not gathering new
+  facts but **checking existing facts for drift.**
+- The design axes of a harness split into those that are **surface-independent** (approval,
+  permissions, providers, capability distribution) and those that are **surface-specific**
+  (perception model, prompt injection, credential shielding). The former is this repository's
+  reusable asset.
+- **Trying `.md` and `/llms.txt` on a documentation site first** is a general technique, but not a
+  universal one — it fails on client-rendered sites.

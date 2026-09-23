@@ -1,116 +1,123 @@
-# 07. 보안 — 간접 프롬프트 주입
+# 07. Security — indirect prompt injection
 
-> 출처: Brave 보안팀의 Comet 공개 연구(공개일 2025-08-20), Wikipedia 의 CometJacking 기록,
-> 2026년 연구·보도. 이 부류 **고유의** 위험만 다룬다 (일반 브라우저 보안은 범위 밖).
+> Sources: Brave's published research on Comet (disclosed 2025-08-20), Wikipedia's record of
+> CometJacking, and 2026 research and reporting. Only risks **specific to this class** are covered;
+> general browser security is out of scope.
 
-## 1. 왜 이것이 이 분야의 중심 문제인가
+## 1. Why this is the central problem here
 
-브라우저형 에이전트는 두 가지를 동시에 갖는다.
+A browser-type agent holds two things at once.
 
-1. **로그인된 세션에 대한 접근** — 이메일, 은행, 내부 도구
-2. **웹 페이지 내용을 맥락으로 읽는 능력** — 그리고 웹 페이지는 **공격자가 쓸 수 있다**
+1. **Access to logged-in sessions** — email, banking, internal tools
+2. **The ability to read web page content as context** — and web pages **can be written by an
+   attacker**
 
-이 둘이 만나면 새로운 공격면이 생긴다. 웹의 기존 방어선인 **동일 출처 정책(same-origin policy)이
-무력해진다** — 에이전트는 사용자 권한으로 출처를 가로질러 움직이는 존재이기 때문이다.
+Where those two meet, a new attack surface appears. The web's existing defence, **the same-origin
+policy, stops helping** — the agent is an entity that crosses origins with the user's own authority.
 
-## 2. 공격 사슬 — Brave 의 Comet 실증
+## 2. The attack chain — Brave's demonstration against Comet
 
-| 단계 | 내용 |
+| Step | Detail |
 |---|---|
-| **1. 심기** | 공격자가 페이지에 지시를 숨긴다 — "흰 배경의 흰 글자, HTML 주석, 기타 보이지 않는 요소". 또는 Reddit 댓글 같은 **사용자 생성 콘텐츠**에 주입 |
-| **2. 발동** | 사용자가 그 페이지를 방문해 AI 를 부른다 — 예: **"이 페이지 요약해줘"** |
-| **3. 주입** | 시스템이 페이지 내용을 처리하는데, **사용자 지시와 신뢰할 수 없는 페이지 내용을 구분하지 않는다** |
-| **4. 실행** | AI 가 주입된 명령을 정당한 사용자 요청으로 취급해 브라우저 동작을 수행 |
-| **5. 탈취** | 실증에서는 사용자 이메일 주소를 얻고, **Gmail 에서 OTP 를 꺼내**, 둘 다 공격자 서버로 유출 → 계정 장악 |
+| **1. Plant** | The attacker hides instructions in the page — "white text on white backgrounds, HTML comments, or other invisible elements." Or injects into **user-generated content** such as a Reddit comment |
+| **2. Trigger** | The user visits the page and invokes the AI — for example, **"Summarize this page."** |
+| **3. Inject** | The system processes page content **without distinguishing user instruction from untrusted page content** |
+| **4. Execute** | The AI treats the injected commands as a legitimate user request and performs browser actions |
+| **5. Exfiltrate** | In the proof of concept: obtain the user's email address, **pull an OTP out of Gmail**, send both to the attacker's server → account takeover |
 
-> 사용자가 한 일은 **"요약해줘"를 누른 것뿐**이다. 악성 링크를 클릭하거나 자격증명을 입력하지
-> 않았다. 이것이 이 공격의 성질이다.
+> All the user did was **press "summarize."** No malicious link was clicked, no credential typed.
+> That is the character of this attack.
 
-## 3. 구조적 원인
+## 3. The structural cause
 
-Brave 의 진단은 구현 버그가 아니라 아키텍처를 가리킨다.
+Brave's diagnosis points at architecture, not an implementation bug.
 
-> Comet 은 **"페이지의 일부를 사용자 지시와 웹페이지의 신뢰할 수 없는 내용을 구분하지 않고
-> LLM 에 그대로 먹인다."**
+> Comet **"feeds a part of the webpage directly to its LLM without distinguishing between the user's
+> instructions and untrusted content from the webpage."**
 
-입력 스트림이 하나로 합쳐지면 모델은 정당한 의도와 삽입된 페이로드를 구별할 수단이 없다.
-이것이 [06 §2](06-architecture-axes.md) 의 인식 축과 직결된다 — **무엇을 맥락에 넣는가**를
-정할 때 그것들의 **신뢰 등급도 함께** 정해야 한다.
+Once the input stream is merged, the model has no means of telling legitimate intent from an inserted
+payload. That connects directly to the perception axis in
+[06 §2](06-architecture-axes.md) — deciding **what goes into the context** means also deciding **its
+trust grade.**
 
-## 4. Brave 가 제시한 완화책 4범주
+## 4. Brave's four mitigation categories
 
-| # | 범주 | 내용 |
+| # | Category | Detail |
 |---|---|---|
-| 1 | **입력 분리** | "브라우저는 백엔드에 맥락을 보낼 때 사용자 지시와 사이트 내용을 명확히 분리해야 한다. **페이지 내용은 항상 신뢰할 수 없는 것으로 취급**되어야 한다" |
-| 2 | **출력 검증** | 모델 출력이 사용자 요청과 정합하는지 **독립적으로 검사** |
-| 3 | **보안 체크포인트** | "보안·프라이버시에 민감한 동작은 **사용자 상호작용을 요구**해야 한다" |
-| 4 | **모드 격리** | "에이전틱 브라우징은 본질적으로 강력하지만 위험한 모드" — 일반 브라우징과 명확히 분리하고 **우발적 활성화를 막아야** 한다 |
+| 1 | **Input separation** | "The browser should clearly separate the user's instructions from the website's contents when sending them as context to the backend. **The contents of the page should always be treated as untrusted.**" |
+| 2 | **Output validation** | Model output should be "independently checked for alignment against the user's requests" |
+| 3 | **Security checkpoints** | "Security and privacy sensitive actions should require user interaction" |
+| 4 | **Mode isolation** | "Agentic browsing is an inherently powerful-but-risky mode" — keep it clearly separated from ordinary browsing and **prevent accidental activation** |
 
-## 5. 공개 타임라인 — 한 번에 고쳐지지 않았다
+## 5. Disclosure timeline — it was not fixed in one pass
 
-| 날짜 | 사건 |
+| Date | Event |
 |---|---|
-| 2025-07-25 | 발견·신고 |
-| 2025-07-27 | Perplexity 확인, 초기 수정 |
-| 2025-07-28 | **재검증 — 수정 불완전** |
-| 2025-08-11 | 7일 공개 예고 |
-| 2025-08-13 | 패치 완료로 보임 |
-| 2025-08-20 | 공개 |
-| 이후 | **추가 기록: Perplexity 의 수정이 여전히 불완전** |
+| 2025-07-25 | Discovered and reported |
+| 2025-07-27 | Perplexity acknowledges, ships an initial fix |
+| 2025-07-28 | **Retesting shows the fix incomplete** |
+| 2025-08-11 | Seven-day disclosure notice |
+| 2025-08-13 | Patch appears complete |
+| 2025-08-20 | Published |
+| after | **A later note records Perplexity's fix as still incomplete** |
 
-> 📌 이 타임라인 자체가 결론의 일부다. **두 차례 수정 시도가 불완전했다.** 이것이 점 하나짜리
-> 버그가 아니라는 근거다.
+> 📌 The timeline is itself part of the conclusion. **Two rounds of fixes were incomplete.** That is
+> the evidence this is not a single-point bug.
 
-## 6. 2026년 현재 — 해결되지 않았다
+## 6. As of 2026 — unsolved
 
-| 사실 | 출처 등급 |
+| Fact | Grade |
 |---|---|
-| ChatGPT Atlas, Perplexity Comet, Dia 에서 **프롬프트 주입은 완전히 패치될 수 없다**고 2026년 연구자들이 확인 | 2차 |
-| 2026-06 워싱턴대 연구: **인기 에이전틱 브라우저 7개 중 4개**에서 악성 페이지가 동일 출처 정책을 우회. Atlas 에 대한 **동작하는 데이터 탈취 PoC** | 2차 |
-| OpenAI 자체 서술 (2025-12): 프롬프트 주입은 **"unlikely to ever be fully 'solved'"** | 1차 인용(2차 경유) |
-| Atlas 종료 사유에 **보안 유지보수**가 포함 | 2차 |
+| Researchers confirmed in 2026 that **prompt injection cannot be fully patched** in ChatGPT Atlas, Perplexity Comet or Dia | secondary |
+| 2026-06, University of Washington: **four of seven** popular agentic browsers let a malicious page bypass the same-origin policy, with a **working data-theft PoC against Atlas** | secondary |
+| OpenAI's own words (2025-12): prompt injection is **"unlikely to ever be fully 'solved'"** | primary quote, via secondary |
+| **Security maintenance appears among the reasons for retiring Atlas** | secondary |
 
-> ⚠️ 위 항목들은 **2차 출처**다. 원 연구 논문과 OpenAI 원문을 직접 읽지 못했다
-> (OpenAI 헬프센터는 403). 방향은 여러 출처가 일치하지만, 개별 수치와 문구는 1차 확인 전이다.
+> ⚠️ These are **secondary sources.** The original papers and OpenAI's own text were not read
+> directly (the OpenAI help centre returns 403). Several sources agree on the direction, but the
+> individual figures and wording are not primary-confirmed.
 
-## 7. 다른 보안 사건
+## 7. Other security incidents
 
-| 사건 | 대상 | 내용 |
+| Incident | Target | Detail |
 |---|---|---|
-| **CometJacking** | Comet | 민감 개인정보 탈취. Perplexity 가 **초기에 보안 영향을 부인**했다가 이후 독자 발견·패치 |
-| **ChatGPT Tainted Memories** (LayerX, 2025-10) | Atlas | CSRF 를 통한 메모리 오염. 사회공학으로 메모리 기능 침해 가능. **OpenAI 는 재현 가능성을 반박** |
+| **CometJacking** | Comet | Sensitive personal data exfiltration. Perplexity **initially disputed the impact**, then independently found and patched it |
+| **ChatGPT Tainted Memories** (LayerX, 2025-10) | Atlas | Memory poisoning via CSRF; the memory feature compromised through social engineering. **OpenAI disputed reproducibility** |
 
-> 두 건 모두 **벤더가 초기에 부인**했다는 공통점이 있다. 이 분야 보안 주장을 읽을 때
-> 벤더 반응을 최종 판정으로 삼으면 안 된다는 뜻이다.
+> Both share a trait: **the vendor initially denied it.** When reading security claims in this field,
+> do not take the vendor's reaction as the final verdict.
 
-## 8. 제품별 대응 현황
+## 8. Where each product stands
 
-| 제품 | 확인되는 대응 | 등급 |
+| Product | Confirmed response | Grade |
 |---|---|---|
-| **Aside** | 민감 동작(결제·게시·메시지)에 **사람 승인** 요구, `Ask`/`Deny` 권한 규칙, `Guard` 기본 모드, **자격증명 값 은닉**, 시크릿에서 금고 비활성 | 문서 확인 (승인 UI 구체는 미확인) |
-| **Comet** | `isInternalPage`·`isUrlBlocked` **URL 수준 차단**, 관리자 블랙리스트 | 리버싱 확인 |
-| **Dia** | ✅ **구체적 문서화** — LLM 생성 URL 추종 금지, URL 원문 미전달, 비밀번호·비가역 버튼을 에이전트 인식에서 제거, 초기 탭 접근 없음, 자율 이동 금지, 제3자 쓰기 승인. **한계도 스스로 명시** | 1차 문서 ([11 §2](11-dia-and-neon.md)) |
-| **Opera Neon** | 자격증명·결제 정보가 Opera 서버로 미전송. 에이전트 가시 범위는 미확인 | 1차 문서 |
+| **Aside** | Human approval for sensitive actions (payments, posts, messages), `Ask`/`Deny` rules, `Guard` as the default mode, **credential value hiding**, vault disabled in incognito | documentation, plus [10 §1.5](10-aside-enforcement-and-native.md) for the approval UI |
+| **Comet** | **URL-level blocking** via `isInternalPage` / `isUrlBlocked`, administrator blacklists | reverse-engineered |
+| **Dia** | ✅ **Documented concretely** — will not follow LLM-generated URLs, does not pass URLs to the LLM verbatim, removes password fields and irreversible buttons from the agent's perception, no tab access initially, no autonomous navigation, approval before writing to third-party sites. **It also states what remains** | primary documentation ([11 §2](11-dia-and-neon.md)) |
+| **Opera Neon** | Credentials and payment details are not sent to Opera's servers. What the agent can see is unconfirmed | primary documentation |
 
-> ⚠️ **정정 (2026-09-23)**: 이 단락은 원래 "입력 분리(#1)를 명시적으로 구현했다고 문서화한
-> 제품이 조사 범위에서 확인되지 않았다"고 적었다. **부분적으로 틀렸다.** 이후 Dia 의 보안
-> 문서에서 구체적인 방어가 확인됐다 — LLM 생성 URL 추종 금지, **URL 을 LLM 에 원문으로 넘기지
-> 않음**, 비밀번호 필드와 비가역 동작 버튼을 "**invisible to the agentic system**" 으로 처리.
-> Brave 의 #1 과 완전히 같지는 않지만(사용자 지시와 페이지 내용을 구조적으로 가르는 것은
-> 아니다) **인식에 들어가는 것을 통제**한다는 점에서 같은 층위다.
-> 상세: [11 §2](11-dia-and-neon.md).
+> ⚠️ **Correction (2026-09-23)**: this section originally read "no product in scope documents having
+> implemented input separation (#1)." **That was partly wrong.** Dia's defences were later confirmed
+> — refusing LLM-generated URLs, **not passing URLs verbatim**, and making password fields and
+> irreversible buttons "**invisible to the agentic system**." It is not identical to Brave's #1 (it
+> does not structurally partition user instruction from page content) but it operates **at the same
+> layer, controlling what enters perception.** Detail: [11 §2](11-dia-and-neon.md).
 >
-> 나머지 제품에 대해서는 원래 관찰이 유효하다 — 대부분 #3(체크포인트)·#4(모드 격리)에
-> 머물고, 가장 근본적인 방어가 가장 덜 보인다.
+> For the remaining products the original observation stands — most stop at #3 (checkpoints) and #4
+> (mode isolation), and the most fundamental defence is the least visible.
 
-## 9. 도입 판단에 쓸 정리
+## 9. Practical summary for an adoption decision
 
-- **이 부류를 쓰는 것은 "요약해줘" 한 번이 계정 장악으로 이어질 수 있는 위험을 받아들이는 것**이다.
-  위험 수준은 그 브라우저가 어떤 로그인 세션을 갖고 있느냐에 정비례한다.
-- 완화의 실질은 **권한 축소**다 — 민감 계정은 에이전트 브라우저에 로그인하지 않는 것이 가장 확실하다.
-  Aside 의 시크릿 작업 모드가 이 용도에 맞는다.
-- **승인 게이트를 끄지 마라.** Brave 의 #3 이 현재 실질적으로 작동하는 몇 안 되는 방어다.
-- 기업 도입이라면 **관리형 정책으로 도메인 블랙리스트**를 거는 축(Comet 의 managed storage)이
-  있는지 확인하라.
-- 벤더의 "우리는 로컬이라 안전하다"는 주장과 **프롬프트 주입은 별개 문제**다. 로컬 실행은
-  데이터 전송을 줄이지, 에이전트가 속는 것을 막지 않는다.
+- **Using this class means accepting that one "summarize this" can lead to account takeover.** The
+  risk scales directly with which logged-in sessions that browser holds.
+- **The substance of mitigation is reducing privilege** — not signing sensitive accounts into the
+  agent browser at all is the surest measure. Aside's incognito task mode fits this use.
+- **Do not turn off the approval gate.** Brave's #3 is one of the few defences actually working today.
+- For enterprise adoption, check whether there is an axis for **domain blacklists via managed policy**
+  (Comet's managed storage).
+- A vendor's "we are local, so we are safe" **is a separate matter from prompt injection.** Local
+  execution reduces data transmission; it does not stop the agent being fooled.
+
+> ⚠️ And the surface keeps widening. Aside's `Computer Use` reaches the system-wide accessibility
+> tree, an event tap, screen capture and Contacts ([10 §2](10-aside-enforcement-and-native.md)) — a
+> fooled agent's range there is **the whole desktop, not a browser tab.**

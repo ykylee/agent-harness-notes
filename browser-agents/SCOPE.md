@@ -1,76 +1,78 @@
-# 이 조사의 scope 선언
+# Scope declaration for this study
 
-- 상태: **해소됨 (2026-09-23)** — A안으로 시작했으나 융합 결정으로 공용 PURPOSE 가 확장됐다
-- 결정일: 2026-09-23 (소유자 ykylee)
-- 최종 수정일: 2026-09-23 (2차 갱신)
+- Status: **resolved (2026-09-23)** — began as option A, closed by extending the shared PURPOSE as
+  part of the fusion decision
+- Updated: 2026-09-23 (second revision)
 
-## 왜 별도 선언이 필요한가
+## Why a separate declaration was needed
 
-저장소 공용 [`PURPOSE.md`](../ai-workflow/memory/active/PURPOSE.md) 의 **제외 영역**에
-"OpenAI 외 벤더의 하네스 비교 조사 — 별도 저장소의 일"이 적혀 있다. 브라우저형 에이전트
-조사는 그 선언대로라면 지금 scope 밖이다.
+The shared [`PURPOSE.md`](../ai-workflow/memory/active/PURPOSE.md) originally excluded "comparative
+research on non-OpenAI vendors' harnesses — work for a separate repository." By that declaration, a
+browser-agent study was out of scope.
 
-**공용 PURPOSE.md 를 말없이 고치지 않았다.** 그 파일은 기존 조사의 판정 기준이고, 조용히
-넓히면 기존 문서들이 어떤 약속 아래 쓰였는지가 사라진다. 대신 이 브랜치의 scope 를 여기에
-따로 선언한다.
+**The shared PURPOSE was not quietly edited.** That file is the basis on which the existing study was
+judged; widening it silently would erase the terms the existing documents were written under.
+Instead this branch's scope was declared separately.
 
-## 결정 — A안 (2026-09-23)
+## Resolution — option A (2026-09-23)
 
-| 선택지 | 결과 | |
+| Option | Result | |
 |---|---|---|
-| **A. 브랜치 국한 연구로 유지** | **이 문서가 곧 scope.** 공용 `PURPOSE.md` 는 건드리지 않는다 | ✅ **채택** |
-| B. 공용 PURPOSE 확장 | 저장소 성격을 "에이전트 하네스 전반"으로 재정의 | 미채택 |
-| C. 별도 저장소로 분리 | 이 브랜치는 이관용 초안이 된다 | 미채택 |
+| **A. Keep it branch-scoped** | **This document is the scope.** The shared `PURPOSE.md` is untouched | ✅ **chosen** |
+| B. Extend the shared PURPOSE | Redefine the repository as "agent harnesses generally" | not chosen |
+| C. Split into a separate repository | This branch becomes a draft for migration | not chosen |
 
-### ⚠️ 후속 (2026-09-23) — A안의 조건이 발동했다
+### ⚠️ Follow-up (2026-09-23) — option A's condition fired
 
-A안은 "병합 시 공용 PURPOSE 도 함께 넓힌다"를 조건으로 달고 있었다. **위키 개념층 융합이
-사실상 그 병합**이므로, 조건대로 [`PURPOSE.md`](../ai-workflow/memory/active/PURPOSE.md) 를
-수정했다 — §0 에 확장 기록, 제외 영역에서 "OpenAI 외 벤더" 삭제, Goals 에 G5 추가.
+Option A carried the condition "when merging, widen the shared PURPOSE along with it." **Fusing the
+wiki concept layer was effectively that merge**, so the condition was honoured:
+[`PURPOSE.md`](../ai-workflow/memory/active/PURPOSE.md) now records the extension in §0, drops
+"non-OpenAI vendors" from its exclusions, and adds goal G5.
 
-**이 문서는 이제 이력이다.** 현재 판정 기준은 공용 PURPOSE 다.
+**This document is now history.** The shared PURPOSE is the operative criterion.
 
-### A안이 뜻했던 것 (이력)
+### What option A meant (historical)
 
-| 지금 (브랜치 유지 중) | main 병합을 시도할 때 |
+| While on the branch | When attempting to merge |
 |---|---|
-| 공용 `PURPOSE.md` 는 **손대지 않는다.** 제외 영역 문구가 그대로 유효하다 | **병합 자체가 scope 확장 행위다.** 공용 PURPOSE 의 제외 영역 수정을 **같은 PR 에서** 해야 한다 |
-| 이 문서가 이 브랜치의 판정 기준 | 병합 없이 브랜치에 머무는 한, 이 충돌은 문제가 되지 않는다 |
-| `main` 의 기존 조사는 자기 선언 아래 그대로 | 병합 시점까지 미루는 것이지 없앤 것이 아니다 |
+| The shared `PURPOSE.md` is untouched; its exclusion stands | **The merge itself is the act of widening scope.** The exclusion must be edited **in the same PR** |
+| This document is the branch's criterion | While the work stays on a branch, the conflict does not bite |
+| `main`'s existing study remains under its own declaration | Deferred to the merge, not eliminated |
 
-> ⚠️ **A안은 결정을 미루는 선택이 아니라 경계를 긋는 선택이다.** 브랜치에 머무는 동안은
-> 두 조사가 서로의 선언을 침범하지 않는다. 단, **병합은 조용히 하면 안 된다** — 병합하는
-> 순간 공용 PURPOSE 가 거짓이 되므로, 병합 PR 은 반드시 PURPOSE 수정을 포함해야 한다.
-> 이 조건을 잊지 않도록 브랜치 handoff 의 Risks 에도 남겼다.
+> ⚠️ **Option A was not a way of postponing a decision but of drawing a boundary.** While the work
+> stayed on the branch, neither study trespassed on the other's declaration. But **a merge could not
+> be done quietly** — the moment it happened the shared PURPOSE would have become false.
 
-## 이 브랜치의 scope
+## This branch's scope
 
-### 포함
+### Included
 
-- 브라우저를 제어 표면으로 쓰는 에이전트 도구의 **기능·구성·구조**
-- **디자인과 UI/UX** — 진입점, 상태 표현, 승인 흐름, 단축키 체계
-- 제어 표면 유형별 아키텍처 (네이티브 브라우저 / 확장 / 라이브러리)
-- 자격증명·권한·샌드박스 설계
-- 간접 프롬프트 주입 등 이 부류 고유의 보안 문제
-- **Aside 를 1순위**로, 나머지는 비교 맥락
+- **Features, composition and structure** of agent tools that use the browser as a control surface
+- **Design and UI/UX** — entry points, state representation, approval flow, shortcut systems
+- Architecture by control-surface type (native browser / extension / library)
+- Credential, permission and sandbox design
+- Security problems specific to this class, such as indirect prompt injection
+- **Aside first**, the rest as comparative context
 
-### 제외
+### Excluded
 
-- 범용 웹 스크래핑·크롤링 인프라 (Firecrawl, Browserbase 등)는 맥락으로만 언급
-- 모델 자체의 성능 비교·벤치마크 재현
-- 각 제품의 가격 정책 추적 (조사 시점 스냅샷만 기록)
-- 실제 구현·포크
+- General web scraping and crawling infrastructure (Firecrawl, Browserbase and so on) — mentioned
+  only as context
+- Benchmarking or reproducing model performance
+- Tracking each product's pricing policy (only a snapshot at the time of research is recorded)
+- Actually implementing or forking anything
 
-## 계승하는 규율
+## Inherited discipline
 
-주제는 다르지만 [기존 조사의 인식 방법](../ai-workflow/wiki/concepts/primary-source-verification.md)은
-그대로 가져온다.
+The subject differs, but [the existing study's method of
+knowing](../ai-workflow/wiki/concepts/primary-source-verification.md) carries over unchanged.
 
-| 규율 | 이 조사에서의 적용 |
+| Discipline | How it applies here |
 |---|---|
-| 커밋된 아티팩트 > 산문 | 제품 문서(`.md` 원본), 소스, 리버싱 기록을 랜딩 페이지보다 우선 |
-| 2차 출처는 대조 전 확정 금지 | 비교 블로그의 수치는 1차 확인 전까지 "자체보고"로 표기 |
-| 추론은 추론이라고 표기 | 공개되지 않은 내부 구조 추정에 등급을 붙인다 |
-| 반증은 지우지 않고 보존 | 틀린 것으로 드러난 주장을 판정과 함께 남긴다 |
+| Committed artifacts over prose | Product documentation (`.md` originals), source and reverse-engineering records before landing pages |
+| No secondary source is settled before cross-checking | Numbers from comparison blogs are marked "self-reported" until checked |
+| Inference is labelled as inference | Estimates of undisclosed internals carry a grade |
+| Refutations are kept, not deleted | Claims shown to be wrong stay on the record with their verdict |
 
-**특히 이 분야는 벤더 자체보고 벤치마크가 많다.** 등급 구분이 기존 조사보다 더 중요하다.
+**This field is especially full of vendor self-reported benchmarks.** Grading matters more here than
+it did in the existing study.

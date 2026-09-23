@@ -2,166 +2,169 @@
 type: concept
 status: active
 last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md
-related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary]
+related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model]
 created: 2026-09-22
 updated: 2026-09-23
 ---
 
-# Harness (에이전트 실행 시스템)
+# Harness — the agent execution system
 
-- 문서 목적: "하네스"가 무엇이고 그 안에 무엇이 들어가는지, 그리고 OpenAI 가 이 실행 시스템을 몇 겹으로 열었는지를 정리한다.
-- 범위: 정의, 내부 구성요소, 3+1 계층 개방 구조, 애플리케이션이 쥐는 몫, 표면의 크기
-- 1차 출처: `openai/codex` 저장소 + "Codex as a platform" / "Unlocking the Codex harness" 포스트
-- 최종 수정일: 2026-09-22
+- Purpose: what a "harness" is, what sits inside it, and how many layers OpenAI opened of theirs.
+- Scope: definition, internal components, the four-layer opening, what the application owns, the size of the surface
+- Primary sources: the `openai/codex` repository plus the "Codex as a platform" and "Unlocking the Codex harness" posts
+- Updated: 2026-09-23
 
 ## §1 TL;DR  {#s1-tldr}
 
-| # | 항목 | 값 |
+| # | Item | Value |
 |---|---|---|
-| 1 | 한 줄 정의 | **모델과 과업 사이에 앉은 실행 시스템** |
-| 2 | 제품 가치의 위치 | 채팅 UI 가 아니라 이 실행 계층 |
-| 3 | 코드 위치 | `codex-rs/core/` (= Codex core). 저장소 전체는 100+ Rust crate |
-| 4 | 라이선스 | Apache-2.0 |
-| 5 | 개방 계층 | CLI · SDK · App Server 프로토콜 · 관리형 Agents API (4) |
-| 6 | 에이전트 루프가 차지하는 비중 | **104 메서드 중 약 20 — 전체의 20%** |
+| 1 | One-line definition | **the execution system that sits between a model and a task** |
+| 2 | Where the product value lives | this execution layer, not the chat UI |
+| 3 | Code location | `codex-rs/core/` (Codex core). The repository spans 100+ Rust crates |
+| 4 | Licence | Apache-2.0 |
+| 5 | Opened layers | CLI · SDK · App Server protocol · managed Agents API (four) |
+| 6 | Share taken by the agent loop | **about 20 of 104 methods — a fifth** |
 
-## §2 정의  {#s2-definition}
+## §2 Definition  {#s2-definition}
 
-OpenAI 자신의 표현:
+OpenAI's own phrasing:
 
 > "A capable agent is more than a prompt and a model response. It needs a way to understand a task,
 > maintain context over time, inspect relevant information, call tools, expose progress, handle
 > failures, request human approval when necessary, and return a useful result."
 
-`harness engineering` 포스트는 더 날카롭게 말한다 — 고전적 소프트웨어 공학이 **예측 가능한 동작**을
-전제하는 반면, 하네스 엔지니어링은 **개발자가 정확한 궤적을 미리 알 수 없는 자율 런타임을 한정하고
-관찰하고 통치하는 일**이다. 자세한 운영 원칙은 [[concepts/harness-engineering]].
+The `harness engineering` post puts it more sharply: where classical software engineering assumes
+**predictable behaviour**, harness engineering is the work of **bounding, observing and governing an
+autonomous runtime whose exact trajectory no developer can predict in advance.** Operating principles
+in [[concepts/harness-engineering]].
 
-## §3 하네스 안에 들어가는 것  {#s3-components}
+## §3 What is inside a harness  {#s3-components}
 
-에이전트 루프 자체 말고도 다음이 포함된다.
+Beyond the agent loop itself:
 
-| # | 구성요소 | 내용 |
+| # | Component | Contents |
 |---|---|---|
-| 1 | **Thread lifecycle & persistence** | thread 생성·재개·fork·archive, 이벤트 이력 영속화 (클라이언트가 재접속해도 같은 타임라인) |
-| 2 | **Config & auth** | 설정 로딩, 기본값 관리, "Sign in with ChatGPT" 등 인증 흐름과 자격증명 상태 |
-| 3 | **Tool execution & extensions** | 샌드박스 안에서 shell/file 도구 실행, MCP 서버·skill 을 일관된 정책 모델 아래 루프에 편입 |
+| 1 | **Thread lifecycle and persistence** | creating, resuming, forking and archiving threads, and persisting event history so clients reconnect to a consistent timeline |
+| 2 | **Config and auth** | loading configuration, managing defaults, running authentication flows such as "Sign in with ChatGPT," and credential state |
+| 3 | **Tool execution and extensions** | executing shell and file tools in a sandbox, and wiring MCP servers and skills into the loop under one policy model |
 
-**Codex core** 는 이 둘을 겸한다 — 에이전트 코드가 사는 **라이브러리**이자, 하나의 thread 를 돌리고
-그 영속성을 관리하도록 띄울 수 있는 **런타임**.
+**Codex core** is both at once — the **library** where the agent code lives, and a **runtime** that
+can be spun up to run the loop and manage one thread's persistence.
 
-## §4 App Server 의 자리  {#s4-app-server}
+## §4 Where the App Server sits  {#s4-app-server}
 
 ```
 Clients (Web / TUI / VS Code · JetBrains · Xcode / Desktop / partners)
         │  bidirectional JSON-RPC (JSONL)
 Codex App Server (long-lived process)
    ├─ stdio reader
-   ├─ Codex message processor   ← 번역 계층
-   ├─ thread manager            ← thread 당 core session 하나
+   ├─ Codex message processor   ← translation layer
+   ├─ thread manager            ← one core session per thread
    └─ core threads (N Codex core runtimes)
         │
 Model (Responses API) · tools · MCP · sandbox
 ```
 
-- **thread manager** 는 thread 하나당 core session 하나를 띄운다.
-- **message processor** 는 클라이언트 JSON-RPC 요청을 core 연산으로 번역하고, core 의 저수준 내부
-  이벤트 스트림을 **작고 안정적인 UI-ready 알림 집합**으로 변환한다.
-- 프로토콜은 **완전 양방향**이다. 승인이 필요하면 *서버가* 요청을 보내고 turn 을 멈춘다
-  ([[concepts/approval-gate]]).
+- The **thread manager** spins up one core session per thread.
+- The **message processor** translates client JSON-RPC into core operations and turns core's
+  low-level internal event stream into **a small set of stable, UI-ready notifications.**
+- The protocol is **fully bidirectional.** When approval is needed *the server* issues a request and
+  pauses the turn ([[concepts/approval-gate]]).
 
-### §4.1 왜 MCP 가 아니라 JSON-RPC 인가  {#s4-1-why-jsonrpc}
+### §4.1 Why JSON-RPC and not MCP  {#s4-1-why-jsonrpc}
 
-| 단계 | 사건 |
+| Step | What happened |
 |---|---|
-| 1 | Codex CLI 는 TUI 로 출발 — 에이전트 루프와 같은 프로세스에서 Rust 타입을 직접 다뤘다 |
-| 2 | VS Code 확장을 만들며 같은 하네스를 재사용해야 했고, 단순 request/response 를 넘는 상호작용이 필요해졌다 (워크스페이스 탐색, 추론 진행 스트리밍, diff 방출) |
-| 3 | **Codex 를 MCP 서버로 노출하는 실험을 먼저 했다.** VS Code 에 맞게 MCP 의미론을 유지하기가 어려웠다 |
-| 4 | 대신 TUI 루프를 그대로 비추는 JSON-RPC 프로토콜을 도입 — 이것이 App Server 의 비공식 1판 |
-| 5 | JetBrains · Xcode · Desktop(병렬 에이전트 오케스트레이션)의 요구가 이를 **하위호환 보장을 갖는 플랫폼 표면**으로 밀어올렸다 |
+| 1 | Codex CLI began as a TUI, handling Rust types in the same process as the agent loop |
+| 2 | Building the VS Code extension meant reusing the harness, which required interaction beyond request/response — workspace exploration, streaming reasoning, emitting diffs |
+| 3 | **They first tried exposing Codex as an MCP server.** Maintaining MCP semantics in a way that made sense for VS Code proved difficult |
+| 4 | Instead they introduced a JSON-RPC protocol mirroring the TUI loop — the unofficial first App Server |
+| 5 | Demand from JetBrains, Xcode and the Desktop app (orchestrating agents in parallel) pushed it into **a platform surface with backward-compatibility guarantees** |
 
-## §5 4계층 개방 구조  {#s5-layers}
+## §5 The four-layer opening  {#s5-layers}
 
-| 계층 | 산출물 | 누가 돌리나 | 적합한 용도 |
+| Layer | Artifact | Who runs it | Good for |
 |---|---|---|---|
-| CLI | `codex exec` | 내 머신 / CI | 스크립트, CI 잡, 일회성 배치 |
-| SDK | `@openai/codex-sdk`, `openai-codex` | 내 머신 (CLI 를 spawn) | 서버사이드 도구·워크플로우에 임베드 |
-| Protocol | `codex app-server` | 내 머신 / 컨테이너 | **에이전트가 곧 제품일 때** |
-| Managed | Agents API | **OpenAI 호스팅** | 하네스 운영을 맡기고 싶을 때 |
+| CLI | `codex exec` | your machine / CI | scripts, CI jobs, one-off batches |
+| SDK | `@openai/codex-sdk`, `openai-codex` | your machine (spawns the CLI) | embedding in server-side tools |
+| Protocol | `codex app-server` | your machine / container | **when the agent is the product** |
+| Managed | Agents API | **OpenAI-hosted** | when you want the harness operated for you |
 
-공식 권고는 App Server 다 — *"Codex App Server will be the first-class integration method we maintain
-moving forward."* 선택 기준은 `docs/06-choosing.md`.
+The official recommendation is the App Server — *"Codex App Server will be the first-class
+integration method we maintain moving forward."* Selection criteria in `docs/06-choosing.md`.
 
-## §6 애플리케이션이 쥐는 몫  {#s6-application-owns}
+## §6 What the application owns  {#s6-application-owns}
 
-분업의 공식 문장: *"Your application owns product context, business rules, and tools; Codex
-app-server provides the agent loop and sandboxed execution."*
+The official division of labour: *"Your application owns product context, business rules, and tools;
+Codex app-server provides the agent loop and sandboxed execution."*
 
-| # | 애플리케이션의 몫 |
+| # | The application's share |
 |---|---|
-| 1 | **인터페이스** — 기존 대시보드와 워크플로우를 그대로 유지 |
-| 2 | **컨텍스트와 도구** — 애플리케이션 소유 MCP 서비스를 노출 |
-| 3 | **운영 경계** — 파일 접근 범위, 승인 지점, 실행 범위, 관측과 로깅 |
+| 1 | **Interface** — keep your existing dashboards and workflows |
+| 2 | **Context and tools** — expose application-owned MCP services |
+| 3 | **Operational boundaries** — file access scope, where approvals are required, execution scope, observation and logging |
 
-프로토콜 차원의 구현체가 `item/tool/call` 이다 — 에이전트가 **호스트 애플리케이션 소유 도구**를
-호출하는 통로.
+Its protocol-level implementation is `item/tool/call` — the channel by which the agent calls tools
+**owned by the host application.**
 
-## §7 표면의 크기가 가르치는 것  {#s7-surface-size}
+## §7 What the size of the surface teaches  {#s7-surface-size}
 
-104개 `ClientRequest` 메서드를 제품 요구사항 목록으로 다시 읽으면:
+Reading all 104 `ClientRequest` methods as a list of product requirements:
 
-| 티어 | 메서드 수 | 내용 |
+| Tier | Methods | Contents |
 |---|---|---|
-| Agent core | ~20 | 루프: thread, turn, item, 승인 |
-| Capability system | ~25 | skill, plugin, marketplace, app, hook, MCP |
-| Host services | ~15 | 파일시스템, PTY, fuzzy search, git |
-| Identity & policy | ~20 | 계정, 인증, rate limit, config, permission profile |
-| Platform & migration | ~10 | Windows 샌드박스, 외부 에이전트 import, 피드백 |
-| Realtime | ~11 (알림) | 음성 세션 |
+| Agent core | ~20 | the loop: threads, turns, items, approvals |
+| Capability system | ~25 | skills, plugins, marketplaces, apps, hooks, MCP |
+| Host services | ~15 | filesystem, PTY, fuzzy search, git |
+| Identity and policy | ~20 | accounts, auth, rate limits, config, permission profiles |
+| Platform and migration | ~10 | Windows sandbox, external agent import, feedback |
+| Realtime | ~11 (notifications) | voice sessions |
 
-> **에이전트 루프는 일의 20% 정도다.** 나머지가 실제로 쓸 만한 물건인지를 결정한다.
-> 제품급 최소 집합은 core 20 + 약 25 = **약 45개** (`docs/12-product-surface.md` §4).
+> **The agent loop is maybe a fifth of the work.** The rest decides whether anyone can actually use
+> the thing. The minimum product-grade set is core 20 plus about 25 — **roughly 45**
+> (`docs/12-product-surface.md` §4).
 
+## §7.5 Observation — the execution surface divides harnesses  {#s7-5-surfaces}
 
-## §7.5 관측 — 실행 표면이 하네스를 가른다  {#s7-5-surfaces}
+The Codex harness's execution surface is **the shell and the filesystem.** The same abstraction over
+**a browser and an OS** becomes a different class of thing. `browser-agents/` is the study of that
+class.
 
-Codex 하네스의 실행 표면은 **셸과 파일시스템**이다. 같은 추상이 **브라우저와 OS** 위에
-올라가면 다른 부류가 된다. 그 부류를 조사한 결과가 `browser-agents/`.
-
-| 외피 | 얻는 것 | 치르는 것 | 사례 |
+| Shell | What you get | What you pay | Examples |
 |---|---|---|---|
-| **네이티브 브라우저 (포크)** | 브라우저 크롬 수준 UX, 전체 권한 모델, 커스텀 확장 API | **Chromium 추격 부채**, 사용자 마이그레이션 | Aside, Comet, Dia, Neon |
-| **확장** | 이동 불필요, 유지보수 부채 없음 | 확장 API 가 허용하는 것만 | Claude for Chrome, Gemini in Chrome |
-| **라이브러리** | 완전한 통제, 프로그램적 조합 | 사람이 쓰는 제품이 아님 | Browser Use |
+| **Native browser (fork)** | browser-chrome-level UX, a full permission model, custom extension APIs | **the debt of chasing Chromium**, user migration | Aside, Comet, Dia, Neon |
+| **Extension** | no migration, no maintenance debt | only what extension APIs permit | Claude for Chrome, Gemini in Chrome |
+| **Library** | full control, programmatic composition | not a product a person uses | Browser Use |
 
-> ⚠️ **겉 분류와 속 구조가 다르다.** Comet 도 Aside 도 "네이티브 브라우저"를 표방하지만
-> 에이전트는 **둘 다 MV3 크롬 확장**이다. 외피는 배포 단위이고, 제어는 확장 계층에 있다.
-> 그래서 갱신 주기를 분리할 수 있다 (Aside: 셸 `1.0.x` / 확장·CLI `1.26.x`).
+> ⚠️ **The outer classification can differ from the inner structure.** Both Comet and Aside present
+> as native browsers, yet **both implement the agent as an MV3 Chrome extension.** The shell is a
+> distribution unit; control lives in the extension layer — which is what lets their release cadences
+> diverge (Aside: shell `1.0.x`, extensions and CLI `1.26.x`).
 >
-> 📌 **브라우저를 만드는 것은 제품이 아니라 상시 부채다.** OpenAI 는 ChatGPT Atlas 를
-> 출시 10개월 만에(2026-08-09) 접었고, 사유에 **보안 유지보수**가 들어갔다. 기능은
-> ChatGPT·Codex 로 흡수됐다 — 에이전트 능력에 브라우저 소유가 필수가 아님을 보여준다.
+> 📌 **Building a browser is not a product but a standing debt.** OpenAI retired ChatGPT Atlas within
+> ten months (2026-08-09), with **security maintenance** among the stated reasons. The features moved
+> into ChatGPT and Codex — agent capability does not require owning a browser.
 
-## §7.6 표면과 무관한 축 / 표면 고유의 축  {#s7-6-axis-split}
+## §7.6 Surface-independent axes vs. surface-specific ones  {#s7-6-axis-split}
 
-두 조사를 가로질러 보면 하네스의 설계 축이 갈린다.
+Across both studies, the design axes of a harness split.
 
-| 표면과 **무관**한 축 (재사용 가능) | 표면 **고유**의 축 |
+| **Surface-independent** (reusable) | **Surface-specific** |
 |---|---|
-| 승인 게이트 [[concepts/approval-gate]] | **인식 모델** [[concepts/perception-model]] |
-| 프로바이더 데이터화 [[concepts/provider-as-data]] | **간접 프롬프트 주입** [[concepts/indirect-prompt-injection]] |
-| capability 배포 [[concepts/capability-distribution]] | **자격증명 은닉** [[concepts/credential-shielding]] |
-| control/execution plane [[concepts/control-plane-execution-plane]] | 샌드박스 기전 [[concepts/os-sandbox-policy]] |
-| 대화 원시형 [[concepts/thread-turn-item]] | |
+| approval gates [[concepts/approval-gate]] | **perception model** [[concepts/perception-model]] |
+| providers as data [[concepts/provider-as-data]] | **indirect prompt injection** [[concepts/indirect-prompt-injection]] |
+| capability distribution [[concepts/capability-distribution]] | **credential shielding** [[concepts/credential-shielding]] |
+| control/execution plane [[concepts/control-plane-execution-plane]] | sandbox mechanisms [[concepts/os-sandbox-policy]] |
+| conversation primitives [[concepts/thread-turn-item]] | |
 
-> 📌 **왼쪽이 이 저장소의 재사용 가능한 자산이다.** 새 하네스를 설계할 때 표면이 무엇이든
-> 왼쪽은 그대로 적용된다. 오른쪽은 표면을 정한 뒤에야 답이 나온다.
-> 전체 종합은 [`SYNTHESIS.md`](../../../SYNTHESIS.md).
+> 📌 **The left column is this repository's reusable asset.** Whatever surface a new harness targets,
+> the left column applies unchanged. The right column only has answers once the surface is chosen.
+> The full synthesis is [`SYNTHESIS.md`](../../../SYNTHESIS.md).
 
-## §8 다음에 읽을 문서  {#s8-next}
+## §8 Read next  {#s8-next}
 
-- [[concepts/thread-turn-item]] — 대화 원시형 세 가지
-- [[concepts/approval-gate]] — 사람이 끼어드는 지점
-- [[concepts/control-plane-execution-plane]] — 하네스와 compute 의 분리
-- [[concepts/wire-protocol-boundary]] — 코어 재사용 가능성을 가르는 경계
-- 원문: [`docs/01-overview.md`](../../../docs/01-overview.md), [`docs/12-product-surface.md`](../../../docs/12-product-surface.md)
+- [[concepts/thread-turn-item]] — the three conversation primitives
+- [[concepts/approval-gate]] — where humans step in
+- [[concepts/control-plane-execution-plane]] — separating the harness from compute
+- [[concepts/wire-protocol-boundary]] — the boundary that decides whether the core is reusable
+- Originals: [`docs/01-overview.md`](../../../docs/01-overview.md), [`docs/12-product-surface.md`](../../../docs/12-product-surface.md)

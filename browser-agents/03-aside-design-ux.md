@@ -1,171 +1,180 @@
-# 03. Aside — 디자인 · UI/UX
+# 03. Aside — design and UI/UX
 
-> 출처: `docs.aside.com` 원본 마크다운(`browser-basics.md`, `side-panel.md`, `tasks.md`,
-> `ultrabrowse.md`, `security.md`). 스크린샷 기반 시각 분석이 아니라 **문서가 규정한 상호작용
-> 모델**을 읽은 것이다. 색·타이포 같은 시각 언어는 이 방법으로 확인할 수 없어 다루지 않는다.
+> Sources: raw Markdown from `docs.aside.com` (`browser-basics.md`, `side-panel.md`, `tasks.md`,
+> `ultrabrowse.md`, `security.md`). This is **the interaction model the documentation specifies**,
+> not a visual analysis from screenshots. Visual language — colour, typography — cannot be confirmed
+> this way and is not covered.
 
-## 1. 핵심 설계 문제
+## 1. The core design problem
 
-브라우저형 에이전트의 UX 난제는 하나로 요약된다.
+The UX difficulty of a browser-type agent reduces to one thing.
 
-> **같은 창이 두 가지 일을 한다 — 내가 쓰는 브라우저이면서, 에이전트가 쓰는 브라우저다.**
+> **The same window does two jobs — it is the browser I use and the browser the agent uses.**
 
-여기서 파생되는 질문 넷:
+Four questions follow:
 
-| # | 질문 | Aside 의 답 |
+| # | Question | Aside's answer |
 |---|---|---|
-| 1 | 작업을 **어디서** 시작하나 | 진입점 4종 (§2) |
-| 2 | 에이전트가 일하는 동안 **나는 무엇을 보나** | 분할 탭 (§4) |
-| 3 | 맥락을 **어떻게 넘기나** | 사이드 패널의 페이지 첨부 (§3) |
-| 4 | 진행 중인 에이전트를 **어떻게 고쳐 잡나** | Queue / Steer (§5) |
+| 1 | **Where** do I start a task | four entry points (§2) |
+| 2 | What do **I** see while the agent works | split tabs (§4) |
+| 3 | How is context **handed over** | the side panel's page attachment (§3) |
+| 4 | How do I **correct** a running agent | Queue / Steer (§5) |
 
-## 2. 진입점 4종 — 작업 무게에 따라 갈린다
+## 2. Four entry points, graded by weight
 
-| 진입점 | 무게 | 언제 |
+| Entry point | Weight | When |
 |---|---|---|
-| **Ask AI** (새 탭 옴니박스) | 가벼움 | 브라우저 UI 에서 바로 시작. 옴니박스에 Search 와 Ask AI 두 모드 |
-| **Side panel** | 중간 | **보고 있는 페이지를 앵커로** 작업 시작 |
-| **Task page** | 무거움 | 다중 사이트·다중 계정·파일 작업 |
-| **CLI** (`aside "..."`) | 외부 | 터미널에서 |
+| **Ask AI** (new-tab omnibox) | light | start straight from the browser UI. The omnibox has Search and Ask AI modes |
+| **Side panel** | medium | start a task **anchored to the page you are looking at** |
+| **Task page** | heavy | multiple sites, multiple accounts, file work |
+| **CLI** (`aside "..."`) | external | from a terminal |
 
-작업 작성기의 플레이스홀더가 설계 의도를 그대로 노출한다 — **`"Ask AI a task, @ for context"`**.
-`@` 가 맥락 첨부 기호다. 문서는 **사이트·원하는 결과·제약**을 함께 적을 때 가장 잘 동작한다고
-안내한다.
+The task composer's placeholder exposes the intent directly — **`"Ask AI a task, @ for context"`**.
+`@` is the context-attachment sigil. The documentation advises naming **the site, the desired outcome
+and any constraints** for best results.
 
-> 📌 옴니박스에 Search 와 Ask AI 를 **같은 자리에 두되 모드로 가른** 것이 눈에 띈다. 검색과
-> 위임을 별도 UI 로 분리하지 않았다. 사용자가 이미 주소창에 의도를 타이핑한다는 습관을 그대로 쓴다.
+> 📌 Putting Search and Ask AI **in the same place but as modes** is notable. Search and delegation
+> were not split into separate UI. It reuses the habit users already have of typing intent into the
+> address bar.
 
-## 3. 사이드 패널 — 맥락 첨부의 명시화
+## 3. Side panel — making context attachment explicit
 
-가장 잘 설계된 부분이다. 사이드 패널을 열면:
+The best-designed part. Opening the side panel:
 
-1. **페이지 첨부가 `제목 + 호스트명` 으로 표시된다** — 무엇이 넘어가는지 보인다
-2. 유지하면 Aside 가 그 페이지를 읽고, **제거하면 그 페이지 없이 시작**한다
-3. **초안이 탭 단위로 남는다** — 페이지를 떠났다 돌아와도 시작한 탭에 묶여 있다
+1. **Shows the page attachment as `title + hostname`** — you can see what is being handed over
+2. Keeping it lets Aside read that page; **removing it starts without it**
+3. **Drafts are kept per tab** — leave and come back and the draft is still tied to the tab you
+   started in
 
-> 📌 **맥락 첨부를 눈에 보이고 취소 가능하게** 만든 것이 핵심이다. 대부분의 사이드바 AI 는
-> "현재 페이지를 읽는다"를 암묵 기본값으로 두는데, Aside 는 그것을 **제거 가능한 칩**으로
-> 물화했다. [07-security.md](07-security.md) 의 프롬프트 주입 관점에서도 의미가 있다 —
-> 페이지 내용이 맥락에 들어갔는지를 사용자가 **볼 수 있다**.
+> 📌 **Making context attachment visible and removable** is the key move. Most sidebar AIs treat
+> "reads the current page" as an implicit default; Aside materialises it as a **removable chip.**
+> That also matters for prompt injection ([07-security.md](07-security.md)) — the user can **see**
+> whether page content entered the context.
 
-> 📌 **초안이 탭에 묶이는** 것도 작은 디테일이지만 옳다. 브라우저 작업은 본래 탭 단위로
-> 흩어지고, 사용자는 탭 사이를 오간다. 전역 초안 하나만 있으면 그 이동이 초안을 파괴한다.
+> 📌 **Tying drafts to tabs** is a small detail but the right one. Browser work scatters across tabs
+> and users move between them; a single global draft would be destroyed by that movement.
 
-## 4. 분할 탭 — 관찰 가능성을 UI 로
+## 4. Split tabs — observability as layout
 
-`Cmd/Ctrl+Shift+\` (또는 `Cmd/Ctrl+Shift+-`) 로 두 페이지를 동시에 본다.
-문서가 든 용례 넷 중 **뒤의 둘이 에이전트 전용**이다.
+`Cmd/Ctrl+Shift+\` (or `Cmd/Ctrl+Shift+-`) shows two pages at once. Of the four use cases the
+documentation gives, **the last two are agent-specific.**
 
-| 용례 | 성격 |
+| Use case | Character |
 |---|---|
-| 상품 페이지 비교 | 일반 브라우징 |
-| 원본 문서를 띄운 채 양식 작성 | 일반 브라우징 |
-| **대상 사이트에서 작업이 실행되는 것을 관찰** | 에이전트 |
-| **작업 기록(transcript)을 조작 중인 페이지 옆에 배치** | 에이전트 |
+| comparing product pages | ordinary browsing |
+| keeping a source document visible while filling a form | ordinary browsing |
+| **watching a task execute on the target site** | agent |
+| **placing the task transcript beside the page being driven** | agent |
 
-> 📌 이것이 이 제품의 UX 관점 핵심 중 하나다. 에이전트가 페이지를 조작하는 동안 사용자가
-> **밀려나지 않는다.** 한쪽에서 에이전트가 일하고 다른 쪽에서 사용자가 본다. "에이전트가
-> 화면을 가져간다"는 모드 전환 대신 **공간 분할**로 푼 것이다.
+> 📌 One of the central UX ideas in this product. **The user is not pushed out** while the agent
+> drives a page: the agent works on one side, the user watches on the other. Instead of a mode switch
+> that says "the agent has the screen," it is solved **by splitting space.**
 >
-> 대조: Atlas 는 에이전트 모드에서 커서를 주고 브라우저 UI 를 **파란색으로 강조**하는 방식,
-> 즉 **모드 표시**로 풀었다([05](05-comparables.md) §1). 화면을 나누는 쪽과 화면에 모드를
-> 칠하는 쪽 — 같은 문제의 다른 답이다.
+> Contrast: Atlas solved it by giving the AI a cursor and **tinting the browser UI blue** — that is,
+> **by marking a mode** ([05](05-comparables.md) §1). Splitting the screen versus painting a mode on
+> it: two answers to the same problem.
 
-## 5. Queue vs Steer — 실행 중 개입 모델
+## 5. Queue vs. Steer — the mid-run intervention model
 
-`Settings > Agents > Chat` 에서 고른다.
+Chosen under `Settings > Agents > Chat`.
 
-| 모드 | 동작 | 쓸 때 |
+| Mode | Behaviour | Use when |
 |---|---|---|
-| **Queue** | 새 메시지는 **현재 실행이 끝난 뒤** 적용 | 지금 경로를 끝까지 보고 싶을 때 |
-| **Steer** | 메시지가 **진행 중인 실행에 들어가** 실시간 조정 | 즉시 교정이 필요할 때 |
+| **Queue** | a new message applies **after the current run finishes** | you want to see the current path through |
+| **Steer** | the message **enters the running turn** for live adjustment | you need an immediate correction |
 
-> 📌 **긴 자율 실행을 가진 도구에는 이 구분이 필수다.** 사용자가 무언가를 입력했을 때 그것이
-> "지금 끼어드는 것"인지 "다음 차례"인지가 모호하면, 사용자는 에이전트가 오래 도는 동안 아무
-> 말도 못 하게 된다. 설정으로 뺀 것은 사용자마다 선호가 갈리기 때문일 것이다.
+> 📌 **Any tool with long autonomous runs needs this distinction.** If it is ambiguous whether typing
+> something means "interrupt now" or "next in line," the user simply stops speaking while the agent
+> runs. Exposing it as a setting suggests the preference genuinely varies by person.
 >
-> 이 저장소 기존 조사의 `turn/steer` 와 같은 문제다 — 참고: [`docs/12-product-surface.md`](../docs/12-product-surface.md).
+> It is the same problem as `turn/steer` in this repository's other study — see
+> [`docs/12-product-surface.md`](../docs/12-product-surface.md).
 
-## 6. 결과 표현 — 파일이 1급이다
+## 6. Results — files are first class
 
-작업 상세 페이지가 **작업이 만들거나 바꾼 파일을 보여준다.** 이미지·PDF·HTML·텍스트는 미리보기가
-된다. 작업 기록은 작업 폴더에 저장되고, 생성 파일은 작업을 지울 때까지 남는다.
-시크릿 작업은 브라우저 상태를 남기지 않는다.
+The task detail page **shows the files a task created or changed.** Images, PDFs, HTML and text
+preview inline. Transcripts are stored in the task folder, and generated files persist until the task
+is deleted. Incognito tasks leave no browser state.
 
-> 📌 채팅 로그가 아니라 **산출물(파일)을 결과 화면의 주인공**으로 둔 것이 위임형 도구답다.
-> "무슨 말을 했나"보다 "무엇이 생겼나"가 먼저다.
+> 📌 Making the **artifact, not the chat log, the protagonist of the result screen** suits a
+> delegation tool. What was produced matters more than what was said.
 
-## 7. 선택 단축키 — 라쏘
+## 7. Selection shortcuts — the lasso
 
-기본 제공:
+Defaults:
 
-| 선택 종류 | 기본 동작 |
+| Selection kind | Default actions |
 |---|---|
-| 텍스트 선택 | Summarize, Translate |
-| **라쏘 선택** | Copy code, Search image |
+| Text selection | Summarize, Translate |
+| **Lasso selection** | Copy code, Search image |
 
-`Settings > Lasso` 에서 끄기·순서 변경·편집·삭제·추가가 된다.
-템플릿이 변수를 받는다 — `{text}`, 라쏘는 추가로 `{code}` 와 `{image}`.
+`Settings > Lasso` allows disabling, reordering, editing, deleting and adding.
+Templates take variables — `{text}`, and for lasso also `{code}` and `{image}`.
 
-> 📌 **라쏘(영역 선택)** 가 있다는 게 특징이다. 텍스트 선택만으로는 코드 블록이나 이미지를
-> 정확히 집기 어렵다. 그리고 **단축키가 사용자 정의 템플릿**이라는 점 — 고정 메뉴가 아니라
-> 사용자가 자기 프롬프트를 상비 동작으로 등록할 수 있다.
+> 📌 Having a **lasso (region selection)** is distinctive. Text selection alone makes it hard to grab
+> a code block or an image precisely. And the shortcuts are **user-defined templates**, not a fixed
+> menu — users can register their own prompts as standing actions.
 
-## 8. 전체 키보드 단축키
+## 8. Full keyboard shortcuts
 
-| 기능 | 바인딩 |
+| Function | Binding |
 |---|---|
 | Toggle Sidebar | `Cmd/Ctrl+S` |
 | **Ask Aside** | `Cmd/Ctrl+E` |
 | **New Task** | `Cmd/Ctrl+Shift+E` |
 | Copy URL | `Cmd/Ctrl+Shift+C` |
 | Split tab | `Cmd/Ctrl+Shift+\` |
-| Split tab (대체) | `Cmd/Ctrl+Shift+-` |
+| Split tab (alternate) | `Cmd/Ctrl+Shift+-` |
 
-> 📌 `Cmd+E` = 가벼운 질문, `Cmd+Shift+E` = 본격 작업. **같은 키에 Shift 를 얹어 무게를 올리는**
-> 일관된 규칙이다. 사용자가 둘의 관계를 외우지 않아도 손이 기억한다.
+> 📌 `Cmd+E` is a light question, `Cmd+Shift+E` real work. **Adding Shift to the same key raises the
+> weight** — a consistent rule the hand learns without the user memorising the relationship.
 >
-> ⚠️ 다만 `Cmd/Ctrl+S` 를 사이드바 토글에 쓴 것은 공격적이다. 웹 표준에서 `Cmd+S` 는 저장이다.
-> 문서에 이 충돌에 대한 언급은 없다.
+> ⚠️ Binding `Cmd/Ctrl+S` to the sidebar toggle is aggressive, though. `Cmd+S` is Save on the web,
+> and the documentation says nothing about the collision.
 
-## 9. 모드 선택으로서의 Ultrabrowse
+## 9. Ultrabrowse as a mode selection
 
-Ultrabrowse 는 별도 화면이 아니라 **모델 선택기 안의 "Reasoning" 범주에 있는 항목**이다.
-Free 사용자가 고르면 Pro 업그레이드 안내가 뜬다.
+Ultrabrowse is not a separate screen but **an entry in the model picker under "Reasoning."** Free
+users who select it get an upgrade prompt for Pro.
 
-| 일반 작업 | Ultrabrowse |
+| Normal task | Ultrabrowse |
 |---|---|
-| 단일 페이지 질문, 기본 검색 | 인용이 필요한 조사, 벤더·제품 비교, 마이그레이션 계획, 여러 사이트에 걸친 보안·컴플라이언스·가격 확인 |
+| single-page questions, basic search | research needing citations, vendor/product comparison, migration planning, security/compliance/pricing checks across several sites |
 
-> 📌 **깊이를 별도 기능이 아니라 모델 선택으로 표현**한 것이 UX 상 깔끔하다. 사용자는 이미
-> 모델을 고르는 자리를 알고, 거기서 "더 깊게"를 고른다. 새 개념을 배우지 않아도 된다.
-> 동시에 이것이 **유료 전환 지점**으로도 쓰인다 — 무게를 고르는 자리가 곧 과금 경계다.
+> 📌 **Expressing depth as a model choice rather than a separate feature** is clean. Users already
+> know where they pick a model, and they pick "deeper" there. No new concept to learn.
+> It doubles as the **paid conversion point** — the place where you choose weight is also the
+> billing boundary.
 
-## 10. 승인 흐름
+## 10. Approval flow
 
-- 랜딩 페이지 주장: 결제·게시·메시지 전송 같은 민감 동작은 **사람 승인 필요**
-- 문서 쪽 근거: `Ask` 권한 규칙, `Guard` 모드의 폴더 외 접근 시 요청
-- 작업 실행 중 "request approvals" 가 동작 목록에 포함
+- Landing-page claim: sensitive actions such as payments, posts and messages **require human
+  approval**
+- Documentary support: the `Ask` permission rule, and `Guard` mode asking about folders outside the
+  approved set
+- "request approvals" appears among the actions a running task can take
 
-> ✅ **해소 (2026-09-23)**: 데몬의 **suspension** 시스템이 승인 UI 다 —
-> `Allow once` / `Confirm`·`Cancel` / 선택지 최대 5개, 그리고 *"or just reply with your answer"*.
-> 결정적으로 **버튼 배열과 번호 목록 텍스트 폴백을 함께** 만든다 —
-> **채팅 채널(Slack/Discord)에서 렌더되는 것을 전제로 설계**됐다.
-> "항상 허용"이 없고 "영구 권한은 부여되지 않는다"를 명시한다.
-> 상세: [10 §1.5](10-aside-enforcement-and-native.md).
+> ✅ **Resolved (2026-09-23)**: the daemon's **suspension** system *is* the approval UI —
+> `Allow once` / `Confirm`·`Cancel` / up to five options, with the hint *"or just reply with your
+> answer."* Decisively, it builds **a button array and a numbered text fallback together** — it is
+> designed to be **rendered in a chat channel (Slack/Discord).** There is no "always allow," and it
+> states that **no lasting permission is granted.**
+> Detail: [10 §1.5](10-aside-enforcement-and-native.md).
 
-## 11. 정리 — 이 UX 에서 배울 것
+## 11. What to take from this UX
 
-| # | 원칙 | Aside 의 구현 |
+| # | Principle | Aside's implementation |
 |---|---|---|
-| 1 | **맥락 첨부를 보이게, 그리고 떼어낼 수 있게** | 사이드 패널의 `제목+호스트` 칩 |
-| 2 | **모드 전환이 아니라 공간 분할로 관찰성을 준다** | 분할 탭 |
-| 3 | **개입 의미를 명시적으로 고르게 한다** | Queue / Steer |
-| 4 | **위임 도구의 결과는 대화가 아니라 산출물** | 작업 상세의 파일 미리보기 |
-| 5 | **무게를 단축키 수식자로 표현** | `Cmd+E` / `Cmd+Shift+E` |
-| 6 | **깊이를 새 개념이 아니라 기존 선택지 안에** | 모델 선택기 속 Ultrabrowse |
-| 7 | 초안은 **작업 맥락(탭)에 묶는다** | 탭별 사이드패널 초안 |
+| 1 | **Make context attachment visible — and detachable** | the `title+hostname` chip in the side panel |
+| 2 | **Give observability through space, not a mode switch** | split tabs |
+| 3 | **Let the user choose what an intervention means** | Queue / Steer |
+| 4 | **A delegation tool's result is an artifact, not a conversation** | file previews on the task detail page |
+| 5 | **Express weight as a shortcut modifier** | `Cmd+E` / `Cmd+Shift+E` |
+| 6 | **Put depth inside an existing choice, not a new concept** | Ultrabrowse in the model picker |
+| 7 | Bind drafts to their **work context (the tab)** | per-tab side-panel drafts |
+| 8 | **Shape approval prompts so a channel can render them** | buttons plus a numbered text fallback |
 
-> 한계: 이 분석은 **문서가 규정한 상호작용**에 근거한다. 실제 시각 디자인, 애니메이션,
-> 에이전트 진행 상태의 시각적 표현, 오류 상태의 생김새는 제품을 직접 돌려야 확인된다.
-> 그 부분은 조사하지 않았고, 추정으로 채우지 않았다.
+> Limitation: this analysis rests on **the interactions the documentation specifies.** The actual
+> visual design, animation, the visual representation of agent progress and the appearance of error
+> states require running the product. None of that was investigated, and none of it was filled in by
+> guesswork.
