@@ -5,12 +5,12 @@
   "purpose_digest_rev": "2026-09-23",
   "source_of_truth": {
     "project_profile_path": "docs/PROJECT_PROFILE.md",
-    "session_handoff_path": "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
+    "session_handoff_path": "ai-workflow/memory/archived/study/browser-agents/session_handoff.md",
     "work_backlog_index_path": null,
-    "daily_backlog_dir": "ai-workflow/memory/active/study/browser-agents/backlog",
-    "tasks_dir": "ai-workflow/memory/active/study/browser-agents/backlog/tasks",
-    "sessions_dir": "ai-workflow/memory/active/study/browser-agents/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
+    "daily_backlog_dir": "ai-workflow/memory/archived/study/browser-agents/backlog",
+    "tasks_dir": "ai-workflow/memory/archived/study/browser-agents/backlog/tasks",
+    "sessions_dir": "ai-workflow/memory/archived/study/browser-agents/sessions",
+    "latest_backlog_path": "ai-workflow/memory/archived/study/browser-agents/backlog/2026-09-23.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -46,7 +46,7 @@
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
+    "latest_backlog_path": "ai-workflow/memory/archived/study/browser-agents/backlog/2026-09-23.md",
     "task_count": 6,
     "in_progress_items": [],
     "blocked_items": [],
@@ -61,10 +61,10 @@
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
-    "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
-    "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
-    "ai-workflow/memory/active/study/browser-agents/state.json",
-    "ai-workflow/memory/active/study/browser-agents/backlog"
+    "ai-workflow/memory/archived/study/browser-agents/session_handoff.md",
+    "ai-workflow/memory/archived/study/browser-agents/backlog/2026-09-23.md",
+    "ai-workflow/memory/archived/study/browser-agents/state.json",
+    "ai-workflow/memory/archived/study/browser-agents/backlog"
   ],
   "repository_assessment": {
     "path": null,

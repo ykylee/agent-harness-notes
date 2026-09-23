@@ -10,7 +10,7 @@
 - Related: [PURPOSE](../ai-workflow/memory/active/PURPOSE.md), [SYNTHESIS](../SYNTHESIS.md)
 
 ## 1. Project overview
-- Name: Codex Harness — Study Notes
+- 프로젝트명: Codex Harness — Study Notes
 - Purpose: investigate agent harnesses against primary sources and record the findings. Codex is the
   first case; browser-type agents are the contrast group.
 - Stakeholders: ykylee (sole researcher and maintainer)
@@ -20,22 +20,23 @@
   anything.
 
 ## 2. Document layout
-- Index: `README.md`; Codex study: `docs/` (16 documents)
+- 문서 위키 홈: `README.md` · Codex study: `docs/` (16 documents)
 - Browser-agent study: `browser-agents/` (13 documents)
 - Cross-study synthesis: `SYNTHESIS.md`
 - Reports: `REPORT.md` (English), `REPORT.ko.md` (Korean)
 - Source and verification records: `docs/99-sources.md`, `browser-agents/99-sources.md`
 - Concept re-index: `ai-workflow/wiki/` (16 concepts)
-- Operational home: `ai-workflow/memory/active/`
-- Backlog: `ai-workflow/memory/active/<branch>/backlog/`
-- Session handoff: `ai-workflow/memory/active/<branch>/session_handoff.md`
+- 환경 기록 위치: `ai-workflow/memory/active/repository_assessment.md`
+- 운영 문서 위치: `ai-workflow/memory/active/`
+- 백로그 위치: `ai-workflow/memory/active/<branch>/backlog/`
+- 세션 인계 문서 위치: `ai-workflow/memory/active/<branch>/session_handoff.md`
 
 ## 3. Standard commands
 - Install: none — a Markdown repository with no dependencies
 - Run locally: none — there is nothing to run
-- Quick test: `python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept
+- 빠른 테스트: `python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept
   re-index has kept up with its source documents
-- Isolated test: `grep -rn "](" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken
+- 격리 테스트: `grep -rn "](" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken
   relative links
 - Smoke check: re-fetch a primary source. Appending `.md` to an OpenAI (and many other) documentation
   URL returns the raw Markdown; `/llms.txt` is often a full index.
@@ -97,6 +98,12 @@ default-mode check into CI.
   (`session_handoff.md`, backlog tasks) are Korean.** This includes `docs/`, `browser-agents/`,
   `SYNTHESIS.md`, the wiki concept pages, this profile, and `PURPOSE.md`. Settled 2026-09-23;
   the browser-agent study was drafted in Korean and translated, the same path the Codex study took.
+- **Exception — machine-read labels stay Korean.** `wk` parses this profile and `PURPOSE.md` by
+  hard-coded Korean labels (`프로젝트명`, `문서 위키 홈`, `운영 문서 위치`, `백로그 위치`,
+  `세션 인계 문서 위치`, `환경 기록 위치`, `빠른 테스트`, `격리 테스트`, and `### 포함 영역` /
+  `### 제외 영역` in PURPOSE §3). Translating those labels **silently disables scope-creep
+  detection**, which matches task briefs against the excluded areas. The label stays Korean; the
+  value stays English.
 
 ## Read next
 - [Session handoff](../ai-workflow/memory/active/main/session_handoff.md)

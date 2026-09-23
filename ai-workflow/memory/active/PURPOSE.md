@@ -66,7 +66,7 @@ first case; the rest are the contrast group that tests the abstraction.
 
 ## 3. Research Scope
 
-### Included
+### 포함 영역
 
 - Reading the generated schemas and Rust source of `openai/codex`
 - The App Server JSON-RPC protocol (methods / notifications / approvals / transports / error codes)
@@ -81,7 +81,7 @@ first case; the rest are the contrast group that tests the abstraction.
 - **The axes shared by agent harnesses generally** — the concept layer
   (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)
 
-### Excluded
+### 제외 영역
 
 - **Actually implementing, forking or redistributing a harness** — these are research notes, not a
   codebase

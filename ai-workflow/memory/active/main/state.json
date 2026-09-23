@@ -14,16 +14,16 @@
     "repository_assessment_path": null
   },
   "project": {
-    "project_name": null,
-    "document_home": null,
-    "operations_path": null,
-    "backlog_path": null,
-    "handoff_path": null,
-    "environment_path": null
+    "project_name": "Codex Harness — Study Notes",
+    "document_home": "README.md` · Codex study: `docs/` (16 documents)",
+    "operations_path": "ai-workflow/memory/active/",
+    "backlog_path": "ai-workflow/memory/active/<branch>/backlog/",
+    "handoff_path": "ai-workflow/memory/active/<branch>/session_handoff.md",
+    "environment_path": "ai-workflow/memory/active/repository_assessment.md"
   },
   "commands": {
-    "quick_tests": null,
-    "isolated_tests": null,
+    "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept",
+    "isolated_tests": "grep -rn \"](\" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken",
     "runtime_checks": null
   },
   "session": {
