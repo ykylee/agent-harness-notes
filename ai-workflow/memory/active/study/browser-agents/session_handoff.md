@@ -17,6 +17,7 @@
 
 - TASK-2026-09-22-browser-agents-001 브라우저형 에이전트 도구 조사 — Aside 중심: done
 - TASK-2026-09-23-browser-agents-002 Aside 코드레벨 분석 — CLI 바이너리 추출: done
+- TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
 
 ## 현재 `in_progress` 작업
 
@@ -34,13 +35,19 @@
 - **scope A안 확정** (2026-09-23) — 공용 `PURPOSE.md` 는 건드리지 않고 `browser-agents/SCOPE.md` 가 이 브랜치의 판정 기준이 된다.
 - **`08-aside-code-level.md` 추가 (2차 세션)** — Aside Linux CLI 를 설치해 **Node SEA 페이로드를 추출**, 난독화 안 된 ESM 번들 67,774줄을 분석했다. 문서에 없던 사실 다수 확보. 이로써 `99-sources` 의 미확인 항목 2건(**메모리 형식**, **인식·동작 방식**)이 해소됐고, `04`·`06` 의 비교표와 판단이 갱신됐다.
 - 설치물: `~/.aside/cli/aside` (144MB), `~/.local/bin/aside` 심볼릭 링크. sudo 없이 설치됐고 제거는 두 경로 삭제로 끝난다.
+- **`09-aside-browser-internals.md` 추가** — macOS DMG(334MB)를 내려받아 **실행하지 않고 정적 분석**. Chromium 포크 확인, 내부 MV3 확장 3종, 353MB 로컬 데몬(Node SEA, 258,965줄), Vault 의 libsodium 호출부 확인.
+- **자기 서술 1건을 반증했다** — 04 에서 "Comet 은 Aside 와 정반대 구조"라고 적었으나 Aside 의 에이전트도 MV3 확장이었다. 원문은 지우지 않고 정정 표시를 달았고 `99-sources` §4.5 에 반증 기록을 신설했다.
+- 다운로드 산출물은 scratchpad 에만 있고 저장소에 커밋되지 않았다 (DMG 334MB, 추출물 포함 약 2GB).
 
 ## Next Actions
 
 - [x] ~~`aside repl`/`mcp` 표면 확인~~ — 완료. 번들에서 규격까지 확보
 - [ ] **GUI 확인은 macOS/Windows 기기가 필요하다.** 이 환경(헤드리스 리눅스)에서는 불가능함이 실측으로 확정됐다 — Aside 브라우저는 리눅스 빌드가 없고, CLI 는 로컬 데몬 없이는 `guide` 외 전부 실패한다
 - [ ] 대안 경로: 원격 호스트(`aside --host`). macOS/Windows 기기에서 Settings > Developers 의 원격 제어를 켜고 `aside login` 하면 이 리눅스에서 조종 가능하다 — 번들 가이드가 정확히 이 시나리오를 예시로 든다
-- [ ] **브라우저 바이너리**를 CLI 와 같은 방식으로 열기 — 권한 강제·Vault 암호화·인식 파이프라인의 실체가 거기 있다
+- [x] ~~브라우저 바이너리 열기~~ → `09` 완료. Vault 암호와 데몬 구조 확보
+- [ ] 데몬 258,965줄에서 **권한 강제(Allow/Ask/Deny) 집행 지점** 찾기 — 아직 미탐색
+- [ ] **`Aside Computer Use.app`** 분석 — OS 수준 제어의 별도 프로세스. 문서에 없는 기능 축이다
+- [ ] Secure Enclave·포스트양자 주장 — 확장 코드에 없다. 네이티브 계층(`libaperitif.dylib`) 확인 필요
 - [ ] Aside 네트워크 트래픽 관찰 → "local-first" 주장 실증
 - [ ] 문서 언어 결정 — 이번엔 한국어로 썼다. `docs/` 는 영어이고 PROJECT_PROFILE §6 은 "문서 본문은 영어"라 적혀 있다. 기존 Codex 조사도 한국어로 시작해 나중에 일괄 번역한 이력이 있어 같은 경로를 택했다. main 병합 전 결정 필요.
 
