@@ -162,7 +162,14 @@ in use, and the decisive split is **whether perception and action share a namesp
 ### 3.2 Indirect prompt injection
 
 > All the user did was **click "summarize this page."** The result was an OTP from Gmail landing in an
-> attacker's hands (Brave's demonstration against Comet).
+> attacker's hands (Brave's demonstration against Comet) — posted as a reply to the Reddit comment
+> that carried the injection.
+
+**Read the shape of that chain before designing against it.** The agent navigated only to legitimate
+origins the user was logged into — perplexity.ai, gmail.com — and exfiltrated through **one ordinary
+write on a site the attacker could read.** There is no attacker-controlled destination anywhere in
+it ([`browser-agents/07` §2](browser-agents/07-security.md)). The threat is not "the agent goes
+somewhere bad"; it is **"the agent reads across the user's sessions and then writes once."**
 
 **The same-origin policy stops helping** — the agent crosses origins with the user's own authority.
 As of 2026 this is **unsolved.** OpenAI itself wrote that it is "unlikely to ever be fully 'solved',"
@@ -177,11 +184,13 @@ and security maintenance appears among the stated reasons for retiring Atlas.
 > credential channel. "Sensitive elements are invisible" is **evadable by invisible characters** if
 > it is a word heuristic, which is all a published description can tell you it is.
 >
-> ⚠️ And the attack shape this section is built around — **exfiltration by navigation** — is the one
-> **both models tested refused, 0/120 each** ([§6.5](#65-what-a-model-actually-obeys)). One of the
-> two was instead talked into pressing a button already on the page; the other was not. The
-> demonstration that defined the threat may not be the shape that gets you — **and which shape does
-> get you appears to depend on the model.**
+> ⚠️ **Corrected 2026-09-23.** This section and the study behind it had paraphrased the
+> demonstration as exfiltration **by navigation** to an attacker. It was not — see above. That
+> paraphrase is also what [§6.5](#65-what-a-model-actually-obeys) tested: navigation to an attacker
+> origin, refused **0/120 by both models.** The shape that got through — on one of the two — was **a
+> button already on the page**, which is the measured shape closest to the demonstration's real
+> payoff. Corrected, the demonstration and the measurement agree: **defences keyed on destinations
+> meet neither.** Which write a model can be talked into still depends on the model.
 
 ### 3.3 Credential shielding
 
@@ -232,7 +241,8 @@ it. `AdditionalTools` is the item that carries the tool list in Codex's `respons
 - [ ] Build a **reading cost ladder** — interactive-only → full → wait → annotated screenshot.
 - [ ] Add a **stagnation watchdog.** An agent cannot tell that it is stuck.
 - [ ] **Separate page content from user instruction.** This is not optional.
-- [ ] **Remove dangerous elements from perception** — password fields, irreversible buttons.
+- [ ] **Remove dangerous elements from perception** — password fields, irreversible buttons. This is depth, not the defence (§6.4).
+- [ ] **Gate writes, not only destinations.** The demonstrated payoff was a posted reply (§3.2). A write's approval prompt must name *what* is written and *where* — a bare ref is unanswerable (§6.5).
 - [ ] Shield credentials by **hiding the value.** URL blocking is enumerative.
 - [ ] **Set defaults narrow.** Good cryptography and good defaults are different jobs.
 
@@ -362,9 +372,12 @@ instruction; the two conditions differ only in whether page text is fenced and l
 > run.
 
 > 📌 **What replicates and what does not.** The navigation refusal holds on both providers —
-> **0/120 each**, announced or disguised. §3.2 of this document, and the injection literature
-> generally, is written around exfiltration by navigation; the Comet/Gmail demonstration is exactly
-> that shape, and **neither model tested would do it.**
+> **0/120 each**, announced or disguised. That navigation went **to an attacker origin carrying
+> data.** This document had described the Comet/Gmail demonstration as that shape; **it is not** —
+> the demonstration exfiltrates by replying to a comment, and navigates only to the user's own
+> accounts (§3.2, corrected). So this row refutes a paraphrase, not the demonstration. The
+> demonstration's actual chain — several reading navigations across real sessions, then a write —
+> was **not** measured.
 >
 > ⚠️ **The button result is one model's.** MiniMax pressed a control the page framed as necessary
 > about 40% of the time; DeepSeek did so **0 times in 40** under the same attack. So "an agent will
@@ -404,8 +417,8 @@ bounded case §6.4 recorded, now with a consequence attached:
 | Layer | Result |
 |---|---|
 | Perception filter (hide destructive controls) | ❌ missed it |
-| Envelope / provenance marking | ⚠️ 9/20 → 3/20 |
-| The model's own judgement | ❌ complied 45% of the time |
+| Envelope / provenance marking | ⚠️ 24/60 → 10/60 pooled — a direction, not a ratio |
+| The model's own judgement | ❌ complied ~40% of the time (24/60), on one of two models |
 | **Policy gate** | ✅ refused; the page did not change |
 
 > 📌 And the action class the model was talked into is **the one that reaches the gate carrying the
@@ -441,9 +454,10 @@ The feedback covers the axes that were built: perception, action, policy, approv
 nothing about capability distribution (§2.5) or exposing a harness to other harnesses (§2.6).
 
 Indirect prompt injection (§3.2) is **no longer the untouched claim it was** — §6.4 attacked the
-defences and five of them failed, and §6.5 put a model in front of them. Both halves now have
-numbers. **But they are one model's numbers**, and the result that matters most — that a disguised
-click beats a disguised navigation — is a single model's prior, not a law. Nothing
+defences and five of them failed, and §6.5 put two models in front of them. Both halves now have
+numbers. **But the vulnerability numbers are one model's** — the other obeyed nothing — and the
+result that matters most, that a disguised click beats a disguised navigation, is a single model's
+prior, not a law. Nor was the demonstrated chain itself (read across sessions, then write) run. Nothing
 in §6.4–§6.5 should be read as evidence that injection is handled; it is evidence that five specific
 defences were weaker than their descriptions.
 
@@ -461,6 +475,7 @@ Both studies used the same discipline, and the browser study **added two lessons
 | **(new) Cross-check primary sources against each other** | Opera's `llms.txt` contradicts its product FAQ. The more specific one wins |
 | **(new) A document describing behaviour is not evidence the behaviour exists** | In the implementation, a design document and a source comment both claimed iframe contents were included while the code walked only the main frame. Documentation and implementation had simply diverged, and nothing failed until it was measured. **This repository reads documents for a living** — §6 is the only place its claims were checked against something that runs |
 | **(new) Building a conclusion is a way of testing it** | Five of the conclusions in §2–§3 were refuted by implementing them (§6.1). All five had survived reading |
+| **(new) Re-read the original before building a test on your summary of it** | The Brave demonstration was paraphrased in one line as "send to the attacker's server." That became the threat model in §3.2, the threat model became a probe, and the probe then refuted a shape the demonstration never had (§6.5). Brave's own fourth step exfiltrates by replying to a comment. The primary source had been read — the error entered at the **summary**, and nothing downstream went back to the original |
 | **(new) A zero is evidence only if the input provably arrived** | Four separate times, a failure to deliver a test printed a *good* number: a frame walk that never ran, a payload mangled by a missing `charset`, a payload dropped by the reading mode, and a provider returning 404 for 200 straight calls — the last of which rendered as a flawless defence (§6.5, §6.6). Assertions looked correct in review every time; only printing what actually arrived found them |
 
 And one practical technique: **try `.md` and `/llms.txt` on a documentation site first.**
@@ -473,7 +488,7 @@ Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered). *
 | The Codex harness itself | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
-| **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and one model measured against injected instructions |
+| **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and two models measured against injected instructions |
 | Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)

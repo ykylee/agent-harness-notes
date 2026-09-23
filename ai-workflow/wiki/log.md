@@ -75,3 +75,22 @@ commit messages and operational documents (`session_handoff.md`, backlog tasks) 
 Note: the browser study was drafted in Korean and then translated — the same path the Codex study
 took. No facts changed in translation; only the language did.
 
+
+## [2026-09-23] ingest | Brave's demonstration re-read against the original
+
+Re-ingested `browser-agents/07-security.md` §2 (corrected) and §10 (new) into
+`indirect-prompt-injection`, and `browser-agents/99-sources.md` §4.5 into
+`primary-source-verification`.
+
+The study had paraphrased Brave's Comet chain as ending "send both to the attacker's server."
+Brave's fourth step reads "Exfiltrate both the email address and the OTP **by replying to the
+original Reddit comment**." Every navigation in the chain went to a legitimate, logged-in origin.
+
+Notes:
+- One `[CONTRADICTION]` resolved rather than tagged: `indirect-prompt-injection` §10.1 had set the
+  demonstration against the measurement ("the demonstration may be the wrong threat shape"). With
+  the original read, **they agree** — neither has an attacker destination. The contradiction was
+  between the measurement and this wiki's paraphrase.
+- The paraphrase had travelled into the implementation's probe design (navigation to an attacker
+  origin). That repository is out of scope here; the note stands so the next probe is built on the
+  original four steps.

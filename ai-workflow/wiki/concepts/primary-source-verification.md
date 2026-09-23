@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md + browser-agents/11-dia-and-neon.md
+last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
 updated: 2026-09-23
@@ -126,8 +126,16 @@ The same rule was applied to this repository's own earlier statements.
 | "Comet is the exact opposite structure to Aside" | ❌ **Refuted.** Aside's agent is an MV3 extension too. The real difference is **planning location** |
 | "No product documents input separation" | ❌ **Partly refuted.** Dia documents it concretely |
 | Opera Neon's unit of reuse is "Skills" | ❌ **Refuted.** The official name is **Cards**, and the axis differs |
+| Brave's Comet demonstration exfiltrated "to the attacker's server" | ❌ **Refuted by the original.** The fourth step posts the data **as a reply to the Reddit comment**; no attacker origin appears in the chain |
 
-> 📌 The last three are cases of **a conclusion being overturned as primary material accumulated.**
+> 📌 The last entry is a different kind of error, and a costlier one. It was not a secondary source
+> being wrong — the primary source had been read, then **paraphrased** in one line. The paraphrase
+> became the threat model ("exfiltration by navigation"), the threat model became a probe in the
+> implementation, and the probe then measured a shape the demonstration never had
+> ([[concepts/indirect-prompt-injection]] §10.1). **Re-read the original before building a test on
+> your summary of it.**
+
+> 📌 The three before it are cases of **a conclusion being overturned as primary material accumulated.**
 > That is why refutations are not deleted — deleting them would also delete the reason the earlier
 > belief was held.
 

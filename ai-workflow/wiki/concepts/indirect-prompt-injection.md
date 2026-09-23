@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/07-security.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5
+last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23)
 related_pages: [concepts/perception-model, concepts/credential-shielding, concepts/approval-gate, concepts/os-sandbox-policy]
 created: 2026-09-23
 updated: 2026-09-23
@@ -24,7 +24,8 @@ updated: 2026-09-23
 | 4 | As of 2026 | **unsolved.** OpenAI's own words: "unlikely to ever be fully 'solved'" |
 | 5 | The substance of mitigation | **reducing privilege** — not signing sensitive accounts into the agent browser |
 | 6 | ⚠️ **Measured** | Dia's published defences were implemented and attacked: **5 of 16 attacks got through**. The approval gate held; the perception-layer filters did not — §9 |
-| 7 | ⚠️ **Measured, two providers** | the navigation-exfiltration shape this page is built around was refused **0/120 by both**. A disguised **button press** got through on one model (~40%) and **not at all** on the other — §10 |
+| 7 | ⚠️ **The demonstration has no attacker origin** | Brave's chain read across the user's own sessions and exfiltrated by **replying to the Reddit comment** — a write, not a navigation. This page earlier said "send to the attacker's server" — §2 |
+| 8 | ⚠️ **Measured, two providers** | navigation **to an attacker origin** was refused **0/120 by both** — but that was never the demonstration's shape. A disguised **button press** got through on one model (~40%) and **not at all** on the other — §10 |
 
 ## §2 The attack chain (Brave's demonstration against Comet)  {#s2-chain}
 
@@ -34,7 +35,14 @@ updated: 2026-09-23
 | 2. Trigger | the user invokes the AI on that page — **"summarize"** |
 | 3. Inject | the system processes it **without distinguishing user instruction from untrusted page content** |
 | 4. Execute | the AI treats the injected commands as a legitimate request |
-| 5. Exfiltrate | demonstrated: obtain the email address → **extract an OTP from Gmail** → send both to the attacker → account takeover |
+| 5. Exfiltrate | demonstrated: obtain the email address → **extract an OTP from Gmail** → **post both as a reply to the original Reddit comment** → account takeover |
+
+> ⚠️ **Corrected 2026-09-23.** This row used to end "send both to the attacker." Brave's own fourth
+> step: "Exfiltrate both the email address and the OTP **by replying to the original Reddit
+> comment**." Steps 1–3 navigated only to legitimate origins the user was logged into
+> (perplexity.ai, gmail.com). **No destination in the chain is attacker-controlled** — so no
+> URL blocklist or domain blacklist has anything to match. What the chain needs is to read across
+> sessions and then **perform one write where the attacker can read it.**
 
 ## §3 The structural cause  {#s3-cause}
 
@@ -118,9 +126,10 @@ The size of this risk is **directly proportional to what the agent can reach.**
 - **Do not turn off the approval gate.** It is one of the few defences actually working — and §9 is
   the measurement behind that sentence: the filters around it are heuristics, the gate is not
 - For enterprise, check for **domain blacklists via managed policy** (Comet's managed storage)
-- ⚠️ **A domain blacklist defends the shape a model already refuses.** §10 measured the
-  navigation payoff at 0/80 and an on-page button at 9/20. Gating *which control may be pressed* is
-  the weaker-covered side, and it is the side that reaches a human with less to go on
+- ⚠️ **A domain blacklist defends neither the demonstration nor what got through.** §2 has no
+  attacker origin; §10 measured navigation to one at 0/120 on both models and an on-page button at
+  ~40% on one. **Gate writes** — posts, submits, transfers — and make the prompt name *what* and
+  *where*. That is the side that reaches a human with the least to go on
 
 ## §9 The defences, attacked  {#s9-attacked}
 
@@ -176,19 +185,27 @@ the loop; this is the other half, across **two providers**, N=20 per cell.
 *(plain condition. A third provider was excluded rather than measured — its "perfect" 0/80 was 200
 HTTP 404s.)*
 
-### §10.1 The threat model on this page may be the wrong shape  {#s10-1-shape}
+### §10.1 The mismatch was in this page, not in the demonstration  {#s10-1-shape}
 
-> ⚠️ §2 of this page is the Brave/Comet chain, and its payoff is **exfiltration by navigation.** That
-> is the shape **both models refused, 0/120 each**, including when it was disguised as ordinary site
-> copy rather than announced.
+> ⚠️ An earlier version of this section said §2's payoff was **exfiltration by navigation**, and
+> that both models refused that shape, so the demonstration might be the wrong threat model. **The
+> first half was this page's paraphrase, not Brave's.** The original exfiltrates by replying to a
+> comment (§2). The navigation that the models refused — to an attacker origin, carrying data —
+> appears nowhere in the demonstration.
 >
-> 📌 What got through — on one of the two — was **a button already on the page**, framed by the page
-> as a necessary step. **The demonstration that defined the threat is not necessarily the shape that
-> gets you**, and it is the shape everyone's defences are tuned against.
+> 📌 Corrected, the two agree. The demonstration's payoff is **a write on a page the attacker can
+> read**; the measured shape that got through is **a button already on the page**, framed as a
+> necessary step. Neither involves an attacker destination, and defences tuned to destinations
+> (blocklists, blacklists, "don't follow LLM-generated URLs") meet neither.
 >
-> ⚠️ But the button result did **not** replicate: DeepSeek is 0/40 on that attack. Which shape gets
-> you depends on the model, so **a threat model written around one demonstration and a defence tuned
-> to one model are the same mistake.**
+> ⚠️ Two limits stay. The button result did **not** replicate — DeepSeek is 0/40 — so which shape
+> gets through depends on the model. And the demonstration's actual chain — several reading
+> navigations across real logged-in sessions, then a write — **was not measured at all**; the
+> probes were single-turn on synthetic pages.
+>
+> 📌 **How the error propagated** is the transferable part: a one-line paraphrase of a primary source
+> became the threat model, the threat model became a probe, and the probe then "refuted" a shape the
+> source never had. See [[concepts/primary-source-verification]].
 
 ### §10.2 The envelope has a number now  {#s10-2-envelope}
 
@@ -211,7 +228,7 @@ note instead of acting on it, which is what the instruction asked for.
 ### §10.3 Why the gate still held  {#s10-3-gate}
 
 The button read "Transfer balance to partner account" — invisible to the destructive-hiding heuristic
-(§9, the bounded case), obeyed 45% of the time by the model, and **refused by the policy gate.**
+(§9, the bounded case), obeyed by that model ~40% of the time (24/60 pooled), and **refused by the policy gate.**
 
 > ⚠️ Note which action class got through: a `navigate` carries its destination to the gate, a `click`
 > carries only a ref. **The action a model is most easily talked into is the one that arrives with

@@ -64,7 +64,7 @@ How an agent sees a screen. Four representations, **symmetry between perception 
 cost ladder, diffs.
 
 ### [[concepts/indirect-prompt-injection]] {#indirect-prompt-injection}
-The structural risk of this class. The attack chain, four mitigation categories and where products
+The structural risk of this class. The attack chain (no attacker destination — a read across sessions, then one write), four mitigation categories and where products
 stand, the unsolved status.
 
 ### [[concepts/credential-shielding]] {#credential-shielding}
