@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md
+last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md
 related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Harness (에이전트 실행 시스템)
@@ -121,6 +121,42 @@ app-server provides the agent loop and sandboxed execution."*
 
 > **에이전트 루프는 일의 20% 정도다.** 나머지가 실제로 쓸 만한 물건인지를 결정한다.
 > 제품급 최소 집합은 core 20 + 약 25 = **약 45개** (`docs/12-product-surface.md` §4).
+
+
+## §7.5 관측 — 실행 표면이 하네스를 가른다  {#s7-5-surfaces}
+
+Codex 하네스의 실행 표면은 **셸과 파일시스템**이다. 같은 추상이 **브라우저와 OS** 위에
+올라가면 다른 부류가 된다. 그 부류를 조사한 결과가 `browser-agents/`.
+
+| 외피 | 얻는 것 | 치르는 것 | 사례 |
+|---|---|---|---|
+| **네이티브 브라우저 (포크)** | 브라우저 크롬 수준 UX, 전체 권한 모델, 커스텀 확장 API | **Chromium 추격 부채**, 사용자 마이그레이션 | Aside, Comet, Dia, Neon |
+| **확장** | 이동 불필요, 유지보수 부채 없음 | 확장 API 가 허용하는 것만 | Claude for Chrome, Gemini in Chrome |
+| **라이브러리** | 완전한 통제, 프로그램적 조합 | 사람이 쓰는 제품이 아님 | Browser Use |
+
+> ⚠️ **겉 분류와 속 구조가 다르다.** Comet 도 Aside 도 "네이티브 브라우저"를 표방하지만
+> 에이전트는 **둘 다 MV3 크롬 확장**이다. 외피는 배포 단위이고, 제어는 확장 계층에 있다.
+> 그래서 갱신 주기를 분리할 수 있다 (Aside: 셸 `1.0.x` / 확장·CLI `1.26.x`).
+>
+> 📌 **브라우저를 만드는 것은 제품이 아니라 상시 부채다.** OpenAI 는 ChatGPT Atlas 를
+> 출시 10개월 만에(2026-08-09) 접었고, 사유에 **보안 유지보수**가 들어갔다. 기능은
+> ChatGPT·Codex 로 흡수됐다 — 에이전트 능력에 브라우저 소유가 필수가 아님을 보여준다.
+
+## §7.6 표면과 무관한 축 / 표면 고유의 축  {#s7-6-axis-split}
+
+두 조사를 가로질러 보면 하네스의 설계 축이 갈린다.
+
+| 표면과 **무관**한 축 (재사용 가능) | 표면 **고유**의 축 |
+|---|---|
+| 승인 게이트 [[concepts/approval-gate]] | **인식 모델** [[concepts/perception-model]] |
+| 프로바이더 데이터화 [[concepts/provider-as-data]] | **간접 프롬프트 주입** [[concepts/indirect-prompt-injection]] |
+| capability 배포 [[concepts/capability-distribution]] | **자격증명 은닉** [[concepts/credential-shielding]] |
+| control/execution plane [[concepts/control-plane-execution-plane]] | 샌드박스 기전 [[concepts/os-sandbox-policy]] |
+| 대화 원시형 [[concepts/thread-turn-item]] | |
+
+> 📌 **왼쪽이 이 저장소의 재사용 가능한 자산이다.** 새 하네스를 설계할 때 표면이 무엇이든
+> 왼쪽은 그대로 적용된다. 오른쪽은 표면을 정한 뒤에야 답이 나온다.
+> 전체 종합은 [`SYNTHESIS.md`](../../../SYNTHESIS.md).
 
 ## §8 다음에 읽을 문서  {#s8-next}
 

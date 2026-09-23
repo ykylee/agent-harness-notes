@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md
+last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/06-architecture-axes.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Control Plane / Execution Plane — 하네스와 compute 의 분리
@@ -69,6 +69,27 @@ updated: 2026-09-22
 | 2 | 실행 면에 두는 자격증명은 **읽힌다고 가정**하고 권한을 그 전제에 맞춘다 |
 | 3 | 연결 방향을 **아웃바운드 전용**으로 만든다 — self-hosted 환경이 인바운드 포트를 요구하지 않는 이유 |
 | 4 | 실행 면의 수명과 제어 면의 수명을 분리한다 ([[concepts/execution-environment-topology]] §5) |
+
+
+## §5.5 브라우저형 에이전트가 이 축을 3분화한다  {#s5-5-browser-evidence}
+
+Agents API 는 이 경계를 **제품이 선언**한다. 브라우저형 에이전트에서는 같은 경계가
+**제품마다 다른 자리에 그어져** 있고, 그래서 축이 더 선명해진다.
+
+| 제품 | 계획 (control) | 실행 (execution) | 근거 |
+|---|---|---|---|
+| **Comet** | **서버** — Perplexity 백엔드가 계획하고 명령을 발행 | 로컬 확장 | 리버싱 |
+| **Aside** | **로컬 데몬** (`127.0.0.1:21420`, 353MB Node SEA) | 로컬 브라우저 | 바이너리 분석 |
+| **Opera Neon** | **클라우드 LLM** | 로컬 브라우저 (Neon Do) | 제품 FAQ |
+| Dia | 자사 서버 경유 → 파트너 모델 | 로컬 | 보안 문서 |
+
+> 📌 **이 축이 모델 경제를 결정한다.** Aside 가 사용자의 ChatGPT·Claude 구독을 OAuth 로
+> 끌어 쓸 수 있는 것은 계획이 로컬이기 때문이다. 계획이 서버에 있으면 사용자 자격증명을
+> 쓸 이유가 없다 — Comet 은 Max 구독자에게만 모델 선택을 준다.
+
+> ⚠️ **"로컬"이라는 단어를 벤더가 어느 면에 쓰는지 확인하라.** Opera 의 `llms.txt` 는
+> "All AI processes run locally on the device" 라 하는데 제품 FAQ 는 "**계획은 클라우드
+> LLM**"이라고 한다. 같은 회사의 두 1차 출처가 어긋난 사례다.
 
 ## §6 다음에 읽을 문서  {#s6-next}
 

@@ -3,7 +3,11 @@
 # Master Knowledge Index
 
 > 형식과 규칙은 [`./SCHEMA.md`](./SCHEMA.md). ingest 가 page 를 만들 때마다 항목이 추가된다.
-> 원 소스는 저장소 루트의 `docs/` 16편과 `REPORT.md` — 위키는 그것을 **개념 축으로 재색인**한 계층이다.
+> 원 소스는 `docs/`(Codex 하네스)와 `browser-agents/`(브라우저형 에이전트) — 위키는 **두 조사를
+> 개념 축으로 재색인**한 계층이다. 교차 종합은 [`SYNTHESIS.md`](../../SYNTHESIS.md).
+>
+> **표면 고유 축**(인식·주입·자격증명)과 **표면 무관 축**(승인·프로바이더·capability·plane)의
+> 구분은 [[concepts/harness]] §7.6 참조.
 
 ## Concepts
 
@@ -43,8 +47,17 @@ plugin·marketplace·skill 유통. 벤더 중립 manifest, 카탈로그와 설�
 ### [[concepts/provider-as-data]] {#provider-as-data}
 프로바이더를 코드 분기가 아니라 데이터로. 커맨드 기반 토큰 발급, 프로젝트 로컬 설정 deny-list.
 
+### [[concepts/perception-model]] {#perception-model}
+에이전트가 화면을 보는 방식. 네 가지 표현, **인식·동작 이름 공간의 대칭**, 비용 사다리, diff.
+
+### [[concepts/indirect-prompt-injection]] {#indirect-prompt-injection}
+이 부류 고유의 구조적 위험. 공격 사슬, 완화 4범주와 제품별 실태, 미해결 상태.
+
+### [[concepts/credential-shielding]] {#credential-shielding}
+비밀을 주지 않고 로그인시키기. 값 은닉 / 요소 은닉 / URL 차단, 권한 등급과 노출의 분리.
+
 ### [[concepts/primary-source-verification]] {#primary-source-verification}
-이 저장소의 인식 방법. 등급 어휘, 반증의 보존, 검증한 2차 출처 5건 중 2건이 틀렸다는 기록.
+이 저장소의 인식 방법. 등급 어휘, 반증의 보존, `llms.txt` 수법의 성적과 함정.
 
 ## Topics
 

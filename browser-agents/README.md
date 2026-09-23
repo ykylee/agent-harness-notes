@@ -5,8 +5,10 @@
 
 조사일: 2026-09-22 · 브랜치: `study/browser-agents`
 
-> ⚠️ **이 저장소의 기존 조사(`docs/`)와 별개 주제다.** 기존 조사는 OpenAI Codex 하네스이고,
-> 이쪽은 브라우저형 에이전트다. scope 관계는 [SCOPE.md](SCOPE.md) 참조.
+> **이 저장소의 다른 조사(`docs/`, Codex 하네스)와 같은 추상의 다른 사례다.**
+> 두 조사를 가로지르는 종합은 **[`SYNTHESIS.md`](../SYNTHESIS.md)**,
+> 개념 단위 재색인은 [`ai-workflow/wiki/`](../ai-workflow/wiki/index.md).
+> scope 이력은 [SCOPE.md](SCOPE.md) (2026-09-23 에 공용 PURPOSE 확장으로 해소).
 
 ## 문서
 

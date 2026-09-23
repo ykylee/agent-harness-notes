@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/09-aside-browser-internals.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Provider as Data — 프로바이더를 코드 분기가 아니라 데이터로
@@ -114,6 +114,25 @@ realtime 연결은 별도 라우팅 설정을 쓰며 이 검사에서 면제된�
 - [ ] 프로바이더마다 자기 재시도·타임아웃 손잡이를 준다 (로컬 Ollama 와 호스팅 API 는 다르다)
 - [ ] 프로젝트 로컬 설정이 프로바이더·인증·텔레메트리 키를 못 쓰게 막는다
 - [ ] 프로바이더 정책이 바뀔 때 **in-flight thread** 를 어떻게 할지 정한다 — 입력 거부, 제어 유지
+
+
+## §5.5 관측 — 방향이 반대인 두 사례  {#s5-5-two-directions}
+
+`ModelProviderInfo` 는 "프로바이더를 데이터로" 까지만 말한다. 브라우저형 에이전트는
+**그 데이터를 누가 고르는가**에서 갈린다.
+
+| 제품 | 선택 주체 | 구현 |
+|---|---|---|
+| **Aside** | **사용자** | 16+ 프로바이더 id. **기존 구독을 OAuth 로 재사용**(ChatGPT·Claude·Copilot) + BYO API 키 |
+| **Opera Neon** | **제품** | "Opera's AI engine, **model-agnostic**" 이 작업에 맞는 모델로 **라우팅**. Chat 에서만 사용자 선택 |
+| Dia | 제품 | GPT(OpenAI Azure) · Claude(Anthropic·Vertex·AWS) · Gemini(Vertex) 고정 |
+
+> 📌 **"model-agnostic" 이 정반대 두 제품 설계를 가리킨다.** Aside 는 사용자에게 주권을 주고,
+> Neon 은 제품이 대신 고른다. 커스텀 하네스를 설계할 때 이 둘은 **다른 제품**이 된다 —
+> 전자는 도입 장벽에서 모델 비용을 빼고, 후자는 품질 책임을 제품이 진다.
+>
+> 이 선택은 [[concepts/control-plane-execution-plane]] 의 계획 위치와 묶여 있다.
+> 계획이 로컬이어야 사용자 구독을 쓸 수 있다.
 
 ## §8 다음에 읽을 문서  {#s8-next}
 

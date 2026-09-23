@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md
+last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md
 related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Wire Protocol Boundary — 코어 재사용 가능성을 가르는 경계
@@ -114,6 +114,24 @@ wire_api = 'responses'
 > `config.toml` 에는 이를 덮어쓸 키가 없다 — 통제점은 **`model_catalog_json`** 뿐이다.
 > 지원하는 모델마다 명시적 항목을 담은 카탈로그를 실어라. 접두 일치의 운에 기대지 말고,
 > fallback 에도 기대지 마라.
+
+
+## §5.5 관측 — Aside 가 이 분기를 실제로 구현하고 있다  {#s5-5-aside}
+
+`responses_lite` 가 이론적 함정이 아니라는 증거다. Aside 브라우저의 데몬 바이너리에서:
+
+```js
+CODEX_TOOL_CALL_PROVIDERS = new Set([`openai`, `openai-codex`, `opencode`])
+AZURE_TOOL_CALL_PROVIDERS  = new Set([`openai`, `openai-codex`, `opencode`, `azure-openai-responses`])
+// 인접: supportsAdditionalTools, supportsToolSearch, supportsMidConvoSystemMessages
+```
+
+> 📌 **`openai-codex` 가 모델 프로바이더 id 로 등록돼 있고**, `supportsAdditionalTools` 플래그가
+> 함께 있다. `AdditionalTools` 는 lite 모드에서 도구 목록을 싣는 항목이다(§5).
+> 즉 서드파티 하네스가 **Codex 의 두 요청 형태를 프로바이더별 capability 플래그로 흡수**했다.
+>
+> 이 저장소의 두 조사가 코드 수준에서 만나는 지점이고, §5 의 "어댑터는 두 형태를 모두
+> 처리해야 한다"는 권고가 현실에서 그대로 요구됐음을 보여준다.
 
 ## §6 다음에 읽을 문서  {#s6-next}
 

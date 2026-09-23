@@ -1,8 +1,8 @@
 {
   "schema_version": "1",
   "generated_at": "2026-09-23",
-  "purpose_digest": "OpenAI Codex 하네스의 **실제 계약**(App Server JSON-RPC 프로토콜, SDK, Agents API)을",
-  "purpose_digest_rev": "2026-09-22",
+  "purpose_digest": "에이전트 하네스의 **실제 계약**을 블로그 요약이 아니라 **생성 스키마·소스·바이너리**에서",
+  "purpose_digest_rev": "2026-09-23",
   "source_of_truth": {
     "project_profile_path": "docs/PROJECT_PROFILE.md",
     "session_handoff_path": "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
@@ -27,13 +27,14 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "브랜치 `study/browser-agents` 1차 세션 (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안(브랜치 국한)으로 확정**됐다.",
-    "current_axis": "브랜치 `study/browser-agents` 1차 세션 (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안(브랜치 국한)으로 확정**됐다.",
+    "current_baseline": "브랜치 `study/browser-agents` (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안으로 시작했다가 융합 결정으로 공용 PURPOSE 확장으로 해소**됐다.",
+    "current_axis": "브랜치 `study/browser-agents` (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안으로 시작했다가 융합 결정으로 공용 PURPOSE 확장으로 해소**됐다.",
     "current_focus": null,
     "in_progress_items": [],
     "blocked_items": [],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합",
       "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
       "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
@@ -45,14 +46,15 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
-    "task_count": 4,
+    "task_count": 5,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
       "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
-      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화"
+      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
+      "TASK-2026-09-23-browser-agents-006 — 두 조사 융합 — 위키 개념층 + 교차 종합"
     ]
   },
   "next_documents": [

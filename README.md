@@ -7,10 +7,22 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-> **Other studies in this repository** — `study/browser-agents` branch:
-> [browser-agents/](browser-agents/README.md), a separate investigation into browser-type agent
-> tools (Aside, Comet, Dia, Browser Use). Different subject, same verification discipline.
-> Scope relationship: [browser-agents/SCOPE.md](browser-agents/SCOPE.md).
+## Two studies, one subject
+
+This repository now holds **two investigations into agent harnesses**:
+
+| Study | Subject | Execution surface |
+|---|---|---|
+| [`docs/`](docs/) + [REPORT.md](REPORT.md) | OpenAI Codex harness | shell · filesystem |
+| [`browser-agents/`](browser-agents/README.md) | Browser-type agents (Aside, Comet, Dia, Neon, Browser Use) | browser · OS |
+
+**→ [SYNTHESIS.md](SYNTHESIS.md)** crosses the two: which design axes are surface-independent
+(approval, permissions, providers, control/execution plane) and which are surface-specific
+(perception, prompt injection, credential shielding). It also records where the two studies
+**meet in code** — Aside's daemon registers `openai-codex` as a model provider and implements
+Codex's `responses_lite` request-shape branching.
+
+Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (16 concepts).
 
 ## Start with the report
 

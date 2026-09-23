@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/99-sources.md + REPORT.md
+last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md + browser-agents/11-dia-and-neon.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Primary-Source Verification — 이 저장소의 인식 방법
@@ -105,6 +105,50 @@ grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
 
 조사 기준은 `openai/codex` 의 **2026-09-15 상태**다. 빠르게 움직이는 저장소이므로 재조사의 첫 수는
 새 사실 수집이 아니라 **기존 사실의 드리프트 확인**이다.
+
+
+## §3.5 수법의 일반화와 그 한계  {#s3-5-generalization}
+
+**`.md` 접미사와 `/llms.txt`** 는 OpenAI 문서에서 발견했지만 다른 곳에서도 통한다.
+다만 **문서 사이트의 렌더링 방식에 달렸다.**
+
+| 대상 | `llms.txt` | `.md` | 결과 |
+|---|---|---|---|
+| OpenAI 문서 | — | ✅ | 가이드 14편 발견 |
+| **Aside** | ✅ | ✅ | 제품 문서 16종 전부 1차 확보 |
+| **Opera** | ✅ | — | Neon 항목 확보 |
+| **Dia** | ❌ | ❌ | 모든 경로가 동일한 SPA 셸 |
+
+> 📌 **먼저 시도하되 만능으로 믿지 마라.** 클라이언트 렌더 사이트는 정적 수법이 닿지 않는다.
+> 실패 시 렌더된 페이지나 프레임워크 페이로드(Next.js flight 등)로 돌아간다.
+
+## §3.6 새로 확인된 함정 두 가지  {#s3-6-traps}
+
+### 상속을 고유 기능으로 오인하기
+
+포크 제품의 바이너리에서 어떤 기능의 흔적이 나와도, **상류에서 상속한 것일 수 있다.**
+
+> 실례: Aside 브라우저에서 포스트양자 암호(ML-KEM) 문자열이 나왔다. 그런데 **Chromium 은
+> 2024년부터 X25519MLKEM768 TLS 를 기본 탑재**한다. 포크라면 당연히 나온다.
+> **파일 위치를 먼저 갈라야** 했고, 제품 자신의 코드(Vault 확장·데몬)에 있음을 확인한
+> 뒤에야 고유 기능으로 확정했다.
+
+**규칙: 포크 제품에서 발견한 것은 상류에 없는지 먼저 확인한다.**
+
+### 벤더 자신의 두 1차 출처가 모순되기
+
+> 실례: Opera 의 `llms.txt` 와 Opera Neon 제품 FAQ 가 "AI 처리가 로컬인가"에 대해 반대로 말한다.
+
+**규칙: 1차 출처라도 서로 대조한다. 어긋나면 더 구체적인 쪽을 채택하고 모순 자체를 기록한다.**
+
+## §3.7 정보량 차이를 성숙도 차이로 읽지 않기  {#s3-7-asymmetry}
+
+브라우저 조사 초기, Comet 은 내부가 상세히 알려졌고 Aside 는 "미공개"가 많았다. 그 차이는
+**제품 성숙도가 아니라 누가 뜯어봤느냐**의 차이였다 — Aside 바이너리를 직접 열자 대부분 채워졌다.
+
+> 📌 **현재도 같은 비대칭이 남아 있다.** Aside 는 바이너리까지 검증했고 Dia·Neon 은 제품
+> 문서를 믿은 상태다. 문서가 좋다는 것과 구현이 그렇다는 것은 다르다 — 비교표를 읽을 때
+> **각 칸의 근거 등급이 다르다는 점**을 잊으면 안 된다.
 
 ## §9 다음에 읽을 문서  {#s9-next}
 

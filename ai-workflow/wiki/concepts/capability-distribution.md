@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md
+last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md + browser-agents/11-dia-and-neon.md + browser-agents/08-aside-code-level.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/provider-as-data]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Capability Distribution — plugin · marketplace · skill 의 유통 체계
@@ -151,6 +151,35 @@ hooks/list
 | `skills/extraRoots/set` | 클라이언트가 런타임에 skill 탐색 root 를 추가. plugin 과 독립 |
 
 > ⚠️ 현재 `disabledPluginIds` 는 **선택을 저장할 뿐 실제로 capability 를 걸러내지 않는다.**
+
+
+## §8.5 관측 — 재사용 단위의 세 축은 직교한다  {#s8-5-reuse-axes}
+
+plugin/marketplace 는 **배포**의 단위다. 브라우저형 에이전트는 그와 별개로
+**"반복되는 위임을 어떻게 재사용 단위로 만드나"** 를 각자 풀었고, 셋의 축이 서로 다르다.
+
+| 제품 | 이름 | 축 | 내용 |
+|---|---|---|---|
+| **Opera Neon** | **Cards** | **작업 유형** | "이런 종류의 일은 이렇게 다뤄라". 덱으로 묶이고 Chat·Do·Research 전반에서 동작 |
+| Dia | Skills | **호출** | 이름으로 부르는 재사용 루틴 |
+| **Aside** | **Routines** | **시간** | `cron`(새 작업 시작) vs `heartbeat`(기존 대화를 깨워 이어감) |
+
+> 📌 **세 축이 직교한다.** 한 제품이 셋을 다 가질 수 있는데 아직 아무도 그러지 않았다.
+> 특히 Aside 의 cron/heartbeat 구분은 다른 둘에 없다 — 대화 맥락을 가진 에이전트에게
+> "새로 시작"과 "이어하기"는 다른 의미인데, 보통의 스케줄러는 전자만 준다.
+>
+> Aside 는 **반복 작업을 스캔해 루틴을 제안**하기까지 한다. 사용자가 재사용 단위를
+> 스스로 발견하지 못하는 문제를 도구가 먼저 푼다.
+
+## §8.6 관측 — 벤더가 손으로 만든 사이트 스킬  {#s8-6-builtin-skills}
+
+Aside 는 Slack·Gmail·Notion·Google Docs/Sheets/Search·YouTube·LinkedIn·iMessage 에 대해
+**내장 스킬**을 싣고, 가이드가 "범용 `snapshot()` 으로 몰기 전에 스킬부터 확인하라"고 지시한다.
+
+> ⚠️ 이것은 "통합 목록이 아니라 브라우저 자체가 표면"이라는 이 부류의 서사를 **부분적으로
+> 뒤집는다.** 범용 브라우징은 폴백이고 주요 사이트엔 전용 경로가 있다. 실용적 선택이지만,
+> **벤더 자체보고 벤치마크 점수와 함께 읽어야 한다** — 벤치마크 과제가 그 사이트들을
+> 포함한다면 점수는 범용 능력이 아니라 스킬 커버리지를 재는 것일 수 있다.
 
 ## §8 다음에 읽을 문서  {#s8-next}
 

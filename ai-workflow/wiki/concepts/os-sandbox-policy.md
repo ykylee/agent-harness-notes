@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md
+last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md
 related_pages: [concepts/approval-gate, concepts/control-plane-execution-plane, concepts/execution-environment-topology, concepts/primary-source-verification]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # OS Sandbox Policy — 실행 면 안쪽의 방어
@@ -149,6 +149,46 @@ domains = { "api.openai.com" = "allow", "example.com" = "deny" }
 
 `windows/worldWritableWarning` 은 개념으로 옮길 가치가 있다 — 샌드박스가 올바르게 설정돼 있어도
 느슨한 경로 하나가 그것을 무력화할 수 있으므로, **탐지는 집행과 별개**다.
+
+
+## §8.5 관측 — 권한 정책의 표현력  {#s8-5-policy-expressiveness}
+
+App Server 의 샌드박스 정책은 **4개 값**(`readOnly`/`workspaceWrite`/`dangerFullAccess`/
+`externalSandbox`)이고, 세밀한 통제는 `ExecPolicyAmendment` 로 승인 시점에 붙는다.
+Aside 데몬은 **정책을 선언적 스키마로** 갖는다.
+
+| 매처 | 필드 |
+|---|---|
+| `tool` | 이름 또는 **glob**(`mcp__*`) + **인자별 매처**(`{$:"eq"\|"regex"}`, 입력 필드명으로 키잉) |
+| `browser` | `read`/`modify`/`download` + URL glob |
+| `network` | URL·도메인 glob |
+
+버킷은 `allow`/`approved`/`deny`/`ask` **넷**이고 `default` 는 `allow`.
+파일은 `readableRoots`/`writableRoots` + `outsideRead`·`outsideWrite`(`deny`/`ask`).
+
+> 📌 **"bash 허용"이 아니라 "bash 중 첫 인자가 이 정규식에 맞는 것만"** 을 표현할 수 있다.
+> 커스텀 하네스가 베낄 만한 표현력이다.
+>
+> 📌 **권한 등급과 샌드박스가 다른 축이다** — `full-access` 에서도 `sandbox.enabled: true`.
+> 최고 권한이 샌드박스 해제를 뜻하지 않는다. 같은 패턴이 자격증명에도 적용된다
+> ([[concepts/credential-shielding]]).
+
+## §8.6 관측 — 브라우저 에이전트가 OS 로 넘어갈 때  {#s8-6-computer-use}
+
+Aside 는 브라우저 자동화와 별개로 **`Aside Computer Use`** 라는 네이티브 프로세스를 싣는다.
+어느 제품 문서에도 없다.
+
+| 능력 | 심볼 |
+|---|---|
+| 시스템 전역 접근성 트리 | `AXUIElementRef`, **`AXTreeSerializer`** |
+| 입력 탭 (관찰 + 주입) | `CGEventTapCreate/Enable` |
+| 화면 캡처 · 이미지 분석 | `ScreenCaptureKit`, **`Vision.framework`** |
+| 연락처 | **`Contacts.framework`** |
+
+> 📌 인식 철학은 일관된다 — 브라우저에서 접근성 트리를 쓰듯 OS 에서도 트리를 직렬화한다.
+> ⚠️ 그러나 **닿는 면적이 탭이 아니라 데스크톱 전체**다. 프롬프트 주입
+> ([[concepts/indirect-prompt-injection]])과 겹쳐 읽으면, 속은 에이전트의 사정거리가
+> 브라우저를 넘어선다는 뜻이다.
 
 ## §9 다음에 읽을 문서  {#s9-next}
 

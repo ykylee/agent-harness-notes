@@ -6,12 +6,12 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (2차 세션)
+- Updated: 2026-09-23 (3차 세션 — 두 조사 융합)
 - Related docs: [SCOPE](../../../../browser-agents/SCOPE.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
-- 브랜치 `study/browser-agents` 1차 세션 (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안(브랜치 국한)으로 확정**됐다.
+- 브랜치 `study/browser-agents` (2026-09-22~23) — 브라우저형 에이전트 도구 조사를 새로 시작했다. Aside 중심 문서 8편 작성 완료. 기존 Codex 조사(`docs/`)와는 별개 주제이고, **scope 는 A안으로 시작했다가 융합 결정으로 공용 PURPOSE 확장으로 해소**됐다.
 
 ## Work Status
 
@@ -20,6 +20,7 @@
 - TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
 - TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석: done
 - TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화: done
+- TASK-2026-09-23-browser-agents-006 두 조사 융합 — 위키 개념층 + 교차 종합: done
 
 ## 현재 `in_progress` 작업
 
@@ -42,6 +43,9 @@
 - 다운로드 산출물은 scratchpad 에만 있고 저장소에 커밋되지 않았다. 재현 절차가 `08 §1`·`09 §1` 에 있어 언제든 복원된다.
 - **`10-aside-enforcement-and-native.md` 추가** — 09 에서 남긴 미확인 3건을 전부 해소했다. 권한 정책 엔진(도구 glob + 인자 eq/regex, 4버킷, 문서에 없는 `approved`), 승인 UI(=suspension, **채팅 채널 렌더 전제**), `Aside Computer Use`(네이티브, 시스템 전역 AX 트리·이벤트 탭·화면캡처·Vision·연락처), 그리고 Secure Enclave·**ML-KEM-768**·감사 로깅 확인.
 - 검증 장부: 해소 18건 / 미확인 8건.
+- **두 조사를 융합했다 (3차)** — 위키 개념 8종에 브라우저 근거 추가, 신규 3종(`perception-model`·`indirect-prompt-injection`·`credential-shielding`) 작성, 루트에 **`SYNTHESIS.md`** 신설. 개념 13 → **16종**.
+- **공용 `PURPOSE.md` 를 확장했다** — §0 에 범위 확장 기록, 제외 영역에서 "OpenAI 외 벤더" 삭제, Goals 에 G5(표면 무관/고유 축 구분) 추가. `SCOPE.md` 의 A안 조건이 발동한 결과이고, 이로써 **main 병합의 전제 조건이 해소**됐다.
+- 설계상 확인: 개념 페이지의 `last_ingested_from` 에 `browser-agents/*` 를 더하니 **재색인 강제 훅이 자동으로 두 트리를 덮는다.** 새 장치가 필요 없었다.
 - **`11-dia-and-neon.md` 추가** — `llms.txt`/`.md` 수법을 Dia·Neon 에 적용. Opera 는 `www.opera.com/llms.txt` 가 실재해 성공, **Dia 는 실패**(모든 경로가 동일 SPA 셸). 수법이 만능이 아니라 렌더링 방식에 달렸음을 기록했다.
 - **반증 3건 추가** — ① "입력 분리를 문서화한 제품 없음"은 틀렸다(Dia 가 구체적으로 함) ② Neon 의 재사용 단위는 Skills 가 아니라 **Cards** ③ Opera `llms.txt` 의 "모든 AI 처리 로컬"은 제품 FAQ("계획은 클라우드 LLM")와 모순 — 벤더 자신의 두 1차 출처가 어긋난 사례.
 
@@ -55,9 +59,10 @@
 - [ ] `Aside Computer Use` **호출 흐름** 추적 — 심볼만 봤지 실제 동작 경로는 미확인
 - [ ] 동적 관찰 (서버로 가는 내용) — 정적 분석의 한계. **기기가 필요하다**
 - [x] ~~Dia·Neon 1차 심화~~ → `11` 완료
+- [ ] **main 병합 검토** — PURPOSE 전제가 해소됐으므로 이제 가능하다. 다만 문서 언어 결정(아래)이 남아 있다
 - [ ] **검증 비대칭 해소** — Aside 만 바이너리까지 뜯었고 Dia·Neon 은 문서를 믿은 상태다. 문서가 좋은 것과 구현이 그런 것은 다르다
 - [ ] Aside 네트워크 트래픽 관찰 → "local-first" 주장 실증
-- [ ] 문서 언어 결정 — 이번엔 한국어로 썼다. `docs/` 는 영어이고 PROJECT_PROFILE §6 은 "문서 본문은 영어"라 적혀 있다. 기존 Codex 조사도 한국어로 시작해 나중에 일괄 번역한 이력이 있어 같은 경로를 택했다. main 병합 전 결정 필요.
+- [ ] 문서 언어 결정 — `browser-agents/` 와 위키와 `SYNTHESIS.md` 가 한국어, `docs/`·`REPORT.md` 가 영어다. 융합으로 이 분열이 더 눈에 띈다. `docs/` 는 영어이고 PROJECT_PROFILE §6 은 "문서 본문은 영어"라 적혀 있다. 기존 Codex 조사도 한국어로 시작해 나중에 일괄 번역한 이력이 있어 같은 경로를 택했다. main 병합 전 결정 필요.
 
 ## Risks & Blockers
 

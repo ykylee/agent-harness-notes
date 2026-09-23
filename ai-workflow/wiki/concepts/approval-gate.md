@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology]
 created: 2026-09-22
-updated: 2026-09-22
+updated: 2026-09-23
 ---
 
 # Approval Gate — 승인을 프로토콜 원시형으로 만들기
@@ -86,6 +86,38 @@ App Server 의 서버→클라이언트 요청에 해당하는 것이 세션의 
 | 3 | 승인 게이트는 **UI 편의가 아니라 프로토콜 차원의 안전 기전**이다 |
 | 4 | 신뢰할 수 없는 콘텐츠와 사용자 입력을 **타입 수준에서 분리**한다 — Python SDK 의 `ExternalMessage` 가 모델이다 (도구 수준 권한은 유지하되 사용자 권한은 부여하지 않음) |
 | 5 | 관리형 API 는 `requires_action` 이면 **모든 required action 이 처리되기 전까지 아무것도 진행되지 않는다** |
+
+
+## §6.5 브라우저형 에이전트의 승인 — 두 갈래 확장  {#s6-5-browser}
+
+### Aside — 채팅 채널 렌더를 전제한 승인
+
+데몬의 **suspension**(일시정지) 시스템이 승인 UI 다. 세 종류:
+
+| 종류 | 버튼 | 힌트 |
+|---|---|---|
+| 권한 승인 | `Allow once` / 거부 | "_deny it. **No lasting permission will be granted.**_" |
+| `action-confirmation` | `Confirm` / `Cancel` | "_Confirm to proceed, or reply with what to do instead._" |
+| `ask-user-question` | 선택지 최대 5개 | "_Pick an option or just reply with your answer._" |
+
+승인 범위는 넷으로 렌더된다: `file`(mode+path) · `tool`(이름+호출 요약) · `browser`(action+url) ·
+`network`(url).
+
+> 📌 **결정적 설계**: 버튼 배열과 **번호 목록 텍스트 폴백**을 함께 만들고, 힌트가 전부
+> "or just reply with your answer" 다. **네이티브 모달이 아니라 채팅 채널에서 렌더되는 것을
+> 전제**한 것이다. App Server 의 승인이 클라이언트 UI 를 가정하는 것과 대조된다 —
+> 원격·비동기 승인이 필요하면 이 모양이 답이다.
+>
+> "항상 허용"이 없고 **영구 권한 미부여를 명시**하는 것은 보수적으로 잘 잡은 기본값이다.
+> `ReviewDecision` 의 `acceptForSession` 에 해당하는 것이 UI 에 노출되지 않는다.
+
+### Dia — 승인 이전에 인식을 줄인다
+
+Dia 는 승인 게이트에 더해 **에이전트가 볼 수 있는 것 자체를 줄인다**:
+비밀번호 필드와 **되돌릴 수 없는 동작 버튼**이 "invisible to the agentic system" 이다.
+
+> 📌 **승인은 마지막 방어선이지 유일한 방어선이 아니다.** 위험한 요소를 인식에서 지우면
+> 승인을 물을 일 자체가 줄어든다. [[concepts/credential-shielding]] 참조.
 
 ## §7 다음에 읽을 문서  {#s7-next}
 
