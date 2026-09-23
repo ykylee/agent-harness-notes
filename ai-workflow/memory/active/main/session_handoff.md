@@ -6,13 +6,15 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (두 번째 공급자 — 앞선 결론 2건 정정)
+- Updated: 2026-09-23 (세션 종료 — 구현 피드백 루프가 자리잡았다)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
 - **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.
-- **조사 결론이 별도 저장소에서 구현되기 시작했다 — `ykylee/heddle` (private).** 이 저장소의 범위 밖이므로(`PURPOSE.md` 제외 영역: "하네스의 실제 구현·포크·재배포") 여기서 추적하지 않는다. 링크만 남긴다. 다만 **두 저장소의 막힌 지점이 같다**: 둘 다 디스플레이 있는 macOS/Windows 기기를 기다린다.
+- **조사 ↔ 구현 되먹임 루프가 자리잡았다.** 구현은 `ykylee/heddle` (private), 이 저장소 범위 밖이다(`PURPOSE.md` §0.1: **측정만 편입하고 코드는 밖에 둔다**). 이번 세션에 그 경로로 들어온 것이 `SYNTHESIS.md` §6 이다 — 반박 5건, 확인 6건, 방어 공격 5건 관통, 모델 실측 2공급자.
+- **다음 세션의 1순위는 조사 문서 자체의 강조점 재검토다.** §3.2 는 Brave/Comet 시연, 즉 navigate 유출을 위협 모양으로 놓고 쓰였는데 **두 모델 다 그 모양은 0/120 으로 거부**했다. 뚫린 건 다른 모양이었고 그마저 모델마다 달랐다. 조사가 강조한 위험과 측정된 위험이 어긋나 있다.
+- **두 저장소의 막힌 지점은 여전히 같다**: 디스플레이 있는 macOS/Windows 기기.
 
 ## Work Status
 
