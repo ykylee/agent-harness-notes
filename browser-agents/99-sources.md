@@ -87,7 +87,9 @@
 | 항목 | 상태 |
 |---|---|
 | 하드웨어 기반 E2E 암호화 | ✅ **부분 해소 (2026-09-23)** — Vault 확장이 **libsodium** 을 싣고 실제 호출부에서 `crypto_pwhash`(ARGON2ID13) · `crypto_aead_xchacha20poly1305_ietf_*` · `crypto_box_seal` 을 쓴다. [09 §7](09-aside-browser-internals.md) |
-| **Secure Enclave, 포스트양자 암호, 감사 로깅** | ⚠️ **여전히 미확인** — 확장 코드에 없다. 네이티브 계층 추정 |
+| **Secure Enclave** | ✅ **해소** — `kSecAttrTokenIDSecureEnclave`, `CanCreateSecureEnclaveKeyPairBlocking`. [10 §3.1](10-aside-enforcement-and-native.md) |
+| **포스트양자 암호** | ✅ **해소** — **ML-KEM-768**(`crypto_kem_mlkem768_*`)이 Vault 앱 코드와 데몬에 있다. Chromium TLS 상속이 아님을 파일 위치로 확인. [10 §3.2](10-aside-enforcement-and-native.md) |
+| **감사 로깅** | ✅ **해소** — `appendAuditEvent`, `getPasswordAuditLogsDir`. [10 §3.3](10-aside-enforcement-and-native.md) |
 | 메모리가 **"plain markdown"** 으로 저장돼 편집 가능 | ✅ **해소 (2026-09-23)** — CLI 번들이 "distills user's context into **plain-Markdown files**" 라고 명시하고 `aside memory show MEMORY.md` · `aside memory path` 가 존재. 단 **직접 편집은 금지**된다. [08 §4](08-aside-code-level.md) |
 | "local-first", 서버로 무엇이 가는가 | ⚠️ 프라이버시 문서는 **로컬 삭제 방법만** 말하고 서버 전송 여부는 말하지 않는다 |
 | **Max 크레딧 배수** | ❌ **문서 내부 불일치** — 헬프는 "30x", 가격 페이지는 "40x". 어느 쪽이 최신인지 판정 불가 |
@@ -98,7 +100,9 @@
 | 인식·동작 방식 | ✅ **해소 (2026-09-23)** — CLI 번들 추출로 확인. 접근성 트리 + 가상 ref ID, `{tree, diff}` 반환, ref 기반 Playwright locator. [08 §3](08-aside-code-level.md) |
 | 전송 계층 | ✅ **해소** — CLI 는 로컬 데몬(`127.0.0.1:21420`, canary `21421`)에 붙는다. 데몬이 353MB Node SEA 로 계획을 돈다. [09 §5](09-aside-browser-internals.md) |
 | Vault 구현 | ✅ 위 항목 참조 |
-| 권한 강제의 집행 지점 | ⚠️ 데몬 258,965줄 중 미탐색 |
+| 권한 강제의 집행 지점 | ✅ **해소** — zod 정책 스키마(도구 glob + 인자 eq/regex, browser/network 매처, 4버킷) 와 `resolvePermission`/`checkPermission` 확인. [10 §1](10-aside-enforcement-and-native.md) |
+| 승인 UI 의 형태 | ✅ **해소** — suspension 3종. **채팅 채널 렌더를 전제로 설계**됐다. [10 §1.5](10-aside-enforcement-and-native.md) |
+| `Aside Computer Use` | ✅ **부분 해소** — 네이티브 바이너리. 시스템 전역 AX 트리·이벤트 탭·화면캡처·Vision·연락처. 호출 흐름은 미추적. [10 §2](10-aside-enforcement-and-native.md) |
 | "local-first" 주장 | ✅ **구조적 근거 확인** — 계획이 로컬 데몬에 있어 BYO 모델 키가 성립한다. 다만 서버로 무엇이 가는지는 정적 분석의 한계 |
 
 > 📌 이 표의 "미공개"가 많았던 이유는 **제품이 미성숙해서가 아니라 아무도 뜯어보지 않았기
@@ -146,7 +150,10 @@ Perplexity 가 보증한 명세가 아니다. 다음이 따라 나온다:
 4. 문서 간 **내부 불일치를 적극적으로 찾음** → §4 에 2건
 5. **(2026-09-23) 바이너리를 직접 열었다** — Linux CLI 를 설치해 Node SEA 페이로드를
    추출, 난독화되지 않은 ESM 번들 67,774줄을 확보. 재현 절차는 [08 §1](08-aside-code-level.md)
-6. **(2026-09-23) 브라우저 DMG 도 열었다** — 실행하지 않고 정적 분석. 내부 확장 3종의 manifest,
+6. **(2026-09-23) Chromium 상속과 제품 고유 기능을 갈랐다** — 포스트양자 심볼이 나왔을 때
+   "Chromium 은 원래 X25519MLKEM768 TLS 를 기본 탑재한다"는 사실 때문에 **파일 위치를 먼저
+   확인**했다. Aside 자신의 코드(Vault·데몬)에 있음을 확인한 뒤에야 확정으로 적었다.
+7. **(2026-09-23) 브라우저 DMG 도 열었다** — 실행하지 않고 정적 분석. 내부 확장 3종의 manifest,
    데몬의 Node SEA 페이로드(258,965줄), Vault 암호 호출부. 재현은 [09 §1](09-aside-browser-internals.md)
 
 ### 하지 못한 것 — 정직하게
@@ -155,7 +162,7 @@ Perplexity 가 보증한 명세가 아니다. 다음이 따라 나온다:
 |---|---|
 | **GUI 를 직접 보지 못했다** | 조사 환경이 헤드리스 리눅스이고 **Aside 브라우저는 리눅스 빌드가 없다**. CLI 는 설치·분석했으나(§08) 브라우저 UI 는 여전히 미확인. 실제 UI·애니메이션·진행 상태 표현·승인 모달의 생김새는 확인 불가. [03](03-aside-design-ux.md) 은 **문서가 규정한 상호작용 모델**에 한정된다 |
 | 로그인하지 않았다 | `aside login` 은 사용자 계정 자격증명이 필요한 행위라 하지 않았다. 따라서 `skills list` 의 실제 목록, `memory` 내용, 원격 호스트 동작은 미확인 |
-| 데몬 전수 분석은 안 했다 | 258,965줄 중 권한 집행·에이전트 루프 상세는 미탐색 |
+| 데몬 전수 분석은 안 했다 | 권한 집행은 확인했으나([10](10-aside-enforcement-and-native.md)) 에이전트 루프 상세는 미탐색 |
 | 동적 분석을 못 했다 | 서버 통신 내용, 실제 실행 경로는 정적 분석의 한계 밖 |
 | 시각 디자인 언어 (색·타이포·간격) | 위와 같은 이유. **추정으로 채우지 않았다** |
 | Aside 의 내부 구조 | 문서에 없고 공개 분석도 없다 |

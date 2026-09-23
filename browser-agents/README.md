@@ -20,6 +20,7 @@
 | [06-architecture-axes.md](06-architecture-axes.md) | **교차 분석** — 인식 / 제어 표면 / 신뢰 경계 / 자격증명 4축 |
 | [08-aside-code-level.md](08-aside-code-level.md) | **Aside 코드레벨** — 바이너리에서 추출한 인식 모델·메모리 형식·원격 제어·내장 스킬 |
 | [09-aside-browser-internals.md](09-aside-browser-internals.md) | **Aside 브라우저 내부** — Chromium 포크, 내부 확장 3종, 353MB 로컬 데몬, Vault 암호 |
+| [10-aside-enforcement-and-native.md](10-aside-enforcement-and-native.md) | **권한 집행·Computer Use·암호층** — 정책 엔진, OS 전역 제어, ML-KEM-768 확인 |
 | [07-security.md](07-security.md) | 간접 프롬프트 주입 — 공격 사슬, 구조적 원인, 완화책, 미해결 상태 |
 | [99-sources.md](99-sources.md) | 출처와 **검증 등급** — 확인 / 자체보고 / 추론 / 반증 |
 

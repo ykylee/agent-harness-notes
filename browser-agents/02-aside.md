@@ -38,6 +38,10 @@ Aside 문서에서 가장 분량이 실린 곳이 권한이다. 제어 지점이
 | **File permissions** | 폴더 접근 |
 | **Tool permissions** | 능력별 Allow / Ask / Deny |
 
+> 📌 아래는 **문서 기준**이다. 실제 정책 엔진은 이보다 훨씬 정교하다 — 도구 glob, 인자별
+> eq/regex 매처, browser/network 매처, 그리고 문서에 없는 네 번째 버킷 `approved`.
+> 코드 기준 전모는 [10 §1](10-aside-enforcement-and-native.md).
+
 ### 3.1 규칙 어휘
 
 | 규칙 | 동작 |

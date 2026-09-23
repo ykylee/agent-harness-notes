@@ -34,6 +34,7 @@
     "blocked_items": [],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
       "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
       "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
@@ -43,12 +44,13 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
-    "task_count": 2,
+    "task_count": 3,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
-      "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석"
+      "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
+      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석"
     ]
   },
   "next_documents": [
