@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/08-aside-code-level.md + browser-agents/04-comet-architecture.md + browser-agents/05-comparables.md + SYNTHESIS.md §6
+last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/08-aside-code-level.md + browser-agents/04-comet-architecture.md + browser-agents/05-comparables.md + SYNTHESIS.md §6 + SYNTHESIS.md §6.5
 related_pages: [concepts/harness, concepts/indirect-prompt-injection, concepts/control-plane-execution-plane, concepts/credential-shielding, concepts/os-sandbox-policy, concepts/capability-distribution, concepts/thread-turn-item, concepts/primary-source-verification]
 created: 2026-09-23
 updated: 2026-09-23
@@ -162,7 +162,23 @@ Cross-origin iframe content is readable through per-frame CDP evaluation — mea
 unreachable=0`, with four interactive elements lifted out of the embedded origin. **That removes the
 perception argument for shipping a browser fork**; see [[concepts/capability-distribution]].
 
-### §7.3 Still untested  {#s7-3-untested}
+### §7.3 The cost ladder is also an exposure ladder  {#s7-3-ladder-exposure}
+
+Found by a probe bug, which is the only reason it was noticed: a measurement of injected instructions
+scored a clean sweep for the defences, because the snapshot was taken in `interactive` mode and **the
+injected paragraph was never in the prompt.** That rung drops page prose.
+
+> 📌 Page prose is where injections live, so **`interactive` is a genuine injection mitigation** —
+> and it cannot do the task in the canonical attack demonstration, which is *"summarise this page."*
+> The reading rung and the injection exposure are **the same dial**: the cheaper the rung, the less
+> attack surface, and the task decides how far up you are forced to go.
+>
+> §4's ladder was built as a cost argument. It is also a security argument, and the two point the
+> same way for once — which is worth knowing, because they usually do not.
+
+See [[concepts/indirect-prompt-injection]] §10 for what the model did once the text reached it.
+
+### §7.4 Still untested  {#s7-4-untested}
 
 Step 4 of the cost ladder (**annotated screenshot**) and §5's **stagnation watchdog** were both
 designed and neither was built. They remain read-from-a-document claims.

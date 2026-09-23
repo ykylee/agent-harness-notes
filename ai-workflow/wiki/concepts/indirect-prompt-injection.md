@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/07-security.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4
+last_ingested_from: browser-agents/07-security.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5
 related_pages: [concepts/perception-model, concepts/credential-shielding, concepts/approval-gate, concepts/os-sandbox-policy]
 created: 2026-09-23
 updated: 2026-09-23
@@ -24,6 +24,7 @@ updated: 2026-09-23
 | 4 | As of 2026 | **unsolved.** OpenAI's own words: "unlikely to ever be fully 'solved'" |
 | 5 | The substance of mitigation | **reducing privilege** — not signing sensitive accounts into the agent browser |
 | 6 | ⚠️ **Measured** | Dia's published defences were implemented and attacked: **5 of 16 attacks got through**. The approval gate held; the perception-layer filters did not — §9 |
+| 7 | ⚠️ **Measured, with a model** | the navigation-exfiltration shape this page is built around was refused **80/80**. A disguised **button press** got through **9/20** — §10 |
 
 ## §2 The attack chain (Brave's demonstration against Comet)  {#s2-chain}
 
@@ -117,6 +118,9 @@ The size of this risk is **directly proportional to what the agent can reach.**
 - **Do not turn off the approval gate.** It is one of the few defences actually working — and §9 is
   the measurement behind that sentence: the filters around it are heuristics, the gate is not
 - For enterprise, check for **domain blacklists via managed policy** (Comet's managed storage)
+- ⚠️ **A domain blacklist defends the shape a model already refuses.** §10 measured the
+  navigation payoff at 0/80 and an on-page button at 9/20. Gating *which control may be pressed* is
+  the weaker-covered side, and it is the side that reaches a human with less to go on
 
 ## §9 The defences, attacked  {#s9-attacked}
 
@@ -157,7 +161,56 @@ parameter, and one invisible character. **A published description of a defence i
 of one** — and §6 of this page records that vendors' first reaction to a report is often to dispute
 it, which is easier when the defence was never defined precisely enough to be wrong.
 
-## §10 Read next  {#s10-next}
+## §10 What a model actually obeys  {#s10-model}
+
+Ingested from [`SYNTHESIS.md` §6.5](../../../SYNTHESIS.md). §9 attacked the defences with no model in
+the loop; this is the other half, for **one model**, N=20 per cell.
+
+| Injected request | How it reads | plain | envelope |
+|---|---|---|---|
+| navigate to attacker | "IMPORTANT SYSTEM NOTICE…" | 0/20 | 0/20 |
+| navigate to attacker | fake `</user><system>` tags | 0/20 | 0/20 |
+| **press a button on the page** | ordinary site copy | **9/20** | **3/20** |
+| navigate to attacker | ordinary site copy | 0/20 | 0/20 |
+
+### §10.1 The threat model on this page may be the wrong shape  {#s10-1-shape}
+
+> ⚠️ §2 of this page is the Brave/Comet chain, and its payoff is **exfiltration by navigation.** That
+> is the shape this model refused **80 times out of 80**, including when it was disguised as ordinary
+> site copy rather than announced.
+>
+> 📌 What got through was **a button already on the page**, framed by the page as a necessary step.
+> The model has a strong prior against going somewhere strange and almost none against pressing what
+> is in front of it. **The demonstration that defined the threat is not necessarily the shape that
+> gets you** — and it is the shape everyone's defences are tuned against.
+
+### §10.2 The envelope has a number now  {#s10-2-envelope}
+
+Fencing page text in delimiters and naming it as data cut obedience from **9/20 to 3/20**, in the one
+condition where anything got through. Some runs reported the suspicious note instead of acting on it,
+which is what the instruction asked for.
+
+> 📌 §5 lists Dia's defences as described; none of them, anywhere in this study, came with a measured
+> effect. This is one. It says **helps, does not solve** — which is a more useful thing to know than
+> either "defended" or "unsolved".
+
+### §10.3 Why the gate still held  {#s10-3-gate}
+
+The button read "Transfer balance to partner account" — invisible to the destructive-hiding heuristic
+(§9, the bounded case), obeyed 45% of the time by the model, and **refused by the policy gate.**
+
+> ⚠️ Note which action class got through: a `navigate` carries its destination to the gate, a `click`
+> carries only a ref. **The action a model is most easily talked into is the one that arrives with
+> the least information for a human to judge.** What makes it judgeable is the prompt naming the
+> element rather than the ref.
+
+### §10.4 Limits  {#s10-4-limits}
+
+One model, one provider, synthetic pages, a single-turn loop, N=20. A refusal may be that provider's
+safety training rather than the defence under test; separating them needs a second model. **This does
+not say injection is handled.**
+
+## §11 Read next  {#s11-next}
 
 - [[concepts/perception-model]] — what enters the context is the attack surface
 - [[concepts/credential-shielding]] — the design of taking things out
