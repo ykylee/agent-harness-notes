@@ -1,8 +1,8 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-09-22",
-  "purpose_digest": "OpenAI Codex 하네스의 **실제 계약**(App Server JSON-RPC 프로토콜, SDK, Agents API)을",
-  "purpose_digest_rev": "2026-09-22",
+  "generated_at": "2026-09-23",
+  "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
+  "purpose_digest_rev": "2026-09-23",
   "source_of_truth": {
     "project_profile_path": "docs/PROJECT_PROFILE.md",
     "session_handoff_path": "ai-workflow/memory/active/main/session_handoff.md",
@@ -14,21 +14,21 @@
     "repository_assessment_path": null
   },
   "project": {
-    "project_name": "Codex Harness — Study Notes",
-    "document_home": "README.md` (문서 목차), `docs/` (본문 16편)",
+    "project_name": null,
+    "document_home": null,
     "operations_path": null,
-    "backlog_path": "ai-workflow/memory/active/main/backlog/",
+    "backlog_path": null,
     "handoff_path": null,
-    "environment_path": "ai-workflow/memory/active/repository_assessment.md"
+    "environment_path": null
   },
   "commands": {
-    "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — 위키 재색인이 원 문서를 따라갔는지 검사",
-    "isolated_tests": "grep -rn \"](\" docs/ README.md REPORT.md REPORT.ko.md` 로 상대 링크 깨짐 육안 확인",
+    "quick_tests": null,
+    "isolated_tests": null,
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "1차 세션 (2026-09-22) — 조사 완결 상태의 문서 저장소를 표준 AI 워크플로우에 편입했다. 조사 내용 자체는 건드리지 않았다. 다음 축은 문서의 사실 드리프트 점검이다.",
-    "current_axis": "1차 세션 (2026-09-22) — 조사 완결 상태의 문서 저장소를 표준 AI 워크플로우에 편입했다. 조사 내용 자체는 건드리지 않았다. 다음 축은 문서의 사실 드리프트 점검이다.",
+    "current_baseline": "2026-09-23 — `study/browser-agents` 를 병합해 **저장소 범위가 '에이전트 하네스 조사'로 확장**됐다. 조사가 둘이 됐고(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념층이 둘을 재색인하며, `SYNTHESIS.md` 가 교차 종합이다. 다음 축은 여전히 **기존 사실의 드리프트 점검**이다.",
+    "current_axis": "2026-09-23 — `study/browser-agents` 를 병합해 **저장소 범위가 '에이전트 하네스 조사'로 확장**됐다. 조사가 둘이 됐고(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념층이 둘을 재색인하며, `SYNTHESIS.md` 가 교차 종합이다. 다음 축은 여전히 **기존 사실의 드리프트 점검**이다.",
     "current_focus": "TASK-2026-09-22-agent-harness-notes-002 — openai/codex 드리프트 재확인",
     "in_progress_items": [],
     "blocked_items": [],
@@ -40,7 +40,14 @@
     "recent_done_items": [
       "TASK-2026-09-22-agent-harness-notes-006 — docs 수정 시 위키 재색인 강제",
       "TASK-2026-09-22-agent-harness-notes-005 — wiki concepts 계층 구성",
-      "TASK-2026-09-22-agent-harness-notes-001 — 표준 AI 워크플로우 초기 도입"
+      "TASK-2026-09-22-agent-harness-notes-001 — 표준 AI 워크플로우 초기 도입",
+      "TASK-2026-09-22-browser-agents-001 브라우저형 에이전트 도구 조사 — Aside 중심",
+      "TASK-2026-09-23-browser-agents-002 Aside 코드레벨 분석 — CLI 바이너리 추출",
+      "TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석",
+      "TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석",
+      "TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화",
+      "TASK-2026-09-23-browser-agents-006 두 조사 융합 — 위키 개념층 + 교차 종합",
+      "TASK-2026-09-23-browser-agents-007 문서 언어 영어 통일"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
@@ -60,6 +67,7 @@
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/main/session_handoff.md",
     "ai-workflow/memory/active/main/backlog/2026-09-22.md",
+    "ai-workflow/memory/active/PURPOSE.md",
     "ai-workflow/memory/active/main/state.json",
     "ai-workflow/memory/active/main/backlog"
   ],
