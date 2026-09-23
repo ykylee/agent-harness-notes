@@ -6,28 +6,30 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (브라우저형 에이전트 조사 병합)
+- Updated: 2026-09-23 (세션 종료)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
-- 2026-09-23 — `study/browser-agents` 를 병합해 **저장소 범위가 '에이전트 하네스 조사'로 확장**됐다. 조사가 둘이 됐고(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념층이 둘을 재색인하며, `SYNTHESIS.md` 가 교차 종합이다. 다음 축은 여전히 **기존 사실의 드리프트 점검**이다.
+- **2026-09-23 세션 종료 — 저장소 범위가 '에이전트 하네스 조사'로 확장됐고 브랜치 정리까지 끝났다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영. `study/browser-agents` 브랜치는 병합 후 삭제했고 메모리는 `memory/archived/` 로 옮겼다. **남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.**
 
 ## Work Status
 
-- TASK-2026-09-22-agent-harness-notes-001 표준 AI 워크플로우 초기 도입: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: planned
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
-- TASK-2026-09-22-agent-harness-notes-005 wiki concepts 계층 구성: done
-- TASK-2026-09-22-agent-harness-notes-006 docs 수정 시 위키 재색인 강제: done
-- TASK-2026-09-22-browser-agents-001 브라우저형 에이전트 도구 조사 — Aside 중심: done
-- TASK-2026-09-23-browser-agents-002 Aside 코드레벨 분석 — CLI 바이너리 추출: done
-- TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
-- TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석: done
-- TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화: done
-- TASK-2026-09-23-browser-agents-006 두 조사 융합 — 위키 개념층 + 교차 종합: done
+- TASK-2026-09-23-main-010 REPORT 범위 확장 반영: done
+- TASK-2026-09-23-main-009 번역이 깨뜨린 파서 라벨 복구: done
+- TASK-2026-09-23-main-008 브랜치 병합 및 메모리 아카이브: done
 - TASK-2026-09-23-browser-agents-007 문서 언어 영어 통일: done
+- TASK-2026-09-23-browser-agents-006 두 조사 융합 — 위키 개념층 + 교차 종합: done
+- TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화: done
+- TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석: done
+- TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
+- TASK-2026-09-23-browser-agents-002 Aside 코드레벨 분석 — CLI 바이너리 추출: done
+- TASK-2026-09-22-browser-agents-001 브라우저형 에이전트 도구 조사 — Aside 중심: done
+
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제).
 
 ## 현재 `in_progress` 작업
 
@@ -39,11 +41,13 @@
 
 ## Key Changes
 
-- **`study/browser-agents` 병합 (2026-09-23)** — `--no-ff` 로 8커밋을 하나의 조사 단위로 남겼다.
-- **공용 `PURPOSE.md` 확장** — §0 에 범위 확장 기록. 제외 영역에서 "OpenAI 외 벤더" 삭제, Goals G5(표면 무관/고유 축 구분) 추가. `SCOPE.md` A안의 조건 이행.
-- `browser-agents/` 14편, `SYNTHESIS.md`, 위키 개념 13 → **16종**.
-- **내용 문서 전체 영어**. 규칙은 `docs/PROJECT_PROFILE.md` §6.
-- 재색인 훅(`scripts/check_wiki_freshness.py`)이 `last_ingested_from` 을 통해 **두 트리를 자동으로 덮는다**.
+- **저장소 범위 확장** — `PURPOSE.md` §0 에 기록. 제외 영역에서 "OpenAI 외 벤더" 삭제, Goals G5 추가. `study/browser-agents` 의 A안 조건 이행.
+- **조사가 둘이 됐다** — `browser-agents/` 14편 신설. Aside 는 제품 문서 1차 확보 후 **CLI·브라우저 바이너리까지 정적 분석**했다.
+- **위키 개념 13 → 16종** — 기존 8종에 브라우저 근거 추가, 신규 3종(`perception-model`·`indirect-prompt-injection`·`credential-shielding`).
+- **`SYNTHESIS.md` 신설** — 핵심 주장은 **표면 무관 축과 표면 고유 축의 구분**이다.
+- **내용 문서 전체 영어**. 규칙과 예외는 `docs/PROJECT_PROFILE.md` §6.
+- **`REPORT`(영/한)에 외부 증거 절 추가** — 권고 여럿이 서드파티 시스템에서 독립 구현된 것으로 확인됐다.
+- 브랜치 병합(`--no-ff`)·삭제, 고아 메모리를 `memory/archived/` 로 아카이브.
 
 ## Next Actions
 
