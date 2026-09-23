@@ -23,8 +23,11 @@
 원본 마크다운을 돌려준다.** 렌더된 페이지 요약이 아니라 1차 텍스트다.
 
 > 📌 이것은 이 저장소의 기존 조사가 OpenAI 문서에서 발견한 것과 **같은 수법**이다
-> ([`docs/99-sources.md`](../docs/99-sources.md)). 두 번째 사례가 생겼으니 일반적 기법으로
-> 승격할 만하다 — 문서 사이트에 `.md` 와 `/llms.txt` 를 먼저 시도하라.
+> ([`docs/99-sources.md`](../docs/99-sources.md)). 문서 사이트에 `.md` 와 `/llms.txt` 를 먼저 시도하라.
+>
+> **적용 성적 (2026-09-23)**: Aside ✅ (문서 16종) · Opera ✅ (`www.opera.com/llms.txt`) ·
+> **Dia ❌** (모든 경로가 동일한 SPA 셸). **만능이 아니라 문서 사이트의 렌더링 방식에 달렸다.**
+> 실패 시에는 렌더된 페이지로 돌아가야 한다 — [11 §1](11-dia-and-neon.md).
 
 | 읽은 문서 | 추출한 것 |
 |---|---|
@@ -53,6 +56,9 @@
 | Brave, "Agentic Browser Security: Indirect Prompt Injection in Perplexity Comet" | ✅ 보안 연구 원문 | [07](07-security.md) |
 | `leaderboard.steel.dev` Online-Mind2Web | ✅ 3자 리더보드 | §3 |
 | `github.com/OSU-NLP-Group/Online-Mind2Web` | ✅ 벤치마크 정본 | §3 |
+| `www.diabrowser.com/security` | ✅ Dia 보안 문서 | [11 §2](11-dia-and-neon.md) |
+| `www.opera.com/llms.txt` | ✅ Opera 제품 색인 | [11 §3](11-dia-and-neon.md) |
+| `operaneon.com/faq` (Next.js 페이로드) | ✅ Neon FAQ 답변 | [11 §3](11-dia-and-neon.md) |
 | Wikipedia — Comet, ChatGPT Atlas | 📰 (날짜는 출처 표기됨) | [01](01-landscape.md), [04](04-comet-architecture.md) |
 
 ## 3. 벤치마크 주장 — 판정
@@ -115,6 +121,9 @@
 |---|---|
 | "Comet 은 Aside 와 **정반대 구조**" ([04 §1](04-comet-architecture.md)) | ❌ **반증.** Aside 의 에이전트도 MV3 확장이다. 둘은 같은 구조적 선택을 했고, 실제 차이는 **계획 위치**다. 원문은 지우지 않고 정정 표시를 달았다 |
 | "`opencode` 가 데몬에 100회 출현" (초기 탐색) | ❌ **오탐.** 대부분 ANSI 색상 변수 `openCodes` 였다. 실제 의미 있는 출현은 프로바이더 id 와 `x-opencode-*` 헤더 |
+| "입력 분리를 문서화한 제품이 없다" ([07 §8](07-security.md)) | ❌ **부분 반증.** Dia 가 구체적으로 문서화하고 있었다 — URL 원문 미전달, 비밀번호·비가역 버튼을 에이전트 인식에서 제거. [11 §2.3](11-dia-and-neon.md) |
+| "Opera Neon 의 재사용 단위는 Skills" ([05 §3](05-comparables.md)) | ❌ **반증.** 2차 출처를 따른 오류. 공식 명칭은 **Cards** 이고 축도 다르다(작업 유형 ≠ 호출 루틴). [11 §3.4](11-dia-and-neon.md) |
+| Neon "모든 AI 처리가 로컬" (`opera.com/llms.txt`) | ❌ **벤더 자신의 두 1차 출처가 모순.** 제품 FAQ 가 "계획은 클라우드 LLM" 이라고 명시한다. 더 구체적인 쪽을 채택했다. [11 §3.1](11-dia-and-neon.md) |
 
 > 📌 첫 항목은 **1차 자료가 늘어나자 자기 결론이 뒤집힌** 사례다. 이 저장소가 반증을 지우지
 > 않는 이유가 여기 있다 — 지웠다면 왜 그렇게 생각했는지도 사라진다.
@@ -177,7 +186,9 @@ Perplexity 가 보증한 명세가 아니다. 다음이 따라 나온다:
 - [ ] Aside 의 네트워크 트래픽 관찰 → "local-first" 주장의 실증 (§4)
 - [ ] `aside skills list` 실제 목록 확인 (로그인 필요)
 - [ ] 워싱턴대 2026-06 연구 원문 확보
-- [ ] Dia / Opera Neon 의 1차 문서 탐색 (`.md` / `llms.txt` 수법 재시도)
+- [x] ~~Dia / Opera Neon 1차 문서 탐색~~ → [11](11-dia-and-neon.md)
+- [ ] Neon 의 Tasks 상세 — FAQ 답변을 끝까지 추출하지 못했다
+- [ ] Dia·Neon 의 **바이너리 분석** — 현재는 문서를 믿은 상태다. Aside 수준의 검증 비대칭이 남아 있다
 
 ## 8. 유효기간
 

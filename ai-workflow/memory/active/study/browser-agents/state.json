@@ -34,6 +34,7 @@
     "blocked_items": [],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화",
       "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
       "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
@@ -44,13 +45,14 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
-    "task_count": 3,
+    "task_count": 4,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
       "TASK-2026-09-23-browser-agents-003 — Aside 브라우저 바이너리 정적 분석",
-      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석"
+      "TASK-2026-09-23-browser-agents-004 — Aside 권한 집행·Computer Use·암호층 분석",
+      "TASK-2026-09-23-browser-agents-005 — Dia·Neon 1차 출처 심화"
     ]
   },
   "next_documents": [

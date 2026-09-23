@@ -22,6 +22,7 @@
 | [09-aside-browser-internals.md](09-aside-browser-internals.md) | **Aside 브라우저 내부** — Chromium 포크, 내부 확장 3종, 353MB 로컬 데몬, Vault 암호 |
 | [10-aside-enforcement-and-native.md](10-aside-enforcement-and-native.md) | **권한 집행·Computer Use·암호층** — 정책 엔진, OS 전역 제어, ML-KEM-768 확인 |
 | [07-security.md](07-security.md) | 간접 프롬프트 주입 — 공격 사슬, 구조적 원인, 완화책, 미해결 상태 |
+| [11-dia-and-neon.md](11-dia-and-neon.md) | **Dia · Neon 1차 심화** — Dia 의 프롬프트 주입 방어, Neon 의 계획 위치 모순, Cards |
 | [99-sources.md](99-sources.md) | 출처와 **검증 등급** — 확인 / 자체보고 / 추론 / 반증 |
 
 ## 한 줄 요약

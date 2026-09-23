@@ -19,6 +19,7 @@
 - TASK-2026-09-23-browser-agents-002 Aside 코드레벨 분석 — CLI 바이너리 추출: done
 - TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
 - TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석: done
+- TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화: done
 
 ## 현재 `in_progress` 작업
 
@@ -40,7 +41,9 @@
 - **자기 서술 1건을 반증했다** — 04 에서 "Comet 은 Aside 와 정반대 구조"라고 적었으나 Aside 의 에이전트도 MV3 확장이었다. 원문은 지우지 않고 정정 표시를 달았고 `99-sources` §4.5 에 반증 기록을 신설했다.
 - 다운로드 산출물은 scratchpad 에만 있고 저장소에 커밋되지 않았다. 재현 절차가 `08 §1`·`09 §1` 에 있어 언제든 복원된다.
 - **`10-aside-enforcement-and-native.md` 추가** — 09 에서 남긴 미확인 3건을 전부 해소했다. 권한 정책 엔진(도구 glob + 인자 eq/regex, 4버킷, 문서에 없는 `approved`), 승인 UI(=suspension, **채팅 채널 렌더 전제**), `Aside Computer Use`(네이티브, 시스템 전역 AX 트리·이벤트 탭·화면캡처·Vision·연락처), 그리고 Secure Enclave·**ML-KEM-768**·감사 로깅 확인.
-- 검증 장부: 해소 18건 / 미확인 8건 (이전 12/10).
+- 검증 장부: 해소 18건 / 미확인 8건.
+- **`11-dia-and-neon.md` 추가** — `llms.txt`/`.md` 수법을 Dia·Neon 에 적용. Opera 는 `www.opera.com/llms.txt` 가 실재해 성공, **Dia 는 실패**(모든 경로가 동일 SPA 셸). 수법이 만능이 아니라 렌더링 방식에 달렸음을 기록했다.
+- **반증 3건 추가** — ① "입력 분리를 문서화한 제품 없음"은 틀렸다(Dia 가 구체적으로 함) ② Neon 의 재사용 단위는 Skills 가 아니라 **Cards** ③ Opera `llms.txt` 의 "모든 AI 처리 로컬"은 제품 FAQ("계획은 클라우드 LLM")와 모순 — 벤더 자신의 두 1차 출처가 어긋난 사례.
 
 ## Next Actions
 
@@ -51,7 +54,8 @@
 - [x] ~~권한 강제 집행 지점~~ / ~~`Aside Computer Use`~~ / ~~Secure Enclave·포스트양자~~ → `10` 에서 전부 해소
 - [ ] `Aside Computer Use` **호출 흐름** 추적 — 심볼만 봤지 실제 동작 경로는 미확인
 - [ ] 동적 관찰 (서버로 가는 내용) — 정적 분석의 한계. **기기가 필요하다**
-- [ ] 비교군 확장 — Dia·Neon 에 `.md`/`llms.txt` 수법 재시도
+- [x] ~~Dia·Neon 1차 심화~~ → `11` 완료
+- [ ] **검증 비대칭 해소** — Aside 만 바이너리까지 뜯었고 Dia·Neon 은 문서를 믿은 상태다. 문서가 좋은 것과 구현이 그런 것은 다르다
 - [ ] Aside 네트워크 트래픽 관찰 → "local-first" 주장 실증
 - [ ] 문서 언어 결정 — 이번엔 한국어로 썼다. `docs/` 는 영어이고 PROJECT_PROFILE §6 은 "문서 본문은 영어"라 적혀 있다. 기존 Codex 조사도 한국어로 시작해 나중에 일괄 번역한 이력이 있어 같은 경로를 택했다. main 병합 전 결정 필요.
 
