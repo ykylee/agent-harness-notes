@@ -120,7 +120,24 @@ Beyond approval gates, Dia **reduces what the agent can see in the first place**
 > 📌 **Approval is the last line of defence, not the only one.** Erasing dangerous elements from
 > perception reduces how often you have to ask at all. See [[concepts/credential-shielding]].
 
-## §7 Read next  {#s7-next}
+## §7 Confirmed by implementation  {#s7-implementation}
+
+Ingested from [`SYNTHESIS.md` §6.2](../../../SYNTHESIS.md). This concept is one of the few whose
+claims **survived being built** intact.
+
+| Claim | Result |
+|---|---|
+| A gate that degrades to "allow" when its approval channel is missing is not a gate | Enforced: a policy that can `ask` with no broker **refuses the action** |
+| The request is data, not a rendering | One request object drove a text renderer and would drive a GUI or chat one with no core change |
+| Conflict resolution must be stated | `deny > ask > allow > default`. **`ask` beating `allow` is the deliberate part** — a config listing both is a mistake, and the safe reading of a mistake is to ask |
+| No lasting permission | "Allow once" / "Deny", no `acceptForSession` equivalent |
+
+> 📌 One thing the gate's *design* did not anticipate: the first implementation rendered a
+> 340-character `data:` URL into the prompt in full, and named the element only by its ref. **A
+> person cannot consent to what they cannot read**, so a gate that renders like that is decorative.
+> Legibility is part of the mechanism, not presentation on top of it.
+
+## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the turn that approval stops
 - [[concepts/credential-shielding]] — removing the need to ask

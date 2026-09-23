@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (세션 종료 — 조사 결론의 하류 구현 착수)
+- Updated: 2026-09-23 (SYNTHESIS §6 구현 피드백 편입)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -16,6 +16,7 @@
 
 ## Work Status
 
+- TASK-2026-09-23-main-011 SYNTHESIS 구현 피드백 절 편입: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: planned
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
@@ -46,10 +47,11 @@
 - **조사가 둘이 됐다** — `browser-agents/` 14편 신설. Aside 는 제품 문서 1차 확보 후 **CLI·브라우저 바이너리까지 정적 분석**했다.
 - **위키 개념 13 → 16종** — 기존 8종에 브라우저 근거 추가, 신규 3종(`perception-model`·`indirect-prompt-injection`·`credential-shielding`).
 - **`SYNTHESIS.md` 신설** — 핵심 주장은 **표면 무관 축과 표면 고유 축의 구분**이다.
+- **`SYNTHESIS.md` §6 구현 피드백 편입** — 이 저장소에서 가장 강한 근거 등급이 생겼다: 다른 모든 주장은 남의 산출물을 **읽은** 것이고 §6 은 **실행한** 것이다. 반박 5건·확인 6건. 개념 페이지 3종(`perception-model`·`approval-gate`·`primary-source-verification`)과 `PURPOSE.md` §0.1 경계를 함께 갱신했다. **구현 코드는 여전히 이 저장소 밖이다 — 들어온 것은 측정뿐이다.**
 - **내용 문서 전체 영어**. 규칙과 예외는 `docs/PROJECT_PROFILE.md` §6.
 - **`REPORT`(영/한)에 외부 증거 절 추가** — 권고 여럿이 서드파티 시스템에서 독립 구현된 것으로 확인됐다.
 - 브랜치 병합(`--no-ff`)·삭제, 고아 메모리를 `memory/archived/` 로 아카이브.
-- **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. 이 사실은 조사 문서에 역으로 반영할 가치가 있을 수 있다(아래 Next Actions).
+- **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. **이 결과는 `SYNTHESIS.md` §6 으로 편입됐다.**
 
 ## Next Actions
 
@@ -65,12 +67,13 @@
 - [ ] 브라우저 GUI 1차 확인 — **macOS/Windows 기기 필요.** 리눅스 빌드가 없다
 
 **저장소**
-- [ ] `SYNTHESIS.md` 에 **구현 피드백 절**을 넣을지 결정. `heddle` 에서 조사 결론 중 5건이 실측에 반박당했다(토큰 예산 3.6배 초과, `scope` 의 역할, 기본 정책의 사용 불가능성 등). 조사 노트가 구현 결과를 되먹이면 근거 등급이 한 칸 올라가지만, **저장소 범위를 다시 건드리는 결정**이라 `PURPOSE.md` 와 같이 판단해야 한다
-- [ ] 위 결정이 '넣는다'면 `perception-model` 개념 페이지도 함께 재색인 (pre-commit 훅이 강제한다)
+- [x] ~~`SYNTHESIS.md` 구현 피드백 절 편입~~ — TASK-011 완료. `PURPOSE.md` §0.1 에 "측정만 편입, 코드는 아님" 경계를 명시했다
+- [ ] **간접 프롬프트 주입 방어가 이 저장소 최대의 미검증 주장으로 남았다.** §6.4 에 적었듯 방어책은 설계만 됐고 한 번도 공격당한 적 없다. 구현이 다른 축들을 검증하면서 이 축만 홀로 남은 상태 — 다음 조사의 1순위 후보
+- [ ] `SYNTHESIS.md` §6 은 heddle 의 2026-09-23 시점 실측이다. heddle 이 진행되면 여기도 드리프트한다
 
 ## Risks & Blockers
 
-- **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지, Dia·Neon 은 문서만, Comet 은 3자 리버싱이다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다 — `SYNTHESIS.md` §7 에 경고로 달아뒀다.
+- **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지, Dia·Neon 은 문서만, Comet 은 3자 리버싱이다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다 — `SYNTHESIS.md` §8 에 경고로 달아뒀다.
 - 두 분야 모두 빠르게 낡는다. Codex 는 2026-09-15, 브라우저는 2026-09-22/23 기준이다. 재조사의 첫 수는 **기존 사실의 드리프트 확인**이다.
 - `docs/` 또는 `browser-agents/` 를 고치면 **위키 재색인이 따라와야 한다.** pre-commit 훅이 막지만 `core.hooksPath` 를 설정한 clone 에서만 돈다 — 새 clone 에서는 `git config core.hooksPath .githooks` 가 필요하다.
 - `wiki/SCHEMA.md` 는 kit 생성물이라 한국어로 남아 있다. 번역하면 kit 재생성과 갈린다.

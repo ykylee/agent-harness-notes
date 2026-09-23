@@ -166,7 +166,26 @@ The Codex study reflects `openai/codex` **as of 2026-09-15**; the browser study 
 Both move fast. **The first move of a re-investigation is not gathering new facts but checking
 existing facts for drift.**
 
-## §9 Read next  {#s9-next}
+## §9 A document describing behaviour is not evidence of the behaviour  {#s9-doc-vs-code}
+
+Ingested from [`SYNTHESIS.md` §7](../../../SYNTHESIS.md), added after the repository's conclusions
+were implemented.
+
+In that implementation a design document **and** a source comment both stated that page snapshots
+included child-iframe contents, while the code walked only the main frame. Nothing failed; the
+divergence was found by a review and then measured — **1 of 5 interactive elements visible on a page
+with a payment and a consent iframe.**
+
+> 📌 **This repository reads documents for a living.** A vendor's own documentation is the strongest
+> grade it usually offers, and that grade is bounded by the fact that a document is a *claim about*
+> an implementation. Where a claim matters and an artifact exists, the artifact outranks the prose —
+> which is the reason Aside was taken down to its binaries.
+>
+> A second lesson from the same exercise: **building a conclusion tests it.** Five conclusions that
+> had survived reading were refuted by implementation. Where a claim can be cheaply built, that is a
+> stronger check than another source.
+
+## §10 Read next  {#s10-next}
 
 - [[concepts/os-sandbox-policy]] §6 — where the inferred grade is actually applied
 - [[concepts/thread-turn-item]] §3 — where a refutation is actually applied

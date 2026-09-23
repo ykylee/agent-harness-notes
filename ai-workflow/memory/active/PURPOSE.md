@@ -27,6 +27,28 @@ first case; the rest are the contrast group that tests the abstraction.
 
 **What changed is the scope, not the method.** The discipline in §5 is unchanged.
 
+## 0.1 Implementation feedback, 2026-09-23 — a clarification, not an extension
+
+The conclusions of `SYNTHESIS.md` were implemented in a **separate repository** (`ykylee/heddle`,
+private). That repository is not part of this one, and the exclusion in §3 stands unchanged: no
+implementation, fork or redistribution lives here.
+
+What was admitted is narrower — **the measurements that implementation produced**, recorded in
+`SYNTHESIS.md` §6. Five of this repository's own conclusions were refuted by running them.
+
+Two reasons this belongs here rather than only in the other repository:
+
+1. **It is a grade, and a stronger one than anything else here.** G3 requires a verification status
+   on every claim. Every other claim in these notes is read out of someone else's artifact;
+   these were run. A repository whose purpose is to grade claims cannot discard its best grade.
+2. **G3 also requires keeping refutations.** Deleting a conclusion that measurement contradicted, or
+   leaving it standing unmarked, would be the same failure the rule exists to prevent — and the
+   refuted claims here are **this repository's own**, which makes keeping them harder and more
+   necessary.
+
+The boundary to hold: **import measurements, never the code.** If a future session finds itself
+maintaining heddle from inside this repository, §3's exclusion has been breached.
+
 - Purpose: define *why* this repository exists and where it is going (directional intent). AI agents
   read it at session-start and backlog-update to classify work and judge scope.
 - Scope: the four elements (Goals / Key Questions / Research Scope / Evolving Thesis)
@@ -84,7 +106,8 @@ first case; the rest are the contrast group that tests the abstraction.
 ### 제외 영역
 
 - **Actually implementing, forking or redistributing a harness** — these are research notes, not a
-  codebase
+  codebase. Implementation lives in a separate repository; only its **measurements** come back here,
+  as evidence (§0.1)
 - **Tracking or reviewing a specific vendor's product features** — only a snapshot at the time of
   investigation is recorded. Price and feature changes are not chased.
 - Reproducing model benchmarks (a vendor's self-reported score is something to **adjudicate**, not a
