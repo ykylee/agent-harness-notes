@@ -10,7 +10,7 @@
     "daily_backlog_dir": "ai-workflow/memory/active/study/browser-agents/backlog",
     "tasks_dir": "ai-workflow/memory/active/study/browser-agents/backlog/tasks",
     "sessions_dir": "ai-workflow/memory/active/study/browser-agents/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -34,24 +34,25 @@
     "blocked_items": [],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출",
       "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "latest_backlog_path": "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
     "task_count": 1,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-09-22-browser-agents-001 — 브라우저형 에이전트 도구 조사 — Aside 중심"
+      "TASK-2026-09-23-browser-agents-002 — Aside 코드레벨 분석 — CLI 바이너리 추출"
     ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/study/browser-agents/session_handoff.md",
-    "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-22.md",
+    "ai-workflow/memory/active/study/browser-agents/backlog/2026-09-23.md",
     "ai-workflow/memory/active/study/browser-agents/state.json",
     "ai-workflow/memory/active/study/browser-agents/backlog"
   ],

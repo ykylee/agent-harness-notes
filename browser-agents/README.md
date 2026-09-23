@@ -18,6 +18,7 @@
 | [04-comet-architecture.md](04-comet-architecture.md) | Perplexity Comet 아키텍처 — 리버싱으로 드러난 확장 3종·RPC·인식 모델 |
 | [05-comparables.md](05-comparables.md) | Dia · Opera Neon · Claude for Chrome · Gemini in Chrome · Browser Use |
 | [06-architecture-axes.md](06-architecture-axes.md) | **교차 분석** — 인식 / 제어 표면 / 신뢰 경계 / 자격증명 4축 |
+| [08-aside-code-level.md](08-aside-code-level.md) | **Aside 코드레벨** — 바이너리에서 추출한 인식 모델·메모리 형식·원격 제어·내장 스킬 |
 | [07-security.md](07-security.md) | 간접 프롬프트 주입 — 공격 사슬, 구조적 원인, 완화책, 미해결 상태 |
 | [99-sources.md](99-sources.md) | 출처와 **검증 등급** — 확인 / 자체보고 / 추론 / 반증 |
 
