@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-26 (TASK-002 Codex 드리프트 재확인 — 반박 14건, 생성 스키마는 필터된 뷰였다 / 작업 환경 macOS 로 이동)
+- Updated: 2026-09-26 (TASK-002 Codex 드리프트 재확인 — 반박 14건, 생성 스키마는 필터된 뷰였다 / 작업 환경 macOS 로 이동 / TASK-003 위키 신선도 검사기 오탐 수정)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
