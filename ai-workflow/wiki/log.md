@@ -111,3 +111,10 @@ Notes:
   unreliable.
 - Probe results (🧪) come from the SDK's own scripted mock model, re-run by the main session with
   controls. No live model was used; every injection path stays ⚠️.
+
+
+## [2026-09-26] ingest | REPORT carries the Strands case
+
+`REPORT.md` / `REPORT.ko.md` gained § A third case and recommendations 9–10. Re-ingested into
+`primary-source-verification` §9.5 — no new fact; the page now points at the report so the two stay
+on one record. Two report findings were qualified (rec. 7's gate, provider-as-data), none invalidated.

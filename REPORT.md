@@ -19,6 +19,12 @@ means for building a harness of our own.
 >
 > Nothing below was invalidated by that study. **Several findings gained external corroboration**,
 > collected in [§ External corroboration](#external-corroboration-what-the-browser-study-confirmed).
+>
+> **Update (2026-09-26).** A third investigation, [`strands/`](strands/README.md), read the Strands
+> Agents SDK and the Strands harness (AWS) — a harness linked into the caller's process rather than
+> served behind a wire. It invalidated nothing here either; it **qualified two findings** and
+> corroborated several others from the negative side, in
+> [§ A third case](#a-third-case-what-strands-tested).
 
 ## Summary — one requirement collides with the platform
 
@@ -151,6 +157,38 @@ filters fell, the gate did not.
 > heuristic an attacker can study**, because it sits outside the model's control loop. That is an
 > argument for making approval a protocol primitive rather than a UI feature — and it is now
 > measured rather than reasoned.
+>
+> ⚠️ Qualified by the Strands study below: sitting outside the loop is **necessary, not sufficient.**
+
+## A third case: what Strands tested
+
+Codex and Aside both put a boundary between whoever drives the agent and the loop. **Strands has
+none** — "it runs in your process with no hosted control plane." That makes it a test of this
+report's recommendations from an angle the first two studies could not reach: what happens to each
+one when there is no wire at all. Read from `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25),
+its design documents, and probes of its approval paths against the SDK's own scripted mock model.
+
+| Finding here | What Strands showed |
+|---|---|
+| **Approval must be a protocol primitive** | Corroborated from the negative. Without a wire, Strands' approval is an exception plus a re-entry convention: the tool or hook **re-runs from the top**, so side effects before the approval call happen twice, and nothing outside the process can answer it. Its A2A client refuses to send approval answers at all |
+| **The gate outside the loop is the one defence that held** (rec. 7, measured) | **Qualified.** Strands has exactly such a gate, with a Cedar policy backend — and ships it **off**. Probing its error paths found a Cedar `forbid` that errors is **allowed**, a steering handler approves on **any truthy answer, including `"no"`**, policies compose in registration order despite documented precedence, and the CLI turns every deny into an ask. Placement is one property of six ([`SYNTHESIS.md` §2.7](SYNTHESIS.md)) |
+| **Model a provider as data** (rec. 2, 4) | **Qualified.** Strands made the opposite choice deliberately: an internal wire that is literally Bedrock ConverseStream, and one converter *class* per vendor. That buys vendor-native features and first-class Chat Completions; it costs operator-level extension. **Provider-as-data holds where the wire is shared** — which it is in Codex, so the recommendation stands there |
+| **Make retained reasoning a per-provider capability** (rec. 3) | Corroborated. Every OpenAI path in Strands — Chat Completions **and** Responses — drops reasoning between turns, with a warning. A converter-per-vendor design loses it unless someone decides to keep it; nobody did |
+| **Keep the adapter stateless** (rec. 2) | Corroborated. Strands' opt-in stateful Responses mode clears local history after each invocation, refuses a conversation manager outright, and — unverified — appears to resend the invocation's items alongside `previous_response_id` inside a tool loop. State brought its own failure modes, as predicted |
+| **Adopt the portable plugin schema** (rec. 5) | Corroborated from the negative. A Strands plugin is a `pip` package with no manifest — nothing a policy layer could inspect or refuse; skills' `allowed-tools` is not enforced |
+| **Tool globs with per-argument matchers** (rec. 8) | Corroborated from the negative. Strands' finest policy grain is the tool name; "always allow" for `shell` allows every command |
+
+Two findings are new rather than confirming, and both become recommendations below:
+
+- **The harness's own credentials reach the model's tools.** Provider keys sit in the process
+  environment, which every shell call inherits; one approved `env` prints them.
+- **An authority tag the model is told to trust is forgeable.** The harness prompt says
+  `<system-reminder>` tags in tool results come from the harness; nothing escapes that tag in fetched
+  pages, files or MCP output. Read in source, not run against a model.
+
+And one record for this report's own claims: Strands' benchmark headline — "28% lower cost with
+equal or better accuracy" — is contradicted by its chart's own data in 7 of 19 same-model pairs.
+With no variance reported, that refutes the **wording**, not a ranking.
 
 ## Recommendations
 
@@ -176,6 +214,16 @@ Two more, added after the browser study and grounded in systems other people shi
    coarse; "allow `bash` when the first argument matches this regex" is the level that is actually
    useful — and a third party already ships it.
 
+Two more after the Strands study, grounded in what its error paths did when probed:
+
+9. **Give the approval gate all six properties, not just its placement:** on by default, fail closed
+   on every error path, answers parsed as an enum, an explicit precedence, a hard deny nothing can
+   downgrade, and authorization of the *final* tool input. Test each error path with a control that
+   proves the input arrived — Strands' design documents describe the right behaviour for four of the
+   six, and the code does otherwise.
+10. **Keep the harness's own credentials out of every tool process's environment,** and never tell
+    the model that an authority marker can appear in tool results unless every tool result escapes it.
+
 ## Method
 
 Most corrections came from reading generated schemas and Rust source rather than prose. The method
@@ -188,7 +236,9 @@ intact, and surfaced fourteen guide pages we did not know existed.
 
 **That technique generalises — but not universally.** Applied later to other vendors: Aside ✅ (a
 `/llms.txt` index plus `.md` originals, 16 documents), Opera ✅, **Dia ❌** (every path returns the
-same client-rendered shell). Try it first; fall back to the rendered page when it fails.
+same client-rendered shell), **Strands ✅ with a variant** (`/llms.txt` works, but raw pages live at
+`<page>/index.md` and a constructed `<page>.md` returns 404). Try it first, follow the links the index
+gives rather than building URLs, and fall back to the rendered page when it fails.
 
 The browser study also added two verification rules worth carrying back here:
 
@@ -198,6 +248,13 @@ The browser study also added two verification rules worth carrying back here:
 - **Cross-check primary sources against each other.** A vendor's own documentation index and its
   product FAQ contradicted each other on whether planning runs locally. The more specific source wins,
   and the contradiction itself gets recorded.
+
+The Strands study added one more:
+
+- **A design document's status line is not implementation status.** Eleven of thirteen designs
+  marked "Proposed" were already implemented — and deviated from their designs exactly where it
+  mattered. Designs committed beside code look authoritative; they are graded as intent (📐), never as
+  behaviour.
 
 Three items remain open by design: a corrected secondary-source error kept on the record, the Windows
 internals labelled as inference, and the Agents API server-side model list, which is a different
@@ -209,11 +266,12 @@ surface from the client catalog. See [99-sources.md](docs/99-sources.md).
 |---|---|
 | Codex detail | [`docs/`](docs/) — 16 documents |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
-| **Both, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) |
+| **All three, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
 | By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) |
 
 ---
 
 Findings reflect the state of `openai/codex` on 2026-09-15 — a fast-moving repository.
-External corroboration added 2026-09-23.
+External corroboration added 2026-09-23. The Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`).

@@ -222,6 +222,9 @@ A design is intent; grade it as intent, and never let its status line stand in f
 in 7 of 19 same-model pairs) without refuting a ranking — no variance was reported, so sub-point gaps
 say nothing either way.
 
+These three now also stand in [`REPORT.md`](../../../REPORT.md) § Method and § A third case (and the
+Korean edition), so the report and this page rest on the same record (G4).
+
 ## §10 Read next  {#s10-next}
 
 - [[concepts/os-sandbox-policy]] §6 — where the inferred grade is actually applied
