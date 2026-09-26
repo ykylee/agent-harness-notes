@@ -4,7 +4,7 @@ status: active
 last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/08-aside-code-level.md + browser-agents/04-comet-architecture.md + browser-agents/05-comparables.md + SYNTHESIS.md §6 + SYNTHESIS.md §6.5
 related_pages: [concepts/harness, concepts/indirect-prompt-injection, concepts/control-plane-execution-plane, concepts/credential-shielding, concepts/os-sandbox-policy, concepts/capability-distribution, concepts/thread-turn-item, concepts/primary-source-verification]
 created: 2026-09-23
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Perception Model — how an agent sees a screen
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: what representation an agent reads a web page (or a screen) through, and what failure mode each choice produces.
 - Scope: four approaches, symmetry between perception and action, the cost ladder, recovery
 - Character: **a surface-specific axis.** A shell-based harness (Codex) does not have this problem
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against `SYNTHESIS.md` changes since the last ingest — none touch the sections this page draws on; previously masked by a freshness-checker parsing bug)
 
 ## §1 TL;DR  {#s1-tldr}
 

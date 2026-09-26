@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: compare the design patterns that let an agent work behind a login without seeing the credentials.
 - Scope: three approaches, separating the axes, what the implementation really is, what remains
 - Character: **a surface-specific axis** — though "separate permission level from secret exposure" is a general principle
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against `SYNTHESIS.md` changes since the last ingest — none touch the sections this page draws on; previously masked by a freshness-checker parsing bug)
 
 ## §1 The problem  {#s1-problem}
 

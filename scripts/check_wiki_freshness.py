@@ -55,10 +55,32 @@ def load_mapping(root: Path) -> dict[str, list[str]]:
         m = re.search(r"^last_ingested_from:\s*(.+)$", fm.group(1), re.M)
         if not m:
             continue
-        sources = [s.strip() for s in m.group(1).split("+")]
+        sources = [parse_source(s) for s in m.group(1).split("+")]
         rel = str(page.relative_to(root))
-        mapping[rel] = [s for s in sources if s]
+        # 같은 문서를 절마다 따로 적은 선언(`SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5`)은 하나로 본다.
+        mapping[rel] = list(dict.fromkeys(s for s in sources if s))
     return mapping
+
+
+# 저장소 안 파일 경로의 모양. 확장자가 있어야 한다 — `Brave original` 같은 외부 출처와 가른다.
+_PATH_TOKEN = re.compile(r"[\w./-]+\.\w+")
+
+
+def parse_source(entry: str) -> str | None:
+    """선언 한 항목에서 저장소 경로만 뽑는다. 경로가 아니면 None.
+
+    선언은 경로 뒤에 절 번호나 괄호 주석을 달 수 있다 — `SYNTHESIS.md §6.4`,
+    `browser-agents/07-security.md (§2 corrected, §10)`. 주석까지 경로로 읽으면 그런 파일은
+    없으니 이력 모드는 "원 문서가 사라졌다"로 오탐하고, --staged 모드는 staged 경로와
+    문자열이 맞지 않아 재색인 누락을 **놓친다**. 첫 토큰만 경로로 쓴다.
+
+    `Brave original (re-read 2026-09-23)` 처럼 저장소 밖 출처는 git 으로 신선도를 잴 수
+    없으므로 검사 대상에서 뺀다 (선언 자체는 기록으로 남는다).
+    """
+    parts = entry.split()
+    if not parts or not _PATH_TOKEN.fullmatch(parts[0]):
+        return None
+    return parts[0]
 
 
 def last_commit_epoch(root: Path, path: str) -> int | None:

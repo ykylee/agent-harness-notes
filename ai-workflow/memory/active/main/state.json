@@ -37,6 +37,7 @@
       "TASK-2026-09-22-agent-harness-notes-004"
     ],
     "recent_done_items": [
+      "TASK-2026-09-26-main-003 — 위키 신선도 검사기 오탐 수정",
       "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
       "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
       "TASK-2026-09-23-main-015 — 주입 위협 모델 강조점 재검토",
@@ -45,21 +46,21 @@
       "TASK-2026-09-23-main-012 — 주입 방어 실측을 노트 저장소로 편입",
       "TASK-2026-09-23-main-011 — SYNTHESIS 구현 피드백 절 편입",
       "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영",
-      "TASK-2026-09-23-main-009 — 번역이 깨뜨린 파서 라벨 복구",
-      "TASK-2026-09-23-main-008 — 브랜치 병합 및 메모리 아카이브"
+      "TASK-2026-09-23-main-009 — 번역이 깨뜨린 파서 라벨 복구"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
-    "task_count": 3,
+    "task_count": 4,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
       "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
-      "TASK-2026-09-22-agent-harness-notes-002 — openai/codex 드리프트 재확인"
+      "TASK-2026-09-22-agent-harness-notes-002 — openai/codex 드리프트 재확인",
+      "TASK-2026-09-26-main-003 — 위키 신선도 검사기 오탐 수정"
     ]
   },
   "next_documents": [

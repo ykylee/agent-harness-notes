@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: the attack surface created when an agent reads untrusted content, and which mitigations are actually implemented.
 - Scope: the attack chain, the structural cause, the four mitigation categories and where each product stands, the unsolved status
 - Character: **a surface-specific axis** — though a shell harness reading files or the web develops the same problem
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against `SYNTHESIS.md` changes since the last ingest — none touch the sections this page draws on; previously masked by a freshness-checker parsing bug)
 
 ## §1 TL;DR  {#s1-tldr}
 

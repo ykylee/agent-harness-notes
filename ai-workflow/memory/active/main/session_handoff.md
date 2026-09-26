@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-26-main-003 위키 신선도 검사기 오탐 수정: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: done
 - TASK-2026-09-26-main-002 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사: done
 - TASK-2026-09-26-main-001 Strands Agents 하네스 조사 및 심층 분석: done
@@ -32,9 +33,8 @@
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
 - TASK-2026-09-23-main-010 REPORT 범위 확장 반영: done
-- TASK-2026-09-23-main-009 번역이 깨뜨린 파서 라벨 복구: done
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008 (브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008·009 (브랜치 병합, 파서 라벨 복구), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
 
 ## 현재 `in_progress` 작업
 
@@ -94,7 +94,8 @@
 - [ ] 모바일 컴패니언(Orca·Superset·Paseo)은 이번 패스에서 제외
 
 **저장소**
-- [ ] 위키 신선도 검사기 오탐 4건 — `last_ingested_from` 의 `SYNTHESIS.md §6.4` 같은 주석이 경로로 파싱돼 "원 문서가 사라졌다"로 뜬다(지난 세션부터). 주석을 빼거나 파서가 공백 뒤를 버리게 할 것
+- [x] ~~위키 신선도 검사기 오탐 4건~~ — 수정(`parse_source`). 버그가 가리던 실제 경고 3건도 드러나 절 단위 대조로 처리. 남은 한계: 검사가 파일 단위라 절(§) 선언을 무시한다
+- [x] ~~pre-commit 훅 활성화~~ — 이 clone 에 `core.hooksPath .githooks` 설정 (2026-09-26)
 - [x] ~~`SYNTHESIS.md` 구현 피드백 절 편입~~ — TASK-011 완료. `PURPOSE.md` §0.1 에 "측정만 편입, 코드는 아님" 경계를 명시했다
 - [x] ~~간접 프롬프트 주입 방어 검증~~ — TASK-012. Dia 의 공개 방어를 구현해 공격했다. **16건 중 5건 관통.** 결과는 `SYNTHESIS.md` §6.4
 - [x] ~~나머지 절반: 모델이 루프에 있을 때~~ — TASK-013. `SYNTHESIS.md` §6.5
