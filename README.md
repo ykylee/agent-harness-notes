@@ -7,15 +7,17 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-## Three studies, one subject
+## Four studies, one subject
 
-This repository now holds **three investigations into agent harnesses**:
+This repository now holds **four investigations into agent harnesses** — three from the engine side,
+one from the client side:
 
 | Study | Subject | Execution surface |
 |---|---|---|
 | [`docs/`](docs/) + [REPORT.md](REPORT.md) | OpenAI Codex harness | shell · filesystem |
 | [`browser-agents/`](browser-agents/README.md) | Browser-type agents (Aside, Comet, Dia, Neon, Browser Use) | browser · OS |
 | [`strands/`](strands/README.md) | Strands Agents SDK and Strands harness (AWS) — an embeddable library | shell · filesystem, **linked into the caller's process** |
+| [`agent-ux/`](agent-ux/README.md) | UX/UI of ten agent clients (Claude, ChatGPT/Codex, Cursor, Antigravity, Devin/Windsurf, Orca, Superset, Paseo, Conductor, Aside) | the **client** — how harness primitives are shown to people |
 
 **→ [SYNTHESIS.md](SYNTHESIS.md)** crosses them: which design axes are surface-independent
 (approval, permissions, providers, control/execution plane) and which are surface-specific
@@ -25,7 +27,7 @@ Codex's `responses_lite` request-shape branching. Strands, the third case, tests
 a different axis — no wire between caller and loop — and found that an approval gate outside the loop
 is necessary but not sufficient (SYNTHESIS §2.7).
 
-Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (16 concepts).
+Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (17 concepts).
 
 ## Start with the report
 

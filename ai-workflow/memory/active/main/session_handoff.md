@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-26 (Strands — 세 번째 사례, 루프 밖 게이트는 필요조건일 뿐)
+- Updated: 2026-09-26 (agent-ux — 클라이언트 측 UX/UI, 스타일은 수렴했고 감독 이론은 갈렸다)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -15,10 +15,12 @@
 - **조사 ↔ 구현 되먹임 루프가 자리잡았다.** 구현은 `ykylee/heddle` (private), 이 저장소 범위 밖이다(`PURPOSE.md` §0.1: **측정만 편입하고 코드는 밖에 둔다**). 이번 세션에 그 경로로 들어온 것이 `SYNTHESIS.md` §6 이다 — 반박 5건, 확인 6건, 방어 공격 5건 관통, 모델 실측 2공급자.
 - **주입 위협 모델 재검토 완료 (TASK-015).** Brave 원문을 다시 읽으니 유출은 "공격자 서버로 navigate"가 아니라 **Reddit 댓글에 답글 달기(쓰기 1회)** 였다. 체인 어디에도 공격자 목적지가 없다. 어긋남은 시연과 실측 사이가 아니라 **우리 한 줄 요약과 원문 사이**에 있었고, 그 요약이 heddle 프로브 설계까지 흘러갔다. 정정하면 시연과 실측은 일치한다 — **목적지 기반 방어는 둘 다 못 막는다. 쓰기를 게이트해야 한다.**
 - **세 번째 사례 Strands 편입 (TASK-2026-09-26-main-001).** `strands/` 8편 — AWS Strands Agents SDK 와 2026-09-22 에 나온 **Strands harness**(`create_harness()`)를 `harness-sdk@15da9dc` 소스로 읽었다. 호출자와 루프 사이에 wire 가 없는 **임베드형** 하네스라 Codex·Aside 와 다른 축에서 추상을 시험한다. 결론: **루프 밖 승인 게이트는 필요조건일 뿐** — Strands 는 그 게이트를 가졌지만 기본 off, 오류 경로 fail-open(Cedar·steering, 🧪 대조군 포함), 등록순 합성, hard deny 없음 (`SYNTHESIS.md` §2.7). provider-as-data 는 **공유 wire 전제에서만** 성립한다는 한정도 붙었다 (§2.3)
+- **클라이언트 측 조사 `agent-ux/` 편입 (TASK-2026-09-26-main-002).** 범위는 `PURPOSE.md` §0.2 로 먼저 기록. 제품 10종(Claude·ChatGPT/Codex·Cursor·Antigravity·Devin(구 Windsurf)·Orca·Superset·Paseo·Conductor + Aside)을 설치본 번들·소스에서 정적 추출. **공통 디자인 언어는 수렴했고(“Allow ⟨agent⟩ to ⟨verb⟩?”, Queue/Steer, amber=needs you, 자율성 다이얼 중간의 기계 리뷰어) 감독 이론은 갈렸다** (`agent-ux/09`, `SYNTHESIS.md` §2.8). 오케스트레이터 3종이 감싼 에이전트의 승인을 기본 off 로 띄운다 — §2.7 "기본 on" 속성 결여. 디스플레이가 없어 시각 인상은 전부 ⚠️
 - **두 저장소의 막힌 지점은 여전히 같다**: 디스플레이 있는 macOS/Windows 기기.
 
 ## Work Status
 
+- TASK-2026-09-26-main-002 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사: done
 - TASK-2026-09-26-main-001 Strands Agents 하네스 조사 및 심층 분석: done
 - TASK-2026-09-23-main-015 주입 위협 모델 강조점 재검토: done
 - TASK-2026-09-23-main-014 두 번째 공급자로 주입 결론 검증 및 정정: done
@@ -31,9 +33,8 @@
 - TASK-2026-09-23-main-010 REPORT 범위 확장 반영: done
 - TASK-2026-09-23-main-009 번역이 깨뜨린 파서 라벨 복구: done
 - TASK-2026-09-23-main-008 브랜치 병합 및 메모리 아카이브: done
-- TASK-2026-09-23-browser-agents-007 문서 언어 영어 통일: done
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~006 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
 
 ## 현재 `in_progress` 작업
 
@@ -45,6 +46,7 @@
 
 ## Key Changes
 
+- **agent-ux 조사 (TASK-2026-09-26-main-002)** — `agent-ux/` 01~09·99. 전제 2건이 틀렸다: **ChatGPT 데스크톱 = Codex Electron 앱**(네이티브 SwiftUI 는 업그레이드 화면을 띄우는 레거시), **Windsurf = Devin Desktop**, Antigravity 와 `CortexStepType` 45개 중 43개 필드 번호 일치. Paseo 가 `SYNTHESIS` §2.1 의 "그냥 답장" 을 프로토콜 규칙으로 구현(보류 중 메시지 = 사유 붙은 거부). 반박 13건은 대부분 문서 지연(`agent-ux/99` §4). 새 위키 개념 `agent-client-design-language`(17종)
 - **Strands 조사 (TASK-2026-09-26-main-001)** — `strands/` 01~07·99. 반박 20건(`strands/99` §4): 승인 계층 R1–R5 가 가장 무겁다 — 문서는 "Cedar 평가 오류는 항상 fail-closed", "deny > confirm > … 우선순위", `auditLog` 를 약속하지만 코드는 아니다. 벤치마크 "동등 이상 정확도"는 차트 자체 데이터로 19쌍 중 7쌍에서 낮다 — **문구 반박이지 순위 반박이 아니다**(분산 없음). 설계 문서 "Proposed" 13건 중 11건이 이미 구현 → 새 등급 📐 designed-only. `llms.txt` 기법 기록에 변형 추가(`<page>/index.md` 만 200). 위키 개념 7종 재ingest, `PURPOSE.md` 포함 영역에 임베드형 SDK 하네스 명시
 - **Brave 시연 요약 정정 (TASK-015)** — "공격자 서버로 전송"은 원문에 없다. 원문 4단계는 perplexity.ai(trailing-dot 변형 포함)·gmail.com 을 읽고 **원래 댓글에 답글로 유출**한다. `browser-agents/99-sources.md` §4.5 반박, 위키 `indirect-prompt-injection`·`primary-source-verification` 재ingest, `SYNTHESIS.md` §7 에 방법론 항목 "요약 위에 테스트를 짓기 전에 원문을 다시 읽어라" 추가. §6.5·§6.7 에 남아 있던 단일 실행 수치(9/20→3/20, 45%)와 "one model" 표현도 함께 정정
 
@@ -79,6 +81,13 @@
 - [ ] TS SDK 세부의 직접 확인 (일부는 위임 요약 + 스폿체크) · stateful Responses 모드의 툴 루프 중복 전송 의심
 - [x] ~~`REPORT`(영/한)에 세 번째 사례 반영~~ — `§ A third case` / `§ 세 번째 사례` 신설, 권고 9·10 추가, 두 결론(권고 7 게이트, 프로바이더-데이터)에 단서. 무효화된 결론 없음
 - [ ] harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인
+
+**agent-ux 조사 (`agent-ux/`)**
+- [ ] GUI 패스 — macOS/Windows 기기에서 시각 주장 ⚠️→✅ (디스플레이 제약은 기존과 같다)
+- [ ] Codex 드리프트 단서: 번들에서 `docs/02` 에 없는 App Server 메서드 3종(`item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `thread/startAeon`) — TASK-002 에 합칠 것
+- [ ] ACP(Agent Client Protocol) 엔진측 독해 — Devin Local·Paseo·Superset·Strands CLI 가 모두 쓴다
+- [ ] `REPORT`(영/한) 개념 수 16→17 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)
+- [ ] 모바일 컴패니언(Orca·Superset·Paseo)은 이번 패스에서 제외
 
 **저장소**
 - [ ] 위키 신선도 검사기 오탐 4건 — `last_ingested_from` 의 `SYNTHESIS.md §6.4` 같은 주석이 경로로 파싱돼 "원 문서가 사라졌다"로 뜬다(지난 세션부터). 주석을 빼거나 파서가 공백 뒤를 버리게 할 것

@@ -118,3 +118,18 @@ Notes:
 `REPORT.md` / `REPORT.ko.md` gained § A third case and recommendations 9–10. Re-ingested into
 `primary-source-verification` §9.5 — no new fact; the page now points at the report so the two stay
 on one record. Two report findings were qualified (rec. 7's gate, provider-as-data), none invalidated.
+
+
+## [2026-09-26] ingest | agent-ux — the client side of the contract
+
+New study `agent-ux/` (11 documents; ten clients read from shipped installers and source). New concept
+`agent-client-design-language` (17 concepts now); `approval-gate` §7.6 added.
+
+Notes:
+- Scope recorded in `PURPOSE.md` §0.2 before the work began.
+- Two premises in the brief were wrong and are recorded as findings: ChatGPT desktop **is** the Codex
+  app; Windsurf is now Devin Desktop and shares an engine with Antigravity down to protobuf field numbers.
+- Engine-side conclusions: approval-as-primitive confirmed from the client side (Paseo's four renderers,
+  Superset's "approvals are items"); SYNTHESIS §2.7's "on by default" is the property the orchestrators
+  lack. Nothing overturned.
+- No display: every visual impression is ⚠️.

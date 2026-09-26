@@ -1,6 +1,6 @@
 ---
 purpose_version: 1
-last_purpose_review: 2026-09-23
+last_purpose_review: 2026-09-26
 ---
 
 # Purpose — why this repository exists
@@ -49,6 +49,26 @@ Two reasons this belongs here rather than only in the other repository:
 The boundary to hold: **import measurements, never the code.** If a future session finds itself
 maintaining heddle from inside this repository, §3's exclusion has been breached.
 
+## 0.2 Scope extension, 2026-09-26 — the client side: UX/UI of agent tools
+
+The three studies so far read harnesses from the **engine** side: protocols, loops, policies. Every
+primitive they found — approval, thread/turn/item, diffs, sandbox state, plans, background tasks —
+also has to be **rendered to a person**, and the Codex study already showed that approval stalls
+without a client that implements it. How desktop agent tools present those primitives is therefore
+the other half of the same contract, not a separate subject.
+
+Added: **the UX/UI design of agent client tools** (Claude desktop, Codex desktop, Antigravity,
+Cursor, Windsurf, ChatGPT desktop, Orca, Paseo, Aside and comparable tools), their stated design
+philosophy, and **the design language they share** — read, as everywhere else here, from committed
+artifacts (shipped bundles, design tokens, UI strings, official documentation) before commentary.
+
+Two boundaries hold:
+
+1. **Snapshot, not tracking.** §3's exclusion of product-feature tracking stands; each product is
+   recorded once, as of the research date.
+2. **Visual claims are graded.** No display is available to this repository's research environment.
+   What is extracted from a bundle is ✅; what a screenshot or video shows is 📣 or ⚠️ until seen.
+
 - Purpose: define *why* this repository exists and where it is going (directional intent). AI agents
   read it at session-start and backlog-update to classify work and judge scope.
 - Scope: the four elements (Goals / Key Questions / Research Scope / Evolving Thesis)
@@ -83,6 +103,8 @@ maintaining heddle from inside this repository, §3's exclusion has been breache
   fork?
 - **Q4**: which claims are settled by a primary source and which are still inference? Does the
   document say so itself?
+- **Q6**: how do agent tools render harness primitives to a person, and is a common design language
+  emerging across vendors?
 - **Q5**: among the design axes of a harness, which **depend on the execution surface** and which do
   not?
 
@@ -102,6 +124,8 @@ maintaining heddle from inside this repository, §3's exclusion has been breache
   (`browser-agents/`)
 - **Embeddable SDK harnesses** — Strands Agents SDK and Strands harness (`strands/`, 2026-09-26):
   loop, approval primitive, providers, execution environment, as read from source and design documents
+- **UX/UI of agent client tools** — how harness primitives are rendered, stated design philosophy,
+  and the shared design language (`agent-ux/`, 2026-09-26, §0.2)
 - **The axes shared by agent harnesses generally** — the concept layer
   (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)
 

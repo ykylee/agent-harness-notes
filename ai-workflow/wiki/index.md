@@ -4,7 +4,7 @@
 
 > Format and rules in [`./SCHEMA.md`](./SCHEMA.md). Entries are added as ingests create pages.
 > The sources are `docs/` (the Codex harness), `browser-agents/` (browser-type agents) and, since
-> 2026-09-26, `strands/` (the Strands SDK and harness) — this wiki **re-indexes them by concept.** The cross-study synthesis is [`SYNTHESIS.md`](../../SYNTHESIS.md).
+> 2026-09-26, `strands/` (the Strands SDK and harness), plus the client-side `agent-ux/` — this wiki **re-indexes them by concept.** The cross-study synthesis is [`SYNTHESIS.md`](../../SYNTHESIS.md).
 >
 > For the split between **surface-specific** axes (perception, injection, credentials) and
 > **surface-independent** ones (approval, providers, capability, planes), see [[concepts/harness]] §7.6.
@@ -70,6 +70,10 @@ stand, the unsolved status.
 ### [[concepts/credential-shielding]] {#credential-shielding}
 Logging in without handing over the secret. Value hiding / element hiding / URL blocking, and
 separating permission level from exposure.
+
+### [[concepts/agent-client-design-language]] {#agent-client-design-language}
+How ten agent clients render harness primitives — "Allow ⟨agent⟩ to ⟨verb⟩?", amber for "needs you",
+a machine reviewer in the autonomy dial — and where their theories of supervision part.
 
 ### [[concepts/primary-source-verification]] {#primary-source-verification}
 This repository's method of knowing. Grade vocabulary, preserving refutations, the record and traps

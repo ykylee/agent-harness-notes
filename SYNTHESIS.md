@@ -1,10 +1,11 @@
 # SYNTHESIS — Agent harnesses, where the studies cross
 
-> This repository holds three investigations. **[`docs/`](docs/)** read the OpenAI Codex harness out of
+> This repository holds three engine-side investigations and one client-side one. **[`docs/`](docs/)** read the OpenAI Codex harness out of
 > generated schemas and Rust source; **[`browser-agents/`](browser-agents/README.md)** read
 > browser-type agents out of product documentation and binaries; **[`strands/`](strands/README.md)**
 > (added 2026-09-26) read the Strands Agents SDK and Strands harness out of their monorepo, design
-> documents and probes. This document crosses them to separate what belongs to harnesses in general
+> documents and probes; **[`agent-ux/`](agent-ux/README.md)** (added 2026-09-26) read how ten agent
+> clients render those primitives to a person, from shipped installers and source. This document crosses them to separate what belongs to harnesses in general
 > from what belongs to a particular execution surface — or, with Strands, to a particular **embedding**.
 >
 > Concept-level notes live in [`ai-workflow/wiki/`](ai-workflow/wiki/index.md); evidence grades live
@@ -214,6 +215,41 @@ a probe of its error paths ([`strands/07`](strands/07-security.md) §3, 🧪 wit
 > 📌 **Placement is one property of six.** Each missing one was found only by running the error path —
 > the design documents describe the right behaviour for four of them.
 
+### 2.8 The client side — how the primitives are rendered
+
+The engine-side studies found the primitives; [`agent-ux/`](agent-ux/README.md) read ten clients that
+show them to people — Claude desktop, ChatGPT/Codex, Cursor, Antigravity, Devin Desktop (formerly
+Windsurf), Orca, Superset, Paseo, Conductor, plus Aside. Static extraction only; nothing was seen rendered.
+
+| Primitive | What the clients converged on | Detail |
+|---|---|---|
+| Approval | **"Allow ⟨agent⟩ to ⟨verb⟩?"** — an action, never a tool name; scope words *once · session · always* | [`agent-ux/08`](agent-ux/08-primitives-rendered.md) §1 |
+| Autonomy | **a dial with a machine reviewer in the middle** — Claude "Auto", OpenAI "Approve for me", Cursor "Auto-review"; sandbox state named in the mode label | §2 |
+| Plan | an **editable or commentable document**; approve with *Implement / Proceed* | §3 |
+| Items | **verb sentences**, progressive → past and counted; detail density is the user's choice | §4 |
+| Review | **the diff comment becomes a prompt**, sent back in a batch | §5 |
+| Attention | **amber/orange = needs you** in every product that declares a colour; completion named for the next step ("Ready for review") | §6 |
+| Steering | **Queue / Steer**, delivered at the next tool call | §7 |
+
+Three findings bear on the engine-side conclusions:
+
+> 📌 **Approval-as-primitive is confirmed from the client side.** Superset's own design research: "Approvals
+> are items … bound to the transcript row"; Paseo makes the request an object with **four renderers** (GUI,
+> CLI, MCP — a parent agent answers its child — and push), and turns §2.1's "or just reply" into a
+> **protocol rule**: a message sent while a prompt is pending denies it with a reason and reaches the
+> same turn.
+>
+> ⚠️ **§2.7's first property — on by default — is where the orchestrators fail.** Orca launches every
+> wrapped agent with its bypass flag, Superset does so in the terminal, Conductor runs local Claude
+> sessions in `bypassPermissions` unless the user opts in. The reviewer-agent rung is the industry's answer
+> to prompt fatigue ("asking for permission too often creates its own safety problem" — Cursor), and one
+> vendor states its limit: "Auto-review is not a security boundary."
+>
+> 📌 **The styles converged; the theories of supervision did not.** Every client agrees how an approval
+> reads and what colour "needs you" is. They disagree on whether a person watches steps, reviews
+> deliverables or directs a board — "there is no IDE" (Antigravity 2.0) against "a full IDE with an agent
+> manager built in" (Devin Desktop). [`agent-ux/09`](agent-ux/09-design-language.md) has the full account.
+
 ## 3. Surface-specific axes — what the browser study produced
 
 The Codex study has no counterpart to these, **because a shell harness does not have the problem.**
@@ -317,6 +353,9 @@ it. `AdditionalTools` is the item that carries the tool list in Codex's `respons
 - [ ] Never tell the model an **authority tag** can appear in tool results unless every tool result
       is escaped ([`strands/07`](strands/07-security.md) §2.1).
 - [ ] Strip provider credentials from the environment of every tool process.
+- [ ] Adopt the shared client vocabulary — "Allow ⟨agent⟩ to ⟨verb⟩?", once/session/always, Queue/Steer,
+      amber for "needs you" — and make the approval request **data any channel can render** (§2.8).
+- [ ] If you wrap other vendors' agents, do not launch them with approvals off by default (§2.8).
 
 ### 5.2 After choosing a browser/OS surface
 
@@ -575,10 +614,11 @@ works, follow the links `llms.txt` gives rather than building URLs.**
 |---|---|
 | The Codex harness itself | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
+| How clients render the primitives (UX/UI) | [`agent-ux/README.md`](agent-ux/README.md) — start at [09](agent-ux/09-design-language.md) |
 | An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) — start at [07](strands/07-security.md) for the gate findings |
-| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
+| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 17 concepts |
 | **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and two models measured against injected instructions |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)
 > were measured in a running implementation, §6.5 against a live model; Aside was verified down to its binaries; Codex was read

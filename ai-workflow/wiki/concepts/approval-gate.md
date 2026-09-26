@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + strands/03-tools-and-approval.md + strands/07-security.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + strands/03-tools-and-approval.md + strands/07-security.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding]
 created: 2026-09-22
 updated: 2026-09-26
@@ -162,6 +162,21 @@ outside the loop is one property of six:
 > with a control that proves the input arrived** — four of the six gaps contradict Strands' own design
 > documents, so reading the design would have found none of them.
 
+## §7.6 Observation — how ten clients render the card  {#s7-6-clients}
+
+From [`agent-ux/08`](../../../agent-ux/08-primitives-rendered.md) §1–2 (extracted strings; nothing seen rendered):
+
+| Axis | Finding |
+|---|---|
+| Sentence | **"Allow ⟨agent⟩ to ⟨verb⟩?"** (Claude, ChatGPT/Codex, Orca); CLI-derived "Do you want to…?" (Conductor). Always an action, never a tool name |
+| Scope | from a long ladder (Claude: once → chat → session → task → **{n} days** → always, with an undo toast) to **none** (Paseo, Aside: trust lives only in the mode) |
+| Scope editing | Antigravity and Devin let you **edit the target inside the card** — the card becomes a scope editor |
+| Other answerers | Paseo: one request object, **four renderers** (GUI, CLI, MCP — a parent agent answers its child — push); Claude: BLE hardware; Codex: an LED keypad |
+| Reply-as-answer | Paseo: a message sent while a prompt is pending **denies it with a reason** and reaches the same turn — §6.5's "or just reply" as a protocol rule |
+| Reflex key | Conductor binds **bare Enter** to approve |
+| Middle rung | a **machine reviewer** — "Auto", "Approve for me", "Auto-review" — between ask and never |
+| Default | three orchestrators launch wrapped agents with **approvals off** — §7.5's first property missing |
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the turn that approval stops
@@ -169,3 +184,4 @@ outside the loop is one property of six:
 - [[concepts/os-sandbox-policy]] — the defence on the side approval does not cover
 - Originals: [`docs/02-app-server-protocol.md`](../../../docs/02-app-server-protocol.md) §7, [`docs/06-choosing.md`](../../../docs/06-choosing.md) §5
 - Strands case: [`strands/03-tools-and-approval.md`](../../../strands/03-tools-and-approval.md)
+- Client rendering: [`agent-ux/08-primitives-rendered.md`](../../../agent-ux/08-primitives-rendered.md)
