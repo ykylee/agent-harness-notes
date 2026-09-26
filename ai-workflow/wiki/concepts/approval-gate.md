@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + strands/03-tools-and-approval.md + strands/07-security.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Approval Gate — making human intervention a protocol primitive
@@ -137,9 +137,35 @@ claims **survived being built** intact.
 > person cannot consent to what they cannot read**, so a gate that renders like that is decorative.
 > Legibility is part of the mechanism, not presentation on top of it.
 
+## §7.5 Observation — approval without a wire, and six properties of a gate  {#s7-5-strands}
+
+**Strands** ([`strands/03`](../../../strands/03-tools-and-approval.md) §4). `interrupt()` raises; the loop stops
+with `stop_reason="interrupt"`; the caller passes the answer back as the next prompt; the hook or tool
+**re-runs from the top** and the second `interrupt()` returns the stored answer. Side effects before
+the call happen twice. The only wire form is A2A `input_required`, and the A2A client refuses to send
+interrupt responses.
+
+Strands also has the most policy machinery studied here (interventions, Cedar, allow/ask lists), and
+probing its error paths ([`strands/07`](../../../strands/07-security.md) §3, 🧪 with controls) showed placement
+outside the loop is one property of six:
+
+| Property | Strands |
+|---|---|
+| On by default | no — harness ships approval off |
+| Fails closed on every error path | no — erroring Cedar `forbid` → allowed; raising steering handler → tool runs |
+| Enum answers | no — steering approves any truthy response, including `"no"` |
+| Explicit precedence | no — registration order, despite documented `deny > confirm > …` |
+| Hard deny | no — the CLI downgrades every deny to an ask |
+| Authorizes the final input | no — later hooks/middleware may rewrite after the decision |
+
+> 📌 Add to the checklist: a gate is not done when it sits outside the loop. **Test every error path
+> with a control that proves the input arrived** — four of the six gaps contradict Strands' own design
+> documents, so reading the design would have found none of them.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the turn that approval stops
 - [[concepts/credential-shielding]] — removing the need to ask
 - [[concepts/os-sandbox-policy]] — the defence on the side approval does not cover
 - Originals: [`docs/02-app-server-protocol.md`](../../../docs/02-app-server-protocol.md) §7, [`docs/06-choosing.md`](../../../docs/06-choosing.md) §5
+- Strands case: [`strands/03-tools-and-approval.md`](../../../strands/03-tools-and-approval.md)

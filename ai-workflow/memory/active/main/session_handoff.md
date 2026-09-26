@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-23 (주입 위협 모델 재검토 — 어긋남은 시연이 아니라 우리 요약에 있었다)
+- Updated: 2026-09-26 (Strands — 세 번째 사례, 루프 밖 게이트는 필요조건일 뿐)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -14,10 +14,12 @@
 - **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.
 - **조사 ↔ 구현 되먹임 루프가 자리잡았다.** 구현은 `ykylee/heddle` (private), 이 저장소 범위 밖이다(`PURPOSE.md` §0.1: **측정만 편입하고 코드는 밖에 둔다**). 이번 세션에 그 경로로 들어온 것이 `SYNTHESIS.md` §6 이다 — 반박 5건, 확인 6건, 방어 공격 5건 관통, 모델 실측 2공급자.
 - **주입 위협 모델 재검토 완료 (TASK-015).** Brave 원문을 다시 읽으니 유출은 "공격자 서버로 navigate"가 아니라 **Reddit 댓글에 답글 달기(쓰기 1회)** 였다. 체인 어디에도 공격자 목적지가 없다. 어긋남은 시연과 실측 사이가 아니라 **우리 한 줄 요약과 원문 사이**에 있었고, 그 요약이 heddle 프로브 설계까지 흘러갔다. 정정하면 시연과 실측은 일치한다 — **목적지 기반 방어는 둘 다 못 막는다. 쓰기를 게이트해야 한다.**
+- **세 번째 사례 Strands 편입 (TASK-2026-09-26-main-001).** `strands/` 8편 — AWS Strands Agents SDK 와 2026-09-22 에 나온 **Strands harness**(`create_harness()`)를 `harness-sdk@15da9dc` 소스로 읽었다. 호출자와 루프 사이에 wire 가 없는 **임베드형** 하네스라 Codex·Aside 와 다른 축에서 추상을 시험한다. 결론: **루프 밖 승인 게이트는 필요조건일 뿐** — Strands 는 그 게이트를 가졌지만 기본 off, 오류 경로 fail-open(Cedar·steering, 🧪 대조군 포함), 등록순 합성, hard deny 없음 (`SYNTHESIS.md` §2.7). provider-as-data 는 **공유 wire 전제에서만** 성립한다는 한정도 붙었다 (§2.3)
 - **두 저장소의 막힌 지점은 여전히 같다**: 디스플레이 있는 macOS/Windows 기기.
 
 ## Work Status
 
+- TASK-2026-09-26-main-001 Strands Agents 하네스 조사 및 심층 분석: done
 - TASK-2026-09-23-main-015 주입 위협 모델 강조점 재검토: done
 - TASK-2026-09-23-main-014 두 번째 공급자로 주입 결론 검증 및 정정: done
 - TASK-2026-09-23-main-013 주입 — 모델을 넣은 나머지 절반 측정: done
@@ -30,12 +32,8 @@
 - TASK-2026-09-23-main-009 번역이 깨뜨린 파서 라벨 복구: done
 - TASK-2026-09-23-main-008 브랜치 병합 및 메모리 아카이브: done
 - TASK-2026-09-23-browser-agents-007 문서 언어 영어 통일: done
-- TASK-2026-09-23-browser-agents-006 두 조사 융합 — 위키 개념층 + 교차 종합: done
-- TASK-2026-09-23-browser-agents-005 Dia·Neon 1차 출처 심화: done
-- TASK-2026-09-23-browser-agents-004 Aside 권한 집행·Computer Use·암호층 분석: done
-- TASK-2026-09-23-browser-agents-003 Aside 브라우저 바이너리 정적 분석: done
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001·002 (조사 착수, CLI 바이너리 추출).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~006 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합).
 
 ## 현재 `in_progress` 작업
 
@@ -47,6 +45,7 @@
 
 ## Key Changes
 
+- **Strands 조사 (TASK-2026-09-26-main-001)** — `strands/` 01~07·99. 반박 20건(`strands/99` §4): 승인 계층 R1–R5 가 가장 무겁다 — 문서는 "Cedar 평가 오류는 항상 fail-closed", "deny > confirm > … 우선순위", `auditLog` 를 약속하지만 코드는 아니다. 벤치마크 "동등 이상 정확도"는 차트 자체 데이터로 19쌍 중 7쌍에서 낮다 — **문구 반박이지 순위 반박이 아니다**(분산 없음). 설계 문서 "Proposed" 13건 중 11건이 이미 구현 → 새 등급 📐 designed-only. `llms.txt` 기법 기록에 변형 추가(`<page>/index.md` 만 200). 위키 개념 7종 재ingest, `PURPOSE.md` 포함 영역에 임베드형 SDK 하네스 명시
 - **Brave 시연 요약 정정 (TASK-015)** — "공격자 서버로 전송"은 원문에 없다. 원문 4단계는 perplexity.ai(trailing-dot 변형 포함)·gmail.com 을 읽고 **원래 댓글에 답글로 유출**한다. `browser-agents/99-sources.md` §4.5 반박, 위키 `indirect-prompt-injection`·`primary-source-verification` 재ingest, `SYNTHESIS.md` §7 에 방법론 항목 "요약 위에 테스트를 짓기 전에 원문을 다시 읽어라" 추가. §6.5·§6.7 에 남아 있던 단일 실행 수치(9/20→3/20, 45%)와 "one model" 표현도 함께 정정
 
 - **저장소 범위 확장** — `PURPOSE.md` §0 에 기록. 제외 영역에서 "OpenAI 외 벤더" 삭제, Goals G5 추가. `study/browser-agents` 의 A안 조건 이행.
@@ -74,7 +73,15 @@
 - [ ] 동적 관찰 (서버로 가는 내용) — **기기 필요**
 - [ ] 브라우저 GUI 1차 확인 — **macOS/Windows 기기 필요.** 리눅스 빌드가 없다
 
+**Strands 조사 (`strands/`)**
+- [ ] 위조 `<system-reminder>` 태그를 모델이 하네스 권위로 받아들이는지 — 프롬프트 계약이 그렇게 말하고 아무도 이스케이프하지 않는다(`strands/07` §2.1). **실측은 heddle 측 작업**, 결과만 편입
+- [ ] 장기 메모리가 주입 지시를 세션 너머로 나르는지 (⚠️ 소스상 경로만 확인)
+- [ ] TS SDK 세부의 직접 확인 (일부는 위임 요약 + 스폿체크) · stateful Responses 모드의 툴 루프 중복 전송 의심
+- [ ] `REPORT`(영/한)에 세 번째 사례 반영 여부 결정
+- [ ] harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인
+
 **저장소**
+- [ ] 위키 신선도 검사기 오탐 4건 — `last_ingested_from` 의 `SYNTHESIS.md §6.4` 같은 주석이 경로로 파싱돼 "원 문서가 사라졌다"로 뜬다(지난 세션부터). 주석을 빼거나 파서가 공백 뒤를 버리게 할 것
 - [x] ~~`SYNTHESIS.md` 구현 피드백 절 편입~~ — TASK-011 완료. `PURPOSE.md` §0.1 에 "측정만 편입, 코드는 아님" 경계를 명시했다
 - [x] ~~간접 프롬프트 주입 방어 검증~~ — TASK-012. Dia 의 공개 방어를 구현해 공격했다. **16건 중 5건 관통.** 결과는 `SYNTHESIS.md` §6.4
 - [x] ~~나머지 절반: 모델이 루프에 있을 때~~ — TASK-013. `SYNTHESIS.md` §6.5

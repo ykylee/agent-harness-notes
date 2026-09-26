@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md
+last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md + strands/01-overview.md + strands/README.md
 related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Harness — the agent execution system
@@ -161,6 +161,24 @@ Across both studies, the design axes of a harness split.
 > the left column applies unchanged. The right column only has answers once the surface is chosen.
 > The full synthesis is [`SYNTHESIS.md`](../../../SYNTHESIS.md).
 
+## §7.7 Observation — a third case moves the caller, not the surface  {#s7-7-embedded}
+
+Strands ([`strands/01`](../../../strands/01-overview.md)) is a harness **you link against**: "it runs in your process
+with no hosted control plane." Codex puts a wire (JSON-RPC, HTTP) between the caller and the loop;
+Aside puts a product. Strands puts a function call.
+
+| | Codex | Aside | Strands |
+|---|---|---|---|
+| Caller ↔ loop | wire | product UI | **function call** |
+| Approval | typed server→client request | daemon suspension | **exception + re-entry** ([[concepts/approval-gate]] §7.5) |
+| Execution plane | declared by environment type | local browser | **`Sandbox` constructor argument** ([[concepts/execution-environment-topology]] §6.5) |
+
+> 📌 **The embedding axis is independent of the surface axis in §7.5.** Strands' harness has the same
+> surface as Codex (shell, files) and still differs on every primitive that Codex expresses as a
+> message — because there is no one to send the message to. The Strands *harness* package
+> (`create_harness()`, released 2026-09-22) is the first product in this wiki literally named a
+> harness; it is a factory returning a plain SDK `Agent` with defaults wired in.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the three conversation primitives
@@ -168,3 +186,4 @@ Across both studies, the design axes of a harness split.
 - [[concepts/control-plane-execution-plane]] — separating the harness from compute
 - [[concepts/wire-protocol-boundary]] — the boundary that decides whether the core is reusable
 - Originals: [`docs/01-overview.md`](../../../docs/01-overview.md), [`docs/12-product-surface.md`](../../../docs/12-product-surface.md)
+- Strands case: [`strands/01-overview.md`](../../../strands/01-overview.md)

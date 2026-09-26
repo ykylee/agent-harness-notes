@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23)
+last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23) + strands/07-security.md
 related_pages: [concepts/perception-model, concepts/credential-shielding, concepts/approval-gate, concepts/os-sandbox-policy]
 created: 2026-09-23
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Indirect Prompt Injection — the structural risk of this class
@@ -242,9 +242,25 @@ The second provider separated the *vulnerability* question — that answer chang
 *defence* question, because a model that obeys nothing cannot show a defence working. **This does not
 say injection is handled.**
 
+## §10.5 Observation — an embedded harness supplies the whole chain  {#s10-5-strands}
+
+The Strands harness ([`strands/07`](../../../strands/07-security.md) §2) supplies every ingredient of §10.1's chain —
+readers (`web_fetch`, `read`, MCP, Exa search), a **cross-session carrier** (long-term memory, distilled
+by a small model and re-injected every call with no provenance), and **ungated writers** (`write`,
+`shell`; approval off by default). Three findings extend this page (all ⚠️ — read in source, not run
+against a model):
+
+- **A forgeable authority tag.** The harness prompt says `<system-reminder>` tags "in messages and tool
+  results are injected by the harness, not the user"; nothing escapes that tag in tool output. The same
+  class of error as §9: a perception-layer signal the attacker can write.
+- **Memory turns one read into many.** The cross-session half of §10.1's chain is built by the harness
+  itself.
+- **Multi-agent handoffs** paste upstream output verbatim into the next agent's *user* turn.
+
 ## §11 Read next  {#s11-next}
 
 - [[concepts/perception-model]] — what enters the context is the attack surface
 - [[concepts/credential-shielding]] — the design of taking things out
 - [[concepts/approval-gate]] — the defence that currently works
 - Original: [`browser-agents/07-security.md`](../../../browser-agents/07-security.md)
+- Strands case: [`strands/07-security.md`](../../../strands/07-security.md)

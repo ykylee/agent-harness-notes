@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md
+last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + strands/99-sources.md + strands/01-overview.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Primary-Source Verification — this repository's method of knowing
@@ -208,9 +208,24 @@ above it — **attacked, and it failed or held** — and two documents carry cla
 > vendor.** Dia publishes no definition of "irreversible action button," so the measurement bounds
 > what such a description can be relied on to mean — it does not report on their code.
 
+## §9.5 Observation — designs committed beside code, and a third `llms.txt` variant  {#s9-5-strands}
+
+**A new grade, 📐 designed-only** ([`strands/99`](../../../strands/99-sources.md) §1). Strands commits 20 design
+documents next to its code. 11 of the 13 marked "Proposed" are implemented — and the implementations
+deviate from the designs where it matters (approval precedence, Cedar fail-closed, stateful history).
+A design is intent; grade it as intent, and never let its status line stand in for grep.
+
+**The `llms.txt` record gains a variant.** `strandsagents.com/llms.txt` ✅ — but raw pages live at
+`<page>/index.md`; a constructed `<page>.md` 404s. Follow the links the index gives.
+
+**Recomputing a vendor chart from its own data** refuted a headline ("equal or better accuracy": lower
+in 7 of 19 same-model pairs) without refuting a ranking — no variance was reported, so sub-point gaps
+say nothing either way.
+
 ## §10 Read next  {#s10-next}
 
 - [[concepts/os-sandbox-policy]] §6 — where the inferred grade is actually applied
 - [[concepts/thread-turn-item]] §3 — where a refutation is actually applied
 - [[concepts/credential-shielding]] §4 — where the inheritance trap was actually avoided
 - Originals: [`docs/99-sources.md`](../../../docs/99-sources.md), [`browser-agents/99-sources.md`](../../../browser-agents/99-sources.md)
+- Strands case: [`strands/99-sources.md`](../../../strands/99-sources.md)

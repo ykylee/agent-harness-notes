@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/09-aside-browser-internals.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4
+last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/09-aside-browser-internals.md + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + strands/04-harness-and-cli.md + strands/07-security.md
 related_pages: [concepts/indirect-prompt-injection, concepts/perception-model, concepts/approval-gate, concepts/control-plane-execution-plane, concepts/primary-source-verification]
 created: 2026-09-23
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Credential Shielding — logging an agent in without giving it the secret
@@ -155,9 +155,20 @@ Shielding by behaviour is still a list of signals. A field that declares nothing
 `autocomplete`, no masking, a neutral name — is invisible to all of them. And shielding stops the
 *model* seeing the value; it says nothing about where the page itself sends it.
 
+## §7.4 Observation — a harness that holds keys in its own environment  {#s7-4-strands}
+
+The Strands CLI never writes API keys to its config file ✅ — then loads them into `process.env`,
+which every `shell` call inherits; the library's host sandbox inherits `env` the same way
+([`strands/07`](../../../strands/07-security.md) §4). One approved `env` prints every key the harness holds.
+
+> 📌 §3's axis split has a precondition: the harness's **own** credentials must not be in the tool
+> process's environment. Scrubbing provider variables from child processes is the cheapest shielding
+> there is, and it is the one most easily forgotten because nothing about the *user's* secrets is involved.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/indirect-prompt-injection]] — why the agent must not hold the secret
 - [[concepts/perception-model]] — element hiding is an operation on the perception layer
 - [[concepts/control-plane-execution-plane]] — planning location decides how the execution plane treats secrets
 - Original: [`browser-agents/06-architecture-axes.md`](../../../browser-agents/06-architecture-axes.md) §4
+- Strands case: [`strands/04-harness-and-cli.md`](../../../strands/04-harness-and-cli.md)

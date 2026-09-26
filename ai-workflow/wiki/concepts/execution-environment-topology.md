@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/09-agents-api-environments.md + docs/05-agents-api.md
+last_ingested_from: docs/09-agents-api-environments.md + docs/05-agents-api.md + strands/04-harness-and-cli.md
 related_pages: [concepts/control-plane-execution-plane, concepts/approval-gate, concepts/capability-distribution, concepts/os-sandbox-policy]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Execution Environment Topology — the three shapes of an execution environment
@@ -165,9 +165,28 @@ products.**
 
 > Pick the roster that matches **who runs the harness**, not the provider you already use.
 
+## §6.5 Observation — the topology as a constructor argument  {#s6-5-strands}
+
+**Strands** ([`strands/04`](../../../strands/04-harness-and-cli.md) §3) expresses this page's topology inside a
+library: `Agent(sandbox=…)` takes one of `NotASandboxLocalEnvironment` (the default — "no isolation …
+full privileges of the host process"), `DockerSandbox` or `SshSandbox`. Every harness tool (shell,
+files, `web_fetch`'s curl, environment probes) routes through it.
+
+| Agents API | Strands |
+|---|---|
+| `none` | — |
+| `openai_hosted` | — (no hosted plane) |
+| `self_hosted` | `DockerSandbox` · `SshSandbox` |
+| (local CLI) | `NotASandboxLocalEnvironment` — the default |
+
+> 📌 **Selecting a plane is not restricting it.** The `Sandbox` object decides *where* a command runs;
+> nothing in it limits *what* the command touches ([[concepts/os-sandbox-policy]] is the other half).
+> Even the host plane passes the full process environment — credentials included — to every child.
+
 ## §7 Read next  {#s7-next}
 
 - [[concepts/control-plane-execution-plane]] — the higher-level separation
 - [[concepts/capability-distribution]] — loading skills and plugins into an environment
 - [[concepts/approval-gate]] — handling `requires_action`
 - Original: [`docs/09-agents-api-environments.md`](../../../docs/09-agents-api-environments.md)
+- Strands case: [`strands/04-harness-and-cli.md`](../../../strands/04-harness-and-cli.md)

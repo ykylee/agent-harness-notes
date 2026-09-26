@@ -100,6 +100,8 @@ maintaining heddle from inside this repository, §3's exclusion has been breache
 - Source verification records and the history of refutations (`99-sources.md`)
 - **Control surface, perception model and credential design of browser-type agents**
   (`browser-agents/`)
+- **Embeddable SDK harnesses** — Strands Agents SDK and Strands harness (`strands/`, 2026-09-26):
+  loop, approval primitive, providers, execution environment, as read from source and design documents
 - **The axes shared by agent harnesses generally** — the concept layer
   (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)
 

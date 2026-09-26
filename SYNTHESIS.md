@@ -1,9 +1,11 @@
-# SYNTHESIS — Agent harnesses, where two studies cross
+# SYNTHESIS — Agent harnesses, where the studies cross
 
-> This repository holds two investigations. **[`docs/`](docs/)** read the OpenAI Codex harness out of
+> This repository holds three investigations. **[`docs/`](docs/)** read the OpenAI Codex harness out of
 > generated schemas and Rust source; **[`browser-agents/`](browser-agents/README.md)** read
-> browser-type agents out of product documentation and binaries. This document crosses them to
-> separate what belongs to harnesses in general from what belongs to a particular execution surface.
+> browser-type agents out of product documentation and binaries; **[`strands/`](strands/README.md)**
+> (added 2026-09-26) read the Strands Agents SDK and Strands harness out of their monorepo, design
+> documents and probes. This document crosses them to separate what belongs to harnesses in general
+> from what belongs to a particular execution surface — or, with Strands, to a particular **embedding**.
 >
 > Concept-level notes live in [`ai-workflow/wiki/`](ai-workflow/wiki/index.md); evidence grades live
 > in each study's `99-sources.md`.
@@ -21,14 +23,21 @@ OpenAI's own definition presumes no surface:
 > failures, **request human approval when necessary**, and return a useful result."
 
 **A harness is the execution system that sits between a model and a task.** That definition contains
-neither "shell" nor "browser." Codex and Aside are therefore **two instances of one abstraction.**
+neither "shell" nor "browser." Codex and Aside are therefore **two instances of one abstraction** —
+and Strands is a third, which differs on an axis the first two share.
 
-| | Codex | Browser-type agents |
-|---|---|---|
-| Execution surface | **shell · filesystem** | **browser · OS** |
-| What it observes | command output, diffs, files | **pages** |
-| Principal risk | destructive commands | **indirect prompt injection** |
-| Distribution | binary · SDK · managed API | browser fork · extension · library |
+| | Codex | Browser-type agents | **Strands** |
+|---|---|---|---|
+| Execution surface | **shell · filesystem** | **browser · OS** | shell · filesystem · web (harness); whatever tools you register (SDK) |
+| What it observes | command output, diffs, files | **pages** | tool results |
+| Principal risk | destructive commands | **indirect prompt injection** | both — and a default that gates neither ([`strands/07`](strands/07-security.md)) |
+| Distribution | binary · SDK · managed API | browser fork · extension · library | **library linked into your process** |
+| Caller ↔ loop | a wire (JSON-RPC, HTTP) | a product UI | **a function call** |
+
+> 📌 **The third case moves the caller, not the surface.** Codex and Aside both put a boundary between
+> whoever drives the agent and the loop itself. Strands has none: "it runs in your process with no
+> hosted control plane." Every concept this document calls a *protocol primitive* therefore has to
+> be re-asked of Strands as "what does it become without a wire?" — §2.1 is where the answer bites.
 
 > 📌 **A different surface means a different risk.** Codex asks "may I run this command?" A browser
 > agent has to ask "**is this page lying to me?**" That question did not exist for the former — shell
@@ -56,6 +65,18 @@ where to start when designing a new harness.
 > Conversely, Aside exposes no UI equivalent of `acceptForSession`. That is a deliberately
 > conservative choice.
 
+**Strands — approval without a wire** ([`strands/03`](strands/03-tools-and-approval.md) §4). A hook or
+tool calls `interrupt()`, which **raises**; the loop stops with `stop_reason="interrupt"`; the caller
+resumes by passing the answer back **as the next prompt**, and the hook or tool **re-runs from the
+top**. The only wire form is the A2A server's `input_required` — and the A2A *client* refuses to
+send interrupt responses.
+
+> 📌 **"The turn stops" survives the loss of the wire; the request shape does not.** Codex's
+> approval is a typed server→client message the client must answer. Strands' is a stop reason plus a
+> re-entry convention, so every side effect before the `interrupt()` call happens twice, and nothing
+> outside the process can answer it without a bridge. **If callers will ever be remote, approval
+> needs a shape before it needs a UI.**
+
 ### 2.2 Permissions as declarative policy
 
 | | Codex | Aside |
@@ -74,6 +95,12 @@ where to start when designing a new harness.
 > different axes.** Aside keeps the sandbox on and passwords hidden even under `full-access`. Codex
 > refuses to let project-local config override provider, auth or telemetry keys.
 
+**Strands** has the most policy *machinery* of the three — interventions, a Cedar backend
+(principal × tool × input context), an allow/ask list — and the least policy *by default*: the
+harness ships with approval off. Its finest grain is the **tool name**; the CLI's "always allow" for
+`shell` allows every command, and it downgrades every Cedar deny to an ask. §2.7 records what that
+adds to this section's principle.
+
 ### 2.3 Providers as data
 
 `ModelProviderInfo`'s premise — a provider is data, not a code branch — holds. What the browser study
@@ -87,6 +114,19 @@ adds is **who chooses.**
 
 > 📌 **"Model-agnostic" names two opposite designs.** The first removes model cost from the adoption
 > barrier; the second makes the product answerable for quality. This choice is tied to §2.4.
+
+**Strands tests the premise itself** ([`strands/05`](strands/05-providers-and-telemetry.md)). Its
+providers are **code**: twelve Python classes, five TS, each converting to an internal wire that is
+literally Bedrock ConverseStream ("modeled after the Bedrock API"). There is no base-URL-plus-wire
+record an operator can add; the harness's `"provider/model"` strings resolve through a closed table,
+and a bare string in the core `Agent` is always a Bedrock model id.
+
+> 📌 **Two coherent designs, not a right and a wrong.** Codex fixes the *wire* (Responses) and lets
+> providers vary as data — cheap to add a provider, expensive to use a vendor-native feature.
+> Strands fixes an *internal* wire and writes a converter per vendor — native features and first-class
+> Chat Completions, at the cost of per-converter information loss (every OpenAI path drops retained
+> reasoning) and no operator-level extension. **Provider-as-data holds where the wire is shared;
+> where it is not, the converter is the unit, and it is code.**
 
 ### 2.4 Control plane / execution plane
 
@@ -104,6 +144,16 @@ commands, state)** — is drawn **in a different place by each browser product.*
 > subscription to be usable. Aside's BYO-subscription is a consequence of the local daemon, not a
 > marketing choice.
 >
+**Strands draws the line inside the library.** Planning is wherever the caller's process is. Execution
+goes through a `Sandbox` object with three implementations — the host (`NotASandboxLocalEnvironment`,
+the default, "no isolation"), `DockerSandbox`, `SshSandbox` — and every harness tool routes through it
+([`strands/04`](strands/04-harness-and-cli.md) §3).
+
+> 📌 **This is the Agents API's environment topology ([`docs/09`](docs/09-agents-api-environments.md))
+> as a constructor argument.** It makes the execution plane swappable without a service boundary.
+> What it does *not* do is apply a policy on the plane it selects — Codex's OS sandbox modes restrict
+> what a command can touch; Strands' `Sandbox` only decides where it runs.
+
 > ⚠️ **Check which side a vendor means by "local."** Opera's `llms.txt` says "All AI processes run
 > locally"; the product FAQ says "**it uses cloud-based LLMs to generate the plans.**" Two
 > first-party sources from the same company disagree.
@@ -120,6 +170,10 @@ three axes are **orthogonal.**
 | Dia | Skills | **invocation** — called by name |
 | Aside | **Routines** | **time** — cron (start a new task) / heartbeat (wake an existing chat) |
 
+**Strands** is at the code-library end of *distribution*: a plugin is an in-process object installed
+by `pip`, with no manifest and nothing a policy layer could refuse; skills load `SKILL.md` folders,
+and `allowed-tools` in them is not enforced ([`strands/03`](strands/03-tools-and-approval.md) §3).
+
 > 📌 **Nobody has all three yet.** The cron/heartbeat distinction in particular exists only in Aside
 > — for an agent that carries conversational context, "start fresh" and "continue" mean different
 > things, and ordinary schedulers only offer the first.
@@ -131,9 +185,34 @@ three axes are **orthogonal.**
 | Codex | `codex mcp-server`, the App Server protocol, `item/tool/call` |
 | **Aside** | **`aside mcp`** — "Install the aside-browser skill into your coding agents (Codex, Claude Code, Cursor, OpenCode)" |
 | **Opera Neon** | **MCP server** — "external AI tools can connect to your live Neon browser session" |
+| **Strands** | **A2A server** (`a2a-sdk`), **ACP** via `strands --acp-server`. `strands-mcp` is a *documentation* server, not the agent |
 
-> 📌 **They reached this independently.** All three expose themselves not as a final product but as
+> 📌 **They reached this independently.** All four expose themselves not as a final product but as
 > **an execution surface for another harness.** It looks like a convergence point for the field.
+>
+> ⚠️ **The convergence is on exposure, not on MCP.** Strands — the one designed from the start to be
+> embedded — reaches other harnesses through agent-to-agent protocols (A2A, ACP) rather than as an MCP
+> tool. And exposure strips approval: its A2A default stream is self-declared non-conformant, the A2A
+> client cannot answer an interrupt, and the harness's ACP path forwards no permission requests
+> ([`strands/06`](strands/06-multi-agent-and-exposure.md)).
+
+### 2.7 A gate outside the loop is necessary, not sufficient
+
+§6.4 concluded that only the gate outside the model's control loop held. Strands puts that sentence
+under a different test: it **has** such a gate, as a first-class primitive with a Cedar backend — and
+a probe of its error paths ([`strands/07`](strands/07-security.md) §3, 🧪 with controls) found:
+
+| Property | Strands |
+|---|---|
+| **On by default** | no — the harness ships `interventions=None` |
+| **Fails closed on every error path** | no — a Cedar `forbid` that errors is skipped (**allowed**); a steering handler that raises lets the tool run |
+| **Parses the answer as an enum** | no — steering approves on any truthy response, **including `"no"`** |
+| **Composes by explicit precedence** | no — registration order, first short-circuit wins, despite documented precedence |
+| **Keeps a hard deny** | no — the CLI turns every deny into an ask |
+| **Authorizes the final input** | no — a later hook or middleware can rewrite the call after authorization |
+
+> 📌 **Placement is one property of six.** Each missing one was found only by running the error path —
+> the design documents describe the right behaviour for four of them.
 
 ## 3. Surface-specific axes — what the browser study produced
 
@@ -232,6 +311,12 @@ it. `AdditionalTools` is the item that carries the tool list in Codex's `respons
 - [ ] Provide a **unit of reuse**, and **suggest it automatically.** Users do not discover it themselves.
 - [ ] **Expose your own tool over MCP.** You may be an execution surface, not a final product.
 - [ ] **Keep a deterministic path** (Aside's `repl`) for where the model is weak.
+- [ ] Give the gate all six properties in §2.7 — **on by default, fail closed on every error path, enum
+      answers, explicit precedence, a hard deny, authorize the final input** — and test each error path.
+- [ ] If callers may be remote, give approval a **request shape**, not just a stop reason (§2.1).
+- [ ] Never tell the model an **authority tag** can appear in tool results unless every tool result
+      is escaped ([`strands/07`](strands/07-security.md) §2.1).
+- [ ] Strip provider credentials from the environment of every tool process.
 
 ### 5.2 After choosing a browser/OS surface
 
@@ -476,10 +561,13 @@ Both studies used the same discipline, and the browser study **added two lessons
 | **(new) A document describing behaviour is not evidence the behaviour exists** | In the implementation, a design document and a source comment both claimed iframe contents were included while the code walked only the main frame. Documentation and implementation had simply diverged, and nothing failed until it was measured. **This repository reads documents for a living** — §6 is the only place its claims were checked against something that runs |
 | **(new) Building a conclusion is a way of testing it** | Five of the conclusions in §2–§3 were refuted by implementing them (§6.1). All five had survived reading |
 | **(new) Re-read the original before building a test on your summary of it** | The Brave demonstration was paraphrased in one line as "send to the attacker's server." That became the threat model in §3.2, the threat model became a probe, and the probe then refuted a shape the demonstration never had (§6.5). Brave's own fourth step exfiltrates by replying to a comment. The primary source had been read — the error entered at the **summary**, and nothing downstream went back to the original |
+| **(new, Strands) A design document's status line is not implementation status** | 11 of 13 designs marked "Proposed" were implemented — and deviated from the design in ways that mattered (approval precedence, Cedar fail-closed, stateful history). Designs committed beside code look authoritative; grade them 📐 — intent, not behaviour |
 | **(new) A zero is evidence only if the input provably arrived** | Four separate times, a failure to deliver a test printed a *good* number: a frame walk that never ran, a payload mangled by a missing `charset`, a payload dropped by the reading mode, and a provider returning 404 for 200 straight calls — the last of which rendered as a flawless defence (§6.5, §6.6). Assertions looked correct in review every time; only printing what actually arrived found them |
 
 And one practical technique: **try `.md` and `/llms.txt` on a documentation site first.**
-Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered). **It is not universal.**
+Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered) · **Strands ✅, variant** —
+raw pages live at `<page>/index.md`; a constructed `<page>.md` 404s. **It is not universal, and where it
+works, follow the links `llms.txt` gives rather than building URLs.**
 
 ## 8. Reading order
 
@@ -487,12 +575,13 @@ Record: OpenAI ✅ · Aside ✅ · Opera ✅ · **Dia ❌** (client-rendered). *
 |---|---|
 | The Codex harness itself | [`REPORT.md`](REPORT.md) → [`docs/`](docs/) |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
+| An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) — start at [07](strands/07-security.md) for the gate findings |
 | **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
 | **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and two models measured against injected instructions |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)
 > were measured in a running implementation, §6.5 against a live model; Aside was verified down to its binaries; Codex was read
-> out of generated schemas and Rust source; Dia and Neon rest on product documentation; Comet relies
+> out of generated schemas and Rust source; Strands was read out of source, with five approval behaviours probed against a scripted mock model; Dia and Neon rest on product documentation; Comet relies
 > on third-party reverse engineering. Do not read the comparison tables without that asymmetry in
 > mind — and note that §6 grades **this repository's own conclusions**, not any vendor's.

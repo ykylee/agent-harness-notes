@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/09-aside-browser-internals.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Provider as Data — model providers as data, not code branches
@@ -135,9 +135,30 @@ Realtime connections use separate routing configuration and are exempt from this
 - [ ] Decide what happens to **in-flight threads** when provider policy changes — reject input, keep control
 - [ ] Decide **who chooses the model**, and know which product that makes you
 
+## §6.5 Observation — the opposite design, and where each holds  {#s6-5-strands}
+
+**Strands** ([`strands/05`](../../../strands/05-providers-and-telemetry.md)) makes providers **code**: 12 Python
+classes and 5 TS, each converting to an internal wire that is literally Bedrock ConverseStream
+(`types/streaming.py:1-5`, "modeled after the Bedrock API"). There is no base-URL + wire + auth
+record; the harness's `"provider/model"` strings go through a closed table of builder functions, and
+a bare string in the core `Agent` is always a Bedrock model id.
+
+| | Codex | Strands |
+|---|---|---|
+| Fixed | the **external** wire (Responses) | an **internal** wire (Converse) |
+| Varies | provider rows (data) | converter classes (code) |
+| Adding a provider | a config entry | a class |
+| Vendor-native features | only what the wire carries | per converter |
+| Retained reasoning | kept ([[concepts/retained-reasoning]]) | **dropped on every OpenAI path** |
+
+> 📌 **Provider-as-data holds where the wire is shared.** Where it is not, the unit of variation is the
+> converter, and a converter is code. Choose which wire you fix before choosing how providers are
+> expressed — the second decision follows from the first.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/wire-protocol-boundary]] — the constraint this data model sits under
 - [[concepts/retained-reasoning]] — a capability that should be a flag
 - [[concepts/control-plane-execution-plane]] — where planning runs, which this follows
 - Original: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md)
+- Strands case: [`strands/05-providers-and-telemetry.md`](../../../strands/05-providers-and-telemetry.md)

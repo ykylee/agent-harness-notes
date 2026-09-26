@@ -94,3 +94,20 @@ Notes:
 - The paraphrase had travelled into the implementation's probe design (navigation to an attacker
   origin). That repository is out of scope here; the note stands so the next probe is built on the
   original four steps.
+
+
+## [2026-09-26] ingest | Strands — a third case, embedded rather than served
+
+New study `strands/` (8 documents) re-indexed into seven concepts: `harness` §7.7,
+`approval-gate` §7.5, `provider-as-data` §6.5, `execution-environment-topology` §6.5,
+`indirect-prompt-injection` §10.5, `credential-shielding` §7.4, `primary-source-verification` §9.5.
+
+Notes:
+- No existing conclusion was overturned. Two were **qualified**: provider-as-data holds where the
+  wire is shared (Strands fixes an internal wire and makes providers code); and "only the gate
+  outside the loop held" (SYNTHESIS §6.4) is necessary, not sufficient — Strands has such a gate
+  and five other properties of it are missing (SYNTHESIS §2.7).
+- A new grade, 📐 designed-only, for design documents committed beside code whose status lines are
+  unreliable.
+- Probe results (🧪) come from the SDK's own scripted mock model, re-run by the main session with
+  controls. No live model was used; every injection path stays ⚠️.

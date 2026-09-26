@@ -90,7 +90,7 @@ default-mode check into CI.
   confirmed with the user first.
 - Constraints:
   - The Codex study reflects `openai/codex` as of 2026-09-15; the browser-agent study reflects
-    2026-09-22/23. Both move fast. The first move of any re-investigation is checking the existing
+    2026-09-22/23; the Strands study reflects `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.
   - Dates diverge between primary sources because of time zones. Record publication dates in UTC and
     add a conversion table where it matters.

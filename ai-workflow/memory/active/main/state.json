@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-09-23",
+  "generated_at": "2026-09-26",
   "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
   "purpose_digest_rev": "2026-09-23",
   "source_of_truth": {
@@ -10,7 +10,7 @@
     "daily_backlog_dir": "ai-workflow/memory/active/main/backlog",
     "tasks_dir": "ai-workflow/memory/active/main/backlog/tasks",
     "sessions_dir": "ai-workflow/memory/active/main/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-23.md",
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -38,6 +38,7 @@
       "TASK-2026-09-22-agent-harness-notes-004"
     ],
     "recent_done_items": [
+      "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
       "TASK-2026-09-23-main-015 — 주입 위협 모델 강조점 재검토",
       "TASK-2026-09-23-main-014 — 두 번째 공급자로 주입 결론 검증 및 정정",
       "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정",
@@ -46,32 +47,24 @@
       "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영",
       "TASK-2026-09-23-main-009 — 번역이 깨뜨린 파서 라벨 복구",
       "TASK-2026-09-23-main-008 — 브랜치 병합 및 메모리 아카이브",
-      "TASK-2026-09-22-agent-harness-notes-006 — docs 수정 시 위키 재색인 강제",
-      "TASK-2026-09-22-agent-harness-notes-005 — wiki concepts 계층 구성"
+      "TASK-2026-09-22-agent-harness-notes-006 — docs 수정 시 위키 재색인 강제"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-23.md",
-    "task_count": 8,
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
+    "task_count": 1,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-09-23-main-008 — 브랜치 병합 및 메모리 아카이브",
-      "TASK-2026-09-23-main-009 — 번역이 깨뜨린 파서 라벨 복구",
-      "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영",
-      "TASK-2026-09-23-main-011 — SYNTHESIS 구현 피드백 절 편입",
-      "TASK-2026-09-23-main-012 — 주입 방어 실측을 노트 저장소로 편입",
-      "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정",
-      "TASK-2026-09-23-main-014 — 두 번째 공급자로 주입 결론 검증 및 정정",
-      "TASK-2026-09-23-main-015 — 주입 위협 모델 강조점 재검토"
+      "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석"
     ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/main/session_handoff.md",
-    "ai-workflow/memory/active/main/backlog/2026-09-23.md",
+    "ai-workflow/memory/active/main/backlog/2026-09-26.md",
     "ai-workflow/memory/active/PURPOSE.md",
     "ai-workflow/memory/active/main/state.json",
     "ai-workflow/memory/active/main/backlog"
