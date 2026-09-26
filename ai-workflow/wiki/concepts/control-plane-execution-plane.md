@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/06-architecture-axes.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Control Plane / Execution Plane — separating the harness from compute
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against the Codex drift re-check of `e72da2b538`; no change to this concept)
 
 ## §1 TL;DR  {#s1-tldr}
 

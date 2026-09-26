@@ -60,20 +60,25 @@ Server requests are **bucketed per turn** before rendering. One switch collects
 item/tool/requestOptionPicker | item/tool/requestUserInput` into a `Map` keyed on `params.turnId`. Replies go through
 `replyWithCommandExecutionApprovalDecision` / `replyWithFileChangeApprovalDecision` ✅ (`webview/assets/app-initial-*.js`).
 
-#### 1.2.1 Drift lead for the Codex study: three methods the shipped client uses but `docs/02` lacks
+#### 1.2.1 Methods the shipped client uses that the open-source engine does not have
 
-> ⚠️ **Lead, not a finding.** These literals are in the shipped 26.924.22138 bundle. They are absent from
-> [../docs/02-app-server-protocol.md](../docs/02-app-server-protocol.md) @ `acd9fad` **and** from the public
-> `learn.chatgpt.com/docs/app-server.md` fetched 2026-09-26. `docs/` was not edited.
+> **Resolved 2026-09-26** by the Codex drift re-check ([../docs/99-sources.md §E.3](../docs/99-sources.md)). This section
+> first read "either these are experimental or internal, or `docs/02` has drifted." **Neither held.**
 
-| Method | Bundle refs | Adjacent UI string | Likely role (⚠️) |
-|---|---|---|---|
-| `item/tool/requestOptionPicker` | 14 | batched with the approval/user-input requests above | a server→client multiple-choice ask, a sibling of `requestUserInput` |
-| `item/plan/requestImplementation` | 12 | `Yes, implement this plan` (`codex.userMessage.implementPlan`) | the plan-mode → execute hand-off as a server request |
-| `thread/startAeon` | 8 | none found | possibly the long-running `Persistent` effort tier (§3.2); unknown |
+| Method | Bundle refs | Adjacent UI string | `openai/codex` history | Bundled engine |
+|---|---|---|---|---|
+| `item/tool/requestOptionPicker` | 14 | batched with the approval/user-input requests above | 0 commits | absent |
+| `item/plan/requestImplementation` | 12 | `Yes, implement this plan` (`codex.userMessage.implementPlan`) | 0 commits | absent |
+| `thread/startAeon` | 8 | none found; shares `thread/start`'s param rewriting and lifecycle tracing | 0 commits | absent |
 
-Next step for the Codex study: check `codex-rs/app-server-protocol/schema` at a current commit. Either these are
-experimental or internal, or `docs/02` has drifted.
+The full sweep found the same pattern for `item/tool/requestSetupCodexContextPicker`, `thread/stop`,
+`turn/addUserMessage` and `plugin/codex`, and `thread/rollback` (listed above among referenced methods) was
+**removed** from the open-source protocol on 2026-09-11 (#44915). "Bundled engine" is the binary this same app ships,
+`codex-cli 0.158.0-alpha.2.1`, scanned with `strings` and positive-controlled (`gatewayOAuth`, `requestUserInput` are found).
+
+So the client carries code paths the engine it ships cannot answer. ⚠️ Which engine does — a cloud-side one or a closed
+build — is not determinable from the artifacts. Separately, about 33 other methods the client calls are **experimental**
+methods that exist in the engine but are filtered out of the generated schema; that gap was in `docs/02`, now fixed.
 
 ### 1.3 (A) Layout: where the agent lives
 
@@ -300,7 +305,7 @@ and `{actor}`-parameterised prompts. **The same primitive gets a different perso
 | Claim | Artifact | Grade |
 |---|---|---|
 | Study premise: "ChatGPT desktop (macOS) is native SwiftUI, distinct from Codex desktop" | The official ChatGPT download for macOS/Windows/Linux is the Codex Electron/OWL build (§1.1). SwiftUI survives only as legacy 1.2026.183, which ships an upgrade screen to the new app | ❌ (premise, not vendor claim) |
-| "Codex app-server is the interface Codex uses to power rich clients" (📣 `app-server.md`) implies the public doc covers what rich clients use | The shipped client calls `item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `thread/startAeon`, none of which is documented (§1.2.1) | ⚠️ drift, not refuted |
+| "Codex app-server is the interface Codex uses to power rich clients" (📣 `app-server.md`) implies the public doc covers what rich clients use | The shipped client calls at least seven methods that exist neither in `openai/codex` nor in the engine the app bundles, e.g. `item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `thread/startAeon` (§1.2.1) | ❌ refuted 2026-09-26: not drift — the open-source App Server is not the whole surface the client targets |
 | Tool shell presented as "Electron" | Electron API only; the runtime is OWL on a full Chromium 154 | ✅ correction |
 
 ## 7. What this means if you are building an agent client
@@ -319,7 +324,7 @@ and `{actor}`-parameterised prompts. **The same primitive gets a different perso
 
 - ⚠️ **Everything visual**: approval card weight, density in practice, icon usage, whether squircles are active in the shipped Chromium 154.
 - ⚠️ Mapping of `Always allow` and the prefix rule onto App Server amendment decisions. This needs a live run with protocol tracing.
-- ⚠️ Semantics of `thread/startAeon` and `item/tool/requestOptionPicker` (§1.2.1).
+- ⚠️ Semantics of `thread/startAeon` and `item/tool/requestOptionPicker`, and which engine answers them (§1.2.1).
 - ⚠️ How much of the component layer is Radix and how much is in-house.
 - ⚠️ Native (B) colour tokens need `assetutil`/`acextract` on macOS. Which `codex_remote_*` strings render on macOS versus only on iOS.
 - ⚠️ Whether the pre-superapp Windows ChatGPT (Store) build still exists and what it was built with. Not checked.

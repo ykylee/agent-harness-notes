@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/16-responses-chat-adapter.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/thread-turn-item]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Stateless Conversation Wire — what `store: false` gives away free
@@ -12,21 +12,21 @@ updated: 2026-09-23
 - Purpose: why Codex sends conversations to the model completely statelessly, and what that exempts an adapter or proxy from building.
 - Scope: the real request payload, the evidence of statelessness, the design burdens removed, the fields pinned to constants
 - Primary sources: `codex-rs/codex-api/src/common.rs`, `codex-rs/core/src/client.rs`
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
 | # | Item | Value |
 |---|---|---|
 | 1 | `store` | **`false`** — always |
-| 2 | `previous_response_id` | **absent** from the HTTP payload (it exists only on the WebSocket variant, and the conversion sets it to `None`) |
+| 2 | `previous_response_id` | **absent** from the HTTP payload. *(Corrected 2026-09-26:)* the conversion sets it to `None`, but the **WebSocket** client then fills it in for incremental requests (`core/client.rs`) — so statelessness holds **over HTTP only** |
 | 3 | Conclusion | **the entire conversation is resent as `input[]` every turn** |
 | 4 | What is exempted | session store · response-id registry · expiry handling · cleanup path |
 | 5 | Scaling | horizontal scaling for free |
 
 ## §2 The actual payload  {#s2-actual-payload}
 
-`ResponsesApiRequest` — seventeen fields.
+`ResponsesApiRequest` — sixteen fields *(corrected 2026-09-26; this page first said seventeen)*.
 
 ```rust
 pub struct ResponsesApiRequest {
@@ -93,8 +93,11 @@ if !is_openai {
 When the provider is **not** named `openai`, Codex strips OpenAI-specific passthrough metadata and
 encrypted function arguments before sending. The adapter gets cleaner input for free.
 
-> The lever is the provider's **`name`** alone. A provider *named* `openai` but pointed at a proxy
-> takes the OpenAI path and sends fields the adapter must then strip itself.
+> The main lever is the provider's **`name`**. A provider *named* `openai` but pointed at a proxy
+> takes the OpenAI path and sends fields the adapter must then strip itself. *(Narrowed 2026-09-26:)* not the
+> only lever — tool-result metadata and MCP attribution are also filtered by a first-party HTTPS
+> destination check, and since 2026-09 by `include_internal_metadata`, which only the built-in `openai`
+> provider sets (#48344) ⚠️.
 
 ## §6 What statelessness does not solve  {#s6-what-remains}
 

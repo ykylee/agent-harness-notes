@@ -1,18 +1,24 @@
 # 06. Choosing an Integration Path
 
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+
 ## 1. Comparison
 
-| Criterion | `codex exec` | Codex SDK | `codex mcp-server` | **App Server** | Agents API |
-|---|---|---|---|---|---|
-| Form | CLI | TS/Python library | MCP stdio server | JSON-RPC process | Managed HTTPS API |
-| Who runs it | Your machine / CI | Your machine | Your machine | Your machine / container | **OpenAI** |
-| Surface area | Narrow | Medium | Only what MCP exposes | **Full** | Full (managed) |
-| Progress streaming | `--json` JSONL | `runStreamed()` | Limited | 84 notification types | Streaming / webhooks |
-| Approval interception | Policy flags only | Policy | Limited | **Live, via server requests** | requires_action |
-| Injecting app-owned tools | ✗ | Limited | ✗ | **`item/tool/call`** | Function calls / MCP |
-| Auth · model discovery · config management | Partial | Partial | ✗ | **All of it** | Managed |
-| Integration cost | Lowest | Low | Low | **High (write bindings)** | Medium |
-| Infrastructure you operate | Yours | Yours | Yours | Yours | **OpenAI's** |
+| Criterion | `codex exec` | Codex SDK | **App Server** | Agents API |
+|---|---|---|---|---|
+| Form | CLI | TS/Python library | JSON-RPC process | Managed HTTPS API |
+| Who runs it | Your machine / CI | Your machine | Your machine / container | **OpenAI** |
+| Surface area | Narrow | Medium | **Full** | Full (managed) |
+| Progress streaming | `--json` JSONL | `runStreamed()` | 85 notification types *(2026-09-26: was 84; + `account/gatewayOAuth/changed`, #47207)* | Streaming / webhooks |
+| Approval interception | Policy flags only | Policy | **Live, via server requests** | requires_action |
+| Injecting app-owned tools | ✗ | Limited | **`item/tool/call`** | Function calls / MCP |
+| Auth · model discovery · config management | Partial | Partial | **All of it** | Managed |
+| Integration cost | Lowest | Low | **High (write bindings)** | Medium |
+| Infrastructure you operate | Yours | Yours | Yours | **OpenAI's** |
+
+*(corrected 2026-09-26: the `codex mcp-server` column was removed — that command was already gone at
+the snapshot, removed in #42993 on 2026-09-05. Only `codex mcp`, which manages external MCP servers,
+remains; App Server is the route for rich integration.)*
 
 ## 2. Decision flow
 
@@ -22,7 +28,7 @@ Is the agent "the product itself"? (embedded in the UI, approval flows, live str
 │          ├─ Yes ──▶ ★ App Server
 │          └─ No  ──▶ ★ Agents API
 └─ No
-   ├─ You already have an MCP workflow and want Codex as one tool ──▶ codex mcp-server
+   ├─ You already have an MCP workflow and want Codex as one tool ──▶ App Server (codex mcp-server removed, #42993)
    ├─ You want to call it programmatically from server-side code ──▶ Codex SDK
    └─ You want a one-shot run in CI or a script ──▶ codex exec
 ```
@@ -34,7 +40,7 @@ Is the agent "the product itself"? (embedded in the UI, approval flows, live str
 
 Their commentary on the trade-offs:
 
-**Using Codex as an MCP server**
+**Using Codex as an MCP server** *(corrected 2026-09-26: this mode no longer exists — `codex mcp-server` was removed in #42993)*
 > "you only get what MCP exposes, so Codex-specific interactions that rely on richer session semantics
 > (e.g., diff updates) may not map cleanly through MCP endpoints."
 
@@ -58,7 +64,7 @@ Their commentary on the trade-offs:
 - [ ] Opt into only the capabilities you need in `initialize`
       (`experimentalApi` significantly widens the surface — enable it only when you actually use it)
 - [ ] Use `optOutNotificationMethods` to **suppress notifications you don't consume** — you do not
-      need to handle all 84
+      need to handle all 85 *(2026-09-26: was 84)*
 
 ### Rendering
 - [ ] Implement the three-stage pipeline in the UI: `item/started` → render a placeholder
@@ -77,7 +83,10 @@ Their commentary on the trade-offs:
 
 ### Errors / resilience
 - [ ] Branch on `turn/completed` with `status: "failed"` and `codexErrorInfo`
-      (`ContextWindowExceeded`, `UsageLimitExceeded`, `HttpConnectionFailed`, `SandboxError`)
+      (`contextWindowExceeded`, `usageLimitExceeded`, `{httpConnectionFailed: {httpStatusCode}}`, `sandboxError`,
+      `flexUnavailable`) *(corrected 2026-09-26: wire values are camelCase and `httpConnectionFailed` is an
+      object variant; `flexUnavailable` added in #47967; core `BioPolicy`/`InvalidPrompt` surface as `other`,
+      #46306, #47353)*
 - [ ] For JSON-RPC errors, branch on the **`{type, reason}` values, not message text**
 - [ ] Backpressure: `-32001` when the queue saturates → exponential backoff with jitter
 - [ ] Design for reconnection — in ephemeral contexts like the web, **keep state on the server** and
@@ -94,6 +103,8 @@ Their commentary on the trade-offs:
       meant one turn only
 - [ ] `thread/rollback` is **removed** → use `thread/revert`
 - [ ] `disabledPluginIds` is currently **saved but does not actually filter capabilities**
+      *(2026-09-26: field doc unchanged, but disabled plugins now hide their connectors via plugin config,
+      #45755, #47939 — ⚠️ inferred distinction between the saved field and the plugin-config path)*
 - [ ] A thread with a live internal worker cannot be archived or deleted (`-32600`)
 - [ ] `serverCapabilities` from `mcpServerStatus/list` is `null` when initialization failed — never
       infer it from the tool list

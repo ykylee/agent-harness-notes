@@ -2,6 +2,7 @@
 
 > Source: the official guides `agents-api/sessions/webhooks`, `agents-api/observability`,
 > `agents-api/tracing`, read as raw Markdown. Extracted 2026-09-15.
+> Drift-checked against `openai/openai-openapi@d983890f77` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. API key scopes
 
@@ -13,6 +14,9 @@ A restricted application key needs:
 | `api.agents.write` | Creating sessions and submitting input |
 | `api.responses.write` | Inference |
 | `api.vaults.read` / `api.vaults.write` | Managing vaults (only if you use them) |
+
+A key missing a scope gets `403` "The API key lacks the required permission" — the head spec declares it
+on most `/agents` operations *(2026-09-26)*.
 
 Separately, the executor uses an **environment key** as `CODEX_API_KEY`, which authorizes nothing but
 connecting environments.
@@ -180,6 +184,9 @@ and **may change after the fact**.
 - [ ] Remember the webhook/stream name split: `action_required` vs `requires_action`
 - [ ] Always **retrieve the session** after a webhook — the payload carries no details
 - [ ] Return 2xx from the webhook **only after queuing succeeds**
+- [ ] Treat `202` from a cancel event as acceptance, not durable completion; cancel can also recover a
+      still-open turn whose backend execution has ended. Cancel running execution **before** deleting a
+      session — delete only cancels a still-open turn once execution has ended *(2026-09-26)*
 - [ ] Page turns and items with `last_id` → `after` while `has_more`
 - [ ] Sum Agent-span usage across root and subagents; don't read a parent span as a total
 - [ ] Treat `usage` as best-effort and mutable; don't bill customers directly from it

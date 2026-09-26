@@ -4,6 +4,7 @@
 > (→ learn.chatgpt.com/docs/app-server), the OpenAI engineering blog (2026-02-04), and
 > **the schemas generated in the `openai/codex` repository**
 > (`codex-rs/app-server-protocol/schema/`). Where they disagree, the generated schemas are authoritative.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. Basic shape of the protocol
 
@@ -26,7 +27,7 @@ Three message kinds:
 |---|---|---|
 | **stdio** | default | Newline-delimited JSON (JSONL). Single client. Used by the VS Code extension and the Python SDK |
 | **WebSocket** | experimental | `ws://` / `wss://`, optional authentication. Multiple clients |
-| **Unix socket** | supported | Standard HTTP upgrade handshake |
+| **Unix socket** | supported | Standard HTTP upgrade handshake; the upgrade now advertises `x-codex-websocket-max-unfragmented-message-bytes` (#46548) and socket parent dirs are permission-checked (#45984) *(2026-09-26)* |
 | **off** | — | No local transport exposed |
 
 `--listen` accepts exactly: **`stdio://` (the default)**, `unix://`, `unix://PATH`, `ws://IP:PORT`, `off`
@@ -38,7 +39,7 @@ Three message kinds:
 
 Health probes `/readyz` and `/healthz` are registered as routes on the WebSocket listener.
 
-WebSocket hardening, verified in `app-server-transport/src/transport/websocket.rs`:
+WebSocket hardening, verified in `app-server-transport/src/transport/websocket.rs` *(2026-09-26: behaviour unchanged, but the auth policy moved to the new crate `codex-websocket-auth`; #47447)*:
 - **Any request carrying an `Origin` header is rejected** (`reject_requests_with_origin_header`
   middleware) — CSRF defense, since a browser cannot suppress `Origin`
 - Binds **localhost only**; the startup notice suggests SSH port-forwarding for remote access
@@ -109,6 +110,7 @@ type InitializeCapabilities = {
   mcpServerOpenaiFormElicitation?: boolean, // legacy opt-in for the openai/form MCP extension
   optOutNotificationMethods?: string[] | null, // notification methods to suppress on this connection (e.g. "thread/started")
   extensions?: Record<string, JsonValue> | null, // MCP extension settings
+  explicitGatewayOauth?: boolean,         // explicit gateway OAuth login instead of automatic browser auth — added 2026-09-26 (#47207)
 }
 ```
 
@@ -142,7 +144,7 @@ terminal payload on `completed`.
 | `plan` | `text` |
 | `commandExecution` | `command`, `cwd`, `processId`, `source`, `status`, `commandActions[]`, `aggregatedOutput`, `exitCode`, `durationMs`, `pluginId`, `scriptPath` |
 | `fileChange` | `changes: FileUpdateChange[]`, `status` |
-| `mcpToolCall` | `server`, `tool`, `status`, `arguments`, `appContext`, `readOnlyHint`, `result`, `error`, `durationMs` |
+| `mcpToolCall` | `server`, `tool`, `status`, `arguments`, `appContext`, `mcpAppUi` (`McpAppUi \| null`: `resourceUri`, `preferredModelDisplayMode` `inline`\|`fullscreen`; `mcpAppResourceUri` is now a legacy compatibility field — added 2026-09-26, #45805), `readOnlyHint`, `result`, `error`, `durationMs` |
 | `dynamicToolCall` | `namespace`, `tool`, `arguments`, `status`, `contentItems`, `success`, `durationMs` |
 | `functionCallOutput` | `name`, `namespace`, `output` |
 | `collabAgentToolCall` | `tool`, `status`, `senderThreadId`, `receiverThreadIds[]`, `prompt`, `model`, `reasoningEffort`, `agentsStates` |
@@ -207,9 +209,12 @@ To see the actual JSON for a full turn:
 codex debug app-server send-message-v2 "run tests and summarize failures"
 ```
 
-## 6. Client → server methods (104 total)
+## 6. Client → server methods (107 stable; 170 including experimental)
 
-The full `ClientRequest` list, grouped by domain.
+The full *stable* `ClientRequest` list, grouped by domain. *(corrected 2026-09-26: the committed
+`schema/typescript/ClientRequest.ts` is generated without `#[experimental]` methods — 104 stable of
+166 total at the snapshot; `common.rs` `client_request_definitions!` is the full list. Experimental
+methods are in §6.12.)*
 
 ### 6.1 Handshake
 ```
@@ -291,6 +296,7 @@ account/rateLimits/read account/usage/read
 account/rateLimitResetCredit/consume
 account/workspaceMessages/read
 account/sendAddCreditsNudgeEmail
+account/gatewayOAuth/login  account/gatewayOAuth/read  account/gatewayOAuth/cancel   ← added 2026-09-26 (#47207)
 ```
 
 ### 6.11 Miscellaneous
@@ -304,6 +310,47 @@ externalAgentConfig/import/readHistories
 
 > `externalAgentConfig/*` is a migration path that **detects and imports configuration from other
 > agent tools** (the `codex-rs/external-agent-migration` crate).
+
+### 6.12 Experimental methods (not in the generated schema) *(2026-09-26)*
+
+63 client methods marked `#[experimental]` in `common.rs` (62 at the snapshot) are filtered out of the
+committed TypeScript/JSON schema, but exist in source and in the shipped engine binary
+(codex-cli 0.158.0-alpha.2.1 in ChatGPT.app). They require `experimentalApi: true`. Experimental
+*server notifications* (22) **are** exported, which is why §8 lists e.g. `thread/queue/changed` and
+`thread/realtime/*` without the requests that drive them. One experimental **server request** is
+filtered the same way: `currentTime/read` ("Read the current time from an external clock owned by the
+client"), so the 10 in §7 are the stable set.
+
+```
+account/bedrock/discover        account/bedrock/setup
+collaborationMode/list
+environment/add                 environment/info            environment/status
+fuzzyFileSearch/sessionStart    fuzzyFileSearch/sessionStop fuzzyFileSearch/sessionUpdate
+mcpServer/event/stream/start    mcpServer/event/stream/stop
+memory/reset                    memory/status
+mock/experimentalMethod
+plugin/search
+process/spawn   process/kill    process/resizePty   process/writeStdin
+project/create  project/delete  project/import  project/list
+project/move    project/read    project/update
+remoteControl/enable            remoteControl/disable       remoteControl/status/read
+remoteControl/pairing/start     remoteControl/pairing/status
+remoteControl/client/list       remoteControl/client/revoke
+rollout/compress                ← new since snapshot (#46020): schedules background compression of cold rollouts
+server/diagnostics
+thread/backgroundTerminals/list thread/backgroundTerminals/clean  thread/backgroundTerminals/terminate
+thread/increment_elicitation    thread/decrement_elicitation
+thread/memoryMode/set
+thread/queue/add    thread/queue/delete thread/queue/list
+thread/queue/reorder thread/queue/start thread/queue/update
+thread/realtime/start           thread/realtime/stop        thread/realtime/listVoices
+thread/realtime/appendAudio     thread/realtime/appendSpeech thread/realtime/appendText
+thread/search                   thread/searchOccurrences
+thread/settings/update          turn/settings/update
+thread/timeline/list
+userVerification/status  userVerification/enroll  userVerification/delete
+userVerification/verify  userVerification/cancel
+```
 
 ## 7. Server → client requests (10) — where humans step in
 
@@ -333,7 +380,7 @@ by the host application**. It is the protocol-level implementation of the divisi
 "your application owns product context, business rules, and tools; Codex provides the agent loop
 and sandboxed execution."
 
-## 8. Server notifications (84)
+## 8. Server notifications (85)
 
 ### 8.1 Thread lifecycle
 ```
@@ -387,6 +434,7 @@ mcpServer/startupStatus/updated     mcpServer/oauthLogin/completed
 mcpServer/event/stream/notification
 app/list/updated
 account/updated     account/rateLimits/updated      account/login/completed
+account/gatewayOAuth/changed        ← added 2026-09-26 (#47207)
 skills/changed
 ```
 
@@ -436,7 +484,7 @@ type ThreadStartParams = {
   serviceName?: string | null,
   baseInstructions?: string | null,
   developerInstructions?: string | null,
-  personality?: Personality | null,
+  personality?: Personality | null,   // @deprecated 2026-09-26 (#45809): friendly/pragmatic no longer select a style
   ephemeral?: boolean | null,                     // a thread that is not persisted
   sessionStartSource?: ThreadStartSource | null,
   threadSource?: ThreadSource | null,
@@ -481,7 +529,7 @@ type TurnStartParams = {
   serviceTier?: string | null,
   effort?: ReasoningEffort | null,
   summary?: ReasoningSummary | null,
-  personality?: Personality | null,
+  personality?: Personality | null,   // @deprecated 2026-09-26 (#45809), see note below
 
   serviceTierForTurn?: string | null,  // this turn only (does not change the thread's tier)
   outputSchema?: JsonValue | null,     // JSON Schema constraining the final assistant message
@@ -492,6 +540,10 @@ type TurnStartParams = {
 > To change only one turn, use an explicitly scoped field like `serviceTierForTurn`, or revert on
 > the next turn.
 
+> *(2026-09-26, #45809)* `personality` is now `@deprecated`: `friendly` / `pragmatic` no longer
+> select a style, `model/list` always returns `supportsPersonality: false`, and `features.personality`
+> is ignored.
+
 ### `UserInput` kinds (per protocol_v1)
 
 | type | Description |
@@ -500,6 +552,10 @@ type TurnStartParams = {
 | `image` / `local_image` | Image input |
 | `skill` | Explicit skill selection (`name`, path to `SKILL.md`) |
 | `mention` | Explicit app/connector selection (`name`, path in `app://{connector_id}` form) |
+
+*(corrected 2026-09-26: the table above is protocol_v1. The v2 `UserInput.ts` uses `text`, `image`,
+`localImage`, `audio` (`url`), `localAudio` (`path`), `skill`, `mention`.)* The v2 `image` variant is
+now `{url} | {fileId}` (an `ImageReference`), added 2026-09-26 (#45794).
 
 ## 10. Sandbox policies
 
@@ -524,15 +580,17 @@ Turn failures arrive inside `turn/completed`:
       "status": "failed",
       "error": {
         "message": "...",
-        "codexErrorInfo": "ContextWindowExceeded"
+        "codexErrorInfo": "contextWindowExceeded"
       }
     }
   }
 }
 ```
 
-Common `codexErrorInfo` values: `ContextWindowExceeded`, `UsageLimitExceeded`,
-`HttpConnectionFailed`, `SandboxError`.
+Common `codexErrorInfo` values: `contextWindowExceeded`, `usageLimitExceeded`,
+`{ httpConnectionFailed: { httpStatusCode } }`, `sandboxError`. *(corrected 2026-09-26: wire values
+are camelCase, and `httpConnectionFailed` is an object variant.)* `flexUnavailable` was added
+2026-09-26 (#47967).
 
 RPC-level failures use the JSON-RPC error envelope. Some domains (for example user verification)
 attach closed-set `{type, reason}` data: `invalidRequest` / `unavailable` / `cancelled` / `failed`.
@@ -573,11 +631,11 @@ The committed outputs are readable directly in the repository:
 ```
 codex-rs/app-server-protocol/schema/
 ├── json/
-│   ├── ClientRequest.json                        (~197KB)
+│   ├── ClientRequest.json                        (~202KB)
 │   ├── ServerNotification.json                   (~198KB)
 │   ├── ServerRequest.json                        (~49KB)
-│   ├── codex_app_server_protocol.schemas.json    (~682KB)
-│   ├── codex_app_server_protocol.v2.schemas.json (~583KB)
+│   ├── codex_app_server_protocol.schemas.json    (~696KB)
+│   ├── codex_app_server_protocol.v2.schemas.json (~597KB)
 │   └── v1/ , v2/
 ├── typescript/
 │   ├── ClientRequest.ts  ServerRequest.ts  ServerNotification.ts
@@ -586,6 +644,8 @@ codex-rs/app-server-protocol/schema/
 │   └── v2/   ← ThreadStartParams, TurnStartParams, ThreadItem, and the other payloads
 └── precomputed/
 ```
+
+Sizes updated 2026-09-26.
 
 Languages with existing implementations: **Go, Python, TypeScript, Swift, Kotlin**.
 OpenAI notes that "Codex is able to do a lot of the heavy lifting if you feed it the JSON schema
@@ -648,6 +708,17 @@ The repo's `codex-rs/app-server/README.md` reads more like release notes. Curren
 - **Amazon Bedrock** — if `model_providers.amazon-bedrock.aws.credential_export` is configured,
   Bedrock setup and login return an error without changing configuration or credentials.
   `aws.credential_export` and `aws.profile` cannot be configured together.
+
+*(2026-09-26: the README grew by ~227 lines.)* New sections since the snapshot:
+
+- **MCP App UI** — `mcpToolCall.mcpAppUi` (#45805).
+- **Hosted resource read** — `target {connectorId, linkId}` (#47248).
+- **Rollout compression** — experimental `rollout/compress` (#46020).
+- **Deprecated personality** — see §9 (#45809).
+- **Windows sandbox implementation / MXC** (#45737).
+- **Gateway OAuth sign-in** — `account/gatewayOAuth/*` (#47207).
+- **Model-catalog provider check** (`-32600`).
+- **Project trust** and **app network policy**.
 
 ## 15. Legacy: the Codex core internal protocol (protocol_v1)
 

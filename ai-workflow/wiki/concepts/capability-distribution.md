@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md + browser-agents/11-dia-and-neon.md + browser-agents/08-aside-code-level.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/provider-as-data]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Capability Distribution — how plugins, marketplaces and skills circulate
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: how capabilities (skills and MCP) are packaged, distributed, installed and enabled — and what to know before inventing your own format.
 - Scope: the model in a paragraph, the portable manifest, catalog format, the install cache, three verbs, the protocol surface
 - Primary sources: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -129,7 +129,7 @@ system configuration. **Decide the precedence order before you ship.**
 > load every child plugin's MCP configuration.**
 > Each session gets its own environment, and **the root agent and its subagents share it.**
 
-Path rules (repeated everywhere, so enforce them once): **start with `./`, stay inside the plugin,
+Path rules (repeated everywhere, so enforce them once — one exception since 2026-09: the `com.openai` overlay's `onboardingSkill` accepts paths with or without `./`, #46544): **start with `./`, stay inside the plugin,
 contain no `..` components.**
 
 ## §7 Protocol surface  {#s7-protocol}
@@ -141,6 +141,7 @@ plugin/install         plugin/uninstall        plugin/reconcile
 plugin/skill/read
 plugin/share/save      plugin/share/list       plugin/share/checkout
 plugin/share/delete    plugin/share/updateTargets
+plugin/search          (experimental — absent from the generated schema; first missed here)
 app/list               app/read                app/installed
 skills/list            skills/extraRoots/set   skills/config/write
 hooks/list

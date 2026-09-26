@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/02-app-server-protocol.md
 related_pages: [concepts/harness, concepts/approval-gate, concepts/stateless-conversation-wire]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Thread / Turn / Item — the conversation primitives
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -77,7 +77,7 @@ Most `turn/start` overrides **persist beyond this turn.**
 
 | Scope | Fields |
 |---|---|
-| **sticky** (applies to later turns too) | `cwd`, `approvalPolicy`, `approvalsReviewer`, `sandboxPolicy`, `model`, `serviceTier`, `effort`, `summary`, `personality` |
+| **sticky** (applies to later turns too) | `cwd`, `approvalPolicy`, `approvalsReviewer`, `sandboxPolicy`, `model`, `serviceTier`, `effort`, `summary`, `personality` (deprecated 2026-09 — no longer selects a style, #45809) |
 | **this turn only** | `serviceTierForTurn`, `outputSchema` |
 
 > To change a single turn, use an explicitly scoped field or revert on the next one. This is among

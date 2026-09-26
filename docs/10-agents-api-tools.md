@@ -2,6 +2,7 @@
 
 > Source: the official guides `agents-api/tools/{functions,mcp,vaults,plugins}`, read as raw
 > Markdown. Extracted 2026-09-15.
+> Drift-checked against `openai/openai-openapi@d983890f77` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. Function tools
 
@@ -133,7 +134,7 @@ For connections from your environment, use the other MCP authentication options 
 | GET | `/vaults/{vault_id}/credentials` | `listVaultCredentials` |
 | POST | `/vaults/{vault_id}/credentials` | `createVaultCredential` |
 | GET | `/vaults/{vault_id}/credentials/{credential_id}` | `retrieveVaultCredential` |
-| POST | `/vaults/{vault_id}/credentials/{credential_id}` | `rotateVaultCredential` |
+| POST | `/vaults/{vault_id}/credentials/{credential_id}` | `rotateVaultCredential` — now "Update a vault credential" *(2026-09-26)* |
 | DELETE | `/vaults/{vault_id}/credentials/{credential_id}` | `deleteVaultCredential` |
 
 > These sit under `/v1/vaults`, **not** under `/v1/agents` — which is why they were missed in the
@@ -151,6 +152,12 @@ CreateVaultCredentialParams = {
   name: string,                       // required, same trimming rule
   auth: CreateVaultCredentialAuthParam,   // required
 }
+
+// (2026-09-26) update body — was rotate-only with `auth` required
+RotateVaultCredentialParams = {
+  auth?: RotateVaultCredentialAuthParam,  // replacement values for the existing auth method
+  metadata?: Record<string,string>,       // ≤16 pairs; replaces the whole map; {} clears it
+}                                         // at least one of auth or metadata
 
 // discriminator: type
 CreateVaultCredentialAuthParam = mcp_oauth | static_bearer
@@ -174,6 +181,8 @@ If an expired token cannot be refreshed, supply a valid replacement.
 ### Rotating and deleting
 
 Updating a credential replaces its token **without changing its ID, authentication type, or server URL.**
+*(2026-09-26: the same endpoint can now update `metadata` alone — `auth` is no longer required; supply at
+least one of `auth` or `metadata`. The operationId is still `rotateVaultCredential`.)*
 
 > Supplying a new access token **without** an expiry **clears the stored expiry**; an explicit `null`
 > also clears it. Include `expires_at` when the replacement token expires.

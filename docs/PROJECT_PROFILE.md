@@ -89,7 +89,7 @@ default-mode check into CI.
 - Approval: a change that **overturns an existing conclusion** (settled → refuted, and so on) is
   confirmed with the user first.
 - Constraints:
-  - The Codex study reflects `openai/codex` as of 2026-09-15; the browser-agent study reflects
+  - The Codex study reflects `openai/codex` as of 2026-09-15, drift-checked to `e72da2b538` on 2026-09-26 (`docs/99-sources.md` §E); the browser-agent study reflects
     2026-09-22/23; the Strands study reflects `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25); the agent-client UX
     study reflects builds downloaded on 2026-09-26 (two products were renamed or merged that year). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.

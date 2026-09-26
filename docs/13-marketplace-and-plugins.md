@@ -3,6 +3,7 @@
 > Sources: `developers.openai.com/plugins/build/plugins.md` (29KB, read as raw Markdown),
 > `developers.openai.com/plugins.md` index, and the plugin/marketplace methods in the App Server
 > protocol. Extracted 2026-09-15.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. The model in one paragraph
 
@@ -143,7 +144,8 @@ enabled = true
 ```
 
 The quoted key is **`plugin-name@marketplace-name`** — the same identifier the App Server protocol
-uses in `disabledPluginIds`.
+uses in `disabledPluginIds`. *(2026-09-26: that field is still documented as saved-but-not-filtering, but
+disabled plugins now hide their connectors via plugin config, #45755, #47939 — ⚠️ inferred distinction.)*
 
 > During marketplace refresh, Codex can install or refresh files for configured plugins **even when
 > `enabled = false`.** Connected services still require authentication.
@@ -207,10 +209,13 @@ Rules:
       "privacyPolicyURL": "...",
       "termsOfServiceURL": "...",
       "defaultPrompt": [ ... ]
-    }
+    },
+    "onboardingSkill": "skills/setup/SKILL.md"
   }
 }
 ```
+
+*(2026-09-26: `onboardingSkill` is new — exposed as `onboarding_skill` in plugin details, #46544.)*
 
 **Identity and metadata stay at the root; presentation, MCP mappings, and lifecycle hooks go in the
 namespaced overlay.** This is the split to imitate.
@@ -218,6 +223,8 @@ namespaced overlay.** This is the split to imitate.
 ### Path rules (repeated everywhere, so enforce them once)
 
 Paths must **start with `./`, stay inside the plugin, and contain no `..` components.**
+*(2026-09-26: exception — `extensions["com.openai"].onboardingSkill` accepts relative paths with or
+without the legacy `./` prefix, #46544.)*
 
 ### A minimal skill
 
@@ -236,7 +243,7 @@ From `ClientRequest` (see [02](02-app-server-protocol.md)):
 
 ```
 marketplace/add        marketplace/remove      marketplace/upgrade
-plugin/list            plugin/installed        plugin/read
+plugin/list            plugin/installed        plugin/read        plugin/search (experimental)
 plugin/install         plugin/uninstall        plugin/reconcile
 plugin/skill/read
 plugin/share/save      plugin/share/list       plugin/share/checkout
@@ -245,6 +252,9 @@ app/list               app/read                app/installed
 skills/list            skills/extraRoots/set   skills/config/write
 hooks/list
 ```
+
+*(corrected 2026-09-26: `plugin/search` exists at both revisions as an experimental method, which the
+generated `ClientRequest` schema omits.)*
 
 Notifications: `app/list/updated`, `skills/changed`.
 

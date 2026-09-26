@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md
 related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Wire Protocol Boundary — what decides whether the core is reusable
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: which wire protocol Codex core presumes, and what that presumption forces on a custom harness.
 - Scope: the current state of `WireApi`, three ways out, the in-repo proxy precedent, and the two request shapes
 - Primary sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly), `codex-rs/core/src/client.rs`
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -86,12 +86,12 @@ When `model_info.use_responses_lite` is set, the request is assembled differentl
 
 ### §5.1 Which models are lite  {#s5-1-which-models}
 
-From the nine entries in `codex-rs/models-manager/models.json`:
+From `codex-rs/models-manager/models.json` (nine entries at the snapshot; ten at 2026-09-26):
 
 | `use_responses_lite` | Models |
 |---|---|
-| **true** | `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `codex-auto-review` |
-| false | `gpt-5.5`, `gpt-5.4` |
+| **true** | `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna` (both added 2026-09, #47332), `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `codex-auto-review` |
+| false | `gpt-5.5` (`gpt-5.4` removed 2026-09, #47932) |
 
 **Every current-generation model is lite.** An adapter that handles only the classic shape is writing
 against the legacy path.
@@ -113,8 +113,9 @@ against the legacy path.
 ```
 
 > **The trap**: naming a third-party model with an OpenAI-shaped prefix **silently changes the
-> request shape.** `config.toml` has no key to override it — the only control point is
-> **`model_catalog_json`.** Ship a catalog with an explicit entry for every model you support. Do not
+> request shape.** `config.toml` has no key to override it — the control points are a catalog:
+> **`model_catalog_json`**, or since 2026-09 a per-provider **`model_catalog_url`** serving a remote
+> catalog (#46561). Lite mode also forces `parallel_tool_calls` off. Ship a catalog with an explicit entry for every model you support. Do not
 > rely on prefix-match luck, and do not rely on the fallback.
 
 ## §5.5 Observation — Aside implements this branching  {#s5-5-aside}

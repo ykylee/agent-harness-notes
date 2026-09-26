@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -40,7 +40,10 @@ updated: 2026-09-26
 
 | Field | Purpose |
 |---|---|
-| `name` | display name. **Also the lever that selects the non-OpenAI path** ([[concepts/stateless-conversation-wire]] §5) |
+| `name` | display name. **Also the main lever that selects the non-OpenAI path** ([[concepts/stateless-conversation-wire]] §5) |
+| `model_catalog_url` | *(added 2026-09, #46561)* a remote model catalog — which also decides each model's request shape |
+| `gateway_oauth` | *(added 2026-09, #46482)* gateway OAuth sign-in, surfaced as `account/gatewayOAuth/*` |
+| `include_internal_metadata` | *(added 2026-09, #48344, runtime-only)* set only by the built-in `openai` provider |
 | `base_url` | base URL for the provider's OpenAI-compatible API |
 | `env_key` / `env_key_instructions` | the environment variable holding the key, and help text for it |
 | `experimental_bearer_token` | a literal `Authorization: Bearer` value. **Discouraged** versus `env_key`, but needed programmatically |

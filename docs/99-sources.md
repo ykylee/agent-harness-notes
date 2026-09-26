@@ -1,19 +1,20 @@
 # 99. Sources and Verification Status
 
 Research date: 2026-09-14 (Agents API reference extracted 2026-09-15)
+Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` and `openai/openai-openapi@d983890f77` — see [§E](#e-drift-re-check-2026-09-26)
 
 ## A. Primary sources — verified directly ✅
 
-### Repository (highest confidence; the generated schemas are authoritative)
+### Repository (highest confidence; the generated schemas are authoritative **for the stable surface only** — see §E.2)
 
 | Path | Contents |
 |---|---|
 | [`openai/codex` README](https://github.com/openai/codex/blob/main/README.md) | Installation, authentication, doc links |
 | [`codex-rs/app-server/README.md`](https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md) | Recent protocol changes, user verification, attachments, plugin settings |
 | [`codex-rs/docs/protocol_v1.md`](https://github.com/openai/codex/blob/main/codex-rs/docs/protocol_v1.md) | The legacy SQ/EQ core protocol |
-| `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts` | **104 client methods** |
+| `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts` | **104 stable client methods** (107 at head). Experimental methods are filtered out at generation — 166 in total at baseline, 170 at head (`src/protocol/common.rs`) |
 | `codex-rs/app-server-protocol/schema/typescript/ServerRequest.ts` | **10 server requests** |
-| `codex-rs/app-server-protocol/schema/typescript/ServerNotification.ts` | **84 server notifications** |
+| `codex-rs/app-server-protocol/schema/typescript/ServerNotification.ts` | **84 server notifications** (85 at head). Experimental notifications are **not** filtered |
 | `.../InitializeParams.ts`, `InitializeResponse.ts`, `InitializeCapabilities.ts`, `ClientNotification.ts` | Handshake |
 | `.../v2/ThreadStartParams.ts`, `ThreadStartResponse.ts`, `TurnStartParams.ts`, `TurnStartResponse.ts`, `ThreadItem.ts` | Payloads |
 | [`sdk/typescript/README.md`](https://github.com/openai/codex/blob/main/sdk/typescript/README.md) | Full TS SDK docs |
@@ -31,7 +32,7 @@ Extracted directly from it: endpoint paths/methods/operationIds, `CreateAgentSes
 `SessionAgentConfigParam`, `EnvironmentParam` (3 variants), `AgentToolConfigParam` (5 kinds),
 `MultiAgentConfigCurrentParam`, `SessionResource`, `TurnResource`, `TokenUsageResource`,
 `SessionEvent` (30 kinds), `SessionInputParam` (3 kinds), `SessionTurnItemResource` (14 kinds),
-`SessionTurnErrorCodeResource` (17 codes), `SessionArtifactResource`, and the pagination envelope.
+`SessionTurnErrorCodeResource` (17 codes; 18 at head), `SessionArtifactResource`, and the pagination envelope.
 
 → [08-agents-api-reference.md](08-agents-api-reference.md)
 
@@ -140,8 +141,8 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 | Item | Status |
 |---|---|
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
-| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | **Narrowed.** Both are real slugs in the bundled Codex catalog (`models-manager/models.json`), which carries exactly nine: `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `gpt-5.5`, `gpt-5.4`, `codex-auto-review`. What remains unverified is whether the **Agents API** server-side list matches this client catalog — they are separate surfaces |
-| Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Inferred from module names** in `windows-sandbox-rs`, not from prose documentation. [14](14-windows-sandbox.md) labels this explicitly. Treat as a map of the problem space |
+| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | **Narrowed.** Both are real slugs in the bundled Codex catalog (`models-manager/models.json`), which carried exactly nine at baseline: `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `gpt-5.5`, `gpt-5.4`, `codex-auto-review` (ten at head: + `gpt-6-sol`, `gpt-6-luna`, − `gpt-5.4`). What remains unverified is whether the **Agents API** server-side list matches this client catalog — they are separate surfaces. **Re-checked 2026-09-26, still open, and now known to be unanswerable from public artifacts:** the spec's `model` is a free `string` with no enum, no Agents API models page exists (`agents-api/models.md` → 404), and no per-model page lists an Agents row |
+| Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Partly promoted 2026-09-26.** Originally inferred from module names. Reading the module doc comments confirmed `dpapi.rs`, `wfp.rs`, `setup_mutex`, `installation_record`, and **refuted** `hide_users.rs` (it hides the sandbox user's profile directory, not the desktop). Remaining modules are still name-inferred. [14 §6](14-windows-sandbox.md) |
 
 ### Secondary-source claims, re-checked against the repository
 
@@ -224,9 +225,14 @@ artifact. These notes use **2026-08-19**.
 ```bash
 # Count the protocol methods yourself
 B=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript
-curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104
+curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104 (107 at 2026-09-26) — stable only
 curl -s $B/ServerRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 10
-curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84
+curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84 (85)
+
+# The full client surface, including experimental methods the schema omits
+S=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/src/protocol/common.rs
+curl -s $S | awk '/^client_request_definitions! *\{/,/^\}/' | grep -cE '=> "[a-zA-Z/_]+"'   # 170
+curl -s $S | grep -oE '#\[experimental\("[^"]*"\)\]' | sort -u | wc -l                       # 86 tags (63 client requests + 1 server request + 22 notifications)
 
 # Generate locally
 codex app-server generate-ts
@@ -239,3 +245,95 @@ curl -sL https://developers.openai.com/api/docs/guides/agents-api/tools/mcp.md
 curl -sL https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -o /tmp/openapi.yaml
 grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
 ```
+
+## E. Drift re-check, 2026-09-26
+
+Baseline `openai/codex@2fdcdeaf0e` (2026-09-15, "Add startup tool allowlists for threads") → head
+`e72da2b538` (2026-09-26), **686 commits**. Agents API spec baseline `openai/openai-openapi@de408863f9`
+→ head `d983890f77`. Every doc was re-read claim by claim against both revisions; each changed claim
+is marked *(2026-09-26)* in the body. Roughly 170 checkable claims were confirmed unchanged.
+
+The re-check found two kinds of change, and they are recorded separately because they mean different
+things: **drift** is the world moving; a **refutation** is these notes having been wrong on the day
+they were written.
+
+### E.1 Refutations — wrong at the baseline ❌
+
+| Doc | Claim | What the source says |
+|---|---|---|
+| [02 §6](02-app-server-protocol.md) | "Client → server methods (**104 total**)", "the full `ClientRequest` list" | 104 is the **stable** subset. `client_request_definitions!` held **166** methods at baseline. The TS schema is generated without `#[experimental]` methods — see §E.2 |
+| [02 §9](02-app-server-protocol.md) | UserInput kinds `image`/`local_image`/`skill`/`mention` | That table is protocol v1. v2 `UserInput.ts` uses `localImage` and also has `audio`/`localAudio` |
+| [02 §11](02-app-server-protocol.md), [06](06-choosing.md) | `codexErrorInfo: "ContextWindowExceeded"` | The wire form is camelCase (`contextWindowExceeded`); `httpConnectionFailed` is an object variant |
+| [03](03-sdk.md) | "The SDKs spawn the CLI and exchange JSONL; they may later be rebuilt on App Server" | True of the TS SDK only. The **Python SDK already speaks App Server JSON-RPC** over `codex app-server --listen stdio://` (`sdk/python/src/openai_codex/client.py`) |
+| [04](04-cli-exec.md) | `--full-auto` is deprecated | **Removed** from `codex exec` on 2026-07-30 (#36054) |
+| [04](04-cli-exec.md), [06](06-choosing.md) | `codex mcp-server` is an integration path | **Removed** on 2026-09-05 (#42993), ten days before the baseline. Only `codex mcp` (manage external servers) remains |
+| [12 §2.3](12-product-surface.md), [13 §8](13-marketplace-and-plugins.md) | Plugin method list | Omits `plugin/search` (experimental; present at both revisions) |
+| [14 §6](14-windows-sandbox.md) | "Elevated mode needs a privileged service — not something a single user-mode process can do" | `service_identity.rs`: unpackaged callers "may use ordinary elevated setup when it is absent". The service is the **packaged** path, not a requirement |
+| [14 §6](14-windows-sandbox.md) | `hide_users.rs` = desktop isolation (inferred) | Hides the sandbox user's **profile directory** (HIDDEN\|SYSTEM). Account hygiene, not UI isolation |
+| [14 §7](14-windows-sandbox.md) | `windows/worldWritableWarning` shows detection separate from enforcement | Nothing emits it at either revision. The detector was unused at baseline and is deleted at head (#47943). A vestigial protocol entry ⚠️ |
+| [15 §4](15-model-providers.md) | Project-local config denylist | Also contains `responses_api_metadata` and `experimental_realtime_webrtc_call_base_url` |
+| [16 §1–2, §7](16-responses-chat-adapter.md) | `ResponsesApiRequest` has **17** fields | **16** at both revisions. The mapping table has more rows because it splits sub-fields |
+| [16 §10.1](16-responses-chat-adapter.md) | "The lever is just the provider `name`" | Tool-result metadata and MCP attribution are also filtered by a first-party HTTPS destination check ⚠️ |
+| [agent-ux/03 §1.2.1](../agent-ux/03-openai-codex-chatgpt.md) | Three methods the ChatGPT client calls mean `docs/02` "has drifted" or they are experimental | **Neither.** See §E.3 |
+
+Also previously unstated, true at both revisions: `responses_lite` forces `parallel_tool_calls` off,
+and the WebSocket transport sends `previous_response_id`, so "fully stateless" holds for HTTP only.
+
+### E.2 The generated schema is a filtered view
+
+This section's own header called the generated schemas authoritative. They are — for what they
+contain. `app-server-protocol/src/export.rs` drops every method tagged `#[experimental(...)]` from the
+**client request** schema, but keeps experimental **notifications**:
+
+| | In source (`common.rs`) | In `ClientRequest.ts` / `ServerNotification.ts` |
+|---|---|---|
+| Client requests, baseline | 166 | 104 (62 experimental omitted) |
+| Client requests, head | 170 | 107 (63 omitted; new: `rollout/compress`) |
+| Server requests | 11 | 10 (`currentTime/read` omitted) |
+| Experimental notifications | 22 | 22 — all exported |
+
+So the schema describes `thread/queue/changed` but not `thread/queue/add`, and the realtime
+notifications but not `thread/realtime/start`. A reader counting the schema sees a protocol that cannot
+drive half of its own events. The omitted methods are not dead code: all of them are in the engine
+binary shipped with ChatGPT.app (`codex-cli 0.158.0-alpha.2.1`), and the desktop client calls about 33
+of them. They require `experimentalApi: true`. Listed in [02 §6](02-app-server-protocol.md).
+
+**Method note:** "read the generated artifact, not the prose" is still the right rule. The refinement is
+to check what the generator **excludes** before treating its count as a total.
+
+### E.3 Methods that exist only in the shipped client
+
+The ChatGPT desktop webview (`app.asar`, build 26.924.22138, extracted 2026-09-26) references protocol
+methods found **nowhere** in `openai/codex` — not at head, not in any commit (`git log -S`), and not in
+the bundled engine binary. Detection was positive-controlled: the same scan finds `gatewayOAuth` (6) and
+`requestUserInput` (3) in the binary.
+
+| Method | Source history | Bundled engine |
+|---|---|---|
+| `item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `item/tool/requestSetupCodexContextPicker` | 0 commits | absent |
+| `thread/startAeon`, `thread/stop`, `turn/addUserMessage`, `plugin/codex` | 0 commits | absent |
+| `thread/rollback` | removed 2026-09-11 (#44915) | absent |
+
+`thread/startAeon` shares `thread/start`'s parameter rewriting and request-lifecycle tracing in the
+webview, so it is a live code path, not a stray string. Which engine answers it is unknown — the local
+one cannot. ⚠️ Plausibly a server-side (cloud) engine or a closed build; neither is verifiable from here.
+
+### E.4 Drift — the world moved
+
+Summarised; details are inline in each doc.
+
+- **Protocol** — `account/gatewayOAuth/{login,read,cancel}` + `account/gatewayOAuth/changed`,
+  `InitializeCapabilities.explicitGatewayOauth` (#47207); `mcpAppUi` (#45805); `personality`
+  deprecated (#45809); image input `{url} | {fileId}` (#45794); `flexUnavailable` error (#47967).
+- **CLI** — `--no-daemon` (#46088), hidden `tcp-tunnel` (#45900); `exec-server` gains `--ws-auth` and
+  token flags, none of which apply to remote registration.
+- **Windows sandbox** — `windows.sandbox_private_desktop` removed (#46554); a third implementation,
+  `mxc` (#46271), not constrained by `allowed_sandbox_implementations`; `audit.rs` deleted (#47943).
+- **Model providers** — `model_catalog_url` (#46561) is a second way to control `use_responses_lite`;
+  `gateway_oauth` (#46482); `include_internal_metadata` (#48344). Lite table + `gpt-6-sol`,
+  `gpt-6-luna`, − `gpt-5.4`; `gpt-5.5` is the only non-lite model.
+- **Agents API spec** — turn error codes 17 → 18 (`misalignment_policy_violation`); session update
+  can now change model, reasoning effort and service tier; vault credential "rotate" became "update"
+  with optional `auth` and a `metadata` map; delete/cancel semantics for still-open turns; `403` on most
+  operations. Endpoint paths unchanged.
+- **Plugins** — `onboardingSkill` overlay field accepts paths without `./` (#46544).

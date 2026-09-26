@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -42,6 +42,16 @@ updated: 2026-09-26
 Most corrections came from **reading generated schemas and source rather than prose.** Method lists,
 exact request payloads, error codes and timeout defaults are all committed artifacts. Blog posts and
 third-party write-ups drift from them.
+
+> **Refinement, 2026-09-26: a generated artifact can be a filtered view.** The Codex protocol schema
+> drops every `#[experimental]` client method at generation — 104 in the schema, 166 in source at the
+> snapshot — while keeping experimental notifications. The count was right about the file and wrong about
+> the protocol. Before treating a generated artifact's count as a total, **read the generator for what it
+> excludes.** (`docs/99-sources.md` §E.2)
+>
+> The same re-check found the converse: a shipped client (ChatGPT desktop) calling methods that exist in
+> neither the open-source engine nor the engine the app bundles. **An open-source surface is not
+> necessarily the whole surface its own vendor's client targets.** (§E.3)
 
 > One practical discovery paid for itself repeatedly: **appending `.md` to an OpenAI documentation
 > URL returns the raw Markdown source.** It turned lossy page summaries into primary text with code
@@ -145,16 +155,16 @@ The same rule was applied to this repository's own earlier statements.
 |---|---|
 | The claim that `initialize` carries `serverInfo`/`capabilities` | **a refutation kept as a record** |
 | The Windows sandbox internals (ACL/WFP/token/desktop) | **inferred from module names.** [[concepts/os-sandbox-policy]] §6 says so explicitly |
-| Agents API model ids | **narrowed.** The bundled client catalog of nine is confirmed; **whether the Agents API's server-side list matches is unverified** — a different surface |
+| Agents API model ids | **narrowed.** The bundled client catalog is confirmed (nine at the snapshot, ten at 2026-09-26); **whether the Agents API's server-side list matches is unverified** — a different surface. Re-checked 2026-09-26: **not answerable from public artifacts** (the spec's `model` is a free string; no models page exists) |
 
 ## §7 Reproduction  {#s7-reproduction}
 
 ```bash
 # Count the protocol methods yourself
 B=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript
-curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104
+curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104 at the snapshot, 107 at 2026-09-26 — stable only
 curl -s $B/ServerRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 10
-curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84
+curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84 (85)
 
 # Generate locally
 codex app-server generate-ts

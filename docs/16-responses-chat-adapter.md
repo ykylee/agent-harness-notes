@@ -5,6 +5,7 @@
 > **SSE events Codex parses** (`codex-rs/codex-api/src/sse/responses.rs`), then compared against
 > `CreateChatCompletionRequest` / `ChatCompletionStreamResponseDelta` in the OpenAI OpenAPI spec.
 > Analysed 2026-09-15.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 0. Verdict
 
@@ -13,7 +14,7 @@
 | Dimension | Assessment |
 |---|---|
 | Request field mapping | ✅ Nearly complete. One constant value, no negotiation |
-| Session state emulation | ✅ **Not needed.** Codex sends `store: false` and no `previous_response_id` |
+| Session state emulation | ✅ **Not needed over HTTP.** Codex sends `store: false` and no `previous_response_id` (the WebSocket path does send it — see §1) |
 | Input item mapping | ⚠️ 8 of 18 variants map cleanly; 5 are Responses-only tools; **1 has no equivalent at all** |
 | Streaming output | ✅ **Smaller than it looks** — Codex acts on 12 events; 7 suffice for a text + function-calling adapter |
 | Reasoning continuity | ❌ **Structurally impossible.** Chat Completions has no reasoning item |
@@ -24,7 +25,7 @@ Do not build it expecting parity on OpenAI reasoning models.
 
 ## 1. What Codex actually sends
 
-`ResponsesApiRequest` — the complete payload, 17 fields:
+`ResponsesApiRequest` — the complete payload, 16 fields *(corrected 2026-09-26: was "17"; 16 at both base and head)*:
 
 ```rust
 pub struct ResponsesApiRequest {
@@ -58,11 +59,13 @@ reasoning: Some(reasoning),          // always present
 ```
 
 > `previous_response_id` exists only on the **WebSocket** request variant, and the conversion from the
-> HTTP payload sets it to `None`.
+> HTTP payload sets it to `None`. *(corrected 2026-09-26: the WebSocket path does send
+> `previous_response_id` on incremental requests, so the statelessness below holds for HTTP only.)*
 
 ### Why this is good news
 
-**`store: false` plus no `previous_response_id` means Codex is fully stateless on the wire.**
+**`store: false` plus no `previous_response_id` means Codex is fully stateless on the wire — over
+HTTP.** (⚠️ Inference: an adapter should therefore not advertise `supports_websockets`.)
 The entire conversation is resent as `input[]` on every turn.
 
 An adapter therefore needs **no session store, no response-id registry, and no cleanup path**. It is a
@@ -83,8 +86,8 @@ Three more constants simplify things further:
 | `input[]` | `messages[]` | ⚠️ See §3 |
 | `tools` | `tools` | ⚠️ Function tools only |
 | `tool_choice: "auto"` | `tool_choice: "auto"` | ✅ Constant |
-| `parallel_tool_calls` | `parallel_tool_calls` | ✅ Direct |
-| `reasoning.effort` | `reasoning_effort` | ✅ Request side maps |
+| `parallel_tool_calls` | `parallel_tool_calls` | ✅ Direct. Always `false` in lite mode (`&& !model_info.use_responses_lite`; base and head, noted 2026-09-26) |
+| `reasoning.effort` | `reasoning_effort` | ⚠️ Request side maps, but a numeric custom effort is now serialised as a JSON number (`serialize_reasoning_effort`) while Chat expects a string enum *(2026-09-26, #47590)* |
 | `reasoning.summary` | — | ❌ No output channel for it |
 | `store: false` | `store` | ✅ Direct |
 | `stream: true` | `stream` | ✅ Direct |
@@ -97,8 +100,9 @@ Three more constants simplify things further:
 | `client_metadata` | `metadata` | ⚠️ Different semantics; can be dropped |
 | `access_programs` | — | Codex sets `None`. Ignore |
 
-**Score: 13 of 17 map directly or acceptably.** The two that matter are `reasoning.summary` and
-`include: reasoning.encrypted_content`.
+**Score: 13 of 16 fields map directly or acceptably** (15 of the table's 18 rows, which split
+`reasoning` and `text` into sub-fields) *(corrected 2026-09-26: was "13 of 17")*. The two that matter
+are `reasoning.summary` and `include: reasoning.encrypted_content`.
 
 ## 3. Input item mapping — `ResponseItem` has 18 variants
 
@@ -112,7 +116,7 @@ ConfigurationUpdate   CompactionTrigger   ContextCompaction   Other
 
 | Variant | Chat Completions equivalent | Verdict |
 |---|---|---|
-| `Message` | `user` / `assistant` / `system` message | ✅ |
+| `Message` | `user` / `assistant` / `system` message | ✅ — except the new `ImageReference::File { file_id }` input image form, which has no Chat analogue *(2026-09-26, #45794)* |
 | `AgentMessage` | `assistant` message | ✅ |
 | `FunctionCall` | `assistant.tool_calls[]` | ✅ |
 | `FunctionCallOutput` | `tool` message with `tool_call_id` | ✅ |
@@ -294,11 +298,11 @@ Because the adapter is stateless, it can run as a sidecar, a shared service, or 
 
 | Component | Difficulty | Why |
 |---|---|---|
-| Request translation | Low | 13/17 fields direct; constants remove branching |
+| Request translation | Low | 13/16 fields direct *(corrected 2026-09-26: was 13/17)*; constants remove branching |
 | Input item → messages | Low–medium | 8 real mappings; the rest drop |
 | Tool definition translation | Low | Function tools are near-identical |
 | **Streaming state machine** | **Low–medium** | 7 events; tool-call args accumulate rather than stream. Still owns id generation and `output[]` assembly |
-| Error and finish-reason mapping | Low | Small closed set |
+| Error and finish-reason mapping | Low | Small closed set — though `sse/responses_error.rs` (#48229) now classifies `invalid_prompt`, Flex capacity, and spend/quota/credit codes (#47353, #47967) *(2026-09-26)* |
 | Reasoning bridging | **Not solvable** | Ship the degradation, document it |
 
 No session store, no id registry, no expiry logic — all avoided by `store: false`.
@@ -460,8 +464,11 @@ When the provider is not named `openai`, Codex **strips OpenAI-specific passthro
 encrypted function arguments before sending.** The adapter gets cleaner input for free, and two
 fields it would otherwise have to discard never arrive.
 
-The lever is just the provider `name`. Worth knowing that a provider *named* `openai` pointed at a
+The lever for *this* strip is the provider `name`. Worth knowing that a provider *named* `openai` pointed at a
 proxy would take the OpenAI path and send fields the adapter must then strip itself.
+⚠️ *(corrected 2026-09-26: `name` is not the only lever — separately from `is_openai`, tool-result
+metadata and MCP attribution are filtered by a first-party HTTPS destination check, and are now also
+granted by `include_internal_metadata`, which only the built-in `openai` provider sets; #48344.)*
 
 ### 10.2 There is a second request shape: `responses_lite` ⚠️
 
@@ -499,6 +506,8 @@ mapping, this is a correction: in lite mode it is **not droppable** — it *is* 
 | Model | `use_responses_lite` |
 |---|:---:|
 | `gpt-6-astra` | **true** |
+| `gpt-6-sol` | **true** — added 2026-09-26 (#47332) |
+| `gpt-6-luna` | **true** — added 2026-09-26 (#47332) |
 | `gpt-5.6-sol` | **true** |
 | `gpt-5.6-terra` | **true** |
 | `gpt-5.6-luna` | **true** |
@@ -506,9 +515,10 @@ mapping, this is a correction: in lite mode it is **not droppable** — it *is* 
 | `gpt-daybreak-red-latest` | **true** |
 | `codex-auto-review` | **true** |
 | `gpt-5.5` | false |
-| `gpt-5.4` | false |
 
-**Every current-generation model is lite; only the older ones use the classic shape.** Lite is the
+*(2026-09-26: `gpt-5.4` (false) was removed, #47932; `gpt-5.5` is now the only non-lite model.)*
+
+**Every current-generation model is lite; only the older one uses the classic shape.** Lite is the
 forward direction, so an adapter that handles only the classic shape is writing against the legacy path.
 
 #### How a slug resolves to that flag
@@ -538,7 +548,7 @@ So naming a third-party model with an OpenAI-shaped prefix **silently changes th
 the adapter receives. Conversely, an unrelated name lands in the fallback — which gives the classic
 shape but also a generic `context_window` of 272,000 and a warning on every resolution.
 
-#### There is no config knob — use `model_catalog_json`
+#### There is no config knob — use a model catalog
 
 `with_config_overrides` touches only `context_window`, `auto_compact_token_limit`, the truncation
 policy, and base instructions / personality. **`use_responses_lite` cannot be overridden from
@@ -547,7 +557,9 @@ policy, and base instructions / personality. **`use_responses_lite` cannot be ov
 The control point is **`model_catalog_json`** — a path to a JSON model catalog loaded at startup
 (and overridable per profile). Supplying your own catalog entry for each third-party model is the
 way to pin the request shape *and* fix the context window at the same time. Candidates can also
-arrive from the provider's own remote model list.
+arrive from the provider's own remote model list — and, added 2026-09-26 (#46561), a provider's
+`model_catalog_url` can serve a full remote catalog, which also sets `use_responses_lite`.
+`with_config_overrides` still cannot set it, so the no-config-knob claim holds.
 
 **Recommendation for the adapter:** ship a `model_catalog_json` with explicit entries for every
 model you support, each with `use_responses_lite` set deliberately. Do not rely on prefix-match

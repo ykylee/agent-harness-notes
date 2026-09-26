@@ -9,6 +9,8 @@ into **an API that OpenAI itself operates**.
 > [09](09-agents-api-environments.md) architecture, environments, files, security ·
 > [10](10-agents-api-tools.md) functions, MCP, vaults, plugins ·
 > [11](11-agents-api-operations.md) webhooks, observability, tracing, cost.
+>
+> Drift-checked against `openai/openai-openapi@d983890f77` and `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 Official wording: *"application access to OpenAI's managed Codex harness through an API."*
 OpenAI handles sessions, orchestration, context management, and recovery, while the application
@@ -57,7 +59,7 @@ client.beta.agents.sessions.create({ /* agent, environment, input */ })
 | create | Create a session from an agent configuration, environment, and initial input |
 | list | Paginated (`hasNextPage()`, `getNextPage()` helpers) |
 | retrieve | Inspect status, agent configuration, environment, and **required actions** by ID |
-| delete | Logical deletion (cleanup may be asynchronous). To stop current work but keep the conversation, **cancel the turn** instead |
+| delete | Logical deletion (cleanup may be asynchronous). To stop current work but keep the conversation, **cancel the turn** instead. *(2026-09-26: delete can cancel a still-open turn once backend execution has ended; running execution must be cancelled first)* |
 
 > The API assumes you **store the session ID in your application's data store.**
 > After a restart or disconnect, retrieve the session to identify pending work.
@@ -102,7 +104,8 @@ Networking: you only need **outbound** access to `https://api.openai.com` and
 `wss://codex-cloud-environments.chatgpt.com` (all connections flow from your environment to OpenAI).
 
 Authentication: generate a **restricted executor key** in the platform dashboard's Agents tab and
-supply it as `CODEX_API_KEY`.
+supply it as `CODEX_API_KEY`. *(2026-09-26: the guide now names the app-side variable
+`OPENAI_EXECUTOR_API_KEY`, whose value is passed into the sandbox as `CODEX_API_KEY` — naming only.)*
 
 ```bash
 # 2. Create the session with a self_hosted environment
@@ -116,6 +119,11 @@ codex exec-server \
 
 The executor registers using the environment ID and the restricted API key, then **connects over
 WebSocket to receive commands and return results.**
+
+*(2026-09-26: `codex exec-server --remote … --environment-id …` is still valid at `openai/codex@e72da2b538`;
+the command moved to `cli/src/exec_server_command.rs`. The new `--ws-auth`, `--ws-token-*`,
+`--ws-issuer`/`--ws-audience`, and `--linux-sandbox-pid-namespace` flags do not apply to remote
+registration.)*
 
 Connection state events: `agent.session.environment.pending` → `connected` / `failed`.
 

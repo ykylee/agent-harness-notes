@@ -1,5 +1,7 @@
 # 01. Codex Harness Overview
 
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+
 ## 1. What a harness is
 
 OpenAI's definition (from the "Codex as a platform" blog post):
@@ -75,7 +77,7 @@ spun up to run the agent loop and manage the persistence of one Codex thread.
 | Layer | Artifact | Who runs it | Good for |
 |---|---|---|---|
 | CLI | `codex exec` | Your machine / CI | Scripts, CI jobs, one-off batches |
-| SDK | `@openai/codex-sdk`, `openai-codex` | Your machine (spawns the CLI) | Embedding in server-side tools and workflows |
+| SDK | `@openai/codex-sdk`, `openai-codex` | Your machine (spawns the CLI: TS via `codex exec`, Python via `codex app-server` *(corrected 2026-09-26)*) | Embedding in server-side tools and workflows |
 | Protocol | `codex app-server` | Your machine / container | When the agent **is the product** |
 | Managed | Agents API | **OpenAI-hosted** | When you want the harness operated for you |
 

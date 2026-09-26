@@ -33,7 +33,6 @@
     "in_progress_items": [],
     "blocked_items": [],
     "planned_items": [
-      "TASK-2026-09-22-agent-harness-notes-002",
       "TASK-2026-09-22-agent-harness-notes-003",
       "TASK-2026-09-22-agent-harness-notes-004"
     ],
@@ -54,12 +53,13 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
-    "task_count": 2,
+    "task_count": 3,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
-      "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사"
+      "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
+      "TASK-2026-09-22-agent-harness-notes-002 — openai/codex 드리프트 재확인"
     ]
   },
   "next_documents": [

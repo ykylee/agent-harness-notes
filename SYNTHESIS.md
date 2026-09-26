@@ -183,7 +183,7 @@ and `allowed-tools` in them is not enforced ([`strands/03`](strands/03-tools-and
 
 | Product | How |
 |---|---|
-| Codex | `codex mcp-server`, the App Server protocol, `item/tool/call` |
+| Codex | the App Server protocol, `item/tool/call` *(corrected 2026-09-26: `codex mcp-server` was listed here but had been removed on 2026-09-05, #42993 — Codex no longer exposes itself over MCP)* |
 | **Aside** | **`aside mcp`** — "Install the aside-browser skill into your coding agents (Codex, Claude Code, Cursor, OpenCode)" |
 | **Opera Neon** | **MCP server** — "external AI tools can connect to your live Neon browser session" |
 | **Strands** | **A2A server** (`a2a-sdk`), **ACP** via `strands --acp-server`. `strands-mcp` is a *documentation* server, not the agent |

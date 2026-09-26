@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: the three kinds of execution environment a managed harness can attach to, and each one's lifecycle and constraints.
 - Scope: the three topologies, hosted configuration, the file/artifact asymmetry, the self-hosted lifecycle, the two provider rosters
 - Primary sources: the `agents-api/environments/{openai-hosted,self-hosted,lifecycle,files,security}` guides (raw Markdown)
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against the Codex drift re-check of `e72da2b538`; no change to this concept)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -4,6 +4,7 @@
 > (`architecture`, `environments/openai-hosted`, `environments/self-hosted`, `environments/lifecycle`,
 > `environments/files`, `environments/security`), read as **raw Markdown** by appending `.md` to each
 > page URL. Extracted 2026-09-15.
+> Drift-checked against `openai/openai-openapi@d983890f77` and `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. The three pieces
 
@@ -202,6 +203,12 @@ codex exec-server \
 
 Outbound access required: `https://api.openai.com` and `wss://codex-cloud-environments.chatgpt.com`.
 
+*(2026-09-26: this invocation is still valid; the command moved to `cli/src/exec_server_command.rs`.
+New flags — `--ws-auth` (capability-token / signed-bearer-token), `--ws-token-*`,
+`--ws-issuer`/`--ws-audience`, `--linux-sandbox-pid-namespace` — do not apply to remote registration
+(`exec-server/README.md` §Authentication). A V2 capability discovery exists but is "not yet wired"
+(ab7439231c).)*
+
 ## 6. Security
 
 > **Agent-generated code can access the files, credentials, and network available to its environment.**
@@ -211,7 +218,7 @@ Outbound access required: `https://api.openai.com` and `wss://codex-cloud-enviro
 | Key | Scopes | Where it lives |
 |---|---|---|
 | Application API key | `api.agents.read`, `api.agents.write`, `api.responses.write` (+ `api.vaults.read` / `api.vaults.write` for vaults) | **Outside** the environment |
-| Environment key (`CODEX_API_KEY`) | Connecting environments **only** — "cannot authorize any other API action" | Inside the environment |
+| Environment key (`CODEX_API_KEY`) | Connecting environments **only** — "cannot authorize any other API action" | Inside the environment *(2026-09-26: the guide calls the app-side copy `OPENAI_EXECUTOR_API_KEY`)* |
 
 > **Agent-generated code can read the environment key.** That is acceptable precisely because the
 > key's authority is limited to connecting environments. Your application API key must never be in

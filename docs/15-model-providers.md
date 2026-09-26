@@ -1,8 +1,9 @@
 # 15. Model Providers — and the Chat Completions Problem
 
-> Sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly),
+> Sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines at baseline, 773 at head; read directly),
 > `learn.chatgpt.com/docs/config-file/config-reference.md`, `learn.chatgpt.com/docs/amazon-bedrock.md`,
 > `codex-rs/responses-api-proxy/README.md`. Extracted 2026-09-15.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. The headline: Chat Completions is gone
 
@@ -82,8 +83,8 @@ would slot into exactly this position.
 > semantics that Chat Completions has no place for.
 >
 > **[16-responses-chat-adapter.md](16-responses-chat-adapter.md) works this out against the real
-> payload**: the adapter is stateless and 13 of 17 request fields map, but retained reasoning cannot
-> survive the crossing.
+> payload**: the adapter is stateless over HTTP and 13 of 16 request fields map *(corrected 2026-09-26:
+> was "13 of 17"; `ResponsesApiRequest` has 16 fields)*, but retained reasoning cannot survive the crossing.
 
 ## 2. Third-party providers *are* supported — within that constraint
 
@@ -131,6 +132,9 @@ From `model-provider-info/src/lib.rs`:
 | `requires_openai_auth` | Whether to show the login screen and store credentials in `auth.json` |
 | `supports_websockets` | Responses API WebSocket transport support |
 | `supports_standalone_web_search` | Standalone web-search endpoint support |
+| `model_catalog_url` | Per-provider remote model catalog URL — added 2026-09-26 (#46561) |
+| `gateway_oauth` | Gateway OAuth sign-in configuration — added 2026-09-26 (#46482) |
+| `include_internal_metadata` | Runtime-only; set only by the built-in `openai` provider, grants tool-result metadata / MCP attribution — added 2026-09-26 (#48344) |
 
 ### Command-backed auth
 
@@ -169,7 +173,7 @@ return an error **without changing configuration or saved credentials**.
 | `model_context_window` | Context tokens for the active model |
 | `model_auto_compact_token_limit` | Threshold triggering automatic compaction |
 | `model_auto_compact_token_limit_scope` | `total` (default) \| `body_after_prefix` |
-| `model_catalog_json` | Path to a JSON model catalog loaded at startup; a selected profile file can override it per profile. **The only way to control per-model flags such as `use_responses_lite`** — see [16 §10.2](16-responses-chat-adapter.md) |
+| `model_catalog_json` | Path to a JSON model catalog loaded at startup; a selected profile file can override it per profile. **One of two ways to control per-model flags such as `use_responses_lite`** — a provider's `model_catalog_url` can now serve a full remote catalog too *(2026-09-26: was "the only way"; #46561)*; neither is a plain config knob — see [16 §10.2](16-responses-chat-adapter.md) |
 | `review_model` | Optional model override used by `/review` |
 
 The repo also ships `codex-rs/models-manager/models.json` — a bundled catalog, which is what
@@ -184,7 +188,10 @@ profile, or telemetry keys. Codex ignores these when they appear in a project-lo
 openai_base_url   chatgpt_base_url   apps_mcp_product_sku
 model_provider    model_providers    notify
 profile           profiles           experimental_realtime_ws_base_url   otel
+responses_api_metadata               experimental_realtime_webrtc_call_base_url
 ```
+
+*(corrected 2026-09-26: the last two keys were already in the denylist at baseline — `config/src/loader/mod.rs`.)*
 
 > A cloned repository must never be able to redirect your agent's model traffic or exfiltrate
 > telemetry. Any custom harness that reads per-project config needs this same deny-list.
@@ -199,6 +206,8 @@ profile           profiles           experimental_realtime_ws_base_url   otel
 | `model/verification` | Model verification state |
 | `model/safetyBuffering/updated` | Safety buffering state |
 | `modelProvider/authRecoveryStarted` / `...Completed` | Provider auth recovery lifecycle |
+| `account/gatewayOAuth/read` / `login` / `cancel` | Gateway OAuth sign-in — added 2026-09-26 (#47170) |
+| `account/gatewayOAuth/changed` | Gateway OAuth state change notification — added 2026-09-26 (#47170) |
 
 ### Managed provider requirements
 
@@ -212,6 +221,9 @@ This is a good pattern to copy: an enterprise policy change must not silently mo
 conversation onto a different model — it fails the *input* path while leaving *control* paths open.
 
 Realtime connections use separate routing configuration and are not checked here.
+
+A managed `ResidencyRequirement::Us` adds the request header `x-openai-internal-codex-residency`
+*(2026-09-26)*.
 
 ## 6. Checklist for a multi-provider harness
 

@@ -57,7 +57,7 @@ Web versions: [English](https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo) ·
 | Document | Topic |
 |---|---|
 | [01-overview.md](docs/01-overview.md) | What a harness is, its internal components, the 3-layer open structure |
-| [02-app-server-protocol.md](docs/02-app-server-protocol.md) | **Core.** The full App Server JSON-RPC protocol — transports, handshake, 104 methods, 84 notifications, approval flow |
+| [02-app-server-protocol.md](docs/02-app-server-protocol.md) | **Core.** The full App Server JSON-RPC protocol — transports, handshake, 107 stable + 63 experimental client methods, 85 notifications, approval flow |
 | [03-sdk.md](docs/03-sdk.md) | TypeScript / Python SDKs |
 | [04-cli-exec.md](docs/04-cli-exec.md) | `codex exec` non-interactive mode |
 | [05-agents-api.md](docs/05-agents-api.md) | Managed Agents API concepts (sessions / sandboxes / subagents) |
@@ -67,7 +67,7 @@ Web versions: [English](https://claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo) ·
 | [11-agents-api-operations.md](docs/11-agents-api-operations.md) | Agents API webhooks, observability, tracing, and the cost model |
 | [06-choosing.md](docs/06-choosing.md) | Comparison of the integration paths and how to choose |
 | [07-harness-engineering.md](docs/07-harness-engineering.md) | Operating principles from OpenAI's internal "zero hand-written code" experiment |
-| [12-product-surface.md](docs/12-product-surface.md) | All 104 protocol methods re-read as a build checklist for a product-grade harness |
+| [12-product-surface.md](docs/12-product-surface.md) | All 107 stable protocol methods re-read as a build checklist for a product-grade harness |
 | [13-marketplace-and-plugins.md](docs/13-marketplace-and-plugins.md) | Marketplace catalog format, plugin manifest and distribution sources |
 | [14-windows-sandbox.md](docs/14-windows-sandbox.md) | Native Windows sandbox — elevated/unelevated modes, mechanisms, policy |
 | [15-model-providers.md](docs/15-model-providers.md) | Provider configuration, and why Chat Completions support was removed |

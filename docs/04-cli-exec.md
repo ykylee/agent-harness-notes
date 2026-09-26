@@ -1,5 +1,7 @@
 # 04. `codex exec` — Non-Interactive Mode
 
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+
 Runs Codex from scripts and CI/CD without the interactive terminal UI. It fits the case where you
 want "a single command that runs to completion non-interactively, streams structured output for
 logs, and exits with a clear success or failure signal."
@@ -44,7 +46,7 @@ The default is **read-only**. You must raise it explicitly.
 | `--sandbox workspace-write` | Allow file edits |
 | `--sandbox danger-full-access` | Full access. Use cautiously |
 
-`--full-auto` is **deprecated** — use explicit sandbox flags.
+`--full-auto` has been **removed** from `codex exec` — use explicit sandbox flags. *(corrected 2026-09-26: removed in #36054 on 2026-07-30, not merely deprecated.)*
 
 ## Machine-readable output
 
@@ -52,7 +54,9 @@ The default is **read-only**. You must raise it explicitly.
 codex exec --json "analyze repo" | jq
 ```
 
-Emits thread-started, turn, item, and error events as JSON Lines, one per line.
+Emits thread-started, turn, item, and error events as JSON Lines, one per line. Since 2026-09-26,
+`web_search` items carry the `action` plus optional `results` (#46319), and exec turns send
+`turnTrigger: "exec"` (#46569).
 
 ## Structured responses (schema-constrained)
 
@@ -86,12 +90,15 @@ Avoiding API keys in the job environment is preferred.
 | `codex app-server generate-ts` | Generate TypeScript protocol definitions |
 | `codex app-server generate-json-schema` | Generate a JSON Schema bundle |
 | `codex debug app-server send-message-v2 "<msg>"` | Dump the full JSON traffic of one turn |
-| `codex mcp-server` | Expose **Codex as an MCP server** (callable as a tool from MCP clients) |
+| `codex mcp` | Manage external MCP servers *(corrected 2026-09-26: `codex mcp-server` was removed in #42993 on 2026-09-05)* |
 | `codex exec-server` | **Self-hosted executor** (for Agents API self-hosted sandboxes) |
+| `codex --no-daemon` | Interactive TUI without starting or probing the shared background server; incompatible with `--remote`, `codex agents`, `codex queue` — added 2026-09-26 (#46088) |
+| `codex tcp-tunnel` | Hidden HTTP/3 TCP tunnel command — added 2026-09-26 (#45900) |
 
-## When to use `codex mcp-server`
+## `codex mcp-server` (removed)
 
-A good fit if you already have an MCP-based workflow and want to invoke Codex as a callable tool.
-The downside: **you only get what MCP exposes.** Codex-specific interactions that rely on richer
-session semantics — diff updates, for instance — may not map cleanly through MCP endpoints.
-(OpenAI themselves abandoned the MCP approach for the VS Code extension and built the App Server.)
+*(corrected 2026-09-26: `codex mcp-server` no longer exists — removed in #42993 on 2026-09-05; only
+`codex mcp`, which manages external MCP servers, remains.)* It used to expose Codex as a callable
+tool to MCP clients, with the downside that **you only got what MCP exposes** — richer session
+semantics such as diff updates did not map cleanly. Integrations should use the App Server instead
+(OpenAI themselves abandoned the MCP approach for the VS Code extension and built the App Server).

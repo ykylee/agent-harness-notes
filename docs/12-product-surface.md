@@ -4,7 +4,10 @@
 > aside. For a harness that is itself a product, that framing is wrong: those methods **are** the
 > product requirements, already enumerated by someone who shipped across five clients.
 > This document re-reads all 104 `ClientRequest` methods as a feature checklist.
+> *(2026-09-26: now 107 stable — + the `account/gatewayOAuth/*` trio, #47207 — and 170 including the
+> `#[experimental]` methods that the generated schema omits.)*
 > Source: `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts`.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. How the surface actually divides
 
@@ -69,7 +72,7 @@ resources stop being optional.** Specific ideas worth stealing:
 ```
 skills/list         skills/extraRoots/set     skills/config/write
 hooks/list
-plugin/list         plugin/installed          plugin/read
+plugin/list         plugin/installed          plugin/read          plugin/search (experimental)
 plugin/install      plugin/uninstall          plugin/reconcile
 plugin/skill/read
 plugin/share/save   plugin/share/list         plugin/share/checkout
@@ -79,6 +82,9 @@ app/list            app/read                  app/installed
 mcpServer/tool/call mcpServer/resource/read   mcpServer/oauth/login
 mcpServerStatus/list  config/mcpServer/reload
 ```
+
+*(corrected 2026-09-26: `plugin/search` exists as an experimental method at both revisions; it was
+omitted because the generated schema excludes experimental methods.)*
 
 Detail in [13-marketplace-and-plugins.md](13-marketplace-and-plugins.md). Structural points:
 
@@ -118,6 +124,7 @@ account/read          getAuthStatus
 account/rateLimits/read           account/usage/read
 account/rateLimitResetCredit/consume
 account/workspaceMessages/read    account/sendAddCreditsNudgeEmail
+account/gatewayOAuth/login  account/gatewayOAuth/read  account/gatewayOAuth/cancel   (added 2026-09-26, #47207)
 config/read           config/value/write       config/batchWrite
 configRequirements/read
 permissionProfile/list
@@ -165,7 +172,8 @@ text loop.
 
 ## 3. What the shape of this surface teaches
 
-**1. The agent loop is maybe 20% of the work.** 104 methods, ~20 of them are the loop.
+**1. The agent loop is maybe 20% of the work.** 107 stable methods *(2026-09-26: was 104; 170 including
+experimental)*, ~20 of them are the loop.
 Budget accordingly.
 
 **2. Everything user-visible needs a protocol method.** If the client can be remote, "just read the
@@ -194,6 +202,6 @@ Platform       windowsSandbox/setupStart, windowsSandbox/readiness
 Adoption       externalAgentConfig/detect, externalAgentConfig/import
 ```
 
-Roughly 25 methods on top of the core — about 45 total, against Codex's 104. The remainder
+Roughly 25 methods on top of the core — about 45 total, against Codex's 107 stable *(2026-09-26: was 104; 170 including experimental)*. The remainder
 (`plugin/share/*`, `app/*`, realtime, credits and nudge emails, `thread/section/*`) is genuinely
 optional until the corresponding product need appears.

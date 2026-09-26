@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: what a "harness" is, what sits inside it, and how many layers OpenAI opened of theirs.
 - Scope: definition, internal components, the four-layer opening, what the application owns, the size of the surface
 - Primary sources: the `openai/codex` repository plus the "Codex as a platform" and "Unlocking the Codex harness" posts
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -23,7 +23,7 @@ updated: 2026-09-26
 | 3 | Code location | `codex-rs/core/` (Codex core). The repository spans 100+ Rust crates |
 | 4 | Licence | Apache-2.0 |
 | 5 | Opened layers | CLI · SDK · App Server protocol · managed Agents API (four) |
-| 6 | Share taken by the agent loop | **about 20 of 104 methods — a fifth** |
+| 6 | Share taken by the agent loop | **about 20 of 104 stable methods — a fifth** (107 stable / 170 with experimental at 2026-09-26) |
 
 ## §2 Definition  {#s2-definition}
 
@@ -109,7 +109,9 @@ Its protocol-level implementation is `item/tool/call` — the channel by which t
 
 ## §7 What the size of the surface teaches  {#s7-surface-size}
 
-Reading all 104 `ClientRequest` methods as a list of product requirements:
+Reading all 104 stable `ClientRequest` methods as a list of product requirements *(the generated schema omits
+experimental methods — 62 more at the snapshot, mostly queueing, realtime, process, project and remote control;
+they would widen the non-core tiers further)*:
 
 | Tier | Methods | Contents |
 |---|---|---|

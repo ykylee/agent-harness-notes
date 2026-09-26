@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/16-responses-chat-adapter.md + docs/07-harness-engineering.md + docs/99-sources.md
 related_pages: [concepts/stateless-conversation-wire, concepts/wire-protocol-boundary, concepts/harness-engineering, concepts/primary-source-verification]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-09-26
 ---
 
 # Retained Reasoning — why the harness is a performance variable
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: why retained reasoning is load-bearing design rather than an optimisation, and why it structurally disappears when crossing to Chat Completions.
 - Scope: the mechanism, what Chat Completions lacks, what is actually lost, design consequences
 - Primary sources: `codex-rs/protocol/src/models.rs`, `codex-rs/core/src/client.rs`, the "Codex as a platform" post
-- Updated: 2026-09-23
+- Updated: 2026-09-26 (re-checked against the Codex drift re-check of `e72da2b538`; no change to this concept)
 
 ## §1 TL;DR  {#s1-tldr}
 

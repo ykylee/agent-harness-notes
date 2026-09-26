@@ -1,7 +1,12 @@
 # 03. Codex SDK (TypeScript / Python)
 
-The SDKs are wrappers that **spawn the `codex` CLI as a child process and exchange JSONL events
-over stdin/stdout**. They give you a native library interface without writing a JSON-RPC client.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+
+The SDKs are wrappers that **spawn the `codex` CLI as a child process** and give you a native
+library interface without writing a JSON-RPC client. *(corrected 2026-09-26: the transports differ —
+the TypeScript SDK runs `codex exec --experimental-json` and reads JSONL events
+(`sdk/typescript/src/exec.ts:92`); the Python SDK runs `codex app-server --listen stdio://` and
+speaks App Server JSON-RPC (`sdk/python/src/openai_codex/client.py:256`).)*
 
 ## 1. TypeScript SDK
 
@@ -176,7 +181,12 @@ with Codex() as codex:
 ```
 
 `thread.run(...)` returns a `TurnResult` containing the final response, collected items, and token
-usage. Plain strings are shorthand for `TextInput(...)`.
+usage. Plain strings are shorthand for `TextInput(...)`. `ImageUserInput` remains the image-input
+type name (preserved across the v2 `ImageReference` change, #45796, 2026-09-26).
+
+*(2026-09-26, #45809)* `Personality` is still exported, but `Personality.friendly` /
+`Personality.pragmatic` are deprecated and no longer select a style; `Model.supports_personality`
+is always `False`.
 
 ### Sandbox presets
 
@@ -277,5 +287,6 @@ A candid assessment from the blog post:
 > the App Server protocol so teams can cover more of the harness surface without writing JSON-RPC
 > bindings.
 
-In other words the relationship is **SDK ⊂ App Server**, with the possibility that the SDKs get
-rebuilt on top of the App Server later.
+In other words the relationship is **SDK ⊂ App Server**. *(corrected 2026-09-26: the "rebuilt on
+top of the App Server later" possibility already holds for Python — the Python SDK is an App Server
+JSON-RPC client over stdio; only the TypeScript SDK still wraps `codex exec`.)*

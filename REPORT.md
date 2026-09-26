@@ -53,7 +53,7 @@ binary and protocol, per-language SDKs, and a managed API they operate.
 
 | Requirement | Verdict | Detail |
 |---|---|---|
-| **Full product surface** | Well covered | 104 client methods, 10 server requests, 84 notifications. Only ~20 are the agent loop; ~45 is the minimum for a deployable product |
+| **Full product surface** | Well covered | 104 stable client methods (plus 62 experimental ones the generated schema omits), 10 server requests, 84 notifications — 107 / 85 by 2026-09-26. Only ~20 are the agent loop; ~45 is the minimum for a deployable product |
 | **Marketplace** | Adopt, don't invent | A vendor-neutral schema exists at `agent-plugins.org`; Codex accepts Claude-compatible manifests. Four source kinds, versioned install cache, per-entry install policy |
 | **Windows sandbox** | Heavier than it looks | `elevated` and `unelevated` modes. The strong mode needs a privileged Windows service — an installer and lifecycle problem |
 | **Third-party models** | First-class | Providers modelled as data. Five built in deliberately; everything else via `model_providers`. Command-backed token minting absorbs most bespoke auth |
@@ -73,7 +73,7 @@ tool_choice: "auto",   // no required/named-tool mapping
 include: ["reasoning.encrypted_content"]   // hardcoded
 ```
 
-Codex is fully stateless on the wire, so an adapter needs **no session store, no response-id registry
+Codex is fully stateless on the wire over HTTP (the WebSocket transport chains `previous_response_id`), so an adapter needs **no session store, no response-id registry
 and no expiry path** — normally the hardest part of emulating the Responses API.
 
 ### Where it holds and where it breaks

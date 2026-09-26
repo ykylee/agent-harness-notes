@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-26 (agent-ux — 클라이언트 측 UX/UI, 스타일은 수렴했고 감독 이론은 갈렸다)
+- Updated: 2026-09-26 (TASK-002 Codex 드리프트 재확인 — 반박 14건, 생성 스키마는 필터된 뷰였다 / 작업 환경 macOS 로 이동)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -16,10 +16,12 @@
 - **주입 위협 모델 재검토 완료 (TASK-015).** Brave 원문을 다시 읽으니 유출은 "공격자 서버로 navigate"가 아니라 **Reddit 댓글에 답글 달기(쓰기 1회)** 였다. 체인 어디에도 공격자 목적지가 없다. 어긋남은 시연과 실측 사이가 아니라 **우리 한 줄 요약과 원문 사이**에 있었고, 그 요약이 heddle 프로브 설계까지 흘러갔다. 정정하면 시연과 실측은 일치한다 — **목적지 기반 방어는 둘 다 못 막는다. 쓰기를 게이트해야 한다.**
 - **세 번째 사례 Strands 편입 (TASK-2026-09-26-main-001).** `strands/` 8편 — AWS Strands Agents SDK 와 2026-09-22 에 나온 **Strands harness**(`create_harness()`)를 `harness-sdk@15da9dc` 소스로 읽었다. 호출자와 루프 사이에 wire 가 없는 **임베드형** 하네스라 Codex·Aside 와 다른 축에서 추상을 시험한다. 결론: **루프 밖 승인 게이트는 필요조건일 뿐** — Strands 는 그 게이트를 가졌지만 기본 off, 오류 경로 fail-open(Cedar·steering, 🧪 대조군 포함), 등록순 합성, hard deny 없음 (`SYNTHESIS.md` §2.7). provider-as-data 는 **공유 wire 전제에서만** 성립한다는 한정도 붙었다 (§2.3)
 - **클라이언트 측 조사 `agent-ux/` 편입 (TASK-2026-09-26-main-002).** 범위는 `PURPOSE.md` §0.2 로 먼저 기록. 제품 10종(Claude·ChatGPT/Codex·Cursor·Antigravity·Devin(구 Windsurf)·Orca·Superset·Paseo·Conductor + Aside)을 설치본 번들·소스에서 정적 추출. **공통 디자인 언어는 수렴했고(“Allow ⟨agent⟩ to ⟨verb⟩?”, Queue/Steer, amber=needs you, 자율성 다이얼 중간의 기계 리뷰어) 감독 이론은 갈렸다** (`agent-ux/09`, `SYNTHESIS.md` §2.8). 오케스트레이터 3종이 감싼 에이전트의 승인을 기본 off 로 띄운다 — §2.7 "기본 on" 속성 결여. 디스플레이가 없어 시각 인상은 전부 ⚠️
-- **두 저장소의 막힌 지점은 여전히 같다**: 디스플레이 있는 macOS/Windows 기기.
+- **Codex 드리프트 재확인 완료 (TASK-002).** `openai/codex` `2fdcdeaf0e`(09-15) → `e72da2b538`(09-26), 686커밋, `docs/` 16편 전수 대조. 드리프트보다 **반박(기준 시점부터 틀림) 14건**이 더 무겁다 — 핵심은 `docs/02` "104 total" 이 stable 부분집합이었다는 것: 생성 TS 스키마가 `#[experimental]` 클라이언트 메서드 62개(현재 63)·서버 요청 1개(`currentTime/read`)를 빼고, experimental 알림 22개는 남긴다. agent-ux 단서 3종은 드리프트가 아니라 **오픈소스·번들 엔진 어디에도 없는 webview 전용 메서드**(8개). 기록은 `docs/99-sources.md` §E
+- **작업 환경이 macOS 로 이동했다 (2026-09-26).** 두 저장소가 공유하던 막힌 지점(디스플레이 있는 기기)이 풀렸다 — 설치된 ChatGPT.app 번들을 이번 세션에서 직접 읽었다. GUI 패스·동적 관찰이 이제 실행 가능한 작업이다
 
 ## Work Status
 
+- TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: done
 - TASK-2026-09-26-main-002 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사: done
 - TASK-2026-09-26-main-001 Strands Agents 하네스 조사 및 심층 분석: done
 - TASK-2026-09-23-main-015 주입 위협 모델 강조점 재검토: done
@@ -27,14 +29,12 @@
 - TASK-2026-09-23-main-013 주입 — 모델을 넣은 나머지 절반 측정: done
 - TASK-2026-09-23-main-012 주입 방어 실측을 노트 저장소로 편입: done
 - TASK-2026-09-23-main-011 SYNTHESIS 구현 피드백 절 편입: done
-- TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: planned
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
 - TASK-2026-09-23-main-010 REPORT 범위 확장 반영: done
 - TASK-2026-09-23-main-009 번역이 깨뜨린 파서 라벨 복구: done
-- TASK-2026-09-23-main-008 브랜치 병합 및 메모리 아카이브: done
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008 (브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
 
 ## 현재 `in_progress` 작업
 
@@ -46,6 +46,7 @@
 
 ## Key Changes
 
+- **Codex 드리프트 재확인 (TASK-002)** — 반박 14건(`docs/99` §E.1): `codex mcp-server`·`--full-auto` 는 기준일 전 이미 제거, Python SDK 는 이미 app-server JSON-RPC, Windows elevated 는 특권 서비스 필수 아님(`service_identity.rs`), `hide_users.rs` 추론 반박, `worldWritableWarning` 은 아무도 안 보냄, `ResponsesApiRequest` 16필드, WebSocket 은 `previous_response_id` 를 잇는다(무상태는 HTTP 한정). 드리프트: gatewayOAuth 4종, Windows `mxc`·private desktop opt-out 제거, `model_catalog_url`, 로컬 모델 +gpt-6-sol/luna −gpt-5.4, Agents API 턴 오류코드 17→18. 방법론 교훈을 `primary-source-verification` 에 추가 — **생성 산출물의 개수를 총계로 쓰기 전에 생성기가 무엇을 빼는지 읽어라**. 위키 12종 재ingest, `SYNTHESIS`·`REPORT`(영/한)·`README` 수치 정정
 - **agent-ux 조사 (TASK-2026-09-26-main-002)** — `agent-ux/` 01~09·99. 전제 2건이 틀렸다: **ChatGPT 데스크톱 = Codex Electron 앱**(네이티브 SwiftUI 는 업그레이드 화면을 띄우는 레거시), **Windsurf = Devin Desktop**, Antigravity 와 `CortexStepType` 45개 중 43개 필드 번호 일치. Paseo 가 `SYNTHESIS` §2.1 의 "그냥 답장" 을 프로토콜 규칙으로 구현(보류 중 메시지 = 사유 붙은 거부). 반박 13건은 대부분 문서 지연(`agent-ux/99` §4). 새 위키 개념 `agent-client-design-language`(17종)
 - **Strands 조사 (TASK-2026-09-26-main-001)** — `strands/` 01~07·99. 반박 20건(`strands/99` §4): 승인 계층 R1–R5 가 가장 무겁다 — 문서는 "Cedar 평가 오류는 항상 fail-closed", "deny > confirm > … 우선순위", `auditLog` 를 약속하지만 코드는 아니다. 벤치마크 "동등 이상 정확도"는 차트 자체 데이터로 19쌍 중 7쌍에서 낮다 — **문구 반박이지 순위 반박이 아니다**(분산 없음). 설계 문서 "Proposed" 13건 중 11건이 이미 구현 → 새 등급 📐 designed-only. `llms.txt` 기법 기록에 변형 추가(`<page>/index.md` 만 200). 위키 개념 7종 재ingest, `PURPOSE.md` 포함 영역에 임베드형 SDK 하네스 명시
 - **Brave 시연 요약 정정 (TASK-015)** — "공격자 서버로 전송"은 원문에 없다. 원문 4단계는 perplexity.ai(trailing-dot 변형 포함)·gmail.com 을 읽고 **원래 댓글에 답글로 유출**한다. `browser-agents/99-sources.md` §4.5 반박, 위키 `indirect-prompt-injection`·`primary-source-verification` 재ingest, `SYNTHESIS.md` §7 에 방법론 항목 "요약 위에 테스트를 짓기 전에 원문을 다시 읽어라" 추가. §6.5·§6.7 에 남아 있던 단일 실행 수치(9/20→3/20, 45%)와 "one model" 표현도 함께 정정
@@ -65,15 +66,18 @@
 ## Next Actions
 
 **Codex 조사 (`docs/`)**
-- [ ] TASK-002: 조사 기준일 2026-09-15 이후 `openai/codex` 변경분 대조
+- [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 다음 드리프트 점검 기준은 `e72da2b538` (2026-09-26)
+- [ ] webview 전용 메서드 8개(`thread/startAeon`, `item/tool/requestOptionPicker` 등)를 받는 엔진이 무엇인지 — ChatGPT.app 동적 관찰(macOS 에서 가능)
+- [ ] `docs/10` L200 Agents API 플러그인 `./` 규칙과 새 `onboardingSkill` 예외(`./` 생략 허용)의 관계 미확인
+- [ ] 참조 체크아웃 `~/repos/harness-refs/codex` 의 `origin` 은 낡은 개인 Gitea 미러다 — 드리프트 점검은 `upstream` 을 fetch 할 것
 - [ ] TASK-003: Agents API 서버측 모델 목록 — `docs/99-sources.md` 의 유일한 미확인 항목
 - [ ] TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격
 
 **브라우저 조사 (`browser-agents/`)**
 - [ ] 검증 비대칭 해소 — Aside 만 바이너리까지 뜯었고 Dia·Neon 은 문서를 믿은 상태다
 - [ ] `Aside Computer Use` 호출 흐름 추적 (심볼만 봤다)
-- [ ] 동적 관찰 (서버로 가는 내용) — **기기 필요**
-- [ ] 브라우저 GUI 1차 확인 — **macOS/Windows 기기 필요.** 리눅스 빌드가 없다
+- [ ] 동적 관찰 (서버로 가는 내용) — **macOS 환경에서 이제 가능**
+- [ ] 브라우저 GUI 1차 확인 — **macOS 환경에서 이제 가능** (리눅스 빌드는 없다)
 
 **Strands 조사 (`strands/`)**
 - [ ] 위조 `<system-reminder>` 태그를 모델이 하네스 권위로 받아들이는지 — 프롬프트 계약이 그렇게 말하고 아무도 이스케이프하지 않는다(`strands/07` §2.1). **실측은 heddle 측 작업**, 결과만 편입
@@ -83,8 +87,8 @@
 - [ ] harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인
 
 **agent-ux 조사 (`agent-ux/`)**
-- [ ] GUI 패스 — macOS/Windows 기기에서 시각 주장 ⚠️→✅ (디스플레이 제약은 기존과 같다)
-- [ ] Codex 드리프트 단서: 번들에서 `docs/02` 에 없는 App Server 메서드 3종(`item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `thread/startAeon`) — TASK-002 에 합칠 것
+- [ ] GUI 패스 — macOS/Windows 기기에서 시각 주장 ⚠️→✅ (macOS 환경에서 이제 가능)
+- [x] ~~Codex 드리프트 단서 3종~~ — TASK-002 에서 판정: 드리프트 아님, webview 전용 (`agent-ux/03` §1.2.1 갱신)
 - [ ] ACP(Agent Client Protocol) 엔진측 독해 — Devin Local·Paseo·Superset·Strands CLI 가 모두 쓴다
 - [ ] `REPORT`(영/한) 개념 수 16→17 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)
 - [ ] 모바일 컴패니언(Orca·Superset·Paseo)은 이번 패스에서 제외

@@ -4,6 +4,7 @@
 > `learn.chatgpt.com/docs/agent-approvals-security.md` (§OS-level sandbox, §Network access),
 > plus the `codex-rs/windows-sandbox-rs` and `codex-rs/windows-sandbox-service` source trees.
 > Extracted 2026-09-15.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 1. Where Windows sits among the OS sandboxes
 
@@ -30,9 +31,14 @@ access even on a Windows host.
 
 ```toml
 [windows]
-sandbox = "unelevated"          # or "elevated"
-# sandbox_private_desktop = true  # default; set false only for compatibility
+sandbox = "unelevated"          # or "elevated", or "mxc"
 ```
+
+*(2026-09-26: `windows.sandbox_private_desktop` was removed — strict config now warns "Remove
+windows.sandbox_private_desktop; legacy Windows sandboxes always use a private desktop"; #46554.)*
+
+A third value, **`mxc`**, was added 2026-09-26 (#46271): `WindowsSandboxModeToml::Mxc`, gated by the
+`prefer_mxc` feature. The protocol type is `WindowsSandboxImplementation = "elevated" | "unelevated" | "mxc"`.
 
 ### `elevated` — preferred
 
@@ -54,9 +60,9 @@ Requires administrator-approved setup.
 
 ### Private desktop
 
-Both modes use a **private desktop for stronger UI isolation** by default.
-Set `windows.sandbox_private_desktop = false` only if you need the older `Winsta0\Default` behavior
-for compatibility.
+Both modes use a **private desktop for stronger UI isolation**, with no opt-out
+*(2026-09-26: was "by default; set `windows.sandbox_private_desktop = false` for the older
+`Winsta0\Default` behavior" — the key was removed, #46554)*.
 
 > This is a defense most harnesses forget: without desktop isolation, sandboxed GUI processes can
 > reach the interactive desktop and drive other windows.
@@ -66,6 +72,8 @@ for compatibility.
 Administrators can constrain which native sandbox implementations Codex may use through
 `requirements.toml`. A policy can **require `elevated` and prevent fallback to `unelevated`**;
 listing both permits either, and Codex prefers `elevated` when no mode is selected.
+`windows.allowed_sandbox_implementations` still lists only `elevated` / `unelevated` and does **not**
+constrain `mxc` *(2026-09-26, #46271)*.
 
 > Note the shape: the *admin* artifact is a separate file from the *user* config, and it expresses
 > allowed sets rather than a single value. Copy that separation — a policy that can only pin one
@@ -121,7 +129,8 @@ explicitly rather than inherit.
 
 > **Inference warning**: the following is read from the `codex-rs/windows-sandbox-rs` and
 > `windows-sandbox-service` **source trees** (module names and layout), not from prose documentation.
-> Treat it as a map of the problem space, not as a specification.
+> Treat it as a map of the problem space, not as a specification. Rows marked ✅ were confirmed
+> from module doc comments on 2026-09-26; ❌ marks a refuted role.
 
 The source tree implies these mechanisms:
 
@@ -131,21 +140,30 @@ The source tree implies these mechanisms:
 | Token restriction | `token.rs`, `token_user.rs`, `token_groups_tests.rs` |
 | Filesystem ACLs | `acl.rs`, `workspace_acl.rs`, `deny_read_acl.rs`, `deny_read_resolver.rs`, `deny_read_walker.rs`, `file_write.rs` |
 | Symlink / reparse defense | `no_reparse_dir.rs`, `path_normalization.rs` |
-| Network filtering | `wfp.rs`, `wfp_setup.rs` (Windows Filtering Platform) |
-| Desktop isolation | `desktop.rs`, `hide_users.rs` |
+| Network filtering ✅ | `wfp.rs` ("Installs the persistent Codex WFP filters for `account`"), `wfp_setup.rs` (Windows Filtering Platform) |
+| Desktop isolation | `desktop.rs` |
+| Sandbox-account hygiene | `hide_users.rs` — ❌ *(corrected 2026-09-26: not desktop isolation; it "hides the current sandbox user's profile directory", setting HIDDEN\|SYSTEM)* |
 | Terminals | `conpty/`, `unified_exec/`, `stdio_bridge.rs` |
-| Secret storage | `dpapi.rs` |
-| Elevation & setup | `elevated/`, `setup.rs`, `setup_launch.rs`, `setup_provisioning.rs`, `setup_mutex.rs`, `installation_record.rs` |
+| Secret storage ✅ | `dpapi.rs` — `CryptProtectData` wrapper; `identity.rs` uses it to decrypt sandbox-account passwords |
+| Elevation & setup | `elevated/`, `setup.rs`, `setup_launch.rs`, `setup_provisioning.rs`, `setup_mutex.rs` ✅ ("Serializes sandbox account and network changes across setup and uninstall"), `installation_record.rs` ✅ (persists the owner across restarts/updates); added 2026-09-26: `provisioning_client`, `runtime_ownership`, `uninstall_windows/` |
+| Launch environment | `environment_transport.rs`, `launch_environment.rs` — added 2026-09-26 (#47919) |
 | Privileged service | `windows-sandbox-service`: `service.rs`, `ipc.rs`, `provisioning.rs`, `machine_policy.rs`, `package_lifecycle.rs`, `registered_runtime.rs` |
-| Auditing | `audit.rs`, `logging.rs` |
+| Logging | `logging.rs` *(2026-09-26: `audit.rs` deleted together with the `hide_world_writable_warning` config edit, #47943)* |
 
 Two structural takeaways:
 
-1. **The elevated mode needs a privileged Windows service.** `windows-sandbox-service` is a separate
-   crate with its own IPC, provisioning, and machine-policy handling. Elevated sandboxing on Windows
-   is not something a single user-mode process can do — plan for an installer and a service lifecycle.
+1. **The privileged service is the packaged path, not a requirement.** `windows-sandbox-service` is a
+   separate crate with its own IPC, provisioning, and machine-policy handling, but what elevated mode
+   actually needs is **elevation (admin) once, for setup**
+   *(corrected 2026-09-26: was "needs a privileged service… not something a single user-mode process can
+   do"; `service_identity.rs` at base: "Unpackaged callers keep the legacy service lookup and may use
+   ordinary elevated setup when it is absent"; head prefers the provisioning service and falls back to
+   the elevated helper, #46239)*. Plan for a service lifecycle only if you ship a packaged install.
 2. **Setup is a first-class, resumable operation**, not a side effect of launching. Hence
    `setup_mutex.rs`, `installation_record.rs`, and the protocol methods below.
+
+Also since baseline: the sandbox token is scoped to the logon session (#47361), and `.aws` is protected
+under writable roots (#48176) *(2026-09-26)*.
 
 One source comment states the authority model plainly:
 
@@ -162,25 +180,28 @@ transfers to any sandbox design.
 | Client → Server | `windowsSandbox/setupStart` | Begin sandbox setup (the elevated path needs admin approval) |
 | Client → Server | `windowsSandbox/readiness` | Query readiness. Takes no params |
 | Server → Client | `windowsSandbox/setupCompleted` | Setup finished |
-| Server → Client | `windows/worldWritableWarning` | A world-writable path was detected |
+| Server → Client | `windows/worldWritableWarning` | A world-writable path was detected — ⚠️ vestigial: *(corrected 2026-09-26: in the schema, but nothing in app-server/core emits it at base or head)* |
 
 > The presence of a dedicated **readiness** RPC and a **setupCompleted** notification says that setup
 > is asynchronous, can outlive a turn, and must be surfaced in the UI. A custom harness targeting
 > Windows needs the same two-phase shape — you cannot treat sandbox availability as a boot-time
 > boolean.
 
-`windows/worldWritableWarning` is worth copying as a concept: the sandbox can be correctly configured
-and still be undermined by a permissive path, so detection is separate from enforcement.
+`windows/worldWritableWarning` is worth copying as a *concept*: the sandbox can be correctly configured
+and still be undermined by a permissive path. *(corrected 2026-09-26: Codex itself does not implement
+it — the detector was unused at base and is now deleted (#47943), so the notification is a vestigial
+protocol entry, not evidence of a separate detection path.)*
 
 ## 8. Checklist for a custom Windows sandbox
 
-- [ ] Decide early whether you ship a **privileged service**; it gates the stronger mode
+- [ ] Decide early whether you ship a **privileged service** *(corrected 2026-09-26: it is the packaged path; admin-elevated setup suffices otherwise)*
 - [ ] Implement both a strong mode and a **degraded fallback** — enterprise policy will block setup
 - [ ] Make setup **asynchronous, resumable, and observable** (start / readiness / completed)
 - [ ] Derive authority from **OS package identity**, never from paths or manifest text
-- [ ] Use a **private desktop** by default; make opting out explicit and documented
+- [ ] Use a **private desktop** *(2026-09-26: Codex now always does, with no opt-out; #46554)*
 - [ ] Treat "network allowed" and "network constrained" as **two separate switches**
 - [ ] Handle reparse points and path normalization, or ACL boundaries are bypassable
 - [ ] Target ConPTY; it sets your minimum Windows version (10 1809+)
 - [ ] Let administrators express an **allowed set** of implementations, not a single pinned value
 - [ ] Warn on world-writable paths even when the sandbox itself is configured correctly
+      *(Codex's own warning is vestigial — see §7; corrected 2026-09-26)*

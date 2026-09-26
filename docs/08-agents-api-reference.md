@@ -3,6 +3,7 @@
 > **Authoritative source**: `openapi.yaml` in [`openai/openai-openapi`](https://github.com/openai/openai-openapi)
 > (~3.5MB, entries tagged `Agents`). Extracted **directly from the spec**, not from guide pages.
 > Extracted 2026-09-15. Reproduction steps at the bottom.
+> Drift-checked against `openai/openai-openapi@d983890f77` and `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
 
 ## 0. Calling convention
 
@@ -22,7 +23,9 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
   `client.beta().agents().sessions()` (Java)
 - Streaming responses are `text/event-stream`; non-streaming are `application/json`
 
-## 1. All endpoints (33)
+## 1. All endpoints (33 under `/agents` + 9 under `/vaults` = 42)
+
+*(2026-09-26: heading clarified — the former "33" counted `/agents` only; paths and operationIds are unchanged base→head.)*
 
 ### 1.1 Agents — reusable saved agents
 
@@ -46,6 +49,13 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | POST | `/agents/sessions/{session_id}` | `updateAgentSession` |
 | DELETE | `/agents/sessions/{session_id}` | `deleteAgentSession` |
 
+> **Update and delete semantics** *(2026-09-26)*: `updateAgentSession` was "Updates session metadata"; it now
+> also takes `agent: UpdateSessionAgentParam` (`model`, `reasoning`, `service_tier`) — "Updates session
+> metadata, model, reasoning effort, or service tier", applied to subsequent turns. The guide calls these
+> settings available "in the beta and GA API contracts"; how that fits the beta-only `agents=v1` framing
+> above is unresolved ⚠️. `deleteAgentSession` can now cancel a still-open turn once backend execution
+> has ended (abandoning unpublished outputs); **running execution must be cancelled first**.
+
 ### 1.3 Session input and output
 
 | Method | Path | operationId |
@@ -57,7 +67,8 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | GET | `/agents/sessions/{session_id}/turns/{turn_id}` | `retrieveAgentSessionTurn` |
 
 > **`POST .../events` is the only input channel.** Messages, cancellation, and tool results all go
-> through it.
+> through it. Cancellation "can recover a still-open turn" whose backend execution has ended; "HTTP 202
+> confirms acceptance, not durable completion" *(2026-09-26)*.
 
 ### 1.4 Artifacts — files published by completed turns
 
@@ -112,6 +123,10 @@ curl --no-buffer --fail-with-body https://api.openai.com/v1/agents/sessions \
 | POST | `/vaults/{vault_id}/credentials/{credential_id}` | `rotateVaultCredential` |
 | DELETE | `/vaults/{vault_id}/credentials/{credential_id}` | `deleteVaultCredential` |
 
+*(2026-09-26: `rotateVaultCredential` is now summarised "Update a vault credential" — `auth` is no longer
+required, `metadata` (≤16 pairs, replaces the whole map) was added, and at least one of the two must be
+supplied. The operationId is unchanged.)*
+
 Vaults hold MCP credentials for connections made **from OpenAI**. They live outside the `Agents`
 tag, which is why a scan of `/agents` paths alone misses them. Details in
 [10-agents-api-tools.md](10-agents-api-tools.md#3-vaults).
@@ -158,6 +173,7 @@ Size limits are in [09-agents-api-environments.md](09-agents-api-environments.md
 - `201` + `SessionResource` (JSON)
 - `201` + a `SessionEvent` stream (`text/event-stream`, when `stream: true`)
 - Errors: `400 401 403 404 409 500 503` — all `ErrorResponse-2`
+  *(2026-09-26: `403` "The API key lacks the required permission" now appears on most `/agents` operations — 42 responses vs 32 at base.)*
 
 ### `SessionAgentConfigParam`
 
@@ -167,7 +183,7 @@ Size limits are in [09-agents-api-environments.md](09-agents-api-environments.md
 | `instructions` | `string \| null` | Additional instructions **appended to the agent's default base instructions** |
 | `reasoning` | `ReasoningParam \| null` | Omit to keep current settings; `null` resets to the model's default effort |
 | `text` | `TextParam \| null` | Configuration for generated text |
-| `service_tier` | `ServiceTierParam \| null` | Service tier for model requests |
+| `service_tier` | `ServiceTierParam \| null` | Service tier for model requests. *(2026-09-26: `model`, `reasoning`, `service_tier` can also be changed later via `updateAgentSession`; `null` tier resets to auto)* |
 | `multi_agent` | `MultiAgentConfigCurrentParam \| null` | Subagent configuration |
 | `tools` | `AgentToolConfigParam[] \| null` | Omit to inherit; `null` clears them |
 
@@ -202,6 +218,9 @@ Size limits are in [09-agents-api-environments.md](09-agents-api-environments.md
 
 The response-side `EnvironmentResourceSelfHosted` additionally carries `remote_url` and `id` —
 feed both into `codex exec-server --remote <remote_url> --environment-id <id>`.
+*(2026-09-26: still valid; the command moved to `cli/src/exec_server_command.rs`. New `--ws-auth`,
+`--ws-token-*`, `--ws-issuer`/`--ws-audience`, and `--linux-sandbox-pid-namespace` flags do not apply to
+remote registration.)*
 
 ### `MultiAgentConfigCurrentParam`
 
@@ -329,7 +348,7 @@ feed both into `codex exec-server --remote <remote_url> --environment-id <id>`.
 For subagent turns, `created_at` uses the start time, falling back to the completion time and then
 to the subagent opening time when earlier timestamps are unavailable.
 
-## 5. Turn failure codes — `SessionTurnErrorCodeResource` (17)
+## 5. Turn failure codes — `SessionTurnErrorCodeResource` (18)
 
 | Code | Meaning |
 |---|---|
@@ -340,6 +359,7 @@ to the subagent opening time when earlier timestamps are unavailable.
 | `rate_limit_exceeded` | Rate limit exceeded |
 | `server_overloaded` | The model service is temporarily overloaded |
 | `cyber_policy` | Rejected by a safety policy |
+| `misalignment_policy_violation` | Blocked by the safety systems *(2026-09-26: added; not in the base enum of 17)* |
 | `connection_failed` | Could not connect to the model service |
 | `server_error` | Unexpected error from the model service |
 | `authentication_error` | Invalid credentials or insufficient access |
@@ -353,7 +373,8 @@ to the subagent opening time when earlier timestamps are unavailable.
 
 > Separate the retryable family (`server_overloaded`, `rate_limit_exceeded`, `connection_failed`,
 > `request_timeout`) from the ones requiring a configuration fix (`invalid_request`,
-> `authentication_error`, `executor_version_incompatible`).
+> `authentication_error`, `executor_version_incompatible`). The policy codes (`cyber_policy`,
+> `misalignment_policy_violation` *(2026-09-26)*) are not retryable either.
 
 ## 6. `POST /agents/sessions/{id}/events` — the input channel
 
@@ -652,7 +673,7 @@ codex exec-server \
 - [ ] `usage` is best effort and **may change later**. Be careful using it for billing
 - [ ] Prepare an upgrade path for `executor_version_incompatible` (self-hosted `@openai/codex@alpha`)
 - [ ] Retrieve produced files from **`artifacts`**, not `items`
-- [ ] To stop work, send `agent.session.input.cancel` — not a session delete
+- [ ] To stop work, send `agent.session.input.cancel` — not a session delete (delete refuses running execution; cancel first *(2026-09-26)*)
 
 ## 14. Reproduction
 

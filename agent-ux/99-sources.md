@@ -94,9 +94,9 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
 
 ## 6. Leads for other studies in this repository
 
-- **Codex drift (TASK-002):** the ChatGPT/Codex bundle calls three App Server methods absent from
-  [`docs/02`](../docs/02-app-server-protocol.md): `item/tool/requestOptionPicker`,
-  `item/plan/requestImplementation`, `thread/startAeon` ([03](03-openai-codex-chatgpt.md) §1.2.1).
+- ~~**Codex drift (TASK-002):** three App Server methods absent from `docs/02`~~ — **resolved 2026-09-26:** not
+  drift. They exist nowhere in `openai/codex` nor in the engine the app bundles
+  ([03](03-openai-codex-chatgpt.md) §1.2.1, [`docs/99` §E.3](../docs/99-sources.md)).
 - **Antigravity ↔ Windsurf:** a shared protobuf engine (`exa.cortex_pb`) is a protocol surface this
   repository has not read on the engine side.
 - **ACP** (Agent Client Protocol) now appears in Devin Desktop, Paseo, Superset and Strands' CLI — a
