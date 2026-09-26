@@ -169,6 +169,12 @@ Center (default screen), Orca's dashboard (Needs You / Working / Done / Idle), S
 > 📌 **Amber/orange means "needs you" in every product that declares a colour.** The disagreement is over
 > *working*: blue (OpenAI, Paseo) keeps amber unambiguous; yellow (Orca, Superset) forces a second
 > channel — a shifted hue (Orca) or motion (Superset).
+>
+> **Narrowed by the GUI pass (2026-09-27).** The table holds for *declared status vocabularies*, but inside the apps orange
+> is not exclusive: ChatGPT paints the `Full access` permission chip orange with a warning glyph (a risky **state**, not
+> a request), and Claude's working mark is its **clay** spark — an orange-family hue for *working*. Antigravity marks
+> unread conversations with a **blue** dot. "Amber means needs you" is a convention of status indicators, not a
+> reservation of the hue.
 
 ### 6.3 Naming completion, and leaving the window
 

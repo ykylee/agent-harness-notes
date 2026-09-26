@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-09-26",
+  "generated_at": "2026-09-27",
   "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
   "purpose_digest_rev": "2026-09-26",
   "source_of_truth": {
@@ -10,7 +10,7 @@
     "daily_backlog_dir": "ai-workflow/memory/active/main/backlog",
     "tasks_dir": "ai-workflow/memory/active/main/backlog/tasks",
     "sessions_dir": "ai-workflow/memory/active/main/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-27.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -29,14 +29,16 @@
   "session": {
     "current_baseline": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.",
     "current_axis": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.",
-    "current_focus": null,
+    "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 설치된 5종 시각 주장 확인",
     "in_progress_items": [],
-    "blocked_items": [],
+    "blocked_items": [
+      "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 설치된 5종 시각 주장 확인"
+    ],
     "planned_items": [
-      "TASK-2026-09-22-agent-harness-notes-003",
       "TASK-2026-09-22-agent-harness-notes-004"
     ],
     "recent_done_items": [
+      "TASK-2026-09-27-main-001 — ChatGPT webview 전용 메서드의 수신 엔진 추적",
       "TASK-2026-09-26-main-003 — 위키 신선도 검사기 오탐 수정",
       "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
       "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
@@ -45,28 +47,27 @@
       "TASK-2026-09-23-main-013 — 주입 — 모델을 넣은 나머지 절반 측정",
       "TASK-2026-09-23-main-012 — 주입 방어 실측을 노트 저장소로 편입",
       "TASK-2026-09-23-main-011 — SYNTHESIS 구현 피드백 절 편입",
-      "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영",
-      "TASK-2026-09-23-main-009 — 번역이 깨뜨린 파서 라벨 복구"
+      "TASK-2026-09-23-main-010 — REPORT 범위 확장 반영"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-26.md",
-    "task_count": 4,
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-27.md",
+    "task_count": 3,
     "in_progress_items": [],
-    "blocked_items": [],
+    "blocked_items": [
+      "TASK-2026-09-27-main-002 — agent-ux GUI 패스 — 설치된 5종 시각 주장 확인"
+    ],
     "done_items": [
-      "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석",
-      "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
-      "TASK-2026-09-22-agent-harness-notes-002 — openai/codex 드리프트 재확인",
-      "TASK-2026-09-26-main-003 — 위키 신선도 검사기 오탐 수정"
+      "TASK-2026-09-22-agent-harness-notes-003 — Agents API 서버측 모델 목록 검증",
+      "TASK-2026-09-27-main-001 — ChatGPT webview 전용 메서드의 수신 엔진 추적"
     ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/main/session_handoff.md",
-    "ai-workflow/memory/active/main/backlog/2026-09-26.md",
+    "ai-workflow/memory/active/main/backlog/2026-09-27.md",
     "ai-workflow/memory/active/PURPOSE.md",
     "ai-workflow/memory/active/main/state.json",
     "ai-workflow/memory/active/main/backlog"

@@ -154,7 +154,7 @@ The strongest convergence in this study is **lexical**. Products that share no c
 
 ## 9. Open questions
 
-- The whole visual layer: nothing was seen rendered. A GUI pass on macOS/Windows would move many ⚠️ to ✅
+- The whole visual layer: nothing was seen rendered. A GUI pass on macOS/Windows would move many ⚠️ to ✅. *(2026-09-27: a passive macOS pass covered ChatGPT, Claude, Antigravity, Orca and Aside — layouts confirmed, the amber rule narrowed ([08 §6.2](08-primitives-rendered.md)); approval cards and agent states still need a live run.)*
   — the same device constraint recorded in the session handoff
 - Whether the lexical convergence is deliberate (shared people, shared specs) or independent — Conductor
   copying Claude Code CLI copy verbatim is deliberate; the rest is not established

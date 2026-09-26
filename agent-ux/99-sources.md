@@ -96,7 +96,8 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
 
 - ~~**Codex drift (TASK-002):** three App Server methods absent from `docs/02`~~ — **resolved 2026-09-26:** not
   drift. They exist nowhere in `openai/codex` nor in the engine the app bundles
-  ([03](03-openai-codex-chatgpt.md) §1.2.1, [`docs/99` §E.3](../docs/99-sources.md)).
+  ([03](03-openai-codex-chatgpt.md) §1.2.1, [`docs/99` §E.3](../docs/99-sources.md)). **2026-09-27:** they belong to a
+  second, cloud-hosted engine the app drives (`durable`, "Long-lived"), or never leave the client.
 - **Antigravity ↔ Windsurf:** a shared protobuf engine (`exa.cortex_pb`) is a protocol surface this
   repository has not read on the engine side.
 - **ACP** (Agent Client Protocol) now appears in Devin Desktop, Paseo, Superset and Strands' CLI — a
@@ -112,3 +113,24 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
 | Whether Orca's `1`/`ESC` keystrokes match every vendor TUI's current menu order | not run |
 | Mobile companions (Orca, Superset, Paseo) as design surfaces | out of this pass |
 | Cursor's reported Auto-review figures (~4% blocked) | vendor-reported 📣 |
+
+## GUI pass, 2026-09-27
+
+Passive screenshots on macOS through Orca's `orca computer` (accessibility tree + window capture). Builds matched the
+static study: ChatGPT 26.924.22138, Claude 2.9939.2, Antigravity 2.17.0; Orca 1.4.209 (study: source 1.4.197); Aside
+1.0.922.1. **No agent was run** — every app pointed at the user's own projects, and choosing a scratch folder needs a
+file dialog the tool cannot drive — so approval cards and live agent states remain ⚠️. Screenshots showed the user's
+own threads and pages; they are not kept in this repository, and only UI structure is recorded.
+
+| Doc | Moved | Still ⚠️ |
+|---|---|---|
+| [03](03-openai-codex-chatgpt.md) §1.3 | layout ✅ (+ icon rail, summary right panel), composer footer ✅, orange `Full access` chip | approval card weight, squircles, `Work in` / context status |
+| [02](02-claude-desktop.md) §7 | working mark = clay spark ✅, collapsed tool lines, repo/PR bar | approval placement (session was in Auto), serif "voice" |
+| [05](05-antigravity-windsurf.md) §1 | 2.17 home ✅, `/plan` move ✅, blue unread dot, `Open IDE` hand-off | `Documents`/`Artifacts` placement, sounds |
+| [06](06-orca-superset.md) header | sidebar + host badges, usage meters ✅ | agent states, approval default, font |
+| [08](08-primitives-rendered.md) §6.2 | **amber rule narrowed**: orange also marks risk (ChatGPT) and working (Claude) | — |
+| [`browser-agents/03`](../browser-agents/03-aside-design-ux.md) | Aside sidebar sections + `Ask Aside` ✅ | split tabs |
+
+Next: a live run per app in a scratch project the user sets up once, to see approval cards and `blocked`/`waiting`.
+Not installed here, still fully ⚠️: Cursor, Devin, Superset, Paseo, Conductor.
+

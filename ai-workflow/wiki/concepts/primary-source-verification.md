@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + strands/99-sources.md + strands/01-overview.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-27
 ---
 
 # Primary-Source Verification — this repository's method of knowing
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-27 (`docs/99` §E.3 — the client-only methods traced to a second engine)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -50,8 +50,11 @@ third-party write-ups drift from them.
 > excludes.** (`docs/99-sources.md` §E.2)
 >
 > The same re-check found the converse: a shipped client (ChatGPT desktop) calling methods that exist in
-> neither the open-source engine nor the engine the app bundles. **An open-source surface is not
-> necessarily the whole surface its own vendor's client targets.** (§E.3)
+> neither the open-source engine nor the engine the app bundles. Traced on 2026-09-27, they belong to a
+> **second, cloud-hosted engine** the client also drives (`durable`, `wss://codex-cloud-backend.chatgpt.com/`),
+> or never leave the client at all. **An open-source surface is not necessarily the whole surface its own
+> vendor's client targets** — and a literal in a bundle is not evidence of a wire call until you have
+> found who sends it. (§E.3)
 
 > One practical discovery paid for itself repeatedly: **appending `.md` to an OpenAI documentation
 > URL returns the raw Markdown source.** It turned lossy page summaries into primary text with code

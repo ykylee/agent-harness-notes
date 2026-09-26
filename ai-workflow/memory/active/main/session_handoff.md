@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-26 (TASK-002 Codex 드리프트 재확인 — 반박 14건, 생성 스키마는 필터된 뷰였다 / 작업 환경 macOS 로 이동 / TASK-003 위키 신선도 검사기 오탐 수정)
+- Updated: 2026-09-27 (ChatGPT 두 번째 엔진(durable) 추적 / agent-ux 수동 GUI 패스 / TASK-003 결론 종료)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,9 @@
 
 ## Work Status
 
+- TASK-2026-09-27-main-002 agent-ux GUI 패스 — 설치된 5종 시각 주장 확인: blocked
+- TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
+- TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: done
 - TASK-2026-09-26-main-003 위키 신선도 검사기 오탐 수정: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: done
 - TASK-2026-09-26-main-002 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사: done
@@ -29,12 +32,9 @@
 - TASK-2026-09-23-main-014 두 번째 공급자로 주입 결론 검증 및 정정: done
 - TASK-2026-09-23-main-013 주입 — 모델을 넣은 나머지 절반 측정: done
 - TASK-2026-09-23-main-012 주입 방어 실측을 노트 저장소로 편입: done
-- TASK-2026-09-23-main-011 SYNTHESIS 구현 피드백 절 편입: done
-- TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: planned
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
-- TASK-2026-09-23-main-010 REPORT 범위 확장 반영: done
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008·009 (브랜치 병합, 파서 라벨 복구), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008~011 (브랜치 병합, 파서 라벨 복구, REPORT 범위 확장, SYNTHESIS 구현 피드백), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
 
 ## 현재 `in_progress` 작업
 
@@ -42,10 +42,12 @@
 
 ## 현재 `blocked` 작업
 
--
+- TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개
 
 ## Key Changes
 
+- **ChatGPT 앱은 엔진을 둘 몬다 (TASK-2026-09-27-main-001)** — 로컬 `codex app-server` + 클라우드 `durable`("Long-lived", `wss://codex-cloud-backend.chatgpt.com/`). durable 전용 어댑터가 방언 변환(`thread/queue/add`→`turn/addUserMessage`, `thread/start`→`thread/prewarm`)하고 `config/*` 는 클라이언트 메모리에서 답한다. webview 전용 8개 재분류, 그중 `plugin/codex` 는 메서드가 아니었다(09-26 스윕 오류). 이 계정엔 durable 미개통(로그 `state=disconnected`). `docs/99` §E.3
+- **agent-ux 수동 GUI 패스 (TASK-2026-09-27-main-002, 일부)** — `orca computer` 로 설치 5종 캡처. 레이아웃 확인, **amber 규칙 완화**(ChatGPT 는 Full access 위험 상태를 주황으로, Claude 작업 중 = 점토색 스파크). `agent-ux/99` GUI pass 절. 스크린샷은 사용자 데이터라 저장소에 넣지 않았다
 - **Codex 드리프트 재확인 (TASK-002)** — 반박 14건(`docs/99` §E.1): `codex mcp-server`·`--full-auto` 는 기준일 전 이미 제거, Python SDK 는 이미 app-server JSON-RPC, Windows elevated 는 특권 서비스 필수 아님(`service_identity.rs`), `hide_users.rs` 추론 반박, `worldWritableWarning` 은 아무도 안 보냄, `ResponsesApiRequest` 16필드, WebSocket 은 `previous_response_id` 를 잇는다(무상태는 HTTP 한정). 드리프트: gatewayOAuth 4종, Windows `mxc`·private desktop opt-out 제거, `model_catalog_url`, 로컬 모델 +gpt-6-sol/luna −gpt-5.4, Agents API 턴 오류코드 17→18. 방법론 교훈을 `primary-source-verification` 에 추가 — **생성 산출물의 개수를 총계로 쓰기 전에 생성기가 무엇을 빼는지 읽어라**. 위키 12종 재ingest, `SYNTHESIS`·`REPORT`(영/한)·`README` 수치 정정
 - **agent-ux 조사 (TASK-2026-09-26-main-002)** — `agent-ux/` 01~09·99. 전제 2건이 틀렸다: **ChatGPT 데스크톱 = Codex Electron 앱**(네이티브 SwiftUI 는 업그레이드 화면을 띄우는 레거시), **Windsurf = Devin Desktop**, Antigravity 와 `CortexStepType` 45개 중 43개 필드 번호 일치. Paseo 가 `SYNTHESIS` §2.1 의 "그냥 답장" 을 프로토콜 규칙으로 구현(보류 중 메시지 = 사유 붙은 거부). 반박 13건은 대부분 문서 지연(`agent-ux/99` §4). 새 위키 개념 `agent-client-design-language`(17종)
 - **Strands 조사 (TASK-2026-09-26-main-001)** — `strands/` 01~07·99. 반박 20건(`strands/99` §4): 승인 계층 R1–R5 가 가장 무겁다 — 문서는 "Cedar 평가 오류는 항상 fail-closed", "deny > confirm > … 우선순위", `auditLog` 를 약속하지만 코드는 아니다. 벤치마크 "동등 이상 정확도"는 차트 자체 데이터로 19쌍 중 7쌍에서 낮다 — **문구 반박이지 순위 반박이 아니다**(분산 없음). 설계 문서 "Proposed" 13건 중 11건이 이미 구현 → 새 등급 📐 designed-only. `llms.txt` 기법 기록에 변형 추가(`<page>/index.md` 만 200). 위키 개념 7종 재ingest, `PURPOSE.md` 포함 영역에 임베드형 SDK 하네스 명시
@@ -67,10 +69,10 @@
 
 **Codex 조사 (`docs/`)**
 - [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 다음 드리프트 점검 기준은 `e72da2b538` (2026-09-26)
-- [ ] webview 전용 메서드 8개(`thread/startAeon`, `item/tool/requestOptionPicker` 등)를 받는 엔진이 무엇인지 — ChatGPT.app 동적 관찰(macOS 에서 가능)
+- [x] ~~webview 전용 메서드의 수신 엔진~~ — 클라우드 durable 호스트(TASK-2026-09-27-main-001). 남은 것: durable(Aeon) 엔진의 실체·동작은 개통된 계정에서만 관찰 가능
 - [ ] `docs/10` L200 Agents API 플러그인 `./` 규칙과 새 `onboardingSkill` 예외(`./` 생략 허용)의 관계 미확인
 - [ ] 참조 체크아웃 `~/repos/harness-refs/codex` 의 `origin` 은 낡은 개인 Gitea 미러다 — 드리프트 점검은 `upstream` 을 fetch 할 것
-- [ ] TASK-003: Agents API 서버측 모델 목록 — `docs/99-sources.md` 의 유일한 미확인 항목
+- [x] ~~TASK-003: Agents API 서버측 모델 목록~~ — 공개 산출물로 결정 불가로 종료. 실측은 Agents API 키로 세션 생성 시도(비용)
 - [ ] TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격
 
 **브라우저 조사 (`browser-agents/`)**
@@ -87,7 +89,7 @@
 - [ ] harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인
 
 **agent-ux 조사 (`agent-ux/`)**
-- [ ] GUI 패스 — macOS/Windows 기기에서 시각 주장 ⚠️→✅ (macOS 환경에서 이제 가능)
+- [ ] GUI 패스 — 수동 패스 완료(설치 5종). 남은 것: 앱별 스크래치 프로젝트에서 에이전트 실행해 승인 카드·상태 관찰. 미설치 5종(Cursor·Devin·Superset·Paseo·Conductor)은 ⚠️ 그대로
 - [x] ~~Codex 드리프트 단서 3종~~ — TASK-002 에서 판정: 드리프트 아님, webview 전용 (`agent-ux/03` §1.2.1 갱신)
 - [ ] ACP(Agent Client Protocol) 엔진측 독해 — Devin Local·Paseo·Superset·Strands CLI 가 모두 쓴다
 - [ ] `REPORT`(영/한) 개념 수 16→17 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)

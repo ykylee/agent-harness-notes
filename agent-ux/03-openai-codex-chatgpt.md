@@ -62,27 +62,44 @@ item/tool/requestOptionPicker | item/tool/requestUserInput` into a `Map` keyed o
 
 #### 1.2.1 Methods the shipped client uses that the open-source engine does not have
 
-> **Resolved 2026-09-26** by the Codex drift re-check ([../docs/99-sources.md §E.3](../docs/99-sources.md)). This section
-> first read "either these are experimental or internal, or `docs/02` has drifted." **Neither held.**
+> **Resolved 2026-09-27** ([../docs/99-sources.md §E.3](../docs/99-sources.md)). This section first read "either
+> these are experimental or internal, or `docs/02` has drifted." **Neither held: the app drives a second engine.**
 
-| Method | Bundle refs | Adjacent UI string | `openai/codex` history | Bundled engine |
-|---|---|---|---|---|
-| `item/tool/requestOptionPicker` | 14 | batched with the approval/user-input requests above | 0 commits | absent |
-| `item/plan/requestImplementation` | 12 | `Yes, implement this plan` (`codex.userMessage.implementPlan`) | 0 commits | absent |
-| `thread/startAeon` | 8 | none found; shares `thread/start`'s param rewriting and lifecycle tracing | 0 commits | absent |
+Besides the bundled `codex app-server`, the main process defines a host `durable` ("Long-lived") at
+`wss://codex-cloud-backend.chatgpt.com/`, reached through an adapter that rewrites requests into its own dialect
+(`thread/queue/add` → `turn/addUserMessage`, `thread/start` → `thread/prewarm`, `environmentConfigId`) and answers
+`config/*` from an in-memory config ✅ (`.vite/build/main-*.js`, `src-*.js`). The webview calls these threads **Aeon**
+(`aeonThreads`, `aeonExecutionTarget`, `isAeonThread`).
 
-The full sweep found the same pattern for `item/tool/requestSetupCodexContextPicker`, `thread/stop`,
-`turn/addUserMessage` and `plugin/codex`, and `thread/rollback` (listed above among referenced methods) was
-**removed** from the open-source protocol on 2026-09-11 (#44915). "Bundled engine" is the binary this same app ships,
-`codex-cli 0.158.0-alpha.2.1`, scanned with `strings` and positive-controlled (`gatewayOAuth`, `requestUserInput` are found).
+| Method | Bundle refs | Verdict |
+|---|---|---|
+| `thread/startAeon` | 8 | ✅ durable-host dialect: starts a long-lived (Aeon) thread |
+| `item/tool/requestOptionPicker` | 14 | ⚠️ a server→client multiple-choice ask no open-source engine sends; by elimination, from the durable host. Also accepted as the dynamic tool `request_option_picker` |
+| `item/plan/requestImplementation` | 12 | ✅ **client-local**: pushed into the client's own request queue (`implement-plan:<turnId>`) to render `Yes, implement this plan` (`codex.userMessage.implementPlan`) |
 
-So the client carries code paths the engine it ships cannot answer. ⚠️ Which engine does — a cloud-side one or a closed
-build — is not determinable from the artifacts. Separately, about 33 other methods the client calls are **experimental**
-methods that exist in the engine but are filtered out of the generated schema; that gap was in `docs/02`, now fixed.
+Same pattern: `thread/stop` and `turn/addUserMessage` (durable dialect), `item/tool/requestSetupCodexContextPicker`
+(⚠️ as the option picker). `thread/rollback`, removed from the open-source protocol on 2026-09-11 (#44915), is still
+referenced. "Absent from the bundled engine" was checked with `strings` on `codex-cli 0.158.0-alpha.2.1`,
+positive-controlled.
+
+Observed on macOS (2026-09-27): the app logs `remote_connections … hostId=durable state=disconnected` at every
+launch and never connects — the feature ships and is **not provisioned** for the account used. About 33 other methods
+the client calls are **experimental** methods of the open-source engine, filtered out of its generated schema; that
+gap was in `docs/02`, now fixed.
 
 ### 1.3 (A) Layout: where the agent lives
 
 ⚠️ Reconstructed from strings and chunk names (`sidebar-*`, `thread-side-panel-*`, `terminal-panel`, `plan-side-panel`), not from seeing the UI.
+
+> **GUI pass 2026-09-27 (macOS, same build, `orca computer` screenshots; passive — no agent was run).** ✅ Three regions as below: sidebar of projects with threads nested under them, the
+> thread in the centre, a right panel. Not in the reconstruction: a **narrow icon rail** left of the sidebar. The right
+> panel as seen was a **summary view** (repository, branch with `+n −n`, and a `Sources` list), not the tab set below,
+> which it presumably switches to. Composer footer as seen: `+`, the permission chip, model + effort, mic, send/stop;
+> a `n files changed +n −n` pill floats above the composer. `Work in` and context status were not visible in that state.
+> A running thread shows a **grey** spinner in the sidebar; the stop button is accent blue. The permission chip for
+> `Full access` renders in **orange with a warning glyph** — orange marks a *risky state* here, not only "needs you"
+> (see [08 §6.2](08-primitives-rendered.md)). Approval cards were not seen (that thread was in Full access).
+> Squircles cannot be judged from a screenshot; Chromium 154 is new enough for `corner-shape` ⚠️.
 
 | Region | Contents |
 |---|---|
@@ -305,7 +322,7 @@ and `{actor}`-parameterised prompts. **The same primitive gets a different perso
 | Claim | Artifact | Grade |
 |---|---|---|
 | Study premise: "ChatGPT desktop (macOS) is native SwiftUI, distinct from Codex desktop" | The official ChatGPT download for macOS/Windows/Linux is the Codex Electron/OWL build (§1.1). SwiftUI survives only as legacy 1.2026.183, which ships an upgrade screen to the new app | ❌ (premise, not vendor claim) |
-| "Codex app-server is the interface Codex uses to power rich clients" (📣 `app-server.md`) implies the public doc covers what rich clients use | The shipped client calls at least seven methods that exist neither in `openai/codex` nor in the engine the app bundles, e.g. `item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `thread/startAeon` (§1.2.1) | ❌ refuted 2026-09-26: not drift — the open-source App Server is not the whole surface the client targets |
+| "Codex app-server is the interface Codex uses to power rich clients" (📣 `app-server.md`) implies the public doc covers what rich clients use | The shipped client drives a **second, cloud-hosted engine** (`durable`, `wss://codex-cloud-backend.chatgpt.com/`) with its own dialect — `thread/startAeon`, `turn/addUserMessage`, `thread/stop` (§1.2.1) | ❌ refuted 2026-09-27: the open-source App Server is one of two engines the client targets |
 | Tool shell presented as "Electron" | Electron API only; the runtime is OWL on a full Chromium 154 | ✅ correction |
 
 ## 7. What this means if you are building an agent client
@@ -324,7 +341,7 @@ and `{actor}`-parameterised prompts. **The same primitive gets a different perso
 
 - ⚠️ **Everything visual**: approval card weight, density in practice, icon usage, whether squircles are active in the shipped Chromium 154.
 - ⚠️ Mapping of `Always allow` and the prefix rule onto App Server amendment decisions. This needs a live run with protocol tracing.
-- ⚠️ Semantics of `thread/startAeon` and `item/tool/requestOptionPicker`, and which engine answers them (§1.2.1).
+- ⚠️ What the durable (Aeon) engine is, and its behaviour — not provisioned for the account used, so unobserved (§1.2.1).
 - ⚠️ How much of the component layer is Radix and how much is in-house.
 - ⚠️ Native (B) colour tokens need `assetutil`/`acextract` on macOS. Which `codex_remote_*` strings render on macOS versus only on iOS.
 - ⚠️ Whether the pre-superapp Windows ChatGPT (Store) build still exists and what it was built with. Not checked.

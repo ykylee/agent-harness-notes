@@ -274,7 +274,7 @@ they were written.
 | [15 §4](15-model-providers.md) | Project-local config denylist | Also contains `responses_api_metadata` and `experimental_realtime_webrtc_call_base_url` |
 | [16 §1–2, §7](16-responses-chat-adapter.md) | `ResponsesApiRequest` has **17** fields | **16** at both revisions. The mapping table has more rows because it splits sub-fields |
 | [16 §10.1](16-responses-chat-adapter.md) | "The lever is just the provider `name`" | Tool-result metadata and MCP attribution are also filtered by a first-party HTTPS destination check ⚠️ |
-| [agent-ux/03 §1.2.1](../agent-ux/03-openai-codex-chatgpt.md) | Three methods the ChatGPT client calls mean `docs/02` "has drifted" or they are experimental | **Neither.** See §E.3 |
+| [agent-ux/03 §1.2.1](../agent-ux/03-openai-codex-chatgpt.md) | Three methods the ChatGPT client calls mean `docs/02` "has drifted" or they are experimental | **Neither.** They belong to a second, cloud-hosted engine or never leave the client. See §E.3 |
 
 Also previously unstated, true at both revisions: `responses_lite` forces `parallel_tool_calls` off,
 and the WebSocket transport sends `previous_response_id`, so "fully stateless" holds for HTTP only.
@@ -301,22 +301,48 @@ of them. They require `experimentalApi: true`. Listed in [02 §6](02-app-server-
 **Method note:** "read the generated artifact, not the prose" is still the right rule. The refinement is
 to check what the generator **excludes** before treating its count as a total.
 
-### E.3 Methods that exist only in the shipped client
+### E.3 Methods that exist only in the shipped client — they target a second engine
 
 The ChatGPT desktop webview (`app.asar`, build 26.924.22138, extracted 2026-09-26) references protocol
 methods found **nowhere** in `openai/codex` — not at head, not in any commit (`git log -S`), and not in
 the bundled engine binary. Detection was positive-controlled: the same scan finds `gatewayOAuth` (6) and
-`requestUserInput` (3) in the binary.
+`requestUserInput` (3) in the binary. **Resolved 2026-09-27** by tracing the main-process bundle
+(`.vite/build/main-*.js`, `src-*.js`):
 
-| Method | Source history | Bundled engine |
-|---|---|---|
-| `item/tool/requestOptionPicker`, `item/plan/requestImplementation`, `item/tool/requestSetupCodexContextPicker` | 0 commits | absent |
-| `thread/startAeon`, `thread/stop`, `turn/addUserMessage`, `plugin/codex` | 0 commits | absent |
-| `thread/rollback` | removed 2026-09-11 (#44915) | absent |
+**The app has a second App Server host.** Beside the local `codex app-server` it spawns, the main process
+defines a host with id `durable`, display name `Long-lived`, at `wss://codex-cloud-backend.chatgpt.com/`.
+Requests to that host pass through an adapter that the local host does not use:
 
-`thread/startAeon` shares `thread/start`'s parameter rewriting and request-lifecycle tracing in the
-webview, so it is a live code path, not a stray string. Which engine answers it is unknown — the local
-one cannot. ⚠️ Plausibly a server-side (cloud) engine or a closed build; neither is verifiable from here.
+| Adapter behaviour (host `durable` only) | Evidence |
+|---|---|
+| `thread/queue/add` is rewritten to `turn/addUserMessage` with `mode: "queue"` | serializer exported as `So`, applied only when `hostId === "durable"` |
+| `thread/start` may become `thread/prewarm`; start/turn params gain `environments[].environmentConfigId`, `deferredEnvironment` (for `managed` / `ccarenv_*` environments), `pluginsMcp`, `threadAccess` | same serializer |
+| `config/read` and `config/batchWrite` are answered **in the client** from an in-memory config (`/in-memory/config.toml`); `permissionProfile/list` returns an empty list locally | adapter class exported as `xo`, instantiated as `new xo({forwardConfigRequirements: true})` next to the host definition |
+| `command/exec` and `fs/*` are refused without an `environmentId`; `thread/read` requires "a server-issued thread ID" | same class — the remote host has no local filesystem |
+| `thread/stop` is sent only if the host is durable or the thread's `mode === "durable"`, and falls back to `turn/interrupt` on method-not-found | webview stop handler, then `markDurableAeonStopped` |
+
+So the eight literals sort into four kinds:
+
+| Method | Verdict |
+|---|---|
+| `thread/startAeon`, `thread/stop`, `turn/addUserMessage` (+ `thread/prewarm`) | ✅ **The durable host's dialect.** "Aeon" is the webview's name for long-lived threads (`aeonThreads`, `aeonExecutionTarget`, `isAeonThread` — 500+ references) |
+| `item/tool/requestOptionPicker`, `item/tool/requestSetupCodexContextPicker` | ⚠️ Server→client requests the webview handles but no open-source engine sends — by elimination, the durable host. The option picker also has an open-source-compatible form, a dynamic tool `request_option_picker` over `item/tool/call`; the client handles both |
+| `item/plan/requestImplementation` | ✅ **Never on the wire.** The client pushes it into its own request queue (id `implement-plan:<turnId>`) to drive the "Yes, implement this plan" card |
+| `plugin/codex` | ❌ **Not a method** — a placeholder string for the marketplace "sparse paths" field. An error in the 2026-09-26 sweep |
+
+`thread/rollback`, removed from the open-source protocol on 2026-09-11 (#44915), is still referenced.
+
+**Dynamic check (2026-09-27, macOS, this account):** the app's own log
+(`~/Library/Logs/com.openai.codex/`) records the durable host at every launch —
+`remote_connections.connection_state_changed hostId=durable state=disconnected`, followed by
+`connection_state_ignored_for_missing_manager`. Across three days of logs it never connects, and none of
+the dialect methods appear. The feature is present in the client and **not provisioned for this account**.
+A socket-level check cannot settle it either way: `codex-cloud-backend.chatgpt.com` resolves to the same
+Cloudflare addresses as `chatgpt.com`. ⚠️ What the durable engine is — a hosted build of the same Rust
+engine with a dialect layer, or something else — is not observable from here.
+
+> 📌 This corrects §E.2's framing too. The open-source App Server is **one of two** engines the first-party
+> client drives. A third-party client built against `openai/codex` sees the local dialect only.
 
 ### E.4 Drift — the world moved
 

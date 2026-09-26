@@ -10,6 +10,11 @@
 > **nothing was seen rendered**; colours, glyphs and motion are read from code.
 >
 > Researched 2026-09-26. Dominant grade: ✅ from source; 📣 for docs; three ❌ (Orca docs vs Orca code).
+>
+> **GUI pass 2026-09-27 (macOS, same build, `orca computer` screenshots; passive — no agent was run), Orca 1.4.209, no workspace open.** ✅ Sidebar = projects → worktrees, each worktree with a host badge
+> (`Local Mac` or a remote host name) and a status dot; a bottom status bar with **per-provider usage meters**. The
+> agent states (`blocked`/`waiting`, §4.7) and the wrapped-agent approval default (§4.1) need a running agent and were not
+> seen. The UI face looks like Geist but a screenshot cannot prove the font ⚠️.
 
 Both are **agent orchestrators**. They do not own an agent loop. They run third-party CLI agents
 (Claude Code, Codex, Gemini, Grok, Cursor, Droid, Pi…) in their own PTYs, one git worktree per

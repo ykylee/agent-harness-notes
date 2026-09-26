@@ -4,14 +4,14 @@ status: active
 last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + strands/03-tools-and-approval.md + strands/07-security.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-27
 ---
 
 # Approval Gate — making human intervention a protocol primitive
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: the ten server→client requests, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents extend it
-- Updated: 2026-09-26 (re-checked against the Codex drift re-check of `e72da2b538`; no change to this concept)
+- Updated: 2026-09-27 (re-checked against agent-ux/08 GUI-pass note; approval cards were not seen, no change to this concept)
 
 ## §1 TL;DR  {#s1-tldr}
 

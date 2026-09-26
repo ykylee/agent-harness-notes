@@ -4,7 +4,7 @@ status: active
 last_ingested_from: agent-ux/09-design-language.md + agent-ux/08-primitives-rendered.md + agent-ux/01-landscape.md
 related_pages: [concepts/approval-gate, concepts/thread-turn-item, concepts/harness, concepts/perception-model]
 created: 2026-09-26
-updated: 2026-09-26
+updated: 2026-09-27
 ---
 
 # Agent Client Design Language — how harness primitives are shown to people
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: the shared design language of agent clients, and where their theories of supervision part.
 - Scope: structure, visual system, vocabulary, behaviours; the three client families
 - Primary source: ten shipped clients (installers unpacked, source at pinned commits), 2026-09-26 — [`agent-ux/`](../../../agent-ux/README.md)
-- Updated: 2026-09-26
+- Updated: 2026-09-27 (agent-ux/08 §6.2 GUI-pass narrowing of the amber rule)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -24,11 +24,13 @@ updated: 2026-09-26
 | 4 | Theming | **VS Code theme keys as the token API** (OpenAI, Cursor, Antigravity 1.x, Devin) |
 | 5 | Words | "Allow ⟨agent⟩ to ⟨verb⟩?" · once/session/always · Queue/Steer · Needs you · Ready for review |
 | 6 | Autonomy | a dial with a **machine reviewer** in the middle |
-| 7 | Attention | **amber/orange = needs you**; working is blue (unambiguous) or yellow (needs a second channel) |
+| 7 | Attention | **amber/orange = needs you** in declared status vocabularies; working is blue (unambiguous) or yellow (needs a second channel). *Narrowed 2026-09-27 (GUI pass): in-app, orange also marks a risky state (ChatGPT `Full access`) and Claude's working mark is clay — the hue is not reserved* |
 | 8 | Divergence | the **theory of supervision** — steps, deliverables, or a board — not the style |
 
 > ⚠️ Read from the parts list: tokens, fonts, icons and strings were extracted; **nothing was seen
-> rendered.** Visual impressions stay unverified until a GUI pass.
+> rendered.** Visual impressions stay unverified until a GUI pass. *(2026-09-27: a passive macOS pass of five
+> installed apps confirmed the layouts and narrowed row 7; approval cards and live states are still unseen —
+> [`agent-ux/99`](../../../agent-ux/99-sources.md).)*
 
 ## §2 Words converge faster than pixels  {#s2-words}
 
@@ -58,7 +60,7 @@ is the portable layer** — a new client that adopts it inherits users' expectat
 - [ ] Neutral chrome; colour for state; git/PR state in the token system
 - [ ] Map tokens onto VS Code theme keys if you will live in an editor
 - [ ] Approval request as **data** any channel can render; never bind bare Enter to approve
-- [ ] Sandbox state in the mode label; amber/orange only for "needs you"
+- [ ] Sandbox state in the mode label; amber/orange for "needs you" in status indicators — and if you also use it for risk or working, keep those out of the status channel
 - [ ] Density as a user lens; name completion for the next step
 - [ ] Protect trust surfaces from theming
 - [ ] Write down your theory of supervision — the layout follows from it

@@ -229,6 +229,11 @@ Also present: 10 hue ramps × 35 steps, chart palettes (categorical 8, sequentia
 ## 8. Open questions
 
 - Visual: dock vs inline approval placement, the `WorkingMark`/`Spark` animation, and the appearance of the plan and tasks panes. All ⚠️ unseen.
+- **GUI pass 2026-09-27 (macOS, same build, `orca computer` screenshots; passive — no agent was run), Code tab.** ✅ The working mark is the **clay spark** (sampled `#cc7c5e`, the dark-theme clay) followed by
+  `elapsed · tokens · thought for n s`. So clay is not brand-only as §2 reads the tokens: it is also the **working** colour.
+  Tool calls collapse to one grey line each (`Ran n commands ›`), expandable. A repository bar sits above the composer
+  (repo, branch, `+n −n`, `Create PR`); the footer carries `+`, mic, the permission mode, model, effort and a context
+  ring. Approval placement is still ⚠️ — the observed session was in Auto, which raised no cards.
 - Does the remote claude.ai build that 1P users load match `ion-dist` 2.9939.2 (same CDS version)?
 - Which permission mode does the Desktop Code tab start in per cohort (`ccd_auto_default_mode`)?
 - In the Code tab, does a mid-run message land after the current action or after the turn?

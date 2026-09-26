@@ -51,6 +51,14 @@ Component stacks ✅:
 | 2025 form | Two windows: the Editor with an agent side panel **on the right**, and the **Agent Manager** (Inbox, Workspaces, Playground, Knowledge). The strings `Open Agent Manager` / `Open Editor` handle the handoff ✅ | The Cascade panel on the right (`Cmd/Ctrl+L`) 📣 |
 | 2026 form | **Antigravity 2.0: "there is no IDE."** Layout: a sidebar (Projects, Conversations, Documents, Artifacts, Scheduled), the conversation, and a side pane (artifacts, files, terminal, VCS review, browser preview, subagent conversations) ✅ strings, 📣 docs | **"a full IDE with an agent manager built in — not the other way around."** The Agent Command Center, a Kanban of local and cloud sessions, is the default surface. **Spaces** group sessions, PRs, files and context (`Cmd/Ctrl+\` split, `Cmd/Ctrl+T`) 📣 |
 
+> **GUI pass 2026-09-27 (macOS, same build, `orca computer` screenshots; passive — no agent was run), Antigravity 2.17.0.** ✅ The standalone app opens on an agent home: sidebar `New Conversation`,
+> `Conversation History`, `Scheduled Tasks`, then `Projects` with conversations nested under each; a centred composer
+> (`Ask anything, @ to mention, / for actions`, model + effort, execution target `Local`). `Documents` and `Artifacts`
+> were **not** sidebar entries on that screen ⚠️ (they may live in the side pane). An **`Open IDE`** button hands off to the
+> separately installed Antigravity IDE — "there is no IDE" means the IDE left *this* window, not the product. An
+> onboarding card read `Planning mode has moved to /plan`, confirming the 2.17 change in §4. Unread conversations carry a
+> **blue** dot.
+
 > 📌 Both started from the same premise: one window is too cramped to hold synchronous editing and
 > asynchronous fleet management together. **Google removed the IDE; Cognition kept the IDE and made the manager
 > its home screen.** The two launch quotes (§5) mirror each other almost word for word.

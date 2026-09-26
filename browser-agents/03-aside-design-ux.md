@@ -4,6 +4,10 @@
 > `ultrabrowse.md`, `security.md`). This is **the interaction model the documentation specifies**,
 > not a visual analysis from screenshots. Visual language — colour, typography — cannot be confirmed
 > this way and is not covered.
+>
+> **GUI pass 2026-09-27** (macOS, Aside 1.0.922.1, one passive screenshot): ✅ a left sidebar in three sections —
+> `Bookmarks`, `Chats` (with `New Chat`), `Tabs` (vertical tab list) — and an `Ask Aside` button at the right of the
+> toolbar, matching the side-panel model below. Split tabs and the agent at work were not seen.
 
 ## 1. The core design problem
 
