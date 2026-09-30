@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/06-architecture-axes.md
+last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Control Plane / Execution Plane — separating the harness from compute
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-09-26 (re-checked against the Codex drift re-check of `e72da2b538`; no change to this concept)
+- Updated: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -80,11 +80,15 @@ a different place by each product**, which makes the axis sharper.
 | **Comet** | **server** — the Perplexity backend plans and issues commands | local extensions | reverse engineering |
 | **Aside** | **local daemon** (`127.0.0.1:21420`, a 353MB Node SEA) | local browser | binary analysis |
 | **Opera Neon** | **cloud LLM** | local browser (Neon Do) | product FAQ |
-| Dia | via its own servers → partner models | local | security documentation |
+| Dia | **local `agent-server` spawning Claude Code 2.1.270**; model tokens still remote | local | binary analysis ([12](../../../browser-agents/12-dia-binary.md)) |
 
 > 📌 **This axis decides the model economics.** Aside can pull in a user's ChatGPT or Claude
 > subscription over OAuth because planning is local. If planning ran on a server there would be no
 > reason to use the user's credentials — Comet gives model choice only to Max subscribers.
+>
+> 📌 **Dia's loop is local; its model tokens are not.** Opening the binary relocated planning from
+> "via its own servers" to a local harness. The security page still says request data is "sent
+> through our servers" to partner models. Record both.
 
 > ⚠️ **Check which side a vendor means by "local."** Opera's `llms.txt` says "All AI processes run
 > locally on the device," while the product FAQ says **planning uses cloud LLMs.** Two first-party

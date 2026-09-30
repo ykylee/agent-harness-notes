@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23) + strands/07-security.md
+last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23) + strands/07-security.md
 related_pages: [concepts/perception-model, concepts/credential-shielding, concepts/approval-gate, concepts/os-sandbox-policy]
 created: 2026-09-23
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Indirect Prompt Injection — the structural risk of this class
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: the attack surface created when an agent reads untrusted content, and which mitigations are actually implemented.
 - Scope: the attack chain, the structural cause, the four mitigation categories and where each product stands, the unsolved status
 - Character: **a surface-specific axis** — though a shell harness reading files or the web develops the same problem
-- Updated: 2026-09-26 (re-checked against `SYNTHESIS.md` changes since the last ingest — none touch the sections this page draws on; previously masked by a freshness-checker parsing bug)
+- Updated: 2026-09-30 (Dia binary: security-page sentences absent; prompt-layer untrusted-data + `url://` shortlinks present)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -88,6 +88,12 @@ possible.
 > 📌 "Does not pass URLs verbatim" and "erases dangerous elements from perception" are not identical
 > to Brave's #1 — they do not structurally partition user instruction from page content. But they
 > operate **at the same layer, controlling what enters perception.**
+>
+> 📌 **Opened 2026-09-30** ([12](../../../browser-agents/12-dia-binary.md)). Those exact
+> security-page sentences are not in the unpacked app. What *is* in the prompts: treat page, chat
+> and artifact content as **untrusted data**; `url://N` shortlinks resolved by the browser; a
+> Seatbelt deny-default around the `agent-server`. Snapshot stripping of password fields /
+> irreversible buttons remains ⚠️ — that would live in native snapshot code.
 
 ## §6 Unsolved as of 2026  {#s6-unsolved}
 

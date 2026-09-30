@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + strands/03-tools-and-approval.md + strands/07-security.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding]
 created: 2026-09-22
 updated: 2026-09-30
@@ -11,7 +11,7 @@ updated: 2026-09-30
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: the ten server→client requests, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents extend it
-- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (re-checked against agent-ux/08 GUI-pass note; approval cards were not seen, no change to this concept)
+- Updated: 2026-09-30 (Dia perception-reduction sentences absent from binary; prompt untrusted-data exists)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -114,11 +114,17 @@ Approval scope renders four ways: `file` (mode + path) · `tool` (name + call su
 
 ### Dia — reduce perception before asking
 
-Beyond approval gates, Dia **reduces what the agent can see in the first place**: password fields and
+Beyond approval gates, Dia **documents** reducing what the agent can see: password fields and
 **irreversible action buttons** are "invisible to the agentic system."
 
-> 📌 **Approval is the last line of defence, not the only one.** Erasing dangerous elements from
-> perception reduces how often you have to ask at all. See [[concepts/credential-shielding]].
+The 2026-09-30 binary pass found those **exact sentences absent** from the unpacked app. Prompt
+mixins do tell the model to treat page/chat/artifact content as untrusted data, and Seatbelt
+constrains the bundled Claude Code. Whether the native snapshot actually strips those elements
+is still ⚠️ ([12](../../../browser-agents/12-dia-binary.md) §4).
+
+> 📌 **Approval is the last line of defence, not the only one.** Documented perception reduction
+> would cut how often you have to ask; it is not confirmed in native code. See
+> [[concepts/credential-shielding]] and [[concepts/indirect-prompt-injection]] §5.
 
 ## §7 Confirmed by implementation  {#s7-implementation}
 

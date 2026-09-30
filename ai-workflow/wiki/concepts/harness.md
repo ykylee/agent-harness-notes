@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md + strands/01-overview.md + strands/README.md
+last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md + browser-agents/12-dia-binary.md + strands/01-overview.md + strands/README.md
 related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: what a "harness" is, what sits inside it, and how many layers OpenAI opened of theirs.
 - Scope: definition, internal components, the four-layer opening, what the application owns, the size of the surface
 - Primary sources: the `openai/codex` repository plus the "Codex as a platform" and "Unlocking the Codex harness" posts
-- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (Dia is ArcCore + bundled Claude Code, not an MV3 agent like Aside/Comet)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -142,6 +142,10 @@ class.
 > as native browsers, yet **both implement the agent as an MV3 Chrome extension.** The shell is a
 > distribution unit; control lives in the extension layer — which is what lets their release cadences
 > diverge (Aside: shell `1.0.x`, extensions and CLI `1.26.x`).
+>
+> Dia presents as a native browser and **is one**: ArcCore Chromium fork plus a seatbelted local
+> `agent-server` that spawns bundled Claude Code 2.1.270. The two bundled MV3 extensions are
+> chat/home UI, not the agent ([12](../../../browser-agents/12-dia-binary.md)).
 >
 > 📌 **Building a browser is not a product but a standing debt.** OpenAI retired ChatGPT Atlas within
 > ten months (2026-08-09), with **security maintenance** among the stated reasons. The features moved

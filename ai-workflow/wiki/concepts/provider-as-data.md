@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Provider as Data — model providers as data, not code branches
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (Dia local loop is bundled Claude Code 2.1.270; product still routes models)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -116,12 +116,13 @@ Realtime connections use separate routing configuration and are exempt from this
 |---|---|---|
 | **Aside** | **the user** | 16+ provider ids. **Reuses an existing subscription over OAuth** (ChatGPT, Claude, Copilot) plus BYO API keys |
 | **Opera Neon** | **the product** | "Opera's AI engine, **model-agnostic**" **routes** each task to a model. The user chooses only in Chat |
-| Dia | the product | fixed: GPT (OpenAI Azure) · Claude (Anthropic, Vertex, AWS) · Gemini (Vertex) |
+| Dia | the product | documented: GPT (OpenAI Azure) · Claude (Anthropic, Vertex, AWS) · Gemini (Vertex). The local loop is bundled Claude Code 2.1.270; model tokens still leave the machine |
 
 > 📌 **"Model-agnostic" names two opposite product designs.** Aside gives the user sovereignty; Neon
 > chooses on their behalf. When designing a custom harness these are **different products** — the
 > first removes model cost from the adoption barrier, the second makes the product answerable for
-> quality.
+> quality. Dia's local Claude Code loop does not change the chooser: the product still routes
+> models; the user does not bring a subscription.
 >
 > The choice is bound to the planning location in [[concepts/control-plane-execution-plane]].
 > Planning has to be local for a user's own subscription to be usable.

@@ -26,6 +26,7 @@ Researched 2026-09-22/23 · branch `study/browser-agents`
 | [09-aside-browser-internals.md](09-aside-browser-internals.md) | **Aside browser internals** — a Chromium fork, three internal extensions, a 353MB local daemon, Vault cryptography |
 | [10-aside-enforcement-and-native.md](10-aside-enforcement-and-native.md) | **Enforcement, Computer Use, cryptography** — the policy engine, system-wide OS control, ML-KEM-768 confirmed |
 | [11-dia-and-neon.md](11-dia-and-neon.md) | **Dia and Neon from primary sources** — Dia's injection defences, Neon's planning-location contradiction, Cards |
+| [12-dia-binary.md](12-dia-binary.md) | **Dia macOS binary** — ArcCore fork, seatbelted Claude Code 2.1.270, 44 agent specs. Neon netinstaller only |
 | [99-sources.md](99-sources.md) | Sources and **evidence grades** — confirmed / self-reported / inferred / refuted |
 
 ## In one line

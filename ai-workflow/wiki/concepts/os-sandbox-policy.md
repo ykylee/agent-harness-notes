@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md
+last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/12-dia-binary.md
 related_pages: [concepts/approval-gate, concepts/control-plane-execution-plane, concepts/execution-environment-topology, concepts/primary-source-verification, concepts/credential-shielding, concepts/indirect-prompt-injection]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-09-30 (Windows internals source-read at HEAD `bcd6d9ab6b`)
+- Updated: 2026-09-30 (Dia Seatbelt profiles around bundled Claude Code)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -197,6 +197,20 @@ appears in no product document.
 > layer serialises one.
 > ⚠️ But **the reach is the whole desktop, not a tab.** Read together with prompt injection
 > ([[concepts/indirect-prompt-injection]]), a fooled agent's range extends beyond the browser.
+
+## §8.7 Observation — Dia sandboxes a bundled coding agent  {#s8-7-dia-seatbelt}
+
+Dia's macOS app ships two Seatbelt profiles around a local `agent-server` that spawns bundled
+Claude Code 2.1.270 (`agent.sb` deny-default; `agent-claude-code.sb` scopes the CLI to one
+context directory and `GATEWAY_PORT` on localhost). The prompt mixin tells the model it cannot
+touch Keychain, cannot run `curl`/`python`/`git`, and that network is localhost/Unix sockets only
+([12](../../../browser-agents/12-dia-binary.md) §3).
+
+> 📌 Codex already uses Seatbelt on macOS (§3). Dia uses the same OS mechanism for a **different
+> payload**: a coding-agent CLI living inside a browser. The sandbox is around the harness
+> process, not around Chromium tab isolation.
+>
+> ⚠️ The profiles were read as files; `sandbox-exec` was not exercised (Linux host).
 
 ## §9 Read next  {#s9-next}
 

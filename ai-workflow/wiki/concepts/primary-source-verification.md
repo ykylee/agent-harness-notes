@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + strands/99-sources.md + strands/01-overview.md
+last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/99-sources.md + strands/01-overview.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (plugin path-rule split kept; `docs/99` records GitHub-origin `~/repos/harness-refs/codex`)
+- Updated: 2026-09-30 (Dia macOS binary opened; Neon remains a netinstaller stub)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -108,9 +108,11 @@ Early in the browser study, Comet's internals were well known and Aside's were l
 published." That difference was **not product maturity but who had taken it apart** — opening Aside's
 binaries filled most of it in.
 
-> 📌 **The same asymmetry persists now.** Aside was verified down to its binaries; Dia and Neon are
-> taken on their documentation. A good document is not the same as a good implementation — when
-> reading a comparison table, **remember that the evidence grade differs cell by cell.**
+> 📌 **Narrowed 2026-09-30.** Aside was verified down to its binaries; Dia's macOS app was opened
+> the same way ([12](../../../browser-agents/12-dia-binary.md) — ArcCore + seatbelted Claude
+> Code). Neon remains a netinstaller stub. A good document is still not the same as a good
+> implementation — when reading a comparison table, **remember that the evidence grade differs
+> cell by cell.**
 
 ## §4 What was actually overturned  {#s4-refuted}
 
@@ -141,6 +143,7 @@ The same rule was applied to this repository's own earlier statements.
 | Opera Neon's unit of reuse is "Skills" | ❌ **Refuted.** The official name is **Cards**, and the axis differs |
 | Brave's Comet demonstration exfiltrated "to the attacker's server" | ❌ **Refuted by the original.** The fourth step posts the data **as a reply to the Reddit comment**; no attacker origin appears in the chain |
 | Agents API plugin `./` rule and Codex `onboardingSkill` `./`-optional exception are one rule | **Two surfaces.** Live Agents `plugins.md` still requires `./` and has no `onboardingSkill`. Codex `resolve_openai_onboarding_skill` (#46544) prepends `./`, then the shared resolver still rejects `..` |
+| "Dia and Neon are taken on their documentation" | ❌ **Narrowed.** Dia macOS opened 2026-09-30 ([12](../../../browser-agents/12-dia-binary.md)). Neon remains a stub |
 
 > 📌 The last entry is a different kind of error, and a costlier one. It was not a secondary source
 > being wrong — the primary source had been read, then **paraphrased** in one line. The paraphrase

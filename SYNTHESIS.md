@@ -139,7 +139,7 @@ commands, state)** — is drawn **in a different place by each browser product.*
 | Comet | **server** (Perplexity backend) | local extension |
 | **Aside** | **local daemon** (`127.0.0.1:21420`) | local browser |
 | Opera Neon | **cloud LLM** | local browser |
-| Dia | own servers → partner models | local |
+| Dia | **local `agent-server` + Claude Code 2.1.270**; model tokens still remote ([12](browser-agents/12-dia-binary.md) §6) | local |
 
 > 📌 **This axis decides the model economics.** Planning has to be local for a user's own
 > subscription to be usable. Aside's BYO-subscription is a consequence of the local daemon, not a
@@ -168,7 +168,7 @@ three axes are **orthogonal.**
 | Product | Name | Axis |
 |---|---|---|
 | Opera Neon | **Cards** | **task type** — "handle this kind of work like this" |
-| Dia | Skills | **invocation** — called by name |
+| Dia | Skills | **invocation** — `SKILL.md` inside the bundled `agent-server` (8 product skills + 44 Clia specs), called by name |
 | Aside | **Routines** | **time** — cron (start a new task) / heartbeat (wake an existing chat) |
 
 **Strands** is at the code-library end of *distribution*: a plugin is an in-process object installed
@@ -185,11 +185,13 @@ and `allowed-tools` in them is not enforced ([`strands/03`](strands/03-tools-and
 |---|---|
 | Codex | the App Server protocol, `item/tool/call` *(corrected 2026-09-26: `codex mcp-server` was listed here but had been removed on 2026-09-05, #42993 — Codex no longer exposes itself over MCP)* |
 | **Aside** | **`aside mcp`** — "Install the aside-browser skill into your coding agents (Codex, Claude Code, Cursor, OpenCode)" |
-| **Opera Neon** | **MCP server** — "external AI tools can connect to your live Neon browser session" |
+| **Opera Neon** | **MCP server** — "external AI tools can connect to your live Neon browser session" (docs) |
+| **Dia** | **imports** MCP tools into a local Claude Code (`mcp__dia-tools__`, Atlassian, Notion, …) — opposite direction ([12](browser-agents/12-dia-binary.md) §3) |
 | **Strands** | **A2A server** (`a2a-sdk`), **ACP** via `strands --acp-server`. `strands-mcp` is a *documentation* server, not the agent |
 
-> 📌 **They reached this independently.** All four expose themselves not as a final product but as
-> **an execution surface for another harness.** It looks like a convergence point for the field.
+> 📌 **Aside and Neon export the browser as an MCP server. Dia imports MCP tools into a coding
+> agent.** Same protocol, opposite direction. The earlier reading that every browser-type agent
+> exposes itself as an execution surface for another harness does not hold for Dia.
 >
 > ⚠️ **The convergence is on exposure, not on MCP.** Strands — the one designed from the start to be
 > embedded — reaches other harnesses through agent-to-agent protocols (A2A, ACP) rather than as an MCP
@@ -621,7 +623,7 @@ works, follow the links `llms.txt` gives rather than building URLs.**
 | Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)
-> were measured in a running implementation, §6.5 against a live model; Aside was verified down to its binaries; Codex was read
-> out of generated schemas and Rust source; Strands was read out of source, with five approval behaviours probed against a scripted mock model; Dia and Neon rest on product documentation; Comet relies
-> on third-party reverse engineering. Do not read the comparison tables without that asymmetry in
+> were measured in a running implementation, §6.5 against a live model; Aside was verified down to its binaries; Dia's macOS app was opened the same way ([12](browser-agents/12-dia-binary.md) — ArcCore + seatbelted Claude Code 2.1.270); Codex was read
+> out of generated schemas and Rust source; Strands was read out of source, with five approval behaviours probed against a scripted mock model; Neon remains product documentation plus a netinstaller stub; Comet relies
+> on third-party reverse engineering. Do not read the comparison tables without that remaining asymmetry in
 > mind — and note that §6 grades **this repository's own conclusions**, not any vendor's.

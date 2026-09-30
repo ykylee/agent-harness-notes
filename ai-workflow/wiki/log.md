@@ -217,6 +217,29 @@ Notes:
 - Wiki §6 (Agents load path) no longer carries the Codex exception; it lives in §2.1.
 - `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
 
+## [2026-09-30] ingest | Dia macOS binary + Neon netinstaller stub (TASK-007)
+
+Sources: `browser-agents/12-dia-binary.md`, `browser-agents/11-dia-and-neon.md`,
+`browser-agents/99-sources.md`, `SYNTHESIS.md` §2.4 / §2.5 / §2.6 / §8.
+
+Pages updated (10):
+`concepts/control-plane-execution-plane`, `concepts/capability-distribution`,
+`concepts/indirect-prompt-injection`, `concepts/credential-shielding`,
+`concepts/primary-source-verification`, `concepts/approval-gate`,
+`concepts/provider-as-data`, `concepts/harness`, `concepts/os-sandbox-policy`,
+`concepts/perception-model` (date bump only — SYNTHESIS §6 claims this page draws on are unchanged)
+
+Notes:
+- Dia 1.50.1 (87750) is ArcCore + native BoostBrowser UI + a seatbelted local `agent-server`
+  spawning bundled Claude Code 2.1.270. Not an MV3 browsing agent.
+- Planning relocated: loop is local; model tokens still leave (security page).
+- MCP direction inverts: Dia **imports** tools into Claude Code; Aside/Neon **export** the browser.
+- Security-page sentences (no LLM-generated URLs, no verbatim URL passing, element hiding)
+  are absent from the unpacked app. Prompt-layer untrusted-data + `url://N` shortlinks +
+  Seatbelt exist. Snapshot stripping of password fields / irreversible buttons remains ⚠️.
+- Neon public URL is a 4.1MB netinstaller stub; Linux 404. Full browser unverified.
+- Self-correction: "Dia and Neon taken on documentation" narrowed for Dia.
+
 ## [2026-09-30] ingest | GitHub-origin harness-refs checkout (TASK-006)
 
 Sources: `docs/99-sources.md` — this Linux host had no `~/repos/harness-refs/codex`.

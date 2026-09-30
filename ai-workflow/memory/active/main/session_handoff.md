@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-006 `~/repos/harness-refs/codex` origin GitHub)
+- Updated: 2026-09-30 (TASK-007 Dia macOS 바이너리 · Neon netinstaller 스텁)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-007 Dia macOS 바이너리 정적 분석 · Neon netinstaller 스텁: done
 - TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
@@ -30,7 +31,6 @@
 - TASK-2026-09-30-main-001 session-start overlay 중복 정리: done
 - TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: done
-- TASK-2026-09-26-main-003 위키 신선도 검사기 오탐 수정: done
 
 > 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
@@ -44,6 +44,7 @@
 
 ## Key Changes
 
+- **Dia macOS 바이너리 열림 (TASK-007)** — `Dia-1.50.1-87750.dmg`. ArcCore Chromium fork + 로컬 `agent-server` 가 bundled Claude Code 2.1.270 을 Seatbelt 안에서 spawn. 보안 페이지 문장(LLM URL 비추적·verbatim URL 차단·요소 숨김)은 번들에 없고, 프롬프트 층 untrusted-data + `url://` 단축 + Seatbelt 가 있다. 스냅샷 요소 숨김은 ⚠️. Neon 공개 URL 은 4.1MB netinstaller 스텁(Linux 404). MCP 방향이 반대: Dia 는 import, Aside·Neon 은 export. `browser-agents/12`, 위키 10종 재ingest
 - **ChatGPT 앱은 엔진을 둘 몬다 (TASK-2026-09-27-main-001)** — 로컬 `codex app-server` + 클라우드 `durable`("Long-lived", `wss://codex-cloud-backend.chatgpt.com/`). durable 전용 어댑터가 방언 변환(`thread/queue/add`→`turn/addUserMessage`, `thread/start`→`thread/prewarm`)하고 `config/*` 는 클라이언트 메모리에서 답한다. webview 전용 8개 재분류, 그중 `plugin/codex` 는 메서드가 아니었다(09-26 스윕 오류). 이 계정엔 durable 미개통(로그 `state=disconnected`). `docs/99` §E.3
 - **agent-ux 수동 GUI 패스 (TASK-2026-09-27-main-002, 일부)** — `orca computer` 로 설치 5종 캡처. 레이아웃 확인, **amber 규칙 완화**(ChatGPT 는 Full access 위험 상태를 주황으로, Claude 작업 중 = 점토색 스파크). `agent-ux/99` GUI pass 절. 스크린샷은 사용자 데이터라 저장소에 넣지 않았다
 - **Codex 드리프트 재확인 (TASK-002)** — 반박 14건(`docs/99` §E.1): `codex mcp-server`·`--full-auto` 는 기준일 전 이미 제거, Python SDK 는 이미 app-server JSON-RPC, Windows elevated 는 특권 서비스 필수 아님(`service_identity.rs`), `hide_users.rs` 추론 반박, `worldWritableWarning` 은 아무도 안 보냄, `ResponsesApiRequest` 16필드, WebSocket 은 `previous_response_id` 를 잇는다(무상태는 HTTP 한정). 드리프트: gatewayOAuth 4종, Windows `mxc`·private desktop opt-out 제거, `model_catalog_url`, 로컬 모델 +gpt-6-sol/luna −gpt-5.4, Agents API 턴 오류코드 17→18. 방법론 교훈을 `primary-source-verification` 에 추가 — **생성 산출물의 개수를 총계로 쓰기 전에 생성기가 무엇을 빼는지 읽어라**. 위키 12종 재ingest, `SYNTHESIS`·`REPORT`(영/한)·`README` 수치 정정
@@ -74,7 +75,7 @@
 - [x] ~~TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격~~ — HEAD `bcd6d9ab6b`. `CreateRestrictedToken` / deny ACE / WFP 12 + `INetFwPolicy2` / `CreateDesktopW`. Windows 런타임 미실시
 
 **브라우저 조사 (`browser-agents/`)**
-- [ ] 검증 비대칭 해소 — Aside 만 바이너리까지 뜯었고 Dia·Neon 은 문서를 믿은 상태다
+- [x] ~~검증 비대칭 해소 (Dia)~~ — macOS DMG 정적 분석 [12]. ArcCore + 로컬 Claude Code 2.1.270. Neon 은 netinstaller 스텁만 (Linux 404). TASK-2026-09-30-main-007
 - [ ] `Aside Computer Use` 호출 흐름 추적 (심볼만 봤다)
 - [ ] 동적 관찰 (서버로 가는 내용) — **macOS 환경에서 이제 가능**
 - [ ] 브라우저 GUI 1차 확인 — **macOS 환경에서 이제 가능** (리눅스 빌드는 없다)
@@ -110,7 +111,7 @@
 ## Risks & Blockers
 
 - **"0 은 입력이 도달했음을 증명할 수 있을 때만 증거다."** 이번 작업에서 전달 실패가 *좋은 숫자*로 찍힌 사례가 네 번 나왔다 — 프레임 미순회, charset 모지바케, interactive 모드가 페이로드를 버림, 그리고 공급자가 404 를 200번 내는데 **완벽한 방어로 렌더**. 네 번 다 assertion 은 리뷰에서 멀쩡해 보였고, 실제로 도달한 것을 출력해서야 잡혔다. `SYNTHESIS.md` §7 에 방법론 항목으로 올렸다
-- **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지, Dia·Neon 은 문서만, Comet 은 3자 리버싱이다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다 — `SYNTHESIS.md` §8 에 경고로 달아뒀다.
+- **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지, Dia macOS 는 같은 방법으로 열림 ([12] — ArcCore + seatbelted Claude Code), Neon 은 문서+netinstaller 스텁, Comet 은 3자 리버싱이다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다 — `SYNTHESIS.md` §8 에 경고로 달아뒀다.
 - 두 분야 모두 빠르게 낡는다. Codex 는 2026-09-15, 브라우저는 2026-09-22/23 기준이다. 재조사의 첫 수는 **기존 사실의 드리프트 확인**이다.
 - `docs/` 또는 `browser-agents/` 를 고치면 **위키 재색인이 따라와야 한다.** pre-commit 훅이 막지만 `core.hooksPath` 를 설정한 clone 에서만 돈다 — 새 clone 에서는 `git config core.hooksPath .githooks` 가 필요하다.
 - `wiki/SCHEMA.md` 는 kit 생성물이라 한국어로 남아 있다. 번역하면 kit 재생성과 갈린다.

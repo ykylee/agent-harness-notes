@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md + browser-agents/11-dia-and-neon.md + browser-agents/08-aside-code-level.md
+last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/08-aside-code-level.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/provider-as-data]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: how capabilities (skills and MCP) are packaged, distributed, installed and enabled — and what to know before inventing your own format.
 - Scope: the model in a paragraph, the portable manifest, catalog format, the install cache, three verbs, the protocol surface
 - Primary sources: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
-- Updated: 2026-09-30 (Agents `./` packaging vs Codex `onboardingSkill` overlay exception; catalog follow-up kept)
+- Updated: 2026-09-30 (Dia Skills are `SKILL.md` inside bundled `agent-server`; MCP import vs Aside/Neon export)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -167,7 +167,7 @@ solved **"how do you turn a repeated delegation into a reusable unit?"** — on 
 | Product | Name | Axis | Contents |
 |---|---|---|---|
 | **Opera Neon** | **Cards** | **task type** | "handle this kind of work like this." Grouped into decks, working across Chat, Do and Research |
-| Dia | Skills | **invocation** | reusable routines called by name |
+| Dia | Skills | **invocation** | `SKILL.md` inside the bundled `agent-server` (8 product skills + 44 Clia agent specs), called by name |
 | **Aside** | **Routines** | **time** | `cron` (start a new task) vs. `heartbeat` (wake an existing chat and continue) |
 
 > 📌 **The three axes are orthogonal.** One product could have all three; none does yet. Aside's
@@ -177,6 +177,10 @@ solved **"how do you turn a repeated delegation into a reusable unit?"** — on 
 >
 > Aside goes further and **scans for recurring work to propose routines**, solving ahead of the user
 > the problem that they do not discover their own reusable units.
+>
+> 📌 **MCP direction inverts for Dia.** Aside and Neon **export** the browser as an MCP server. Dia
+> **imports** MCP tools (`mcp__dia-tools__`, Atlassian, Notion, …) into a local Claude Code. Same
+> protocol, opposite direction ([12](../../../browser-agents/12-dia-binary.md) §3).
 
 ## §8.6 Observation — hand-built site skills  {#s8-6-builtin-skills}
 

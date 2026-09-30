@@ -3,8 +3,9 @@
 > [05](05-comparables.md) stopped at secondary summaries for these two. This is the result of
 > re-running the `llms.txt`/`.md` technique against them. Researched 2026-09-23.
 >
-> Grade: this document rests on **the products' own documentation** (✅ primary). No binary analysis
-> was done.
+> Grade: this document rests on **the products' own documentation** (✅ primary). Dia's macOS
+> binary was opened 2026-09-30 — [12](12-dia-binary.md). Neon is still documentation plus a
+> netinstaller stub.
 
 ## 1. How the technique fared — one win, one loss
 
@@ -82,6 +83,11 @@ That is true of storage, but **AI processing goes through servers.**
 
 > ⚠️ That **collection is the default** is worth noting — the same pattern as Aside's analytics
 > sharing defaulting to on.
+>
+> 📌 **The loop is local; the tokens are not.** [12](12-dia-binary.md) found a seatbelted
+> `agent-server` spawning bundled Claude Code 2.1.270 on-device. That relocates *planning* from
+> this table's "through our servers." Model tokens still leave, which is what the AI-requests
+> row records.
 
 ## 3. Opera Neon — two primary sources that contradict each other
 
@@ -177,12 +183,12 @@ providers.
 
 | Axis | Aside | Dia | Opera Neon |
 |---|---|---|---|
-| Planning location | **local daemon** | **through own servers** | **cloud model** |
+| Planning location | **local daemon** | **local `agent-server` + Claude Code**; model tokens still remote ([12](12-dia-binary.md) §6) | **cloud model** (docs) |
 | Execution location | local | local | local (Neon Do) |
 | Model choice | **the user** (BYO subscription/key) | the product (GPT/Claude/Gemini) | **the product routes** (Chat allows choosing) |
 | Unit of reuse | Routines (time) | Skills (invocation) | **Cards (task type)** |
-| MCP | ✅ `aside mcp` | — | ✅ **MCP server** |
-| CLI | ✅ | — | ✅ (mentioned on the product page) |
+| MCP | ✅ `aside mcp` (export) | **import** into local Claude Code ([12](12-dia-binary.md) §3) | ✅ **MCP server** (export, docs) |
+| CLI | ✅ | bundled Claude Code 2.1.270 inside the app | ✅ netinstaller; full CLI ⚠️ |
 | Injection defences documented | partial (approval, permissions) | **✅ concretely** | unverified |
 | Credential protection | **value hiding** (vault) | **element hiding** (removed from perception) | not sent to servers (agent visibility unverified) |
 | Collection by default | analytics sharing on | **content data on** (30 days) | no-training stated |
@@ -195,9 +201,10 @@ providers.
 | Dia's E2E sync implementation | ⚠️ same |
 | What Neon's agent can see | ⚠️ whether credentials enter the model context is unverified (§3.5) |
 | Details of Neon's Tasks | ⚠️ the FAQ answers were not extracted completely |
-| Both products' binaries | ⚠️ not analysed. Nothing here is verified to Aside's standard |
+| Both products' binaries | Dia macOS opened ([12](12-dia-binary.md)). Neon netinstaller only |
 
-> 📌 **Remember the asymmetry**: Aside's claims were verified down to its binaries
+> 📌 **Remember the remaining asymmetry**: Aside's claims were verified down to its binaries
 > ([08](08-aside-code-level.md), [09](09-aside-browser-internals.md),
-> [10](10-aside-enforcement-and-native.md)); Dia and Neon are **taken on their documentation.**
-> That a document is good is not the same as an implementation being so.
+> [10](10-aside-enforcement-and-native.md)); Dia's macOS app was opened the same way
+> ([12](12-dia-binary.md) — ArcCore + seatbelted Claude Code). Neon is still documentation
+> plus a netinstaller stub. A good document is not the same as a good implementation.

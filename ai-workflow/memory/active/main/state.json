@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-30-main-007 — Dia·Neon 바이너리 정적 분석으로 검증 비대칭 축소",
       "TASK-2026-09-30-main-006 — harness-refs/codex origin 을 GitHub 로 고정",
       "TASK-2026-09-30-main-005 — Agents 플러그인 ./ 규칙과 onboardingSkill 예외 관계",
       "TASK-2026-09-30-main-004 — CLAUDE.md kit 1.16.0 갱신",
@@ -44,15 +45,14 @@
       "TASK-2026-09-30-main-001 — session-start overlay 중복 정리",
       "TASK-2026-09-27-main-001 — ChatGPT webview 전용 메서드의 수신 엔진 추적",
       "TASK-2026-09-26-main-003 — 위키 신선도 검사기 오탐 수정",
-      "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사",
-      "TASK-2026-09-26-main-001 — Strands Agents 하네스 조사 및 심층 분석"
+      "TASK-2026-09-26-main-002 — 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-30.md",
-    "task_count": 9,
+    "task_count": 10,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -64,7 +64,8 @@
       "TASK-2026-09-22-agent-harness-notes-003 — Agents API 서버측 모델 목록 검증",
       "TASK-2026-09-22-agent-harness-notes-004 — Windows 샌드박스 내부 구조 추론→확인 승격",
       "TASK-2026-09-30-main-005 — Agents 플러그인 ./ 규칙과 onboardingSkill 예외 관계",
-      "TASK-2026-09-30-main-006 — harness-refs/codex origin 을 GitHub 로 고정"
+      "TASK-2026-09-30-main-006 — harness-refs/codex origin 을 GitHub 로 고정",
+      "TASK-2026-09-30-main-007 — Dia·Neon 바이너리 정적 분석으로 검증 비대칭 축소"
     ]
   },
   "next_documents": [

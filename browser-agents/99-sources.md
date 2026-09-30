@@ -61,6 +61,8 @@ original Markdown.** That is primary text, not a summary of a rendered page.
 | `www.diabrowser.com/security` | ✅ Dia security documentation | [11 §2](11-dia-and-neon.md) |
 | `www.opera.com/llms.txt` | ✅ Opera product index | [11 §3](11-dia-and-neon.md) |
 | `operaneon.com/faq` (Next.js payload) | ✅ Neon FAQ answers | [11 §3](11-dia-and-neon.md) |
+| `Dia-1.50.1-87750.dmg` (SHA-256 `1633666355bd1b79c4e5ff36607c8a98fb3a4103b2f300dc2c2694c47a234077`) | 🔧 observed implementation | [12](12-dia-binary.md) |
+| Opera Neon netinstaller `net.geo.opera.com/opera_neon/stable/mac` | ⚠️ stub, not the browser | [12 §5](12-dia-binary.md) |
 | Wikipedia — Comet, ChatGPT Atlas | 📰 (dates are sourced) | [01](01-landscape.md), [04](04-comet-architecture.md) |
 
 ## 3. Benchmark claims — adjudicated
@@ -171,6 +173,9 @@ engineering, not a specification Perplexity guarantees. It follows that:
 7. **(2026-09-23) Opened the browser DMG too** — statically, without running it. The three internal
    extensions' manifests, the daemon's Node SEA payload (258,965 lines) and the Vault's cryptographic
    call sites. Reproduction in [09 §1](09-aside-browser-internals.md)
+8. **(2026-09-30) Opened Dia's macOS DMG** — statically, without running it. ArcCore Chromium fork
+   plus a seatbelted local `agent-server` spawning bundled Claude Code 2.1.270. The public Neon URL
+   is a netinstaller stub (Linux 404). Reproduction in [12](12-dia-binary.md)
 
 ### What was not done — plainly
 
@@ -180,7 +185,7 @@ engineering, not a specification Perplexity guarantees. It follows that:
 | No login | `aside login` would use the user's account credentials and was not requested. So the real `skills list`, memory contents and remote-host behaviour are unverified |
 | The daemon was not exhaustively analysed | Permission enforcement was confirmed ([10](10-aside-enforcement-and-native.md)) but the agent loop's details were not explored |
 | No dynamic analysis | What goes to a server, and the real execution path, lie beyond static analysis |
-| Dia and Neon binaries | Not analysed. Nothing there is verified to Aside's standard |
+| Neon full browser | ⚠️ netinstaller stub only (`net.geo.opera.com/opera_neon/stable/mac`, 4.1MB). Agent, Cards, MCP server, credential visibility remain documentation-only |
 | Original research papers (University of Washington and others) | Only secondary reporting was checked |
 
 ### Next
@@ -193,8 +198,8 @@ engineering, not a specification Perplexity guarantees. It follows that:
 - [ ] Dynamic observation — what goes to a server. Beyond static analysis
 - [ ] **Confirm the browser GUI on a macOS/Windows machine** — impossible on Linux
 - [ ] Details of Neon's Tasks — the FAQ answers were not extracted completely
-- [ ] **Analyse Dia's and Neon's binaries** — they are currently taken on documentation. The
-  verification asymmetry remains
+- [x] ~~Analyse Dia's macOS binary~~ → [12](12-dia-binary.md). ArcCore + seatbelted Claude Code 2.1.270
+- [ ] Neon full browser — netinstaller stub only; Linux 404
 
 ## 8. Shelf life
 
