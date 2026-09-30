@@ -337,3 +337,17 @@ Notes:
 - Wiki concept count in the report: 16 → 18 (`agent-client-design-language`, `agent-client-protocol`).
 - Method: ACP crate/SDK/schema ≠ `protocolVersion`. Windows internals and Agents API model list
   marked settled. Visual claims in `agent-ux/` remain ⚠️.
+
+## [2026-09-30] ingest | Anthropic redacted_thinking KeyError (TASK-013)
+
+Sources: `strands/02-agent-loop.md` §5.2, `strands/99-sources.md`. Probe: compiled
+`_format_request_message_content` and `format_chunk` from `anthropic.py` @ `a9a62d4e`. No live key.
+
+Pages updated (3):
+`concepts/retained-reasoning`, `concepts/provider-as-data`, `concepts/primary-source-verification`
+
+Notes:
+- Python redacted-only replay → `KeyError: 'reasoningText'`. Stream `redacted_thinking` start drops `data`.
+- Mixed block: thinking sent, redacted bytes dropped.
+- TS `anthropic.ts` handles stream and replay. Same provider, two converters.
+- Live Anthropic ⚠️.

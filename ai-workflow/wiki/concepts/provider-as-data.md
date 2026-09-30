@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-09-30 (Strands OpenAI Responses stateful formatter still resends full invocation `input` with `previous_response_id`)
+- Updated: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -153,7 +153,7 @@ a bare string in the core `Agent` is always a Bedrock model id.
 | Varies | provider rows (data) | converter classes (code) |
 | Adding a provider | a config entry | a class |
 | Vendor-native features | only what the wire carries | per converter |
-| Retained reasoning | kept ([[concepts/retained-reasoning]]) | **dropped on every OpenAI path** |
+| Retained reasoning | kept ([[concepts/retained-reasoning]]) | **dropped on every OpenAI path**; native Anthropic Python KeyErrors on a redacted-only replay, TS does not ([[concepts/retained-reasoning]] §5.5) |
 | Stateful Responses | `store` + `previous_response_id` | formatter still sends the full invocation `input` with the handle ([`strands/02`](../../../strands/02-agent-loop.md) §4.2) |
 
 > 📌 **Provider-as-data holds where the wire is shared.** Where it is not, the unit of variation is the

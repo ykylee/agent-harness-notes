@@ -204,6 +204,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 로드맵 밖 REPORT 수치·agent-ux 편입",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-012.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-013",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 Strands Anthropic redacted_thinking 확인",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-013.md"
     }
   ],
   "issues": []

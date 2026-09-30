@@ -3,10 +3,13 @@
 > Read: the Python event loop, `Agent`, `types/`, conversation/context/session managers and the
 > providers where they touch history; the TS SDK cross-checked on the same points; designs 0003–0005,
 > 0008, 0009, 0011, 0014, 0015, 0018 (`team/designs/`); the `site/` loop, streaming, conversation and
-> session pages. Method: **static reading only** — no probe was run for this document.
+> session pages. Method: static reading, plus a no-key format-path probe of native Anthropic
+> `redacted_thinking` (TASK-013).
 > Source: `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25; python/v1.57.1, typescript/v1.19.0,
 > harness 0.x). Researched 2026-09-26. TS event union, `modelState` write-back, and the stateful
-> Responses tool-loop formatter re-read at HEAD `a9a62d4e` (2026-09-30, TASK-010).
+> Responses tool-loop formatter re-read at HEAD `a9a62d4e` (2026-09-30, TASK-010). Native Anthropic
+> `redacted_thinking` format path probed 2026-09-30 (TASK-013): Python KeyError on replay, stream
+> drop; TS handles both.
 >
 > Grade: mostly ✅ **confirmed from source**. There are two ❌ refutations: one against the site docs
 > and one against design 0004.
@@ -290,12 +293,26 @@ history via `previous_response_id`. The implementation is `OpenAIResponsesModel(
 |---|---|
 | Bedrock | Replays `text` + `signature` (only if truthy) and `redactedContent` verbatim (`models/bedrock.py:1064-1080`). Strips reasoning for DeepSeek (`:854-896`) |
 | Gemini | Round-trips `thought_signature` as base64 (`models/gemini.py:177-183`, `:215-223`) |
-| Anthropic (native) | Maps to `{"type": "thinking", "thinking", "signature"}` (`models/anthropic.py:231-236`). **No `redacted_thinking` handling**: `redacted` has 0 hits in the file |
+| Anthropic (native) | Maps to `{"type": "thinking", "thinking", "signature"}` (`models/anthropic.py:231-236`). **No `redacted_thinking` handling in Python**: `redacted` has 0 hits in `anthropic.py`. The TS SDK **does** handle it (`strands-ts/src/models/anthropic.ts:301-308` stream, `:842-846` replay) |
 | OpenAI Chat / Responses | **Dropped with a warning**: "reasoningContent is not yet supported in multi-turn conversations with the Responses API" (`openai_responses.py:652-655`; `openai.py:410-419`) |
 
-> ⚠️ On the native Anthropic provider, a reasoning block that holds only `redactedContent` would hit
-> `content["reasoningContent"]["reasoningText"]` (`anthropic.py:233`) and raise `KeyError`. This was
-> inferred from reading and was not run.
+> 🧪 Native Anthropic Python, probed 2026-09-30 without a live key (TASK-013). The two methods
+> `_format_request_message_content` and `format_chunk` were compiled from `anthropic.py` at
+> `a9a62d4e` and run against synthetic blocks:
+>
+> | Input | Result |
+> |---|---|
+> | `reasoningContent.reasoningText{text,signature}` | `type: thinking` as the tests already cover |
+> | **`reasoningContent.redactedContent` only** (the shape `streaming.py:364` assembles) | **`KeyError: 'reasoningText'`** at `anthropic.py:233` |
+> | both `reasoningText` and `redactedContent` | thinking is sent; **redacted bytes are dropped** |
+> | stream `content_block_start` `type: redacted_thinking` with `data` | empty `contentBlockStart`; **the `data` field is discarded** |
+> | stream delta `redacted_thinking_delta` | `RuntimeError` unknown delta type (`anthropic.py:794-797`) |
+>
+> So a redacted-only block that is **already in `messages`** (Bedrock, a Python snapshot, TS→Python)
+> crashes the next Anthropic call. A `redacted_thinking` block that arrives **on the native stream**
+> is dropped, so this provider never stores one of its own. The TS sibling keeps both directions.
+> Live Anthropic emitting `redacted_thinking` was not attached ⚠️. Python tests only cover the
+> `reasoningText` shape (`tests/strands/models/test_anthropic.py:358`).
 
 > 📌 Codex requests `reasoning.encrypted_content` unconditionally and treats retained reasoning as
 > load-bearing ([retained-reasoning](../ai-workflow/wiki/concepts/retained-reasoning.md)). Strands
@@ -418,6 +435,6 @@ They agree on `limits`, stateful clear-after-invocation, conversation-manager re
 |---|---|
 | Stateful Responses + multi-cycle tool loop: duplicated input, or an API error? | formatter resends ✅; API outcome ⚠️ |
 | Depth at which Python's nested async-generator recursion degrades or hits the recursion limit | ⚠️ not measured |
-| Native `AnthropicModel` with `redacted_thinking`: dropped at stream time, `KeyError` on replay? | ⚠️ inferred |
+| Native `AnthropicModel` with `redacted_thinking`: dropped at stream time, `KeyError` on replay? | 🧪 format path: KeyError on redacted-only replay; stream start drops `data`. TS handles both. Live API ⚠️. TASK-013 |
 | Loading a Python-written snapshot into TS `SessionManager`, and the reverse | ⚠️ inferred from types |
 | TS event union and `modelState` write-back | ✅ read at `a9a62d4e` (§3.2, §4.2) |

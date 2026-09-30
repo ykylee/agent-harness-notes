@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/16-responses-chat-adapter.md + docs/07-harness-engineering.md + docs/99-sources.md
+last_ingested_from: docs/16-responses-chat-adapter.md + docs/07-harness-engineering.md + docs/99-sources.md + strands/02-agent-loop.md
 related_pages: [concepts/stateless-conversation-wire, concepts/wire-protocol-boundary, concepts/harness-engineering, concepts/primary-source-verification]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: why retained reasoning is load-bearing design rather than an optimisation, and why it structurally disappears when crossing to Chat Completions.
 - Scope: the mechanism, what Chat Completions lacks, what is actually lost, design consequences
 - Primary sources: `codex-rs/protocol/src/models.rs`, `codex-rs/core/src/client.rs`, the "Codex as a platform" post
-- Updated: 2026-09-30 (re-ingest: `docs/99-sources.md` GitHub-origin checkout; facts on this page unchanged)
+- Updated: 2026-09-30 (Strands native Anthropic: Python KeyError on redacted-only replay; TS keeps `redacted_thinking`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -96,9 +96,24 @@ an optimisation.**
 | 3 | Make `include` conditional. Codex hard-codes `reasoning.encrypted_content`; a multi-provider harness cannot |
 | 4 | **Whether to build the adapter at all**: build it if the requirement is "support third-party models that only speak Chat Completions." Do not, if it is "run OpenAI reasoning models over Chat Completions" — you would be paying adapter complexity for a strictly worse version of a path that already works |
 
+## §5.5 Observation — Strands' native Anthropic path  {#s5-5-strands}
+
+[[concepts/provider-as-data]] §6.5: Strands already drops retained reasoning on every OpenAI path.
+The native Anthropic converter is split across SDKs ([`strands/02`](../../../strands/02-agent-loop.md)
+§5.2, TASK-013, no live key):
+
+| | Stream `redacted_thinking` | Replay of a redacted-only block |
+|---|---|---|
+| **Python** `anthropic.py` | start event accepted, `data` discarded; an unknown delta raises | **`KeyError: 'reasoningText'`** |
+| **TypeScript** `anthropic.ts` | mapped to `reasoningContentDelta.redactedContent` | mapped to `{type: redacted_thinking, data}` |
+
+A capability flag would have made this visible. Two converters for one provider is the cost of
+provider-as-code.
+
 ## §6 Read next  {#s6-next}
 
 - [[concepts/stateless-conversation-wire]] — the other side, the one that makes adapters easy
 - [[concepts/harness-engineering]] — treating the harness as a performance variable
 - [[concepts/provider-as-data]] — expressing capability as data
 - Original: [`docs/16-responses-chat-adapter.md`](../../../docs/16-responses-chat-adapter.md) §5
+- Strands Anthropic: [`strands/02-agent-loop.md`](../../../strands/02-agent-loop.md) §5.2

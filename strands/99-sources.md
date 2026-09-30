@@ -139,7 +139,7 @@ Claims are quoted from the source named; the contradicting code is cited in the 
 |---|---|---|
 | TypeScript details beyond spot checks (loop, stop reasons, reasoning types and stateful clearing were checked) | event union and `modelState` write-back re-read at `a9a62d4e` ([02](02-agent-loop.md) §3.2, §4.2). Remaining TS surface still ⚠️ where marked | ✅ those two · ⚠️ rest |
 | Stateful Responses mode resending the invocation's items alongside `previous_response_id` inside a tool loop | formatter confirmed: full `input` + `previous_response_id`, no slice ([02](02-agent-loop.md) §4.2). API outcome not captured. TS live integ exists, body unasserted | ✅ formatter · ⚠️ API |
-| Native Anthropic provider on a redacted-only thinking block (`KeyError` suspected) | not run | ⚠️ |
+| Native Anthropic provider on a redacted-only thinking block (`KeyError` suspected) | 🧪 `_format_request_message_content` compiled from `anthropic.py` @ `a9a62d4e`: `KeyError: 'reasoningText'`. Stream `redacted_thinking` start drops `data`. TS `anthropic.ts:301-308,842-846` keeps both. Live API not attached | 🧪 format · ⚠️ live |
 | Snapshot portability between the Python and TS SDKs | message key names differ; not run | ⚠️ |
 | The harness ACP path not forwarding permission requests to the client | source: no `session/request_permission` in `server.ts:102-147`; spec method confirmed hyphenated. Not run against an ACP client | ✅ source absence · ⚠️ runtime |
 | Anything a live model would do with the injection paths in [07](07-security.md) §2 | no model was used | ⚠️ |

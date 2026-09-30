@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (REPORT 영/한: 개념 18종, agent-ux 절·권고 11; TASK-012)
+- Updated: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -264,6 +264,11 @@ rec. 11 (wrappers leave wrapped-agent approval on), 18 wiki concepts, and the AC
 rule in § Method. Korean edition in lockstep. Windows internals and the Agents API server-side
 model list, previously left open in that Method paragraph, are marked settled. The visual layer of
 `agent-ux/` remains ⚠️.
+
+**Strands Anthropic `redacted_thinking` 2026-09-30** (TASK-013). Python
+`_format_request_message_content` raises `KeyError: 'reasoningText'` on a redacted-only block;
+`format_chunk` drops stream `data`. TS keeps both directions. Probed by executing those two methods
+from `anthropic.py` @ `a9a62d4e` with no live key. See [[concepts/retained-reasoning]] §5.5.
 
 **Drift re-check 2026-09-30** ([`strands/99`](../../../strands/99-sources.md) §6). HEAD `a9a62d4e`,
 31 commits past the study pin, no new version tags. Cedar / interventions / sandbox / `create_harness`

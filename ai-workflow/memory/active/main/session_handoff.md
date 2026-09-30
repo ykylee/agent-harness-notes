@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-012 REPORT 개념 18종 · agent-ux 편입)
+- Updated: 2026-09-30 (TASK-013 Anthropic redacted_thinking KeyError)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-013 Anthropic redacted_thinking KeyError 확인: done
 - TASK-2026-09-30-main-012 REPORT 개념 수 16→18 및 agent-ux 편입: done
 - TASK-2026-09-30-main-011 ACP 엔진측 독해 (스펙·스키마 vs Strands CLI / Codex App Server): done
 - TASK-2026-09-30-main-010 Strands TS SDK 세부 직접 확인 (event union · modelState · stateful formatter): done
@@ -30,10 +31,9 @@
 - TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
-- TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -45,6 +45,7 @@
 
 ## Key Changes
 
+- **Anthropic redacted_thinking KeyError (TASK-013)** — Python `_format_request_message_content` 가 redacted-only 블록에서 `KeyError: 'reasoningText'`. stream `redacted_thinking` start 는 `data` 폐기. TS 는 stream·replay 모두 처리. 라이브 키 없이 메서드 컴파일 실행. `strands/02` §5.2, 위키 `retained-reasoning` §5.5
 - **REPORT 개념 18종 · agent-ux 편입 (TASK-012)** — 영/한 REPORT에 § The client side / § 클라이언트 쪽, 권고 11(래퍼는 감싼 에이전트 승인을 켜 둔다). 개념 수 16→18. Method에 ACP 산출물≠와이어. Windows 내부·Agents API 모델 목록은 정착으로 표기. PSV 재ingest
 - **ACP 엔진측 독해 (TASK-011)** — 스펙 HEAD `9b26a3ea`. 안정 와이어는 `protocolVersion` **1** (crate 1.9.1 / schema-v1.23.0 / SDK 1.3.0 은 산출물 버전). 승인은 메서드 하나 `session/request_permission`, kind 네 개 `allow_once` · `allow_always` · `reject_once` · `reject_always`. Codex App Server 는 요청 10종. Strands harness ACP 경로는 그 RPC 를 안 보냄 (소스 ✅, 라이브 클라이언트 ⚠️). `agent-ux/10`, 위키 개념 `agent-client-protocol` (18종)
 - **Strands TS SDK 직접 확인 (TASK-010)** — `AgentStreamEvent` 16종. `modelState` 는 미들웨어 전 스냅샷, temp `StateStore` 로 모델에 전달, 성공 시에만 write-back. stateful Responses formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. `strands/02` §3.2·§4.2
@@ -89,6 +90,7 @@
 **Strands 조사 (`strands/`)**
 - [ ] 위조 `<system-reminder>` 태그를 모델이 하네스 권위로 받아들이는지 — 프롬프트 계약이 그렇게 말하고 아무도 이스케이프하지 않는다(`strands/07` §2.1). **실측은 heddle 측 작업**, 결과만 편입
 - [ ] 장기 메모리가 주입 지시를 세션 너머로 나르는지 (⚠️ 소스상 경로만 확인)
+- [x] ~~Native Anthropic `redacted_thinking` KeyError~~ — Python replay KeyError, stream drop. TS 는 양쪽 처리. 라이브 API ⚠️. TASK-2026-09-30-main-013
 - [x] ~~TS SDK 세부의 직접 확인 · stateful Responses 툴 루프 중복 전송~~ — event union 16종, `modelState` 스냅샷/write-back 확인. formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. TASK-2026-09-30-main-010
 - [x] ~~`REPORT`(영/한)에 세 번째 사례 반영~~ — `§ A third case` / `§ 세 번째 사례` 신설, 권고 9·10 추가, 두 결론(권고 7 게이트, 프로바이더-데이터)에 단서. 무효화된 결론 없음
 - [x] ~~harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인~~ — `a9a62d4e` 31커밋, 보안 기본값 유지. TASK-2026-09-30-main-009. 다음 드리프트 기준은 `a9a62d4e`
