@@ -4,6 +4,7 @@
 > `developers.openai.com/plugins.md` index, and the plugin/marketplace methods in the App Server
 > protocol. Extracted 2026-09-15.
 > Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+> Follow-up 2026-09-30: `onboardingSkill` `./` exception confirmed Codex-overlay-only (`resolve_openai_onboarding_skill` at HEAD `bcd6d9ab6b`).
 
 ## 1. The model in one paragraph
 
@@ -225,6 +226,10 @@ namespaced overlay.** This is the split to imitate.
 Paths must **start with `./`, stay inside the plugin, and contain no `..` components.**
 *(2026-09-26: exception — `extensions["com.openai"].onboardingSkill` accepts relative paths with or
 without the legacy `./` prefix, #46544.)*
+*(2026-09-30: this exception is Codex overlay only. `resolve_openai_onboarding_skill` normalizes a
+missing `./` then calls the shared resolver. Agents API packaging does not declare the field;
+docs/10's `./` rule is that other surface. Official `plugins/build/plugins.md` Path rules still say
+overlay paths start with `./` — the exception lives in the parser.)*
 
 ### A minimal skill
 

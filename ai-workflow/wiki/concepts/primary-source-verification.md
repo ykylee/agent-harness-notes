@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (Windows internals and Agents roster settled; durable-engine finding from 2026-09-27 kept)
+- Updated: 2026-09-30 (plugin path-rule split: Agents `./` vs Codex overlay exception; Windows internals and Agents roster kept)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -140,6 +140,7 @@ The same rule was applied to this repository's own earlier statements.
 | "No product documents input separation" | ❌ **Partly refuted.** Dia documents it concretely |
 | Opera Neon's unit of reuse is "Skills" | ❌ **Refuted.** The official name is **Cards**, and the axis differs |
 | Brave's Comet demonstration exfiltrated "to the attacker's server" | ❌ **Refuted by the original.** The fourth step posts the data **as a reply to the Reddit comment**; no attacker origin appears in the chain |
+| Agents API plugin `./` rule and Codex `onboardingSkill` `./`-optional exception are one rule | **Two surfaces.** Live Agents `plugins.md` still requires `./` and has no `onboardingSkill`. Codex `resolve_openai_onboarding_skill` (#46544) prepends `./`, then the shared resolver still rejects `..` |
 
 > 📌 The last entry is a different kind of error, and a costlier one. It was not a secondary source
 > being wrong — the primary source had been read, then **paraphrased** in one line. The paraphrase

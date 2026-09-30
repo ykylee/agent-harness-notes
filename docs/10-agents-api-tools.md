@@ -3,6 +3,7 @@
 > Source: the official guides `agents-api/tools/{functions,mcp,vaults,plugins}`, read as raw
 > Markdown. Extracted 2026-09-15.
 > Drift-checked against `openai/openai-openapi@d983890f77` (2026-09-26); changes marked *(2026-09-26)*.
+> Follow-up 2026-09-30: plugin path rules re-read from live `plugins.md` and Codex `resolve_openai_onboarding_skill`.
 
 ## 1. Function tools
 
@@ -208,6 +209,12 @@ docs-helper/
 
 > Paths resolve from the plugin root. They **must start with `./`, stay inside the plugin, and
 > contain no `..` components.**
+
+*(2026-09-30: this `./` rule is Agents API packaging. Live `plugins.md` still states it with no
+exception, and the example manifest only declares `skills` / `mcpServers`. `onboardingSkill` is a
+Codex overlay field in `extensions["com.openai"]`; the parser
+(`codex-rs/core-plugins/src/manifest.rs` `resolve_openai_onboarding_skill`, #46544) prepends `./`
+when missing, then the shared resolver still rejects `..` and empty `./`. See [docs/13](./13-marketplace-and-plugins.md).)*
 
 Note the format split: **`.mcp.json` uses the plugin format, which differs from `agent.tools`.**
 

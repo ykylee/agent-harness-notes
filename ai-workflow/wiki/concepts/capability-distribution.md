@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: how capabilities (skills and MCP) are packaged, distributed, installed and enabled — and what to know before inventing your own format.
 - Scope: the model in a paragraph, the portable manifest, catalog format, the install cache, three verbs, the protocol surface
 - Primary sources: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
-- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (Agents `./` packaging vs Codex `onboardingSkill` overlay exception; catalog follow-up kept)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -43,10 +43,14 @@ manifests** and a legacy path (`$REPO_ROOT/.claude-plugin/marketplace.json`).
 | Location | Holds |
 |---|---|
 | **root** (`plugin.json`) | identity and metadata — `name`, `version`, `description`, `author`, `license`, `keywords` |
-| **overlay** (`extensions.com.openai`) | presentation, MCP mappings, lifecycle hooks — `interface`, `apps`, `hooks` |
+| **overlay** (`extensions.com.openai`) | presentation, MCP mappings, lifecycle hooks — `interface`, `apps`, `hooks`, and since #46544 `onboardingSkill` |
 
 **A split worth imitating.** `name` must be stable **kebab-case** — hosts use it as the plugin
 identifier *and* the component namespace.
+
+`onboardingSkill` is Codex overlay only. `resolve_openai_onboarding_skill` (`core-plugins/src/manifest.rs`,
+#46544) accepts a relative path with or without `./` by prepending the prefix, then the shared
+resolver still rejects `..` and empty `./`. Agents API packaging does not declare the field.
 
 ## §3 Catalog format  {#s3-catalog}
 
@@ -129,8 +133,8 @@ system configuration. **Decide the precedence order before you ship.**
 > load every child plugin's MCP configuration.**
 > Each session gets its own environment, and **the root agent and its subagents share it.**
 
-Path rules (repeated everywhere, so enforce them once — one exception since 2026-09: the `com.openai` overlay's `onboardingSkill` accepts paths with or without `./`, #46544): **start with `./`, stay inside the plugin,
-contain no `..` components.**
+Agents API path rules (live `plugins.md` as of 2026-09-30): **start with `./`, stay inside the plugin,
+contain no `..` components.** The `onboardingSkill` `./`-optional exception is Codex overlay only — see §2.1.
 
 ## §7 Protocol surface  {#s7-protocol}
 

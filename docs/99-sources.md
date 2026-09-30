@@ -440,4 +440,7 @@ Summarised; details are inline in each doc.
   can now change model, reasoning effort and service tier; vault credential "rotate" became "update"
   with optional `auth` and a `metadata` map; delete/cancel semantics for still-open turns; `403` on most
   operations. Endpoint paths unchanged.
-- **Plugins** — `onboardingSkill` overlay field accepts paths without `./` (#46544).
+- **Plugins** — Codex overlay `extensions["com.openai"].onboardingSkill` accepts paths without
+  `./` (#46544, `resolve_openai_onboarding_skill` prepends the prefix then the shared resolver
+  still rejects `..`). Agents API packaging (`skills` / `mcpServers`) still requires `./`; live
+  Agents `plugins.md` has no `onboardingSkill`.

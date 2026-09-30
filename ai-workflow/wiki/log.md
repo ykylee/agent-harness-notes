@@ -198,3 +198,21 @@ Notes:
 - Runtime on Windows was not exercised (this host is Linux). Official
   `learn.chatgpt.com/docs/windows/windows-sandbox.md` still 200.
 - `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
+
+## [2026-09-30] ingest | Agents `./` vs Codex `onboardingSkill` (TASK-005)
+
+Sources: `docs/10-agents-api-tools.md`, `docs/13-marketplace-and-plugins.md`, `docs/99-sources.md`
+— live `developers.openai.com/api/docs/guides/agents-api/tools/plugins.md` and
+`openai/codex` HEAD `bcd6d9ab6b` `codex-rs/core-plugins/src/manifest.rs`.
+
+Pages updated (3):
+`concepts/capability-distribution`, `concepts/primary-source-verification`,
+`concepts/retained-reasoning`
+
+Notes:
+- Agents API packaging still requires paths to start with `./`. Live `plugins.md` example
+  declares `skills` / `mcpServers` only; no `onboardingSkill`.
+- Codex overlay exception is `resolve_openai_onboarding_skill`: prepend `./` when missing,
+  then the shared resolver still rejects `..` and empty `./` (#46544).
+- Wiki §6 (Agents load path) no longer carries the Codex exception; it lives in §2.1.
+- `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
