@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-008 Aside Computer Use 호출 흐름)
+- Updated: 2026-09-30 (TASK-010 Strands TS SDK 세부 직접 확인)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,8 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-010 Strands TS SDK 세부 직접 확인 (event union · modelState · stateful formatter): done
+- TASK-2026-09-30-main-009 Strands harness 0.x 드리프트 재확인 (`15da9dc`→`a9a62d4e`, 31커밋): done
 - TASK-2026-09-30-main-008 Aside Computer Use 호출 흐름 (데몬 spawn + JSON-lines IPC): done
 - TASK-2026-09-30-main-007 Dia macOS 바이너리 정적 분석 · Neon netinstaller 스텁: done
 - TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
@@ -29,11 +31,9 @@
 - TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
 - TASK-2026-09-30-main-003 다른 저장소 workflow overlay plugin-only 위임: done
 - TASK-2026-09-30-main-002 형제 스킬 overlay·캐시 중복 정리: done
-- TASK-2026-09-30-main-001 session-start overlay 중복 정리: done
-- TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -45,6 +45,8 @@
 
 ## Key Changes
 
+- **Strands TS SDK 직접 확인 (TASK-010)** — `AgentStreamEvent` 16종. `modelState` 는 미들웨어 전 스냅샷, temp `StateStore` 로 모델에 전달, 성공 시에만 write-back. stateful Responses formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. `strands/02` §3.2·§4.2
+- **Strands 0.x 드리프트 재확인 (TASK-009)** — `15da9dc`→`a9a62d4e` 31커밋. 버전 태그 없음 (1.57.1 / 1.19.0 / 0.1.x). 승인 기본 off · Cedar fail-open · sandbox host · 등록순 합성 유지. Cedar/intervention/sandbox 빈 diff 라 P1–P5 미재실행. R19 README 문장 #4696 에서 삭제. #4447 은 squash `4095cf5a`. 로컬 `~/repos/harness-refs/strands-harness-sdk`. `strands/99` §6
 - **Aside Computer Use 호출 흐름 (TASK-008)** — `Aside-1.0.928.1.dmg`. 데몬이 `aside-computer-use` 를 stdin/stdout 파이프로 spawn. JSON-line `invoke`/`policy`/`permissions`/…. iMessage·카카오·Contacts 는 invoke 이름. stdout 은 `mac_ax` 스냅샷(fullTree/diff). Swift 내부 미분해, 미실행. `browser-agents/10` §2.3
 - **Dia macOS 바이너리 열림 (TASK-007)** — `Dia-1.50.1-87750.dmg`. ArcCore Chromium fork + 로컬 `agent-server` 가 bundled Claude Code 2.1.270 을 Seatbelt 안에서 spawn. 보안 페이지 문장(LLM URL 비추적·verbatim URL 차단·요소 숨김)은 번들에 없고, 프롬프트 층 untrusted-data + `url://` 단축 + Seatbelt 가 있다. 스냅샷 요소 숨김은 ⚠️. Neon 공개 URL 은 4.1MB netinstaller 스텁(Linux 404). MCP 방향이 반대: Dia 는 import, Aside·Neon 은 export. `browser-agents/12`, 위키 10종 재ingest
 - **ChatGPT 앱은 엔진을 둘 몬다 (TASK-2026-09-27-main-001)** — 로컬 `codex app-server` + 클라우드 `durable`("Long-lived", `wss://codex-cloud-backend.chatgpt.com/`). durable 전용 어댑터가 방언 변환(`thread/queue/add`→`turn/addUserMessage`, `thread/start`→`thread/prewarm`)하고 `config/*` 는 클라이언트 메모리에서 답한다. webview 전용 8개 재분류, 그중 `plugin/codex` 는 메서드가 아니었다(09-26 스윕 오류). 이 계정엔 durable 미개통(로그 `state=disconnected`). `docs/99` §E.3
@@ -85,9 +87,9 @@
 **Strands 조사 (`strands/`)**
 - [ ] 위조 `<system-reminder>` 태그를 모델이 하네스 권위로 받아들이는지 — 프롬프트 계약이 그렇게 말하고 아무도 이스케이프하지 않는다(`strands/07` §2.1). **실측은 heddle 측 작업**, 결과만 편입
 - [ ] 장기 메모리가 주입 지시를 세션 너머로 나르는지 (⚠️ 소스상 경로만 확인)
-- [ ] TS SDK 세부의 직접 확인 (일부는 위임 요약 + 스폿체크) · stateful Responses 모드의 툴 루프 중복 전송 의심
+- [x] ~~TS SDK 세부의 직접 확인 · stateful Responses 툴 루프 중복 전송~~ — event union 16종, `modelState` 스냅샷/write-back 확인. formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. TASK-2026-09-30-main-010
 - [x] ~~`REPORT`(영/한)에 세 번째 사례 반영~~ — `§ A third case` / `§ 세 번째 사례` 신설, 권고 9·10 추가, 두 결론(권고 7 게이트, 프로바이더-데이터)에 단서. 무효화된 결론 없음
-- [ ] harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인
+- [x] ~~harness 는 0.x, 출시 3일차 스냅샷이다 — 재조사의 첫 수는 드리프트 확인~~ — `a9a62d4e` 31커밋, 보안 기본값 유지. TASK-2026-09-30-main-009. 다음 드리프트 기준은 `a9a62d4e`
 
 **agent-ux 조사 (`agent-ux/`)**
 - [ ] GUI 패스 — 수동 패스 완료(설치 5종). 남은 것: 앱별 스크래치 프로젝트에서 에이전트 실행해 승인 카드·상태 관찰. 미설치 5종(Cursor·Devin·Superset·Paseo·Conductor)은 ⚠️ 그대로

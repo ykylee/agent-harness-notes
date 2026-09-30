@@ -176,6 +176,20 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 로드맵 밖 브라우저 에이전트 후속",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-008.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-009",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 Strands 후속 드리프트 점검",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-009.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-010",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 Strands TS SDK 후속 점검",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-010.md"
     }
   ],
   "issues": []

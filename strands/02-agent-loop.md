@@ -5,7 +5,8 @@
 > 0008, 0009, 0011, 0014, 0015, 0018 (`team/designs/`); the `site/` loop, streaming, conversation and
 > session pages. Method: **static reading only** — no probe was run for this document.
 > Source: `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25; python/v1.57.1, typescript/v1.19.0,
-> harness 0.x). Researched 2026-09-26.
+> harness 0.x). Researched 2026-09-26. TS event union, `modelState` write-back, and the stateful
+> Responses tool-loop formatter re-read at HEAD `a9a62d4e` (2026-09-30, TASK-010).
 >
 > Grade: mostly ✅ **confirmed from source**. There are two ❌ refutations: one against the site docs
 > and one against design 0004.
@@ -196,8 +197,12 @@ A consumer keyed on the documented name silently receives nothing.
 
 ### 3.2 TypeScript: typed, hookable, serializable ✅
 
-- Events form an `AgentStreamEvent` union of classes with a `type` discriminator
-  (`strands-ts/src/types/agent.ts:623-639`).
+- Events form an `AgentStreamEvent` discriminated union (`strands-ts/src/types/agent.ts:623-639`).
+  Sixteen members, each a `HookableEvent`: `ModelStreamUpdateEvent`, `ContentBlockEvent`,
+  `ModelMessageEvent`, `ToolStreamUpdateEvent`, `ToolResultEvent`, `BeforeInvocationEvent`,
+  `AfterInvocationEvent`, `BeforeModelCallEvent`, `AfterModelCallEvent`, `BeforeToolsEvent`,
+  `AfterToolsEvent`, `BeforeToolCallEvent`, `AfterToolCallEvent`, `MessageAddedEvent`,
+  `InterruptEvent`, `AgentResultEvent`.
 - Every stream event is also a hook event.
 - `toJSON()` strips runtime references (`events.mdx:218`, 📣).
 - `ToolResultEvent` **is** streamed.
@@ -240,6 +245,9 @@ history via `previous_response_id`. The implementation is `OpenAIResponsesModel(
   (`:578-583`);
 - it captures the id on `response.created` (`:347-352`);
 - the Agent snapshots `_model_state` and writes it back only on success (`event_loop.py:594-617`).
+  TS: snapshot `modelState.getAll()` before middleware, pass a temp `StateStore` to the model,
+  `loadStateSerializable` back onto `agent.modelState` after the chain; skipped on throw
+  (`strands-ts/src/agent/agent.ts:2276-2349`; unit test `agent.stateful-model.test.ts:76-81`).
 
 | Design 0004 says | Code does | Grade |
 |---|---|---|
@@ -249,11 +257,16 @@ history via `previous_response_id`. The implementation is `OpenAIResponsesModel(
 | `BedrockModel(api="responses")` subpackage facade | `models/bedrock.py` is still one file with no `api=`. Mantle goes through `_openai_bedrock.py` | 📐 |
 | `model_state` persisted in `SessionAgent._internal_state` | Yes (`types/session.py:136-141`, `:168-169`) | ✅ |
 
-> ⚠️ **Unverified, and worth a probe.** Inside one invocation, a stateful tool loop still sends every
-> message of the invocation **and** `previous_response_id` (`openai_responses.py:569-583`; TS
-> `strands-ts/src/models/openai/responses-adapter.ts:62-80`). No slicing to "since the last response"
-> was found. From cycle 2 onward, this would re-send items the server already holds. The only
-> integration test is the no-tool case
+> ✅ **The formatter resends.** Inside one invocation, a stateful tool loop still puts every
+> message of the invocation into `input` **and** sets `previous_response_id`
+> (`openai_responses.py:572-583`; TS `formatResponsesRequest` + `formatResponsesMessages`,
+> `responses-adapter.ts:56-80,142-253`). There is no "since the last response" slice; the agent
+> clones `this.messages` for every cycle (`agent.ts:2268`) and `ModelPlugin` only clears after
+> `AfterInvocationEvent` (`model-plugin.ts:27-31`). From cycle 2 onward the request re-sends items
+> the server already holds, plus the new `function_call_output`. ⚠️ Whether the API deduplicates or
+> charges twice was not captured. A TS live integ completes a function-tool round-trip and expects
+> `endTurn` (`strands-ts/test/integ/models/openai/responses.test.ts:193-230`) but does not assert
+> the follow-up body; the Python integ is still the no-tool case
 > (`strands-py/tests_integ/models/test_model_openai.py:305-322`).
 
 > 📌 The wiki's warning applies literally. The moment an adapter stores a response id, it
@@ -403,8 +416,8 @@ They agree on `limits`, stateful clear-after-invocation, conversation-manager re
 
 | Item | Status |
 |---|---|
-| Stateful Responses + multi-cycle tool loop: duplicated input, or an API error? | ⚠️ needs a live or mock probe |
+| Stateful Responses + multi-cycle tool loop: duplicated input, or an API error? | formatter resends ✅; API outcome ⚠️ |
 | Depth at which Python's nested async-generator recursion degrades or hits the recursion limit | ⚠️ not measured |
 | Native `AnthropicModel` with `redacted_thinking`: dropped at stream time, `KeyError` on replay? | ⚠️ inferred |
 | Loading a Python-written snapshot into TS `SessionManager`, and the reverse | ⚠️ inferred from types |
-| TS details beyond the spot-checked lines (event union, `modelState` write-back) | ⚠️ taken from a delegated read |
+| TS event union and `modelState` write-back | ✅ read at `a9a62d4e` (§3.2, §4.2) |

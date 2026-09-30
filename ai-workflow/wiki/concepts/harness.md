@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: what a "harness" is, what sits inside it, and how many layers OpenAI opened of theirs.
 - Scope: definition, internal components, the four-layer opening, what the application owns, the size of the surface
 - Primary sources: the `openai/codex` repository plus the "Codex as a platform" and "Unlocking the Codex harness" posts
-- Updated: 2026-09-30 (Dia is ArcCore + bundled Claude Code, not an MV3 agent like Aside/Comet)
+- Updated: 2026-09-30 (Strands harness still 0.1.x at `a9a62d4e`; approval/sandbox defaults unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -183,7 +183,9 @@ Aside puts a product. Strands puts a function call.
 > surface as Codex (shell, files) and still differs on every primitive that Codex expresses as a
 > message — because there is no one to send the message to. The Strands *harness* package
 > (`create_harness()`, released 2026-09-22) is the first product in this wiki literally named a
-> harness; it is a factory returning a plain SDK `Agent` with defaults wired in.
+> harness; it is a factory returning a plain SDK `Agent` with defaults wired in. Rechecked 2026-09-30
+> at `a9a62d4e` (31 commits past `15da9dc`): still unreleased 0.1.x; approval default-off, Cedar
+> fail-open, and host sandbox hold ([`strands/99`](../../../strands/99-sources.md) §6).
 
 ## §8 Read next  {#s8-next}
 

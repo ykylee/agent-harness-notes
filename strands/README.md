@@ -5,7 +5,8 @@
 documentation source — rather than from the launch posts.
 
 Researched 2026-09-26 · `harness-sdk` @ `15da9dc` (2026-09-25) · Python SDK 1.57.1 · TypeScript SDK
-1.19.0 · harness 0.1.x (released 2026-09-22)
+1.19.0 · harness 0.1.x (released 2026-09-22). Drift re-check 2026-09-30 at HEAD `a9a62d4e`
+([99](99-sources.md) §6): still those versions; approval default-off / Cedar fail-open / host sandbox hold.
 
 > **The third case in this repository, and the first harness you link against rather than talk
 > to.** Codex ([`docs/`](../docs/)) sits behind a wire; browser agents

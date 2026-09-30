@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (Aside Computer Use daemon-side IPC closed; Dia binary / Neon stub kept)
+- Updated: 2026-09-30 (Strands TS event union / modelState / stateful formatter re-read)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -247,6 +247,18 @@ say nothing either way.
 
 These three now also stand in [`REPORT.md`](../../../REPORT.md) § Method and § A third case (and the
 Korean edition), so the report and this page rest on the same record (G4).
+
+**Drift re-check 2026-09-30** ([`strands/99`](../../../strands/99-sources.md) §6). HEAD `a9a62d4e`,
+31 commits past the study pin, no new version tags. Cedar / interventions / sandbox / `create_harness`
+defaults are byte-identical, so P1–P5 were not re-run — empty diff is the skip condition, not "looks
+the same." R1–R18 and R20 stand. R19's README sentence ("No designs have been accepted yet") was
+deleted in #4696; the two designs still declare Accepted. #4447 is a squash (`4095cf5a`, one parent);
+the prior harness tree is not in this history.
+
+**TS SDK re-read 2026-09-30** (TASK-010). `AgentStreamEvent` union and `modelState` write-back
+confirmed from `strands-ts` source ([`strands/02`](../../../strands/02-agent-loop.md) §3.2, §4.2).
+Stateful Responses formatter resends the full invocation `input` with `previous_response_id`; the
+API outcome is still unverified.
 
 ## §10 Read next  {#s10-next}
 

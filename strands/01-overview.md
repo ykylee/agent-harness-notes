@@ -4,7 +4,8 @@
 > product you run. Read out of the `strands-agents/harness-sdk` monorepo at `15da9dc`
 > (2026-09-25; Python SDK 1.57.1, TypeScript SDK 1.19.0, harness 0.1.x), its `team/` governance
 > and design documents, its documentation source (`site/`), and the live `strandsagents.com/llms.txt`.
-> Researched 2026-09-26.
+> Researched 2026-09-26. Drift re-check 2026-09-30 at HEAD `a9a62d4e` ([99](99-sources.md) §6):
+> still 1.57.1 / 1.19.0 / 0.1.x; approval default-off, Cedar fail-open, host sandbox unchanged.
 >
 > Grade: mostly ✅ **confirmed from source.** Design-document status is graded against code, not
 > taken from the document (§5).
@@ -46,12 +47,13 @@ repository cares about:
 | 2026-07-27 | `mcp-server` merged and archived | ✅ |
 | **2026-09-22** | **"merge in the Strands harness" (#4447)**, released with python v1.57.0 / TS v1.19.0 | ✅ |
 | 2026-09-23 | harness versioning policy (0.x: patch = features, minor = breaking) | ✅ |
+| 2026-09-30 | drift re-check at `a9a62d4e` (31 commits past `15da9dc`) | ✅ [99](99-sources.md) §6 |
 
 - The old `sdk-python` repository **became** the monorepo: Python tags back to `v0.1.0` resolve under
   `harness-sdk`, and `git clone …/sdk-python` still lands there. ✅ (inferred from artifacts)
-- The harness arrived by merge from somewhere not visible in a shallow clone ⚠️. At HEAD it was
-  **three days old.** Everything in [04](04-harness-and-cli.md) is a snapshot of a 0.x product in its
-  first week.
+- The harness arrived as squash `4095cf5a` (#4447, 2026-09-21): one parent, prior tree not in this
+  history ⚠️. The study pin was three days after that merge. HEAD `a9a62d4e` is 31 commits later and
+  still unreleased 0.1.x. Everything in [04](04-harness-and-cli.md) is a snapshot of a 0.x product.
 - `samples`, `tools` and `agent-builder` stayed separate. Design 0009 expected `samples` to move;
   it did not ❌ (a plan, not a claim — recorded for completeness).
 
@@ -115,7 +117,7 @@ commits in the shallow window, including the harness versioning policy. ✅
 |---|---|---|
 | Proposed | 13 | **11 implemented in full or in part** — including 0009 (the monorepo it proposed now exists), 0004 (stateful models), 0008, 0014 (storage), 0016 (routing), 0017 (file memory), 0018 |
 | — | — | Not implemented: 0012/0013 (Strandslator), 0015a (WebRTC transport). 0005 (state machine) exists only as its middleware layer |
-| Accepted | 2 | while `team/designs/README.md:129` says "**No designs have been accepted yet.**" ❌ |
+| Accepted | 2 | at the pin, `team/designs/README.md:129` said "**No designs have been accepted yet.**" ❌ — that sentence was deleted in #4696 (2026-09-29); 0009-context-offloader and 0010 still say Accepted |
 
 Three numbers (0009, 0011, 0015) are used twice; 0002 is missing. And the implementations
 **deviate from the designs** in ways that matter — stateful models clear history *after* an invocation
@@ -154,6 +156,7 @@ The route is `site/src/pages/[...slug]/index.md.ts`: raw Markdown lives at **`<p
 
 ## 8. Open questions
 
-- Where the harness lived before #4447 (a shallow clone cannot see it) ⚠️
+- Where the harness lived before #4447 — squash `4095cf5a` (2026-09-21), single parent; the prior
+  tree is not in this history ⚠️
 - Whether the `strands-labs/benchmark-harnesses` repository reproduces the published charts — not
   fetched; see [99](99-sources.md) §4 for what the committed chart data does and does not show

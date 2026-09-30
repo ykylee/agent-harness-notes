@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-09-30 (Dia local loop is bundled Claude Code 2.1.270; product still routes models)
+- Updated: 2026-09-30 (Strands OpenAI Responses stateful formatter still resends full invocation `input` with `previous_response_id`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -154,6 +154,7 @@ a bare string in the core `Agent` is always a Bedrock model id.
 | Adding a provider | a config entry | a class |
 | Vendor-native features | only what the wire carries | per converter |
 | Retained reasoning | kept ([[concepts/retained-reasoning]]) | **dropped on every OpenAI path** |
+| Stateful Responses | `store` + `previous_response_id` | formatter still sends the full invocation `input` with the handle ([`strands/02`](../../../strands/02-agent-loop.md) §4.2) |
 
 > 📌 **Provider-as-data holds where the wire is shared.** Where it is not, the unit of variation is the
 > converter, and a converter is code. Choose which wire you fix before choosing how providers are

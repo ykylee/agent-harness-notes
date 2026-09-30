@@ -2,7 +2,7 @@
 
 > Read: the `Model` base classes and every first-party provider in `strands-py` and `strands-ts`, the event-loop streaming path, `models/routing/`, `experimental/bidi/`, `telemetry/`, the harness model resolver (`harness-py`, `harness-ts`), designs `0004` / `0015` / `0016`, and the `site/` provider and observability pages. Method: static reading only. No probe was run for this document. Source: `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25; python/v1.57.1, typescript/v1.19.0, harness 0.x). Researched 2026-09-26.
 >
-> Dominant grade: ✅ **confirmed from source.** The designs are 📐. There are nine ❌ docs-vs-code refutations (§9).
+> Dominant grade: ✅ **confirmed from source.** The designs are 📐. There are nine ❌ docs-vs-code refutations (§9). Stateful Responses tool-loop formatter re-read at HEAD `a9a62d4e` (2026-09-30, TASK-010).
 
 ## 1. The opposite of provider-as-data
 
@@ -132,7 +132,7 @@ Design 0004 (`team/designs/0004-stateful-models.md`, **Status: Proposed**) again
 | `BedrockModel` split into `bedrock/{converse,responses}.py` with `api="responses"` | `bedrock.py` is still a single 1,790-line file. Mantle is reached through `OpenAIResponsesModel(bedrock_mantle_config=…)` | 📐 |
 | user `conversation_id` → response-id map | no `conversation_id` anywhere in `strands-py/src`; only a single `response_id` | 📐 |
 
-> ⚠️ In stateful mode, `_format_request` still puts **all** of the current invocation's messages into `input` alongside `previous_response_id` (`openai_responses.py:573-583`). Nothing trims to "messages since the last response". Inside a tool loop, the second request would therefore resend the user turn and the function call that the server already holds. The only stateful integration test has no tool call (`strands-py/tests_integ/models/test_model_openai.py:304-322`). This is unverified.
+> ✅ In stateful mode, `_format_request` / `formatResponsesRequest` still put **all** of the current invocation's messages into `input` alongside `previous_response_id` (`openai_responses.py:572-583`; TS `responses-adapter.ts:56-80,142-253`). Nothing trims to "messages since the last response". Inside a tool loop, the second request therefore resends the user turn and the function call the server already holds. ⚠️ The API's reaction (dedupe vs double-charge vs error) was not captured. A TS live integ completes a function-tool round-trip (`strands-ts/test/integ/models/openai/responses.test.ts:193-230`) without asserting the follow-up body; the Python integ is still the no-tool case (`strands-py/tests_integ/models/test_model_openai.py:304-322`). See [02](02-agent-loop.md) §4.2.
 
 ### 4.2 Retained reasoning depends on the provider
 

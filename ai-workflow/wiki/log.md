@@ -270,3 +270,34 @@ Pages updated (2):
 Notes:
 - origin is `https://github.com/openai/codex.git`. A personal Gitea mirror as origin lags.
 - `retained-reasoning` facts are unchanged (date bump only).
+
+## [2026-09-30] ingest | Strands harness 0.x drift re-check (TASK-009)
+
+Sources: `strands/99-sources.md` §6, `strands/01-overview.md`, `strands/README.md`.
+Local `~/repos/harness-refs/strands-harness-sdk` at `a9a62d4e` (31 commits past pin `15da9dc`).
+
+Pages updated (2):
+`concepts/primary-source-verification`, `concepts/harness`
+
+Notes:
+- Still python/v1.57.1, typescript/v1.19.0, harness 0.1.x. No new tags.
+- Approval default-off, Cedar fail-open (R1), host sandbox, registration-order (R3) unchanged.
+  Cedar/intervention/sandbox/`create_harness` defaults empty-diff; P1–P5 not re-run.
+- R19 README sentence "No designs have been accepted yet" deleted in #4696; two designs still
+  Accepted. #4447 is squash `4095cf5a` (single parent).
+- Bulk of the 31 commits is bidirectional-streaming graduation, not security defaults.
+
+## [2026-09-30] ingest | Strands TS SDK event union · modelState · stateful formatter (TASK-010)
+
+Sources: `strands/02-agent-loop.md` §3.2 / §4.2 / §10, `strands/05-providers-and-telemetry.md` §4.1,
+`strands/99-sources.md` §5. Local `strands-harness-sdk` at `a9a62d4e`.
+
+Pages updated (2):
+`concepts/provider-as-data`, `concepts/primary-source-verification`
+
+Notes:
+- `AgentStreamEvent` is a 16-member discriminated union (`strands-ts/src/types/agent.ts:623-639`).
+- `modelState` is snapshotted, passed as a temp `StateStore`, written back after middleware,
+  skipped on throw (`agent.ts:2276-2349`).
+- Stateful Responses formatter resends the full invocation `input` plus `previous_response_id`.
+  No mid-invocation slice. API outcome still ⚠️.
