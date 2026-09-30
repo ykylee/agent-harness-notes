@@ -216,3 +216,16 @@ Notes:
   then the shared resolver still rejects `..` and empty `./` (#46544).
 - Wiki §6 (Agents load path) no longer carries the Codex exception; it lives in §2.1.
 - `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
+
+## [2026-09-30] ingest | GitHub-origin harness-refs checkout (TASK-006)
+
+Sources: `docs/99-sources.md` — this Linux host had no `~/repos/harness-refs/codex`.
+Created `git clone --filter=blob:none https://github.com/openai/codex.git` there.
+At creation HEAD `d42056091a` (one TUI commit past the 09-30 recheck `bcd6d9ab6b`).
+
+Pages updated (2):
+`concepts/primary-source-verification`, `concepts/retained-reasoning`
+
+Notes:
+- origin is `https://github.com/openai/codex.git`. A personal Gitea mirror as origin lags.
+- `retained-reasoning` facts are unchanged (date bump only).

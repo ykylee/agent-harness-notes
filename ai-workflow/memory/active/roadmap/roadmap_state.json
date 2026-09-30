@@ -155,6 +155,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 로드맵 밖 Codex 문서 드리프트 후속",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-005.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-006",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 로컬 참조 클론 정리",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-006.md"
     }
   ],
   "issues": []

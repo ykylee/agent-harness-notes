@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-005 Agents `./` vs Codex `onboardingSkill` / HEAD `bcd6d9ab6b`)
+- Updated: 2026-09-30 (TASK-006 `~/repos/harness-refs/codex` origin GitHub)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
 - TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
@@ -30,7 +31,6 @@
 - TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: done
 - TASK-2026-09-26-main-003 위키 신선도 검사기 오탐 수정: done
-- TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: done
 
 > 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
@@ -69,7 +69,7 @@
 - [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 2026-09-30 HEAD `bcd6d9ab6b` 후속 107 / 10 / 86. 다음 드리프트 기준은 `bcd6d9ab6b`
 - [x] ~~webview 전용 메서드의 수신 엔진~~ — 클라우드 durable 호스트(TASK-2026-09-27-main-001). 남은 것: durable(Aeon) 엔진의 실체·동작은 개통된 계정에서만 관찰 가능
 - [x] ~~`docs/10` L200 Agents API 플러그인 `./` 규칙과 `onboardingSkill` 예외~~ — 두 표면. Agents 는 `./` 강제·필드 없음. Codex overlay 만 `./` 생략 허용 (`resolve_openai_onboarding_skill`, #46544). TASK-2026-09-30-main-005
-- [ ] 참조 체크아웃 `~/repos/harness-refs/codex` 의 `origin` 은 낡은 개인 Gitea 미러다 — 드리프트 점검은 `upstream` 을 fetch 할 것
+- [x] ~~참조 체크아웃 `~/repos/harness-refs/codex` origin~~ — 이 Linux 호스트에는 경로가 없어 GitHub origin 으로 생성 (`blob:none`, HEAD `d42056091a`). 다른 기기에서 origin 이 개인 Gitea 이면 `upstream` 으로 GitHub 를 fetch. TASK-2026-09-30-main-006
 - [x] ~~TASK-003: Agents API 서버측 모델 목록~~ — 2026-09-30 세 표면으로 정착 (unconstrained string / 카탈로그 11 / ModelIdsShared 89). 라이브 POST 는 키 필요
 - [x] ~~TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격~~ — HEAD `bcd6d9ab6b`. `CreateRestrictedToken` / deny ACE / WFP 12 + `INetFwPolicy2` / `CreateDesktopW`. Windows 런타임 미실시
 

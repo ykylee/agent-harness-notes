@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (plugin path-rule split: Agents `./` vs Codex overlay exception; Windows internals and Agents roster kept)
+- Updated: 2026-09-30 (plugin path-rule split kept; `docs/99` records GitHub-origin `~/repos/harness-refs/codex`)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -3,6 +3,7 @@
 Research date: 2026-09-14 (Agents API reference extracted 2026-09-15)
 Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` — see [§E](#e-drift-re-check-2026-09-26).
 Follow-up: 2026-09-30 against HEAD `bcd6d9ab6b` — App Server notifications 86; Agents roster three surfaces; Windows internals source-read.
+Local checkout: `~/repos/harness-refs/codex`, origin `https://github.com/openai/codex.git` (created 2026-09-30; at creation HEAD `d42056091a`, one TUI commit past the recheck).
 
 ## A. Primary sources — verified directly ✅
 
@@ -322,6 +323,14 @@ grep -c 'name: "codex_wfp_' \
   /tmp/openai-codex/codex-rs/windows-sandbox-rs/src/wfp/filter_specs.rs
 grep -n 'PRIVATE_DESKTOP_PREFIX\|CreateDesktopW' \
   /tmp/openai-codex/codex-rs/windows-sandbox-rs/src/desktop.rs | head
+
+# Durable local checkout for drift checks (this Linux host, 2026-09-30).
+# origin MUST be github.com/openai/codex. A personal Gitea mirror as origin
+# (e.g. homelab.ddn777.synology.me) lags — fetch GitHub as `upstream` or
+# repoint origin before counting.
+git -C ~/repos/harness-refs/codex remote get-url origin
+# https://github.com/openai/codex.git
+git -C ~/repos/harness-refs/codex fetch origin
 ```
 
 ## E. Drift re-check, 2026-09-26

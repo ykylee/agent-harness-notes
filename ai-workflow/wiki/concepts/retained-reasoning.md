@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: why retained reasoning is load-bearing design rather than an optimisation, and why it structurally disappears when crossing to Chat Completions.
 - Scope: the mechanism, what Chat Completions lacks, what is actually lost, design consequences
 - Primary sources: `codex-rs/protocol/src/models.rs`, `codex-rs/core/src/client.rs`, the "Codex as a platform" post
-- Updated: 2026-09-30 (re-ingest: `docs/99-sources.md` plugin path-rule split; facts on this page unchanged)
+- Updated: 2026-09-30 (re-ingest: `docs/99-sources.md` GitHub-origin checkout; facts on this page unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 
