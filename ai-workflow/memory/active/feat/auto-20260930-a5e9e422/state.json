@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**조사 축 3곳(Codex · Strands · ACP) 전부 대조 완료, 남은 ⚠️ 0건.** 다음 드리프트",
-    "current_axis": "조사 드리프트 점검 — Codex / Strands / ACP 기존 사실을 1차 출처로 재확인 (main 기준선 계승)",
+    "current_baseline": "**조사 축 4개(Codex · Strands · ACP · Gas Town) 처리 완료, 이 워크스페이스에 남은 ⚠️ 0건.**",
+    "current_axis": "1차 출처 기반 하네스 조사 (드리프트 대조 + 오케스트레이션) — main 기준선 계승",
     "current_focus": "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기",
     "in_progress_items": [],
     "blocked_items": [
@@ -45,11 +45,13 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
-    "task_count": 1,
+    "task_count": 3,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)"
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-002 — Strands · ACP 드리프트 대조 (2차 축)",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-003 — Gas Town 오케스트레이션 기법 조사"
     ]
   },
   "next_documents": [
