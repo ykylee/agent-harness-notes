@@ -196,6 +196,16 @@ Codex types the *thing* being approved as the method name and lets the response 
 amendment (§2). ACP types nothing: **the options are data**, which is why Paseo can put one
 request on four renderers ([07](../../../agent-ux/07-paseo-conductor.md)).
 
+**Re-verified 2026-09-30 evening against `c81fae79`** (7 commits past the `9b26a3ea` pin, +6791 /
+−359): the method and all four option kinds were re-read in `schema/v1/schema.json`, which is
+**byte-identical** across the window. One gate, four kinds — still the whole stable contract.
+
+The same window made **MCP-over-ACP request-scoped** (#2223, `*(unstable)*`): MCP payloads move
+onto the message rather than a standalone exchange. **Whether that changes what a permission
+request can cover is unknown** — the 244 added lines of `docs/protocol/v1/draft/prompt-turn.mdx`
+were not read. The unchanged stable schema is **not** evidence that the two are unrelated; the
+question stays open. [[concepts/primary-source-verification]] §8.2.
+
 **Strands CLI** implements the RPC only on the imported source-agent path. The harness path
 (`createHarness`, default `interventions=None`) never calls it
 ([`strands/06`](../../../strands/06-multi-agent-and-exposure.md) §5.4,

@@ -27,34 +27,36 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "Codex 드리프트 1차 대조 완료. `bcd6d9ab6b` → `92bc601ad6` **8커밋·134파일·+2462/−598**(전부 2026-09-30자)을 소스로 읽었다. **다음 드리프트 기준선은 `92bc601ad6`.**",
+    "current_baseline": "**조사 축 3곳(Codex · Strands · ACP) 전부 1차 대조 완료.** 다음 드리프트 기준선 —",
     "current_axis": "조사 드리프트 점검 — Codex / Strands / ACP 기존 사실을 1차 출처로 재확인 (main 기준선 계승)",
-    "current_focus": "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)",
-    "in_progress_items": [
+    "current_focus": "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기",
+    "in_progress_items": [],
+    "blocked_items": [
+      "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기"
+    ],
+    "planned_items": [],
+    "recent_done_items": [
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-002 — Strands · ACP 드리프트 대조 (2차 축)",
       "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)"
     ],
-    "blocked_items": [],
-    "planned_items": [],
-    "recent_done_items": [],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
     "task_count": 1,
-    "in_progress_items": [
-      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)"
-    ],
+    "in_progress_items": [],
     "blocked_items": [],
-    "done_items": []
+    "done_items": [
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)"
+    ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/session_handoff.md",
     "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
     "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog",
-    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/sessions",
-    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/tasks/TASK-2026-09-30-feat-auto-20260930-a5e9e422-001.md"
+    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/sessions"
   ],
   "repository_assessment": {
     "path": null,

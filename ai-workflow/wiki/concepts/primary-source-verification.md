@@ -237,6 +237,37 @@ The useful shape of that window:
 > never use this path."* The set of actors who may change a goal did not widen. **Reading the
 > field's role in the branch, not in the name, is what separates drift from a new capability.**
 
+### §8.2 A re-check can fail before it starts  {#s8-2-missing-clone}
+
+The Strands and ACP passes on the same evening hit a failure mode the earlier passes never
+recorded, and it is worth keeping because it is cheap to hit and silent if unnoticed.
+
+Both source documents named a **durable local checkout** —
+`~/repos/harness-refs/strands-harness-sdk` and `~/repos/harness-refs/agent-client-protocol` as
+the thing that had been read. **Neither directory existed.** The Strands document even gave the
+origin URL and the `blob:none` detail, so the entry looked verified.
+
+What made it catchable was a step that is easy to skip: *read the provenance line before trusting
+the read.* Both re-checks were then done against temporary clones, and both documents were
+corrected to say the durable path is absent and must be recreated.
+
+- `strands-agents/sdk-python` `a9a62d4e` → **`4dfeca8c`**, 2 commits. The decisive test was
+  negative and cheap: `git diff --name-only … | grep -iE "approval|permission|consent|cedar|sandbox|intervention|harness"`
+  returned **nothing**, so the approval, Cedar fail-open, sandbox-`host` and registration-order
+  findings stand without re-running the probes. Two windows, same conclusion.
+- `agentclientprotocol/agent-client-protocol` `9b26a3ea` → **`c81fae79`**, 7 commits,
+  +6791 / −359. **`schema/v1/schema.json` is byte-identical.** The project's own CHANGELOG marks
+  all three additions `*(unstable)*`, which is the mechanism: **the spec can take a large unstable
+  step without the stable wire moving at all.** A count of changed files would have read as a
+  large protocol change; the stable schema says otherwise.
+
+> 📌 **Read the CHANGELOG before reading the diff.** "All three entries are unstable" is one line
+> and it reclassifies a 6,791-line diff from *drift in the contract* to *drift in the draft*.
+> And when a large unstable change lands near an approval primitive — here MCP-over-ACP became
+> request-scoped — **record it as an open question, not as a null result.** The unchanged stable
+> schema does not license the claim that the two do not interact; that would be an absence of
+> evidence read as evidence of absence, which is this repository's most repeated failure.
+
 ## §9 A document describing behaviour is not evidence of the behaviour  {#s9-doc-vs-code}
 
 Ingested from [`SYNTHESIS.md` §7](../../../SYNTHESIS.md), added after the repository's conclusions

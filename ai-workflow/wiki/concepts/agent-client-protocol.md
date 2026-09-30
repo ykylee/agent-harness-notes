@@ -11,15 +11,15 @@ updated: 2026-09-30
 
 - Purpose: the wire between a code editor (client) and a coding agent (typically a subprocess), as distinct from Codex App Server and from model `WireApi`.
 - Scope: stable `protocolVersion` 1 methods, the permission RPC, session model; Codex and Strands CLI contrasted
-- Primary sources: [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md); spec repo `agentclientprotocol/agent-client-protocol` @ `9b26a3ea`
-- Updated: 2026-09-30 (first ingest)
+- Primary sources: [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md); spec repo `agentclientprotocol/agent-client-protocol` @ `c81fae79` (re-check 2026-09-30 evening; stable schema unchanged)
+- Updated: 2026-09-30 (evening re-check to `c81fae79`: stable schema byte-identical; 3 unstable entries added — subagents RFD, request-scoped MCP-over-ACP, v2 available-commands)
 
 ## §1 TL;DR  {#s1-tldr}
 
 | # | Item | Value |
 |---|---|---|
 | 1 | Wire version | integer `protocolVersion` at `initialize`. **Stable is `1`.** `2` is an unstable draft |
-| 2 | Artifact versions | crate `1.9.1`, `schema-v1.23.0`, SDK `1.3.0`–`1.5.1` — **not** wire versions |
+| 2 | Artifact versions | crate `1.9.1`, `schema-v1.24.0`, SDK `1.3.0`–`1.5.1` — **not** wire versions |
 | 3 | Transport | JSON-RPC 2.0, newline-delimited stdio |
 | 4 | Approval | **one** agent→client method: `session/request_permission` |
 | 5 | Option kinds | `allow_once` · `allow_always` · `reject_once` · `reject_always` |
@@ -50,6 +50,25 @@ The TypeScript SDK's camelCase accessor `requestPermission` sends the hyphenated
 
 Unstable extras (`session/fork`, `providers/*`, `nes/*`, `document/*`, `mcp/message`) live in
 `schema.unstable.json`, not in the stable v1 schema.
+
+**Re-checked 2026-09-30 evening → `c81fae79`** (7 commits past `9b26a3ea`): `schema/v1/schema.json`
+is **byte-identical**, so every line above still holds — including `§4 Permission`, whose one
+method and four option kinds were re-read in the stable schema. `schema-v1.23.0` → `schema-v1.24.0`
+and `2.0.0-alpha.5` → `2.0.0-alpha.6`; **both are artifact versions of wire `1` still.**
+
+Three additions, all tagged `*(unstable)*` in the project's CHANGELOG:
+
+| Entry | Adds | Note |
+|---|---|---|
+| subagents RFD + schema (#1992) | `SubagentSessionCapabilities` · `SubagentUpdate`, keys `subagents` / `mcpServers` | an **RFD** — a proposal, not a decision |
+| MCP-over-ACP becomes request-scoped (#2223) | `MessageMcpRequest` / `MessageMcpResponse`, `McpRequestId` | MCP payloads move onto the message |
+| available commands in session responses (#2259) | — | `*(unstable-v2)*` — v2 only |
+
+> 📌 **The second entry is the open question, and it is not answerable from the diff.** Scoping MCP
+> traffic to a request changes where an approval-relevant payload sits on the wire, yet the
+> stable schema is untouched. This repository has **not** read the 244 added lines of
+> `docs/protocol/v1/draft/prompt-turn.mdx` and therefore makes **no claim** about whether MCP-over-ACP
+> interacts with the permission RPC. Do not infer "it doesn't" from the unchanged schema.
 
 ## §4 Permission  {#s4-permission}
 

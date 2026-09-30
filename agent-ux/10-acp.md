@@ -24,16 +24,24 @@ Official spec: [`agentclientprotocol/agent-client-protocol`](https://github.com/
 (same content as `zed-industries/agent-client-protocol`). Site: <https://agentclientprotocol.com>.
 Official libraries: TypeScript, Python, Rust, Kotlin, Java.
 
-Local clone: `~/repos/harness-refs/agent-client-protocol`, origin
-`https://github.com/agentclientprotocol/agent-client-protocol.git` (`blob:none`). HEAD
-**`9b26a3eaa8d3644c2a899f56171bd25f7a5a884f`** (2026-09-30, `docs: update registry agents (#2258)`).
+Upstream: [`agentclientprotocol/agent-client-protocol`](https://github.com/agentclientprotocol/agent-client-protocol)
+— read via a temporary `blob:none` clone. **No durable local checkout exists** (an earlier
+revision of this file named `~/repos/harness-refs/agent-client-protocol`; that path is absent, and
+the clone was removed after this re-check). Re-create it before the next ACP re-read.
+
+Study pin: **`9b26a3eaa8d3644c2a899f56171bd25f7a5a884f`** (2026-09-30, `docs: update registry agents (#2258)`).
+Re-checked 2026-09-30 evening against **`c81fae79a66b62e6a4c26b20d3ecf0e48b32583d`** — **7 commits**,
+33 files, +6791 / −359. **`schema/v1/schema.json` is byte-identical** (the stable wire did not
+move); everything substantive landed in `schema/v2/schema.json`, `*/schema.unstable.json`, and the
+draft docs. Schema releases moved `schema-v1.23.0` → **`schema-v1.24.0`** and
+`2.0.0-alpha.5` → **`2.0.0-alpha.6`**. **Next baseline: `c81fae79`.**
 
 ## 2. Versioning — three numbers, one wire
 
 | Number | What it is | This read |
 |---|---|---|
 | **`protocolVersion`** | integer exchanged at `initialize`; **the wire version** | **`1` is stable.** `0` is pre-release. `2` exists only behind `unstable_protocol_v2` |
-| Schema / crate release | artifact version for generators (`schema-v1.23.0`, crate `agent-client-protocol-schema` **1.9.1**, repo tag `v1.9.1`) | many schema releases describe the **same** wire version `1` |
+| Schema / crate release | artifact version for generators (`schema-v1.24.0` as of 2026-09-30 evening; crate `agent-client-protocol-schema` **1.9.1**, repo tag `v1.9.1`) | many schema releases describe the **same** wire version `1` |
 | Language SDK | `@agentclientprotocol/sdk` **1.3.0** (Strands CLI pin, 2026-07-21) … latest npm **1.5.1** (2026-09-28) | `PROTOCOL_VERSION = 1` at the 1.3.0 pin (`typescript-sdk` `src/schema/index.ts:320`) |
 
 The spec README states this as a rule: **do not infer wire compatibility from crate or schema
@@ -111,6 +119,21 @@ Generated JSON Schema `schema/v1/schema.json` (`$defs` count 170). Method names 
 
 These are **not** part of wire version 1's stable surface. An SDK pin that lacks them is still
 v1-compatible.
+
+**Added 2026-09-30 (`schema-v1.24.0`, re-check to `c81fae79`)** — three entries, **all marked
+`*(unstable)*` in the project's own CHANGELOG**, which is why the stable schema file did not change:
+
+| # | Entry | PR | What it adds to the unstable surface |
+|---|---|---|---|
+| 1 | Initial RFD and schema for **subagents** | [#1992](https://github.com/agentclientprotocol/agent-client-protocol/pull/1992) | `SubagentSessionCapabilities` · `SubagentCapabilities` · `SubagentUpdate`; new keys `subagents`, `mcpServers`. Design lives in `docs/rfds/subagents.mdx` (+1185 lines) — an RFD, i.e. still a proposal |
+| 2 | **MCP-over-ACP becomes request-scoped** | [#2223](https://github.com/agentclientprotocol/agent-client-protocol/pull/2223) | `MessageMcpRequest` / `MessageMcpResponse`, `McpRequestId`, `McpServerAcpId` — MCP payloads ride the *message* rather than a standalone `mcp/message` exchange |
+| 3 | Return **available commands** in session responses | [#2259](https://github.com/agentclientprotocol/agent-client-protocol/pull/2259) | listed as `*(unstable-v2)*` — v2 only, not in the v1 unstable schema |
+
+> 📌 **Entry 2 is the one to watch on the next re-read.** Moving MCP traffic onto a request-scoped
+> message changes *where* an approval-relevant payload lives on the wire. Whether the permission
+> RPC is affected is **not answerable from this diff** — the stable schema is untouched, and the
+> draft `prompt-turn.mdx` gained 244 lines that were not read for this entry. **Do not carry the
+> claim "MCP-over-ACP does not interact with permission" forward without reading that draft.**
 
 ### 4.4 JS accessor vs wire name
 
