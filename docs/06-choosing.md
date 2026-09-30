@@ -9,7 +9,7 @@
 | Form | CLI | TS/Python library | JSON-RPC process | Managed HTTPS API |
 | Who runs it | Your machine / CI | Your machine | Your machine / container | **OpenAI** |
 | Surface area | Narrow | Medium | **Full** | Full (managed) |
-| Progress streaming | `--json` JSONL | `runStreamed()` | 85 notification types *(2026-09-26: was 84; + `account/gatewayOAuth/changed`, #47207)* | Streaming / webhooks |
+| Progress streaming | `--json` JSONL | `runStreamed()` | 86 notification types *(2026-09-30: was 84 at 2026-09-15, 85 at 2026-09-26)* | Streaming / webhooks |
 | Approval interception | Policy flags only | Policy | **Live, via server requests** | requires_action |
 | Injecting app-owned tools | ✗ | Limited | **`item/tool/call`** | Function calls / MCP |
 | Auth · model discovery · config management | Partial | Partial | **All of it** | Managed |
@@ -64,7 +64,7 @@ Their commentary on the trade-offs:
 - [ ] Opt into only the capabilities you need in `initialize`
       (`experimentalApi` significantly widens the surface — enable it only when you actually use it)
 - [ ] Use `optOutNotificationMethods` to **suppress notifications you don't consume** — you do not
-      need to handle all 85 *(2026-09-26: was 84)*
+      need to handle all 86 *(2026-09-30: was 84 at 2026-09-15, 85 at 2026-09-26)*
 
 ### Rendering
 - [ ] Implement the three-stage pipeline in the UI: `item/started` → render a placeholder

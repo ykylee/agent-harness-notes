@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + strands/99-sources.md + strands/01-overview.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-27
+updated: 2026-09-30
 ---
 
 # Primary-Source Verification — this repository's method of knowing
@@ -12,7 +12,7 @@ updated: 2026-09-27
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-27 (`docs/99` §E.3 — the client-only methods traced to a second engine)
+- Updated: 2026-09-30 (Windows internals and Agents roster settled; durable-engine finding from 2026-09-27 kept)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -157,17 +157,17 @@ The same rule was applied to this repository's own earlier statements.
 | Item | Status |
 |---|---|
 | The claim that `initialize` carries `serverInfo`/`capabilities` | **a refutation kept as a record** |
-| The Windows sandbox internals (ACL/WFP/token/desktop) | **inferred from module names.** [[concepts/os-sandbox-policy]] §6 says so explicitly |
-| Agents API model ids | **narrowed.** The bundled client catalog is confirmed (nine at the snapshot, ten at 2026-09-26); **whether the Agents API's server-side list matches is unverified** — a different surface. Re-checked 2026-09-26: **not answerable from public artifacts** (the spec's `model` is a free string; no models page exists) |
+| The Windows sandbox internals (ACL/WFP/token/desktop) | **settled 2026-09-30.** Source-read at HEAD `bcd6d9ab6b`. [[concepts/os-sandbox-policy]] §6. Runtime on Windows not exercised |
+| Agents API model ids | **settled 2026-09-30.** Agents API `model` is an unconstrained string (no enum). Bundled Codex catalog is 11 entries, all `supported_in_api: true`. Platform `ModelIdsShared` (Chat/Responses, 89 values) is a third roster. They are three surfaces. 2026-09-27 had closed this as unanswerable from public artifacts; the three-surface reading is that settlement |
 
 ## §7 Reproduction  {#s7-reproduction}
 
 ```bash
 # Count the protocol methods yourself
 B=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript
-curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104 at the snapshot, 107 at 2026-09-26 — stable only
+curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 107 stable as of 2026-09-30
 curl -s $B/ServerRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 10
-curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84 (85)
+curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 86 as of 2026-09-30
 
 # Generate locally
 codex app-server generate-ts
@@ -178,12 +178,18 @@ curl -sL https://developers.openai.com/api/docs/guides/agents-api/tools/mcp.md
 
 # Agents API endpoints from the OpenAPI spec
 curl -sL https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -o /tmp/openapi.yaml
+
+# Bundled Codex catalog slugs (11 as of 2026-09-30)
+curl -sL https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); print(len(d["models"]));
+[print(m["slug"], m.get("visibility"), m.get("supported_in_api"), m.get("use_responses_lite")) for m in d["models"]]'
 grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
 ```
 
 ## §8 Shelf life  {#s8-validity}
 
-The Codex study reflects `openai/codex` **as of 2026-09-15**; the browser study reflects 2026-09-22/23.
+The Codex study reflects `openai/codex` **as of 2026-09-15**, with the App Server protocol
+re-counted at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86); the browser study reflects 2026-09-22/23.
 Both move fast. **The first move of a re-investigation is not gathering new facts but checking
 existing facts for drift.**
 

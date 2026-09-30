@@ -1,4 +1,5 @@
-<!-- standard-ai-workflow-kit: v1.10.0 -->
+<!-- standard-ai-workflow-kit: v1.16.0 -->
+<!-- standard-ai-workflow-kit-overlay: plugin-only — 워크플로우 스킬은 플러그인 채널(standard-ai-workflow 1.16.0)로만 소비한다. .claude/commands·skills 의 프로젝트 overlay 사본은 두지 않는다. 두 채널이 같은 스킬을 이중 노출해 정리 (TASK-2026-09-30-main-001) -->
 
 # CLAUDE.md (Claude Code entry point)
 
@@ -6,7 +7,7 @@
 - Scope: session restore, the order to consult workflow state docs, working principles, session close order
 - Audience: Claude Code, repository maintainer, workflow designer
 - Status: beta
-- Last updated: 2026-09-22
+- Last updated: 2026-09-30
 - Related: `ai-workflow/memory/active/<branch>/state.json`, `docs/PROJECT_PROFILE.md`
 
 ## What this file is for
@@ -39,12 +40,15 @@
 the default search scope when exploring project code or project documents — reference it only
 when updating the workflow documents themselves or restoring the current session state.
 
-## Entry slash commands (additive)
+## Plugin skills (standard-ai-workflow 1.16.0)
 
-- `/workflow-session-start` — restore the `state.json` + `session_handoff.md` + `work_backlog.md` baseline
-- `/workflow-backlog-update` — register/update a task + scope-creep warning
-- `/workflow-doc-sync` — sync affected documents (advisory)
-- `/workflow-session-end` — update handoff + backlog and regenerate `state.json` at session close
+Project-local `.claude/commands` / `.claude/skills` copies are not kept. Use the plugin skills:
+
+- `session-start` — restore the `state.json` + `session_handoff.md` + `backlog` baseline
+- `backlog-update` — register/update a task + scope-creep warning
+- `doc-sync` — sync affected documents (advisory)
+- `session-end` — update handoff + backlog and regenerate `state.json` at session close
+- `compact-relay` — record verified / unverified facts and the next step before a context compaction
 
 ## Working Principles
 
@@ -72,13 +76,16 @@ Close a session in the order **update memory → commit → push**. Do not split
 - Sync affected documents (advisory): `wk doc-sync`
 - Regenerate state.json at session close: `wk refresh-state`
 - Roll off handoff §1 baselines when over cap: `wk rollover-baselines`
+- Roll off handoff §5 accumulated notes when over budget: `wk rollover-handoff-notes`
 - Propose memory_index promotion candidates at close (advisory, no write): `wk suggest-memory-entries`
+- Relay working state across a context compaction (skill + hooks): `wk compact-checkpoint`
 
 - When the handoff's `in_progress` / `blocked` lists are empty, leave an **empty bullet `-`**. Prose there is parsed as a work item.
 - Entries in the handoff's recently-completed list start with `TASK-` and never exceed 10.
 - A backlog task's `status` is one of `planned` / `in_progress` / `blocked` / `done`.
 - `state.json` is a **generated artifact** — never hand-edit it. The SSOT is `backlog/tasks/` plus `session_handoff.md`; regenerate with `wk refresh-state` at session close.
 - Handoff §1 baseline lines have a cap. When it is exceeded, **move** the excess with `wk rollover-baselines` — never delete them by hand. That prose exists nowhere else, unlike the recently-done list whose SSOT is `backlog/tasks/`.
+- Handoff §5 accumulated sections (everything outside the declared current-section list) have a byte budget. When it is exceeded, **move** the oldest with `wk rollover-handoff-notes` — rules go to `lessons.md`, other notes to `sessions/`.
 - `session_handoff.md` and the backlog are **inputs to the state.json generator** — writing outside the format silently corrupts state.json.
 
 ## Language and context principles
@@ -93,7 +100,7 @@ Close a session in the order **update memory → commit → push**. Do not split
 ## self-bootstrap (when PURPOSE.md / state.json are absent)
 
 When `state.json` or `PURPOSE.md` is absent, the session-start skill *skips gracefully*.
-When the user invokes `/workflow-session-start` (or on automatic read), it attempts a
+When the user invokes `session-start` (or on automatic read), it attempts a
 *minimum-effort* baseline restore:
 
 1. `ai-workflow/memory/active/<branch>/state.json` missing → offer to scaffold it
@@ -102,17 +109,18 @@ When the user invokes `/workflow-session-start` (or on automatic read), it attem
 
 ## Project run defaults
 
-- **install**: TODO: 설치 명령 입력
-- **run**: TODO: 로컬 실행 명령 입력
-- **quick test**: TODO: 빠른 테스트 명령 입력
-- **isolated test**: TODO: 격리 테스트 명령 입력
-- **smoke check**: TODO: 실행 확인 명령 입력
+These commands come from `docs/PROJECT_PROFILE.md` §3. This is a Markdown research
+repository: there is no install, no local run, and no runtime.
 
-These commands are inferred. Correct them to the project's real commands before committing.
+- **install**: none
+- **run**: none
+- **quick test**: `python3 scripts/check_wiki_freshness.py --show-uncovered`
+- **isolated test**: `grep -rn "](" docs/ browser-agents/ README.md SYNTHESIS.md`
+- **smoke check**: re-fetch a primary source (append `.md` to an OpenAI docs URL; `/llms.txt` is often a full index)
 
 ## Read next
 
 - `ai-workflow/README.md` (kit overview)
 - `docs/PROJECT_PROFILE.md` (project metadata)
 - `ai-workflow/memory/active/<branch>/sessions` (current session handoff)
-- `harnesses/claude-code/apply_guide.md` (Claude Code apply procedure)
+- `ai-workflow/memory/active/PURPOSE.md` (directional intent)

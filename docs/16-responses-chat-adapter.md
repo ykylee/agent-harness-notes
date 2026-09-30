@@ -506,6 +506,7 @@ mapping, this is a correction: in lite mode it is **not droppable** — it *is* 
 | Model | `use_responses_lite` |
 |---|:---:|
 | `gpt-6-astra` | **true** |
+| `gpt-6.1-sol` | **true** — added 2026-09-29 (#49318) |
 | `gpt-6-sol` | **true** — added 2026-09-26 (#47332) |
 | `gpt-6-luna` | **true** — added 2026-09-26 (#47332) |
 | `gpt-5.6-sol` | **true** |
@@ -516,7 +517,7 @@ mapping, this is a correction: in lite mode it is **not droppable** — it *is* 
 | `codex-auto-review` | **true** |
 | `gpt-5.5` | false |
 
-*(2026-09-26: `gpt-5.4` (false) was removed, #47932; `gpt-5.5` is now the only non-lite model.)*
+*(2026-09-26: `gpt-5.4` (false) was removed, #47932. 2026-09-30: catalog is 11 entries; `gpt-5.5` is still the only non-lite model.)*
 
 **Every current-generation model is lite; only the older one uses the classic shape.** Lite is the
 forward direction, so an adapter that handles only the classic shape is writing against the legacy path.

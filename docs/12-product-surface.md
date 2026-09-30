@@ -7,7 +7,8 @@
 > *(2026-09-26: now 107 stable — + the `account/gatewayOAuth/*` trio, #47207 — and 170 including the
 > `#[experimental]` methods that the generated schema omits.)*
 > Source: `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts`.
-> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); generated-schema counts re-read at
+> HEAD `bcd6d9ab6b` (2026-09-30): 107 / 10 / 86.
 
 ## 1. How the surface actually divides
 

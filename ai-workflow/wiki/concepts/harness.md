@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md + strands/01-overview.md + strands/README.md
 related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Harness — the agent execution system
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: what a "harness" is, what sits inside it, and how many layers OpenAI opened of theirs.
 - Scope: definition, internal components, the four-layer opening, what the application owns, the size of the surface
 - Primary sources: the `openai/codex` repository plus the "Codex as a platform" and "Unlocking the Codex harness" posts
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 

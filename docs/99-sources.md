@@ -1,7 +1,8 @@
 # 99. Sources and Verification Status
 
 Research date: 2026-09-14 (Agents API reference extracted 2026-09-15)
-Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` and `openai/openai-openapi@d983890f77` — see [§E](#e-drift-re-check-2026-09-26)
+Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` — see [§E](#e-drift-re-check-2026-09-26).
+Follow-up: 2026-09-30 against HEAD `bcd6d9ab6b` — App Server notifications 86; Agents roster three surfaces; Windows internals source-read.
 
 ## A. Primary sources — verified directly ✅
 
@@ -12,15 +13,35 @@ Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` and `openai/openai-
 | [`openai/codex` README](https://github.com/openai/codex/blob/main/README.md) | Installation, authentication, doc links |
 | [`codex-rs/app-server/README.md`](https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md) | Recent protocol changes, user verification, attachments, plugin settings |
 | [`codex-rs/docs/protocol_v1.md`](https://github.com/openai/codex/blob/main/codex-rs/docs/protocol_v1.md) | The legacy SQ/EQ core protocol |
-| `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts` | **104 stable client methods** (107 at head). Experimental methods are filtered out at generation — 166 in total at baseline, 170 at head (`src/protocol/common.rs`) |
+| `codex-rs/app-server-protocol/schema/typescript/ClientRequest.ts` | **107 stable client methods** as of 2026-09-30 (104 at 2026-09-15). Experimental methods are filtered out at generation (`src/protocol/common.rs`; 170 at 2026-09-26) |
 | `codex-rs/app-server-protocol/schema/typescript/ServerRequest.ts` | **10 server requests** |
-| `codex-rs/app-server-protocol/schema/typescript/ServerNotification.ts` | **84 server notifications** (85 at head). Experimental notifications are **not** filtered |
+| `codex-rs/app-server-protocol/schema/typescript/ServerNotification.ts` | **86 server notifications** as of 2026-09-30 (84 at 2026-09-15, 85 at 2026-09-26). Experimental notifications are **not** filtered |
 | `.../InitializeParams.ts`, `InitializeResponse.ts`, `InitializeCapabilities.ts`, `ClientNotification.ts` | Handshake |
 | `.../v2/ThreadStartParams.ts`, `ThreadStartResponse.ts`, `TurnStartParams.ts`, `TurnStartResponse.ts`, `ThreadItem.ts` | Payloads |
 | [`sdk/typescript/README.md`](https://github.com/openai/codex/blob/main/sdk/typescript/README.md) | Full TS SDK docs |
 | [`sdk/python/README.md`](https://github.com/openai/codex/blob/main/sdk/python/README.md), `docs/getting-started.md` | Full Python SDK docs |
 
 License: **Apache-2.0**
+
+**App Server protocol re-count** — sparse clone of `openai/codex` at HEAD `bcd6d9ab6b`
+(2026-09-30 05:29:56 UTC). Method strings extracted from the generated TypeScript schemas with
+`grep -o '"method": "[^"]*"'`. Additive since 2026-09-15:
+
+| Delta | Methods | Commit |
+|---|---|---|
+| +3 client | `account/gatewayOAuth/read`, `account/gatewayOAuth/login`, `account/gatewayOAuth/cancel` | `064e701b0f` 2026-09-22 #47207 |
+| +0 server requests | the original 10, including the three `*/requestApproval` methods | — |
+| +2 notifications | `account/gatewayOAuth/changed`; `thread/prediction/updated` | `064e701b0f`; `90abcfac02` 2026-09-30 #49480 |
+
+Also new on `initialize.capabilities`: `explicitGatewayOauth`. The prediction commit names
+`thread/prediction/request`; that RPC is unimplemented (method-not-found) and is absent from
+`ClientRequest.ts`.
+
+Needle search of the schema directory for `item/tool/requestOptionPicker`,
+`item/plan/requestImplementation`, and `thread/startAeon`: **0 files**. Public
+`learn.chatgpt.com/docs/app-server.md` fetched 2026-09-30: **0 hits**. Those three names live in
+the ChatGPT/Codex desktop bundle (26.924.22138); they are outside the generated public protocol.
+Recorded in [02 §7.1](02-app-server-protocol.md).
 
 ### OpenAPI spec — authoritative for the Agents API
 
@@ -90,7 +111,7 @@ Base for the guide paths: `https://developers.openai.com/api/docs`.
 |---|---|
 | `codex-rs/model-provider-info/src/lib.rs` | `WireApi`, `ModelProviderInfo`, built-in provider list |
 | `codex-rs/responses-api-proxy/README.md` | Provider-shaped local proxy pattern |
-| `codex-rs/windows-sandbox-rs/src/`, `windows-sandbox-service/src/` | Windows sandbox module map (**inference from the source tree, not prose docs**) |
+| `codex-rs/windows-sandbox-rs/src/`, `windows-sandbox-service/src/` | Windows sandbox internals, source-read 2026-09-30 at HEAD `bcd6d9ab6b` ([14 §6](14-windows-sandbox.md)) |
 | `openai/openai-openapi` `openapi.yaml` | `/vaults` endpoints; `CreateChatCompletionRequest`, `ChatCompletionStreamResponseDelta`, `ModelResponseProperties` |
 | `codex-rs/codex-api/src/common.rs` | `ResponsesApiRequest` — the exact wire payload (17 fields) |
 | `codex-rs/core/src/client.rs` | The constant values Codex fills in (`store: false`, `include`, `tool_choice`) |
@@ -136,13 +157,53 @@ Facts drawn from these are marked "per secondary sources" in the body text.
 
 ### Unverified / conflicting items
 
-> Three entries remain. Two are deliberate records rather than open questions; the third is narrowed below.
+> One entry remains as a record (`initialize`). Agents API model ids and Windows sandbox internals
+> are settled 2026-09-30.
 
 | Item | Status |
 |---|---|
 | Claims that the `initialize` response contains `serverInfo`/`capabilities` | **Wrong.** Per the generated schema, `InitializeResponse` has 4 fields: `userAgent`, `codexHome`, `platformFamily`, `platformOs`. These notes follow the repository |
-| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | **Narrowed.** Both are real slugs in the bundled Codex catalog (`models-manager/models.json`), which carried exactly nine at baseline: `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, `gpt-daybreak-blue-latest`, `gpt-daybreak-red-latest`, `gpt-5.5`, `gpt-5.4`, `codex-auto-review` (ten at head: + `gpt-6-sol`, `gpt-6-luna`, − `gpt-5.4`). What remains unverified is whether the **Agents API** server-side list matches this client catalog — they are separate surfaces. **Re-checked 2026-09-26, still open, and now known to be unanswerable from public artifacts:** the spec's `model` is a free `string` with no enum, no Agents API models page exists (`agents-api/models.md` → 404), and no per-model page lists an Agents row |
-| Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Partly promoted 2026-09-26.** Originally inferred from module names. Reading the module doc comments confirmed `dpapi.rs`, `wfp.rs`, `setup_mutex`, `installation_record`, and **refuted** `hide_users.rs` (it hides the sandbox user's profile directory, not the desktop). Remaining modules are still name-inferred. [14 §6](14-windows-sandbox.md) |
+| Agents API model IDs (`gpt-6-astra`, `gpt-5.6-terra`) | **Settled 2026-09-30.** The Agents API contract is an unconstrained `model` string; official Agents API guides give `gpt-6-astra` as the example slug and enumerate no roster. The bundled Codex catalog is 11 entries (was 9 on 2026-09-15), all `supported_in_api: true`. The platform `ModelIdsShared` enum (Chat/Responses, 89 values) is a different, larger roster. Detail below |
+| Windows sandbox internals (ACL / WFP / token / desktop mechanisms) | **Settled 2026-09-30.** Source-read at HEAD `bcd6d9ab6b`. Token: `CreateRestrictedToken` (`DISABLE_MAX_PRIVILEGE \| LUA_TOKEN \| WRITE_RESTRICTED`). ACL: `SetNamedSecurityInfoW` deny ACEs. Network: 12 persistent WFP `FWP_ACTION_BLOCK` filters plus `INetFwPolicy2` offline-user rules. Desktop: `CreateDesktopW` `CodexSandboxDesktop-*`. `hide_users.rs` is Winlogon login-UI hiding, not desktop isolation. No `audit.rs`. Runtime on Windows was not exercised. [14 §6](14-windows-sandbox.md) |
+
+#### Agents API model roster (2026-09-30)
+
+Three published surfaces. They are not the same list.
+
+**1. Agents API contract** — `CreateAgentParams.model` and `SessionAgentConfigParam.model` in
+`openai/openai-openapi` `openapi.yaml` (fetched 2026-09-30, 3,880,172 bytes) are `type: string`
+with `minLength: 0`, `maxLength: 1048576`, description "The requested model name is preserved."
+No enum, no `$ref` to `ModelIdsShared`. Official Agents API Markdown (overview, quickstart,
+configuration, multi-agent; fetched 2026-09-30) uses `gpt-6-astra` as the example slug and lists
+no other Agents-specific roster.
+
+**2. Bundled Codex catalog** — `codex-rs/models-manager/models.json` (raw `main`, 2026-09-30;
+last catalog commit `b1e72963c3` 2026-09-29, #49318). **11** entries, every one
+`supported_in_api: true`:
+
+| Slug | `visibility` | `use_responses_lite` | Notes |
+|---|---|---|---|
+| `gpt-6-astra` | list | true | Agents API example slug |
+| `gpt-6.1-sol` | list | true | added 2026-09-29 #49318; catalog default |
+| `gpt-6-sol` | list | true | added 2026-09-22 #47332 |
+| `gpt-6-luna` | list | true | added 2026-09-22 #47332 |
+| `gpt-5.6-sol` | list | true | |
+| `gpt-5.6-terra` | list | true | Codex SDK example slug in this study |
+| `gpt-5.6-luna` | list | true | |
+| `gpt-daybreak-blue-latest` | hide | true | |
+| `gpt-daybreak-red-latest` | hide | true | |
+| `gpt-5.5` | list | false | classic Responses shape |
+| `codex-auto-review` | hide | true | absent from `ModelIdsShared` |
+
+`gpt-5.4` left the bundled catalog on 2026-09-24 (`694d8d45bd`). The 2026-09-15 snapshot of nine
+included it.
+
+**3. Platform Chat/Responses enum** — OpenAPI `ModelIdsShared` (89 values, plus an open `string`
+arm). Includes the GPT-6 / 5.6 / 5.5 families and `gpt-5.4` (still present). Daybreak aliases sit
+on `ModelIdsResponses` (Responses-only). Agents schemas do not reference these enums.
+
+`supported_in_api: true` is the client's claim of API eligibility. This environment has no
+`OPENAI_API_KEY`, so a live `POST /v1/agents/sessions` was not exercised.
 
 ### Secondary-source claims, re-checked against the repository
 
@@ -219,20 +280,23 @@ artifact. These notes use **2026-08-19**.
   **Replaced by the OpenAPI spec, which is more precise anyway**
 - `.../guides/agents-api/webhooks.md` and `.../limits.md` — 404; the real paths are
   `.../sessions/webhooks.md`, and limits are distributed across the environment guides
+- Live `POST /v1/agents/sessions` — this environment has no `OPENAI_API_KEY`. Runtime acceptance of
+  a given Agents `model` slug is therefore unpublished here; the published contract is the
+  unconstrained string in the OpenAPI spec
 
 ## D. Reproduction
 
 ```bash
 # Count the protocol methods yourself
 B=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript
-curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 104 (107 at 2026-09-26) — stable only
+curl -s $B/ClientRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 107 stable as of 2026-09-30
 curl -s $B/ServerRequest.ts      | grep -o '"method": "[^"]*"' | wc -l   # 10
-curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 84 (85)
+curl -s $B/ServerNotification.ts | grep -o '"method": "[^"]*"' | wc -l   # 86 as of 2026-09-30
 
 # The full client surface, including experimental methods the schema omits
 S=https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/src/protocol/common.rs
-curl -s $S | awk '/^client_request_definitions! *\{/,/^\}/' | grep -cE '=> "[a-zA-Z/_]+"'   # 170
-curl -s $S | grep -oE '#\[experimental\("[^"]*"\)\]' | sort -u | wc -l                       # 86 tags (63 client requests + 1 server request + 22 notifications)
+curl -s $S | awk '/^client_request_definitions! *\{/,/^\}/' | grep -cE '=> "[a-zA-Z/_]+"'   # 170 at 2026-09-26
+curl -s $S | grep -oE '#\[experimental\("[^"]*"\)\]' | sort -u | wc -l                       # 86 tags at 2026-09-26
 
 # Generate locally
 codex app-server generate-ts
@@ -244,6 +308,20 @@ curl -sL https://developers.openai.com/api/docs/guides/agents-api/tools/mcp.md
 # Agents API endpoints from the OpenAPI spec
 curl -sL https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml -o /tmp/openapi.yaml
 grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
+
+# Bundled Codex catalog slugs
+curl -sL https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); print(len(d["models"]));
+[print(m["slug"], m.get("visibility"), m.get("supported_in_api"), m.get("use_responses_lite")) for m in d["models"]]'
+
+# Windows sandbox internals (source-read; this clone is sparse)
+# CreateRestrictedToken flags, 12 WFP FILTER_SPECS, CreateDesktopW prefix
+grep -n 'DISABLE_MAX_PRIVILEGE | LUA_TOKEN | WRITE_RESTRICTED' \
+  /tmp/openai-codex/codex-rs/windows-sandbox-rs/src/token.rs
+grep -c 'name: "codex_wfp_' \
+  /tmp/openai-codex/codex-rs/windows-sandbox-rs/src/wfp/filter_specs.rs
+grep -n 'PRIVATE_DESKTOP_PREFIX\|CreateDesktopW' \
+  /tmp/openai-codex/codex-rs/windows-sandbox-rs/src/desktop.rs | head
 ```
 
 ## E. Drift re-check, 2026-09-26

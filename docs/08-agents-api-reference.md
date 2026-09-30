@@ -179,7 +179,7 @@ Size limits are in [09-agents-api-environments.md](09-agents-api-environments.md
 
 | Field | Type | Description |
 |---|---|---|
-| `model` | `string` | The requested model name is preserved as given |
+| `model` | `string` | The requested model name is preserved as given. Unconstrained (`minLength: 0`, `maxLength: 1048576`); **no enum** and no `$ref` to `ModelIdsShared`. The Agents API publishes no closed model roster — see [99-sources](99-sources.md) |
 | `instructions` | `string \| null` | Additional instructions **appended to the agent's default base instructions** |
 | `reasoning` | `ReasoningParam \| null` | Omit to keep current settings; `null` resets to the model's default effort |
 | `text` | `TextParam \| null` | Configuration for generated text |

@@ -4,7 +4,7 @@ status: active
 r9_skip: true
 title: Wiki Ingest/Query Log
 related_pages: [index]
-last_touched: 2026-09-22
+last_touched: 2026-09-30
 created: 2026-09-22
 ---
 
@@ -133,3 +133,68 @@ Notes:
   Superset's "approvals are items"); SYNTHESIS §2.7's "on by default" is the property the orchestrators
   lack. Nothing overturned.
 - No display: every visual impression is ⚠️.
+
+
+## [2026-09-30] ingest | App Server protocol re-count (TASK-002)
+
+Sources: `docs/02-app-server-protocol.md`, `docs/99-sources.md`, `docs/12-product-surface.md`,
+`docs/06-choosing.md`, `REPORT.md` — `openai/codex` HEAD `bcd6d9ab6b` (2026-09-30).
+
+Pages updated (7):
+`concepts/thread-turn-item`, `concepts/approval-gate`, `concepts/os-sandbox-policy`,
+`concepts/harness`, `concepts/primary-source-verification`, `concepts/capability-distribution`,
+`concepts/retained-reasoning`
+
+Notes:
+- Counts: `ClientRequest` 104 → **107**, `ServerRequest` **10** (unchanged), `ServerNotification`
+  84 → **86**. Additive: `account/gatewayOAuth/read|login|cancel` + `account/gatewayOAuth/changed`
+  (`064e701b0f`); `thread/prediction/updated` (`90abcfac02`). `thread/prediction/request` is
+  unimplemented (method-not-found) and absent from `ClientRequest`.
+- Approval gate: the generated 10 `ServerRequest` methods are unchanged. Three names in the
+  shipped ChatGPT/Codex client (`item/tool/requestOptionPicker`, `item/plan/requestImplementation`,
+  `thread/startAeon`) are absent from the generated schema and from public `app-server.md` —
+  client-bundle-only, recorded in `docs/02` §7.1. No existing conclusion overturned.
+- `os-sandbox-policy` protocol values and `capability-distribution` plugin RPCs are unchanged.
+  `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
+
+
+## [2026-09-30] ingest | Agents API model roster (TASK-003)
+
+Sources: `docs/99-sources.md`, `docs/08-agents-api-reference.md`, `docs/05-agents-api.md`,
+`docs/15-model-providers.md`, `docs/16-responses-chat-adapter.md` — OpenAPI `openapi.yaml`
+(2026-09-30), Agents API guides, `models.json` @ `b1e72963c3`.
+
+Pages updated (7):
+`concepts/primary-source-verification`, `concepts/wire-protocol-boundary`,
+`concepts/provider-as-data`, `concepts/stateless-conversation-wire`,
+`concepts/control-plane-execution-plane`, `concepts/execution-environment-topology`,
+`concepts/retained-reasoning`
+
+Notes:
+- Agents API `model` is an unconstrained string. Bundled Codex catalog is **11** entries (was 9),
+  all `supported_in_api: true`. Platform `ModelIdsShared` is a 89-value Chat/Responses enum.
+  Three surfaces, not one list. `gpt-5.4` left the bundled catalog 2026-09-24; `gpt-6.1-sol` /
+  `gpt-6-sol` / `gpt-6-luna` were added. Classic-shape catalog slug remaining: `gpt-5.5`.
+- Live Agents session create was not exercised (no API key).
+- `approval-gate` facts unchanged (`docs/05` only gained a model-roster sentence).
+
+## [2026-09-30] ingest | Windows sandbox internals source-read (TASK-004)
+
+Sources: `docs/14-windows-sandbox.md`, `docs/99-sources.md`, `REPORT.md` — `openai/codex`
+HEAD `bcd6d9ab6b` (2026-09-30), `codex-rs/windows-sandbox-rs` and `windows-sandbox-service`.
+
+Pages updated (3):
+`concepts/os-sandbox-policy`, `concepts/primary-source-verification`,
+`concepts/retained-reasoning`
+
+Notes:
+- Module-name inference for ACL / WFP / token / desktop is now **source-read**. Token:
+  `CreateRestrictedToken` (`DISABLE_MAX_PRIVILEGE | LUA_TOKEN | WRITE_RESTRICTED`). ACL:
+  `SetNamedSecurityInfoW` deny ACEs. Network: 12 persistent WFP `FWP_ACTION_BLOCK` filters plus
+  `INetFwPolicy2` offline-user rules. Desktop: `CreateDesktopW` `CodexSandboxDesktop-*`.
+- Corrections to the earlier map: `hide_users.rs` is Winlogon login-UI hiding, not desktop
+  isolation. There is no `audit.rs` (logging is `logging.rs`). Elevated network is WFP **and**
+  Windows Firewall, not WFP alone.
+- Runtime on Windows was not exercised (this host is Linux). Official
+  `learn.chatgpt.com/docs/windows/windows-sandbox.md` still 200.
+- `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).

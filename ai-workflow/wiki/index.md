@@ -49,7 +49,7 @@ two provider rosters.
 
 ### [[concepts/os-sandbox-policy]] {#os-sandbox-policy}
 Four policy values and per-OS mechanisms. Two Windows modes, two independent network switches,
-authority from OS package identity.
+authority from OS package identity. Windows internals source-read 2026-09-30.
 
 ### [[concepts/capability-distribution]] {#capability-distribution}
 Circulating plugins, marketplaces and skills. The vendor-neutral manifest, catalog versus installed

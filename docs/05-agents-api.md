@@ -259,7 +259,7 @@ processing.
   - **container time** for OpenAI-hosted sandboxes
 - Data residency: **US only**
 - **Zero Data Retention is not supported.** Using a self-hosted sandbox does not confer ZDR eligibility
-- Models appearing in the docs' examples: `gpt-6-astra` (SDK examples), `gpt-5.6-terra` (Codex SDK examples)
+- Models appearing in the docs' examples: `gpt-6-astra` (Agents API guides, fetched 2026-09-30), `gpt-5.6-terra` (Codex SDK examples in this study). The Agents API `model` field is an unconstrained string; the bundled Codex catalog is a separate 11-entry list ([99-sources](99-sources.md))
 
 ## 9. How it relates to the open-source harness
 

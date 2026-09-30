@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/16-responses-chat-adapter.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/thread-turn-item]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Stateless Conversation Wire — what `store: false` gives away free
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: why Codex sends conversations to the model completely statelessly, and what that exempts an adapter or proxy from building.
 - Scope: the real request payload, the evidence of statelessness, the design burdens removed, the fields pinned to constants
 - Primary sources: `codex-rs/codex-api/src/common.rs`, `codex-rs/core/src/client.rs`
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 

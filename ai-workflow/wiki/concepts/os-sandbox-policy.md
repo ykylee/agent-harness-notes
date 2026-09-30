@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md
 related_pages: [concepts/approval-gate, concepts/control-plane-execution-plane, concepts/execution-environment-topology, concepts/primary-source-verification, concepts/credential-shielding, concepts/indirect-prompt-injection]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # OS Sandbox Policy — defence inside the execution plane
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (Windows internals source-read at HEAD `bcd6d9ab6b`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -23,7 +23,7 @@ updated: 2026-09-26
 | 3 | Default UI isolation | **a private desktop** — always on; the opt-out was removed 2026-09 |
 | 4 | Network | **two switches** — "is it allowed at all" and "is it constrained by policy" |
 | 5 | Source of authority | **OS package identity.** Never a path or a manifest string |
-| 6 | Basis for the Windows internals | ⚠️ mostly **inferred from module names**; four modules confirmed and one refuted from their doc comments (§6) |
+| 6 | Basis for the Windows internals | **source-read 2026-09-30** at HEAD `bcd6d9ab6b` — Win32 calls in `windows-sandbox-rs`. Runtime on Windows not exercised |
 
 ## §2 Protocol-level policy  {#s2-protocol-policy}
 
@@ -35,6 +35,9 @@ updated: 2026-09-26
 | `externalSandbox` | **the client manages the sandbox itself** |
 
 An optional `networkAccess` setting controls outbound connectivity.
+
+Protocol policy values re-checked 2026-09-30 against `openai/codex` HEAD `bcd6d9ab6b`: the four
+values above are unchanged.
 
 ## §3 Per-OS mechanisms  {#s3-os-mechanisms}
 
@@ -100,28 +103,23 @@ The security documentation also covers DNS rebinding protections, local and priv
 handling, and traffic that escapes the command network proxy — all areas a custom implementation must
 **address explicitly rather than inherit.**
 
-## §6 Implementation structure — labelled as inference  {#s6-implementation}
+## §6 Implementation structure — source-read 2026-09-30  {#s6-implementation}
 
-> ⚠️ **Inference warning**: what follows is read from **module names and layout** in
-> `codex-rs/windows-sandbox-rs` and `windows-sandbox-service`, not from prose documentation. Treat it
-> as **a map of the problem space, not a specification.** The meaning of the grade is in
-> [[concepts/primary-source-verification]]. **2026-09-26:** reading module doc comments confirmed
-> `wfp.rs`, `dpapi.rs`, `setup_mutex.rs`, `installation_record.rs` ✅ and refuted `hide_users.rs` ❌.
+> Re-ingested from [`docs/14`](../../../docs/14-windows-sandbox.md) §6. Official prose names the
+> modes; the Win32 calls are in `windows-sandbox-rs` at HEAD `bcd6d9ab6b`. This environment did not
+> run the sandbox on Windows. Module-layout rows from the 2026-09-26 drift check remain as a map.
 
-| Area | Modules |
-|---|---|
-| Package and process identity | `app_package.rs`, `package_identity.rs`, `service_identity.rs`, `identity.rs` |
-| Token restriction | `token.rs`, `token_user.rs`, `token_groups_tests.rs` |
-| Filesystem ACLs | `acl.rs`, `workspace_acl.rs`, `deny_read_acl.rs`, `deny_read_resolver.rs`, `deny_read_walker.rs`, `file_write.rs` |
-| Symlink / reparse defence | `no_reparse_dir.rs`, `path_normalization.rs` |
-| Network filtering | `wfp.rs` ✅ ("Installs the persistent Codex WFP filters for `account`"), `wfp_setup.rs` |
-| Desktop isolation | `desktop.rs` |
-| Account hygiene | `hide_users.rs` ❌ *not* desktop isolation, as first inferred — it hides the sandbox user's profile directory |
-| Terminals | `conpty/`, `unified_exec/`, `stdio_bridge.rs` |
-| Secret storage | `dpapi.rs` ✅ (`CryptProtectData`; decrypts sandbox-account passwords) |
-| Elevation and setup | `elevated/`, `setup.rs`, `setup_launch.rs`, `setup_provisioning.rs`, `setup_mutex.rs`, `installation_record.rs` |
-| Privileged service | `windows-sandbox-service`: `service.rs`, `ipc.rs`, `provisioning.rs`, `machine_policy.rs`, `package_lifecycle.rs`, `registered_runtime.rs` |
-| Logging | `logging.rs` (`audit.rs` deleted 2026-09, #47943) |
+| Area | Call / object | Source |
+|---|---|---|
+| Token | `CreateRestrictedToken` (`DISABLE_MAX_PRIVILEGE \| LUA_TOKEN \| WRITE_RESTRICTED`); default DACL = logon SID + OWNER RIGHTS `READ_CONTROL`; `SeChangeNotifyPrivilege` restored | `token.rs` |
+| Filesystem ACL | `SetNamedSecurityInfoW` deny ACEs (`FILE_GENERIC_READ` / write+delete mask); lexical **and** canonical deny-read paths; refuse filesystem-root deny | `acl.rs`, `deny_read_acl.rs`, `workspace_acl.rs` |
+| WFP | 12 persistent `FWP_ACTION_BLOCK` filters on sandbox-account SID: ICMP, DNS 53, DoT 853, SMB 445/139 | `wfp.rs`, `wfp/filter_specs.rs` |
+| Windows Firewall | `INetFwPolicy2` offline-user inbound/outbound/loopback rules | `setup_provisioning/firewall.rs` |
+| Private desktop | `CreateDesktopW` `CodexSandboxDesktop-{32 hex}`; startup `Winsta0\<name>` | `desktop.rs` |
+| Login-UI hiding | Winlogon `SpecialAccounts\UserList` — **not** desktop isolation | `hide_users.rs` |
+| Reparse | `OBJ_DONT_REPARSE`; `STATUS_REPARSE_POINT_ENCOUNTERED` is fatal | `no_reparse_dir.rs` |
+| Secrets | `CryptProtectData` machine-scope | `dpapi.rs` |
+| Logging | `logging.rs` (`audit.rs` deleted 2026-09, #47943) | |
 
 Two structural conclusions:
 

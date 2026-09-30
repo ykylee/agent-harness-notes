@@ -53,7 +53,7 @@ binary and protocol, per-language SDKs, and a managed API they operate.
 
 | Requirement | Verdict | Detail |
 |---|---|---|
-| **Full product surface** | Well covered | 104 stable client methods (plus 62 experimental ones the generated schema omits), 10 server requests, 84 notifications — 107 / 85 by 2026-09-26. Only ~20 are the agent loop; ~45 is the minimum for a deployable product |
+| **Full product surface** | Well covered | 107 stable client methods (plus experimental ones the generated schema omits), 10 server requests, 86 notifications as of 2026-09-30 (`bcd6d9ab6b`). Only ~20 are the agent loop; ~45 is the minimum for a deployable product |
 | **Marketplace** | Adopt, don't invent | A vendor-neutral schema exists at `agent-plugins.org`; Codex accepts Claude-compatible manifests. Four source kinds, versioned install cache, per-entry install policy |
 | **Windows sandbox** | Heavier than it looks | `elevated` and `unelevated` modes. The strong mode needs a privileged Windows service — an installer and lifecycle problem |
 | **Third-party models** | First-class | Providers modelled as data. Five built in deliberately; everything else via `model_providers`. Command-backed token minting absorbs most bespoke auth |
@@ -113,7 +113,7 @@ Two widely repeated facts turned out to be wrong, and one disagreement turned ou
 | `initialize` response carries `serverInfo` / `capabilities` | **Refuted** | The generated schema has four fields: user agent, Codex home, platform family, OS |
 | Platform post dated Aug 19 or Aug 20 | **Resolved** | Archive's first capture is 2026-08-19 21:07 UTC. Both sources were right in their own timezone |
 | Two nine-entry sandbox provider lists contradict each other | **Resolved** | Different products: 7 shared, DigitalOcean and OCI are API-only, Unix-local and Docker are SDK-only |
-| Windows sandbox internals (ACL, WFP, token restriction) | **Inferred** | Read from module names in the source tree, not prose docs. Labelled as such throughout |
+| Windows sandbox internals (ACL, WFP, token restriction) | **Settled 2026-09-30** | Source-read: `CreateRestrictedToken`, deny ACEs, 12 WFP filters + `INetFwPolicy2`, `CreateDesktopW`. Runtime on Windows not exercised. [14 §6](docs/14-windows-sandbox.md) |
 
 ## External corroboration: what the browser study confirmed
 
@@ -273,5 +273,6 @@ surface from the client catalog. See [99-sources.md](docs/99-sources.md).
 
 ---
 
-Findings reflect the state of `openai/codex` on 2026-09-15 — a fast-moving repository.
-External corroboration added 2026-09-23. The Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`).
+Findings reflect the state of `openai/codex` on 2026-09-15, with the App Server protocol re-counted
+at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86). External corroboration added 2026-09-23. The
+Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`).

@@ -4,7 +4,8 @@
 > `learn.chatgpt.com/docs/agent-approvals-security.md` (§OS-level sandbox, §Network access),
 > plus the `codex-rs/windows-sandbox-rs` and `codex-rs/windows-sandbox-service` source trees.
 > Extracted 2026-09-15.
-> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); internals source-read at HEAD
+> `bcd6d9ab6b` (2026-09-30).
 
 ## 1. Where Windows sits among the OS sandboxes
 
@@ -127,12 +128,84 @@ explicitly rather than inherit.
 
 ## 6. What the implementation looks like
 
-> **Inference warning**: the following is read from the `codex-rs/windows-sandbox-rs` and
-> `windows-sandbox-service` **source trees** (module names and layout), not from prose documentation.
-> Treat it as a map of the problem space, not as a specification. Rows marked ✅ were confirmed
-> from module doc comments on 2026-09-26; ❌ marks a refuted role.
+> Source-read 2026-09-30 against `codex-rs/windows-sandbox-rs` and `windows-sandbox-service` at
+> `openai/codex` HEAD `bcd6d9ab6b`. Official prose (`windows-sandbox.md`) names the modes and the
+> nouns (dedicated users, ACLs, firewall, restricted token, private desktop). The Win32 calls below
+> are from the Rust sources. This environment did not execute the sandbox on Windows.
+> Drift-checked against `e72da2b538` (2026-09-26); internals promoted 2026-09-30.
 
-The source tree implies these mechanisms:
+### 6.1 Token restriction (`token.rs`)
+
+`CreateRestrictedToken` with flags `DISABLE_MAX_PRIVILEGE | LUA_TOKEN | WRITE_RESTRICTED`. The
+restricting SID list is **capabilities…, extra restricting SIDs…, logon SID, Everyone**. Elevated
+backends also put the dedicated sandbox-account user SID in that list
+(`create_*_token_with_caps_and_user_from`). After creation the token gets:
+
+- a **default DACL** of logon-SID `GENERIC_ALL` plus OWNER RIGHTS (`S-1-3-4`) `READ_CONTROL` only,
+  so a different logon on the same account cannot rewrite the DACL
+- `SeChangeNotifyPrivilege` re-enabled (`AdjustTokenPrivileges`)
+
+This is the `unelevated` path's "restricted Windows token derived from your current user," and the
+elevated path applies the same restriction shape to the dedicated sandbox account.
+
+### 6.2 Filesystem ACLs (`acl.rs`, `workspace_acl.rs`, `deny_read_acl.rs`)
+
+DACLs are read and written with `GetSecurityInfo` / `GetNamedSecurityInfoW` /
+`SetNamedSecurityInfoW` / `SetEntriesInAclW` on `SE_FILE_OBJECT`. Deny ACEs use `DENY_ACCESS`:
+
+- `add_deny_read_ace` — mask `FILE_GENERIC_READ | GENERIC_READ`
+- `add_deny_write_ace` — write data/EA/attributes, `DELETE`, `FILE_DELETE_CHILD`
+
+`workspace_acl` deny-writes `.codex` and `.agents` under the command cwd when those directories
+exist. `deny_read_acl` plans **both the lexical path and the canonical target** (so a reparse cannot
+be read through the resolved location), refuses a filesystem-root deny ACE, and materializes missing
+denied paths as directories before applying the ACE so a later create-then-read cannot skip the
+deny. TrustedInstaller (`S-1-5-80-956008885-…`) is treated as a trusted system owner.
+
+### 6.3 Network: WFP plus Windows Firewall
+
+Two stacks, both real in source.
+
+**Windows Filtering Platform** (`wfp.rs`, `wfp/filter_specs.rs`) — a persistent provider and sublayer
+with Codex-owned GUIDs (`FwpmProviderAdd0` / `FwpmSubLayerAdd0` / `FwpmFilterAdd0`,
+`FWPM_FILTER_FLAG_PERSISTENT`). `install_wfp_filters_for_account` installs **12**
+`FWP_ACTION_BLOCK` filters matched on `FWPM_CONDITION_ALE_USER_ID` for the sandbox account:
+
+| What is blocked | Layers |
+|---|---|
+| ICMP (and ICMPv6) connect + resource assignment | `ALE_AUTH_CONNECT_*`, `ALE_RESOURCE_ASSIGNMENT_*` |
+| DNS TCP/UDP port 53 | `ALE_AUTH_CONNECT_V4/V6` |
+| DNS-over-TLS port 853 | same |
+| SMB ports 445 and 139 | same |
+
+`NAME_RESOLUTION_CACHE` filters are omitted; the comment records `FWP_E_OUT_OF_BOUNDS` during
+validation.
+
+**Windows Firewall** (`setup_provisioning/firewall.rs`) — `INetFwPolicy2` / `INetFwRule3` rules with
+stable names (`codex_sandbox_offline_block_outbound`, inbound, loopback TCP except proxy, loopback
+UDP). This is the "dedicated offline-user firewall rule" in the official `elevated` description.
+
+### 6.4 Private desktop (`desktop.rs`) and account hiding (`hide_users.rs`)
+
+`CreateDesktopW` names `CodexSandboxDesktop-` plus a 32-hex nonce. The process startup desktop is
+`Winsta0\<name>`. The DACL (SDDL) grants the owner user `DESKTOP_ALL_ACCESS` and the sandbox SID
+participant rights **without** `WRITE_DAC` / `WRITE_OWNER` / `DELETE`. Desktops are cached per
+`(sandbox SID, DesktopPolicy)` so GUI hooks do not cross permission policies.
+
+`hide_users.rs` is a **different** control: it writes
+`HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList` so the
+sandbox accounts stay off the login UI, and marks the profile directory hidden+system. It is not
+desktop isolation.
+
+### 6.5 Other confirmed pieces
+
+| Area | Source | Mechanism |
+|---|---|---|
+| Reparse defence | `no_reparse_dir.rs` | directory opens with `OBJ_DONT_REPARSE`; `STATUS_REPARSE_POINT_ENCOUNTERED` is fatal |
+| Secrets | `dpapi.rs` | `CryptProtectData` with `CRYPTPROTECT_UI_FORBIDDEN \| CRYPTPROTECT_LOCAL_MACHINE` so elevated and unelevated processes can decrypt |
+| Logging | `logging.rs` | `audit.rs` was deleted 2026-09 together with the `hide_world_writable_warning` config edit (#47943) |
+
+Module locator (2026-09-26 layout, kept as a map):
 
 | Area | Modules |
 |---|---|
@@ -140,15 +213,15 @@ The source tree implies these mechanisms:
 | Token restriction | `token.rs`, `token_user.rs`, `token_groups_tests.rs` |
 | Filesystem ACLs | `acl.rs`, `workspace_acl.rs`, `deny_read_acl.rs`, `deny_read_resolver.rs`, `deny_read_walker.rs`, `file_write.rs` |
 | Symlink / reparse defense | `no_reparse_dir.rs`, `path_normalization.rs` |
-| Network filtering ✅ | `wfp.rs` ("Installs the persistent Codex WFP filters for `account`"), `wfp_setup.rs` (Windows Filtering Platform) |
+| Network filtering | `wfp.rs`, `wfp_setup.rs`, `setup_provisioning/firewall.rs` |
 | Desktop isolation | `desktop.rs` |
-| Sandbox-account hygiene | `hide_users.rs` — ❌ *(corrected 2026-09-26: not desktop isolation; it "hides the current sandbox user's profile directory", setting HIDDEN\|SYSTEM)* |
+| Login-UI hiding | `hide_users.rs` |
 | Terminals | `conpty/`, `unified_exec/`, `stdio_bridge.rs` |
-| Secret storage ✅ | `dpapi.rs` — `CryptProtectData` wrapper; `identity.rs` uses it to decrypt sandbox-account passwords |
-| Elevation & setup | `elevated/`, `setup.rs`, `setup_launch.rs`, `setup_provisioning.rs`, `setup_mutex.rs` ✅ ("Serializes sandbox account and network changes across setup and uninstall"), `installation_record.rs` ✅ (persists the owner across restarts/updates); added 2026-09-26: `provisioning_client`, `runtime_ownership`, `uninstall_windows/` |
-| Launch environment | `environment_transport.rs`, `launch_environment.rs` — added 2026-09-26 (#47919) |
+| Secret storage | `dpapi.rs` |
+| Elevation & setup | `elevated/`, `setup.rs`, `setup_launch.rs`, `setup_provisioning.rs`, `setup_mutex.rs`, `installation_record.rs`; `provisioning_client`, `runtime_ownership`, `uninstall_windows/` |
+| Launch environment | `environment_transport.rs`, `launch_environment.rs` (#47919) |
 | Privileged service | `windows-sandbox-service`: `service.rs`, `ipc.rs`, `provisioning.rs`, `machine_policy.rs`, `package_lifecycle.rs`, `registered_runtime.rs` |
-| Logging | `logging.rs` *(2026-09-26: `audit.rs` deleted together with the `hide_world_writable_warning` config edit, #47943)* |
+| Logging | `logging.rs` |
 
 Two structural takeaways:
 

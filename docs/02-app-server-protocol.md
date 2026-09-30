@@ -4,7 +4,8 @@
 > (→ learn.chatgpt.com/docs/app-server), the OpenAI engineering blog (2026-02-04), and
 > **the schemas generated in the `openai/codex` repository**
 > (`codex-rs/app-server-protocol/schema/`). Where they disagree, the generated schemas are authoritative.
-> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); changes marked *(2026-09-26)*.
+> Drift-checked against `openai/codex@e72da2b538` (2026-09-26); re-counted at HEAD `bcd6d9ab6b`
+> (2026-09-30): generated `ClientRequest` **107**, `ServerRequest` **10**, `ServerNotification` **86**.
 
 ## 1. Basic shape of the protocol
 
@@ -380,7 +381,7 @@ by the host application**. It is the protocol-level implementation of the divisi
 "your application owns product context, business rules, and tools; Codex provides the agent loop
 and sandboxed execution."
 
-## 8. Server notifications (85)
+## 8. Server notifications (86 as of 2026-09-30; 85 at 2026-09-26)
 
 ### 8.1 Thread lifecycle
 ```

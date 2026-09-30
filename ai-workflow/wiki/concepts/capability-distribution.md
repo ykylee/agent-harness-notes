@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/13-marketplace-and-plugins.md + docs/10-agents-api-tools.md + docs/12-product-surface.md + browser-agents/11-dia-and-neon.md + browser-agents/08-aside-code-level.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/provider-as-data]
 created: 2026-09-22
-updated: 2026-09-26
+updated: 2026-09-30
 ---
 
 # Capability Distribution — how plugins, marketplaces and skills circulate
@@ -12,7 +12,7 @@ updated: 2026-09-26
 - Purpose: how capabilities (skills and MCP) are packaged, distributed, installed and enabled — and what to know before inventing your own format.
 - Scope: the model in a paragraph, the portable manifest, catalog format, the install cache, three verbs, the protocol surface
 - Primary sources: `developers.openai.com/plugins/build/plugins.md`, App Server `ClientRequest`
-- Updated: 2026-09-26 (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 

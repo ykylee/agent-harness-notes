@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-27 (ChatGPT 두 번째 엔진(durable) 추적 / agent-ux 수동 GUI 패스 / TASK-003 결론 종료)
+- Updated: 2026-09-30 (TASK-004 Windows 소스 독해 / overlay plugin-only / HEAD `bcd6d9ab6b` 후속)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,20 +21,18 @@
 
 ## Work Status
 
-- TASK-2026-09-27-main-002 agent-ux GUI 패스 — 설치된 5종 시각 주장 확인: blocked
+- TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
+- TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
+- TASK-2026-09-30-main-003 다른 저장소 workflow overlay plugin-only 위임: done
+- TASK-2026-09-30-main-002 형제 스킬 overlay·캐시 중복 정리: done
+- TASK-2026-09-30-main-001 session-start overlay 중복 정리: done
 - TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
 - TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: done
 - TASK-2026-09-26-main-003 위키 신선도 검사기 오탐 수정: done
 - TASK-2026-09-22-agent-harness-notes-002 openai/codex 드리프트 재확인: done
 - TASK-2026-09-26-main-002 에이전트 도구 UX/UI 디자인 철학·공통 디자인 언어 조사: done
-- TASK-2026-09-26-main-001 Strands Agents 하네스 조사 및 심층 분석: done
-- TASK-2026-09-23-main-015 주입 위협 모델 강조점 재검토: done
-- TASK-2026-09-23-main-014 두 번째 공급자로 주입 결론 검증 및 정정: done
-- TASK-2026-09-23-main-013 주입 — 모델을 넣은 나머지 절반 측정: done
-- TASK-2026-09-23-main-012 주입 방어 실측을 노트 저장소로 편입: done
-- TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: planned
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — main-008~011 (브랜치 병합, 파서 라벨 복구, REPORT 범위 확장, SYNTHESIS 구현 피드백), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -68,12 +66,12 @@
 ## Next Actions
 
 **Codex 조사 (`docs/`)**
-- [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 다음 드리프트 점검 기준은 `e72da2b538` (2026-09-26)
+- [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 2026-09-30 HEAD `bcd6d9ab6b` 후속 107 / 10 / 86. 다음 드리프트 기준은 `bcd6d9ab6b`
 - [x] ~~webview 전용 메서드의 수신 엔진~~ — 클라우드 durable 호스트(TASK-2026-09-27-main-001). 남은 것: durable(Aeon) 엔진의 실체·동작은 개통된 계정에서만 관찰 가능
 - [ ] `docs/10` L200 Agents API 플러그인 `./` 규칙과 새 `onboardingSkill` 예외(`./` 생략 허용)의 관계 미확인
 - [ ] 참조 체크아웃 `~/repos/harness-refs/codex` 의 `origin` 은 낡은 개인 Gitea 미러다 — 드리프트 점검은 `upstream` 을 fetch 할 것
-- [x] ~~TASK-003: Agents API 서버측 모델 목록~~ — 공개 산출물로 결정 불가로 종료. 실측은 Agents API 키로 세션 생성 시도(비용)
-- [ ] TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격
+- [x] ~~TASK-003: Agents API 서버측 모델 목록~~ — 2026-09-30 세 표면으로 정착 (unconstrained string / 카탈로그 11 / ModelIdsShared 89). 라이브 POST 는 키 필요
+- [x] ~~TASK-004: Windows 샌드박스 내부를 모듈명 추론에서 소스 독해로 승격~~ — HEAD `bcd6d9ab6b`. `CreateRestrictedToken` / deny ACE / WFP 12 + `INetFwPolicy2` / `CreateDesktopW`. Windows 런타임 미실시
 
 **브라우저 조사 (`browser-agents/`)**
 - [ ] 검증 비대칭 해소 — Aside 만 바이너리까지 뜯었고 Dia·Neon 은 문서를 믿은 상태다

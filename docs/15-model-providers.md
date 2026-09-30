@@ -177,7 +177,9 @@ return an error **without changing configuration or saved credentials**.
 | `review_model` | Optional model override used by `/review` |
 
 The repo also ships `codex-rs/models-manager/models.json` — a bundled catalog, which is what
-`model_catalog_json` replaces.
+`model_catalog_json` replaces. As of 2026-09-30 that file has **11** entries (was 9 on 2026-09-15);
+all set `supported_in_api: true`. Roster and the Agents API's unconstrained `model` string:
+[99-sources](99-sources.md).
 
 ### A security boundary worth copying
 

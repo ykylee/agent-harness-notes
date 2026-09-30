@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "workflow_kit.common.state.roadmap.generate_roadmap_state",
-  "generated_at": "2026-09-26",
+  "generated_at": "2026-09-30",
   "milestones": [
     {
       "id": "M-001",
@@ -106,6 +106,49 @@
     }
   ],
   "current_milestone_id": null,
-  "exempt_tasks": [],
+  "exempt_tasks": [
+    {
+      "task_id": "TASK-2026-09-22-agent-harness-notes-003",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 기존 사실의 1차 출처 검증",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-22-agent-harness-notes-003.md"
+    },
+    {
+      "task_id": "TASK-2026-09-22-agent-harness-notes-004",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 기존 사실의 1차 출처 검증",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-22-agent-harness-notes-004.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-001",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵(M-001~M-004) 밖 하네스 overlay 운영 정리",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-001.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-002",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 하네스 스킬 채널 정리",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-002.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-003",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 하네스 overlay 운영 정리",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-003.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-004",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 하네스 진입점 갱신",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-004.md"
+    }
+  ],
   "issues": []
 }
