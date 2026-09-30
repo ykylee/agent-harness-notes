@@ -268,6 +268,30 @@ corrected to say the durable path is absent and must be recreated.
 > schema does not license the claim that the two do not interact; that would be an absence of
 > evidence read as evidence of absence, which is this repository's most repeated failure.
 
+**The open question was then closed, and the closure is the second lesson.** `mcp/message` carries
+exactly `serverId` · `requestId` · `method` · `params`. It has no `sessionId`, no `toolCall`, and
+nothing that can hold a `PermissionOption`; `MessageMcpResponse` reserves outer ACP errors for
+"binding and runtime failures", so a refused MCP operation is a *successful* outer RPC wrapping an
+inner error. **The two do not interact — and the reason is the payload's shape, not the unchanged
+stable schema.** The earlier caution was right to refuse an inference, but the answer was available
+one file over, in `draft/schema.mdx`; the 244 lines of `prompt-turn.mdx` that looked like the place
+to look were about subagent transcripts.
+
+- 📌 **Locate the primitive's own schema before reasoning about adjacency.** A change that *sounds*
+  approval-related is only that. Ask what the payload can carry.
+- 📌 **Refusing to conclude is not the same as leaving work open.** "Not answerable from this diff"
+  should route to *a specific file to read*, not to a permanent ⚠️.
+
+And the Strands tag check produced a variant of the same trap in the opposite direction: a
+`blob:none` probe returned nothing for `git tag`, which read as "no new tags" but was really
+"this clone cannot answer that". A durable checkout answered it in one command —
+`harness-cli/v0.1.4-35-ga9a62d4e` → `harness-cli/v0.1.4-37-g4dfeca8c`, confirming no new tag.
+
+> 📌 **Never record a negative result that a thin clone could not have detected.** An empty answer
+> from a partial checkout is indistinguishable from a real null, and this repository's four false
+> "0"s ([§5](#s5-self-corrections)) all had the same shape: the assertion was clean and the
+> delivery path was broken. Recreate the durable checkout, then re-ask.
+
 ## §9 A document describing behaviour is not evidence of the behaviour  {#s9-doc-vs-code}
 
 Ingested from [`SYNTHESIS.md` §7](../../../SYNTHESIS.md), added after the repository's conclusions

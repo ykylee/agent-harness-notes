@@ -9,8 +9,10 @@
 
 ## 1. 현재 작업 요약
 
-- 현재 기준선: **조사 축 3곳(Codex · Strands · ACP) 전부 1차 대조 완료.** 다음 드리프트 기준선 —
-  Codex `92bc601ad6` · Strands `4dfeca8c` · ACP `c81fae79`. **반박 0건.**
+- 현재 기준선: **조사 축 3곳(Codex · Strands · ACP) 전부 대조 완료, 남은 ⚠️ 0건.** 다음 드리프트
+  기준선 — Codex `92bc601ad6` · Strands `4dfeca8c` · ACP `7d794e0e`. **반박 0건.**
+- **정본 참조 클론 2개를 재생성했다** — `~/repos/harness-refs/strands-harness-sdk` (`4dfeca8c74`),
+  `~/repos/harness-refs/agent-client-protocol` (`7d794e0e2d`). 이제 임시 클론이 필요 없다.
 - 현재 주 작업 축: 조사 드리프트 점검 — Codex / Strands / ACP 기존 사실을 1차 출처로 재확인 (main 기준선 계승)
 - 범위 밖(건드리지 않는다): 구현 코드 편입 (PURPOSE §0.1 — 측정만), GUI/기기 관찰, heddle 작업
 
@@ -32,14 +34,9 @@
 
 ## 5. 다음 세션 시작 포인트
 
-- **`~/repos/harness-refs/strands-harness-sdk` 와 `~/repos/harness-refs/agent-client-protocol` 가 없다.**
-  두 문서가 정본 경로로 명시했으나 실재하지 않는다(§6). 임시 클론으로 재대조했고 문서 표기는 정정했다.
-  **다음 재대조 전에 정본 클론을 재생성**하는 게 첫 수 — 없으면 또 임시 클론에 의존한다.
-- **열린 질문 1건 — ACP #2223.** MCP-over-ACP 가 request-scoped 가 되면서 승인 요청이 걸 수 있는 범위가
-  바뀌는가. `docs/protocol/v1/draft/prompt-turn.mdx` +244줄을 읽지 않아 **단정하지 않았다.**
-  `approval-gate` §7.7 에 열린 질문으로 기록됨. 읽으면 닫힌다.
-- **미검증 1건 — Strands 태그/버전.** `strands/99-sources.md` §6.1 에 기재. `blob:none` 클론이라
-  태그 조회가 안 됐다. "새 태그 없음" 은 `a9a62d4e` 까지만 성립.
+- **남은 ⚠️ 가 없다.** ACP #2223(승인과의 관계)과 Strands 태그/버전 모두 해소됐다(§6).
+  조사 축의 다음 수는 새 드리프트가 쌓이는 것 — Codex `92bc601ad6` · Strands `4dfeca8c` ·
+  ACP `7d794e0e` 이후.
 - **`check_wiki_freshness.py` 가 stale 을 알린다 — 고치지 말고 읽어라.** 커밋(`aa528cc`)은
   `--no-verify` 로 근거 있는 concept 2개만 담았다. 나머지는 이번 드리프트와 무관하므로
   내용 변경 없이 남겼다. 이력 모드 판정(`scripts/check_wiki_freshness.py:112` `check_history`)만
@@ -64,12 +61,17 @@
 
 - 위 발견은 **전부 소스 읽기**다. 라이브 앱서버의 `origin` 트레이스, ACP 클라이언트 실동작은
   관찰하지 않았다(⚠️).
-- **ACP #2223 은 열린 질문이다 — 단정하지 말 것.** MCP 페이로드가 message 로 이동하면 승인 요청이
-  걸 수 있는 범위가 바뀔 수 있다. 안정 스키마가 무변경이라는 사실은 **"둘이 무관" 의 근거가 아니다.**
-  근거 부재를 증거로 읽는 것이 이 저장소의 가장 반복된 실패 유형이다.
+- **ACP #2223 은 해소됐다 — 무관하다.** `mcp/message` payload 에 `sessionId`·`toolCall`·
+  `PermissionOption` 을 실을 자리가 없고, `MessageMcpResponse` 는 outer ACP error 를
+  "binding and runtime failures" 로 예약하므로 거절된 MCP 호출은 *성공한* outer RPC 다.
+  **근거는 페이로드의 형태이지 "안정 스키마가 안 바뀌었으므로" 가 아니다** — 후자는 근거 부재를
+  증거로 읽는 것이고, 이 저장소의 가장 반복된 실패 유형이다. 출처는 `draft/schema.mdx`.
+  앞선 세션이 미독으로 남긴 `prompt-turn.mdx` +244줄은 subagent transcript 였다.
+- **얇은 클론에서 나온 부정 결과를 기록하지 말 것.** Strands 태그 ⚠️ 는 `blob:none` 클론이 질의에
+  답하지 못한 것이지 저장소 사실이 아니었다. 정본 클론에서 `v0.1.4-35` → `v0.1.4-37`, 새 태그 없음이
+  확인됐다. `SYNTHESIS.md` §7 의 가짜 0 네 건과 같은 형태다.
 - **`check_wiki_freshness.py` 의 stale 은 새 누락이 아니다**(§5). 커밋 방식의 산물이며,
   근거 없는 concept 갱신으로 메우면 개념 축이 오염된다.
 - `model_catalog_in_context` 는 providers-as-data 축에 어떻게 붙는지 판단하지 않았다. §2.3 의
   "공유 wire 전제" 한정과 관계가 있을 수 있으나 **미분석**.
-- Strands 태그/버전은 `4dfeca8c` 에서 재확인되지 않았다(§6.1).
 - main 브랜치의 `TASK-2026-09-27-main-002`(agent-ux GUI 패스)는 이 워크스페이스에 넘어오지 않았다.

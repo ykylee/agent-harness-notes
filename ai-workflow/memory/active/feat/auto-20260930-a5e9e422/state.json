@@ -27,7 +27,7 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**조사 축 3곳(Codex · Strands · ACP) 전부 1차 대조 완료.** 다음 드리프트 기준선 —",
+    "current_baseline": "**조사 축 3곳(Codex · Strands · ACP) 전부 대조 완료, 남은 ⚠️ 0건.** 다음 드리프트",
     "current_axis": "조사 드리프트 점검 — Codex / Strands / ACP 기존 사실을 1차 출처로 재확인 (main 기준선 계승)",
     "current_focus": "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기",
     "in_progress_items": [],
