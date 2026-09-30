@@ -45,7 +45,13 @@ crossing to Chat Completions.
 
 ### [[concepts/control-plane-execution-plane]] {#control-plane-execution-plane}
 Separating the harness (loop, routing) from compute (files, commands), and the key separation that
-boundary forces.
+boundary forces. §5.6 sharpens it to a **credential** boundary: control channel vs untrusted
+execution.
+
+### [[concepts/multi-agent-orchestration]] {#multi-agent-orchestration}
+The layer *above* a harness. Durable work ledgers, persistent identity vs ephemeral session,
+capacity-capped dispatch, two-channel liveness, and stateless coordination (no agent holds the
+thread). Source-read from Gas Town; **not executed**.
 
 ### [[concepts/execution-environment-topology]] {#execution-environment-topology}
 `none` / `openai_hosted` / `self_hosted`, the file-artifact asymmetry, the self-hosted lifecycle, the

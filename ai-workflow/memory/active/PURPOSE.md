@@ -77,6 +77,42 @@ Two boundaries hold:
 - Updated: 2026-09-23
 - Related: [PROJECT_PROFILE.md](../../../docs/PROJECT_PROFILE.md), [99-sources.md](../../../docs/99-sources.md), [SYNTHESIS.md](../../../SYNTHESIS.md)
 
+## 0.3 Scope extension, 2026-09-30 — above the harness: orchestrating many of them
+
+The four studies read **one** harness at a time, and the primitive unit has been a single agent
+loop. That is no longer the whole problem. Operators now run **20–30 agent instances in parallel
+against the same repository**, and the hard questions move up a level: who assigns work, where the
+work state lives when a session dies, how two agents avoid colliding, and how you tell "running"
+apart from "done".
+
+Gas Town (Steve Yegge, `gastownhall/gastown`, MIT) is the most developed public answer, and it is
+worth this repository's attention for a specific reason: **it is an orchestration layer over the
+harness instances the other four studies examine.** It does not reimplement an agent loop — it
+schedules, attributes and reconciles them. That makes its abstractions a direct test of this
+repository's concept layer rather than a fourth parallel subject.
+
+Two reasons it belongs here rather than in a separate repository:
+
+1. **It touches primitives already recorded here.** The control/execution plane split in its
+   sandbox design is the same axis as the Codex Windows sandbox and the Strands `sandbox: host`
+   default. Its "hysteresis" argument — a coordinating agent loses the thread at compaction — is
+   the same failure this repository already documents as context-window drift in `SYNTHESIS.md` §6.
+2. **It is the only case here with a persistence layer that is not the agent's own context.**
+   Durable work state in a git-backed ledger is a different answer to the same problem the
+   App Server `ThreadGoal` provenance work (§`docs/02` §9) approaches from the other side.
+
+**What is admitted is the design, not the endorsement.** Gas Town is one team's operating model
+with one set of trade-offs (cost, chaos, a large operational surface). It is read as *a* design
+with evidence, in the same graded way as everything else here: source-read claims are ✅, marketing
+comparisons ("Kubernetes for AI agents") are 📣 and are not adopted.
+
+Added: **`gas-town/`** — concepts, architecture, orchestration techniques, and a mapping onto this
+repository's existing axes. A dedicated knowledge entry lives in the wiki concept layer
+(`ai-workflow/wiki/concepts/multi-agent-orchestration.md`).
+
+The boundary to hold: **study the orchestration, do not adopt the tool.** No Gas Town binary
+enters this repository's workflow, and nothing in `ai-workflow/` is reorganised to imitate it.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -126,6 +162,10 @@ Two boundaries hold:
   loop, approval primitive, providers, execution environment, as read from source and design documents
 - **UX/UI of agent client tools** — how harness primitives are rendered, stated design philosophy,
   and the shared design language (`agent-ux/`, 2026-09-26, §0.2)
+- **Multi-agent orchestration over harness instances** — how one operator drives many agent
+  sessions at once: persistent work ledgers, identity and attribution, dispatch under a
+  capacity cap, and the control/execution plane split (`gas-town/`, 2026-09-30, §0.3).
+  Read as an orchestration study, not as a product review.
 - **The axes shared by agent harnesses generally** — the concept layer
   (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)
 

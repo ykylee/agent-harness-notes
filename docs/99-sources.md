@@ -3,6 +3,7 @@
 Research date: 2026-09-14 (Agents API reference extracted 2026-09-15)
 Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` — see [§E](#e-drift-re-check-2026-09-26).
 Follow-up: 2026-09-30 against HEAD `bcd6d9ab6b` — App Server notifications 86; Agents roster three surfaces; Windows internals source-read.
+Second follow-up: 2026-09-30 against HEAD `92bc601ad6` — goal API `origin` field; Guardian skill-warmup skip; `model_catalog_in_context` ([§E.5](#e5-drift-re-check-2026-09-30-afternoon--bcd6d9ab6b--92bc601ad6)).
 Local checkout: `~/repos/harness-refs/codex`, origin `https://github.com/openai/codex.git` (created 2026-09-30; at creation HEAD `d42056091a`, one TUI commit past the recheck).
 
 ## A. Primary sources — verified directly ✅
@@ -453,3 +454,43 @@ Summarised; details are inline in each doc.
   `./` (#46544, `resolve_openai_onboarding_skill` prepends the prefix then the shared resolver
   still rejects `..`). Agents API packaging (`skills` / `mcpServers`) still requires `./`; live
   Agents `plugins.md` has no `onboardingSkill`.
+
+### E.5 Drift re-check, 2026-09-30 (afternoon) — `bcd6d9ab6b` → `92bc601ad6`
+
+8 commits, 134 files, +2462 / −598, all authored 2026-09-30. Sparse checkout at
+`~/repos/harness-refs/codex`. **No refutation** — nothing previously recorded was wrong; two
+drifts and one research-axis item. Method counts (107 stable / 170 experimental, 86 notifications,
+10 server requests) were re-checked and are **unchanged**.
+
+- **Protocol — new `origin` field on the goal API (#49598).** `thread/goal/set` and
+  `thread/goal/clear` params gain `origin: ThreadGoalMutationOrigin` (`user` | `automatic`).
+  Confirmed in the Rust definition (`app-server-protocol/src/protocol/v2/thread.rs:849`) **and** in
+  the generated Python SDK (`v2_all.py` — `ThreadGoalSetParams`, `ThreadGoalClearParams`), so this
+  is on the wire, not internal. The generated field description states the contract: *"Missing
+  provenance does not supply user authorization."* Server behaviour: a user fragment is recorded
+  into model history only when `origin === user` and `objective`/`status` is present
+  (`thread_goal_processor.rs:199`, `:303`); other combinations still mutate goal state and leave
+  history alone. `thread_goal_user_context.rs:2` — *"tool-created goals never use this path."*
+  **Read as a provenance discriminator, not a new permission**: the goal API did not widen.
+  Recorded in [02 §9](02-app-server-protocol.md).
+- **Approval gate — availability is a separate axis from correctness (#49584).** Guardian does not
+  consume skills, but host skill/plugin discovery could block its startup or turn creation when the
+  primary executor is offline. Both the warmup (`core/src/session/session.rs`) and the per-turn
+  snapshot (`core/src/session/turn_context.rs`) now short-circuit on `is_basic_session_source`. The
+  regression test disconnects the primary executor and asserts Guardian still **denies** a network
+  permission request — i.e. the gate's availability was fixed without weakening the gate.
+- **Research axis — `model_catalog_in_context` (#49560), disabled by default.** With the opt-in on
+  for multi-agent V1/V2, model listings move out of the `spawn_agent` tool description into
+  developer `<model_catalog>` messages, bounded to 1,000 bytes, with picker-visible compatible
+  models plus descriptions, reasoning efforts and service tiers. Listings append only when rendered
+  content changes. Relevant to the providers-as-data axis; **not yet analysed in `SYNTHESIS.md`.**
+- **Not recorded (deliberately).** `d42056091a` TUI fork shortcut (`f`, `agents.fork`) and
+  `0b43721d8d` TUI copy treating rendered file targets as plain text are TUI-local ergonomics with
+  no client-visible contract change. Four further commits (`de02016798`, `d7b0d4aa66`,
+  `92bc601ad6`, `1fc8d54807`) are thread-store internals plus one test-isolation fix — the history
+  snapshot work is real but is not part of the protocol surface.
+- **Verification status.** Source-read ✅ across protocol definitions, server processors and the
+  generated SDK. Live App Server traffic for the new `origin` field ⚠️ **not observed** — the
+  behavioural description above is read from the server's own branching, not from a trace.
+
+**Next drift baseline: `92bc601ad6`.**

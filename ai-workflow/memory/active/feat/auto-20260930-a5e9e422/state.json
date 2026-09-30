@@ -1,0 +1,69 @@
+{
+  "schema_version": "1",
+  "generated_at": "2026-09-30",
+  "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
+  "purpose_digest_rev": "2026-09-26",
+  "source_of_truth": {
+    "project_profile_path": "docs/PROJECT_PROFILE.md",
+    "session_handoff_path": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/session_handoff.md",
+    "work_backlog_index_path": null,
+    "daily_backlog_dir": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog",
+    "tasks_dir": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/tasks",
+    "sessions_dir": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/sessions",
+    "latest_backlog_path": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
+    "repository_assessment_path": null
+  },
+  "project": {
+    "project_name": "Codex Harness — Study Notes",
+    "document_home": "README.md` · Codex study: `docs/` (16 documents)",
+    "operations_path": "ai-workflow/memory/active/",
+    "backlog_path": "ai-workflow/memory/active/<branch>/backlog/",
+    "handoff_path": "ai-workflow/memory/active/<branch>/session_handoff.md",
+    "environment_path": "ai-workflow/memory/active/repository_assessment.md"
+  },
+  "commands": {
+    "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept",
+    "isolated_tests": "grep -rn \"](\" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken",
+    "runtime_checks": null
+  },
+  "session": {
+    "current_baseline": "**조사 축 4개(Codex · Strands · ACP · Gas Town) 처리 완료, 이 워크스페이스에 남은 ⚠️ 0건.**",
+    "current_axis": "1차 출처 기반 하네스 조사 (드리프트 대조 + 오케스트레이션) — main 기준선 계승",
+    "current_focus": "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기",
+    "in_progress_items": [],
+    "blocked_items": [
+      "TASK-2026-09-27-main-002 (main 워크스페이스 소관) — agent-ux GUI 패스, 앱별 스크래치 프로젝트 지정 대기"
+    ],
+    "planned_items": [],
+    "recent_done_items": [
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-003 — Gas Town 오케스트레이션 기법 조사",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-002 — Strands · ACP 드리프트 대조 (2차 축)",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)"
+    ],
+    "unknown_status_items": [],
+    "environment_constraints": []
+  },
+  "backlog": {
+    "latest_backlog_path": "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
+    "task_count": 3,
+    "in_progress_items": [],
+    "blocked_items": [],
+    "done_items": [
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 2026-09-30 이후 드리프트 대조 (bcd6d9ab6b 이후)",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-002 — Strands · ACP 드리프트 대조 (2차 축)",
+      "TASK-2026-09-30-feat-auto-20260930-a5e9e422-003 — Gas Town 오케스트레이션 기법 조사"
+    ]
+  },
+  "next_documents": [
+    "docs/PROJECT_PROFILE.md",
+    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/session_handoff.md",
+    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog/2026-09-30.md",
+    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/backlog",
+    "ai-workflow/memory/active/feat/auto-20260930-a5e9e422/sessions"
+  ],
+  "repository_assessment": {
+    "path": null,
+    "present": false
+  },
+  "schema_version_memory_entries": "2"
+}

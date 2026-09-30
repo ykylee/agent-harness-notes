@@ -204,9 +204,93 @@ grep -nE '^  /(agents|vaults)' /tmp/openapi.yaml
 ## §8 Shelf life  {#s8-validity}
 
 The Codex study reflects `openai/codex` **as of 2026-09-15**, with the App Server protocol
-re-counted at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86); the browser study reflects 2026-09-22/23.
+re-counted at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86) and re-checked again the same
+afternoon at `92bc601ad6` (**counts unchanged**); the browser study reflects 2026-09-22/23.
 Both move fast. **The first move of a re-investigation is not gathering new facts but checking
 existing facts for drift.**
+
+### §8.1 What an 8-commit window actually contains  {#s8-1-eight-commit-window}
+
+Re-check `bcd6d9ab6b` → `92bc601ad6`: 8 commits, 134 files, +2462 / −598, all authored on
+2026-09-30. **Zero refutations** — nothing previously recorded turned out to be wrong — and two
+drifts. Recorded in [`docs/99-sources.md` §E.5](../../../docs/99-sources.md).
+
+The useful shape of that window:
+
+- **One client-visible contract change** in 134 files. `thread/goal/set` and `thread/goal/clear`
+  params gained `origin` (`user` | `automatic`). Confirmed in **both** the Rust protocol
+  definition and the *generated* Python SDK, which is the check that matters: a field that appears
+  only in the hand-written schema has not been proven to be on the wire.
+- **One change that reads like a security loosening and is not.** Guardian now skips host
+  skill/plugin discovery. The reason is availability — discovery could block Guardian's startup when
+  the primary executor is offline — and the regression test disconnects that executor and asserts
+  Guardian still **denies** a network permission request. **The gate's availability and its
+  correctness are separate axes**; fixing one did not weaken the other.
+- **Six commits with no client-visible contract** (TUI ergonomics, thread-store internals, one
+  test-isolation fix) — more than half the window. Counting commits would have overstated the
+  drift by 3×.
+
+> 📌 **A field named like an authorization flag may not be one.** `origin` reads as a permission,
+> and the generated description does say *"Missing provenance does not supply user
+> authorization."* But the server only uses it to decide **whether to write a user fragment into
+> model history**; `thread_goal_user_context.rs` states the boundary outright — *"tool-created goals
+> never use this path."* The set of actors who may change a goal did not widen. **Reading the
+> field's role in the branch, not in the name, is what separates drift from a new capability.**
+
+### §8.2 A re-check can fail before it starts  {#s8-2-missing-clone}
+
+The Strands and ACP passes on the same evening hit a failure mode the earlier passes never
+recorded, and it is worth keeping because it is cheap to hit and silent if unnoticed.
+
+Both source documents named a **durable local checkout** —
+`~/repos/harness-refs/strands-harness-sdk` and `~/repos/harness-refs/agent-client-protocol` as
+the thing that had been read. **Neither directory existed.** The Strands document even gave the
+origin URL and the `blob:none` detail, so the entry looked verified.
+
+What made it catchable was a step that is easy to skip: *read the provenance line before trusting
+the read.* Both re-checks were then done against temporary clones, and both documents were
+corrected to say the durable path is absent and must be recreated.
+
+- `strands-agents/sdk-python` `a9a62d4e` → **`4dfeca8c`**, 2 commits. The decisive test was
+  negative and cheap: `git diff --name-only … | grep -iE "approval|permission|consent|cedar|sandbox|intervention|harness"`
+  returned **nothing**, so the approval, Cedar fail-open, sandbox-`host` and registration-order
+  findings stand without re-running the probes. Two windows, same conclusion.
+- `agentclientprotocol/agent-client-protocol` `9b26a3ea` → **`c81fae79`**, 7 commits,
+  +6791 / −359. **`schema/v1/schema.json` is byte-identical.** The project's own CHANGELOG marks
+  all three additions `*(unstable)*`, which is the mechanism: **the spec can take a large unstable
+  step without the stable wire moving at all.** A count of changed files would have read as a
+  large protocol change; the stable schema says otherwise.
+
+> 📌 **Read the CHANGELOG before reading the diff.** "All three entries are unstable" is one line
+> and it reclassifies a 6,791-line diff from *drift in the contract* to *drift in the draft*.
+> And when a large unstable change lands near an approval primitive — here MCP-over-ACP became
+> request-scoped — **record it as an open question, not as a null result.** The unchanged stable
+> schema does not license the claim that the two do not interact; that would be an absence of
+> evidence read as evidence of absence, which is this repository's most repeated failure.
+
+**The open question was then closed, and the closure is the second lesson.** `mcp/message` carries
+exactly `serverId` · `requestId` · `method` · `params`. It has no `sessionId`, no `toolCall`, and
+nothing that can hold a `PermissionOption`; `MessageMcpResponse` reserves outer ACP errors for
+"binding and runtime failures", so a refused MCP operation is a *successful* outer RPC wrapping an
+inner error. **The two do not interact — and the reason is the payload's shape, not the unchanged
+stable schema.** The earlier caution was right to refuse an inference, but the answer was available
+one file over, in `draft/schema.mdx`; the 244 lines of `prompt-turn.mdx` that looked like the place
+to look were about subagent transcripts.
+
+- 📌 **Locate the primitive's own schema before reasoning about adjacency.** A change that *sounds*
+  approval-related is only that. Ask what the payload can carry.
+- 📌 **Refusing to conclude is not the same as leaving work open.** "Not answerable from this diff"
+  should route to *a specific file to read*, not to a permanent ⚠️.
+
+And the Strands tag check produced a variant of the same trap in the opposite direction: a
+`blob:none` probe returned nothing for `git tag`, which read as "no new tags" but was really
+"this clone cannot answer that". A durable checkout answered it in one command —
+`harness-cli/v0.1.4-35-ga9a62d4e` → `harness-cli/v0.1.4-37-g4dfeca8c`, confirming no new tag.
+
+> 📌 **Never record a negative result that a thin clone could not have detected.** An empty answer
+> from a partial checkout is indistinguishable from a real null, and this repository's four false
+> "0"s ([§5](#s5-self-corrections)) all had the same shape: the assertion was clean and the
+> delivery path was broken. Recreate the durable checkout, then re-ask.
 
 ## §9 A document describing behaviour is not evidence of the behaviour  {#s9-doc-vs-code}
 

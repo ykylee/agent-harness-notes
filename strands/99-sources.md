@@ -27,12 +27,14 @@
 | Repository | Commit | Date | Notes |
 |---|---|---|---|
 | **`strands-agents/harness-sdk`** | **`15da9dc`** | 2026-09-25 | the study pin; `git clone …/sdk-python` lands here (renamed). Original read was a shallow clone, depth 50 |
-| same, recheck | **`a9a62d4e`** | 2026-09-29 | 31 commits past the pin. Local checkout `~/repos/harness-refs/strands-harness-sdk`, origin `https://github.com/strands-agents/sdk-python.git` (`blob:none`, full history). No new SDK/harness tags |
+| same, recheck | **`a9a62d4e`** | 2026-09-29 | 31 commits past the pin. No new SDK/harness tags |
+| same, recheck 2 | **`4dfeca8c`** | 2026-09-30 | **2 commits** past `a9a62d4e`, 24 files, +229 / −227 — `4dfeca8c` bidi reconnect → **restart** refactor (`_reconnect_timer.py` → `_restart_timer.py`, `agent/loop.py` 80 lines) and a prettier bump in `/site`. **Zero** files touch approval, permission, consent, Cedar, sandbox, intervention, or `harness` — `git diff --name-only … \| grep -iE "approval\|permission\|consent\|cedar\|sandbox\|intervention\|harness"` returns nothing. **The P1–P5 approval findings from the empty-diff pass still stand unrefuted; no re-run is warranted.** **Durable checkout `~/repos/harness-refs/strands-harness-sdk` has been recreated** (it was absent when this re-check began, despite the 2026-09-30 entry naming it as the place the study was read from). **Next baseline: `4dfeca8c`.** |
 | `strands-agents/tools` | `8c82c29` | 2026-09-21 | community tool package; consent prompts |
 | `strands-agents/samples` | `11dd549` | 2026-09-21 | still separate |
 | `strands-agents/agent-builder` | `136b6f9` | 2026-05-12 | not analysed beyond existence |
 | `strands-agents/docs` · `sdk-typescript` · `mcp-server` | — | archived 2026-06-02 / 2026-06-02 / 2026-07-27 | archive notices read |
-| **`agentclientprotocol/agent-client-protocol`** | **`9b26a3ea`** | 2026-09-30 | ACP spec + `schema/v1/schema.json`. Local `~/repos/harness-refs/agent-client-protocol`. Engine-side notes in [`agent-ux/10`](../agent-ux/10-acp.md) |
+| **`agentclientprotocol/agent-client-protocol`** | **`9b26a3ea`** | 2026-09-30 | ACP spec + `schema/v1/schema.json`. Engine-side notes in [`agent-ux/10`](../agent-ux/10-acp.md) |
+| same, recheck | **`c81fae79`** | 2026-09-30 | 7 commits, 33 files, +6791 / −359. **`schema/v1/schema.json` byte-identical** — the stable wire and the permission RPC (one method, four option kinds) did not move. All three CHANGELOG entries are `*(unstable)*`; `schema-v1.24.0` / `2.0.0-alpha.6`. **Durable checkout `~/repos/harness-refs/agent-client-protocol` recreated** (it was absent when this re-check began). Baseline then moved again to `7d794e0e` (docs only, #2263). **Next baseline: `7d794e0e`.** |
 | `@agentclientprotocol/sdk` **1.3.0** | tag `v1.3.0` / git `fa325709` | 2026-07-21 | Strands CLI pin. `PROTOCOL_VERSION = 1`; wire method `session/request_permission` |
 
 Inside the monorepo:
@@ -150,11 +152,13 @@ Claims are quoted from the source named; the contradicting code is cited in the 
 ## 6. Drift re-check 2026-09-30
 
 Range: `15da9dc` (2026-09-25, `python/v1.57.1`) → HEAD `a9a62d4e` (2026-09-29 19:26:59 −0400,
-`refactor(bidi): make tool execution internals private (#4708)`). **31 commits.** Local checkout
-`~/repos/harness-refs/strands-harness-sdk`, origin `https://github.com/strands-agents/sdk-python.git`
-(`blob:none`). `git describe` `harness-cli/v0.1.4-35-ga9a62d4e`.
+`refactor(bidi): make tool execution internals private (#4708)`). **31 commits.** Read from a
+`blob:none` clone of `https://github.com/strands-agents/sdk-python.git`; `git describe`
+`harness-cli/v0.1.4-35-ga9a62d4e`. **The durable checkout `~/repos/harness-refs/strands-harness-sdk`
+named in an earlier revision of this file was absent when the re-check began; it has since been
+recreated** — see §6.1.
 
-No new version tags. Still Python SDK **1.57.1**, TypeScript SDK **1.19.0**, harness **0.1.x**
+No new version tags — **re-confirmed at `4dfeca8c`** (§6.1). Still Python SDK **1.57.1**, TypeScript SDK **1.19.0**, harness **0.1.x**
 (`harness-python/v0.1.2`, `harness-typescript/v0.1.1`, CLI pin `~0.1.1`). The `cedar` extra bumped
 `cedar-policy-mcp-schema-generator` 0.6.0 → 0.6.1 (#4650); evaluation code is untouched.
 
@@ -192,3 +196,43 @@ What moved, and is **not** a security-default change:
 R1–R18 and R20 are unchanged. R19's contradicting README sentence is gone; the two Accepted
 designs remain. §5 items other than #4447's arrival shape are still unverified — including the
 TypeScript details this study delegated.
+
+### 6.1 Same evening, second pass — `a9a62d4e` → `4dfeca8c`
+
+**2 commits**, 24 files, +229 / −227. The whole window is one refactor plus a docs dependency bump:
+
+| Change | Commit | Touches a security default? |
+|---|---|---|
+| Bidi connection restart path: `reconnect` → **`restart`** used consistently (`_reconnect_timer.py` → `_restart_timer.py`; `bidi/agent/loop.py` 80 lines, `models/{bedrock,google,openai}.py`, `types/events.py`, `hooks/events.py`) | `4dfeca8c` (#4734) | **No** |
+| Prettier `3.9.8` → `3.9.9` under `/site` | `9f0690f1` (#4644) | **No** — docs only |
+
+The decisive check for this repository's claims was the negative one:
+
+```
+git diff --name-only a9a62d4e..HEAD | grep -iE "approval|permission|consent|cedar|sandbox|intervention|harness"
+# (no output)
+```
+
+No file matching any approval, permission, consent, Cedar, sandbox, intervention or harness path
+changed. **Therefore the §6 table above still holds at `4dfeca8c`, and P1–P5 remain not re-run —
+this is now a two-window confirmation, not a re-verification.** The security defaults this study
+recorded (approval off, Cedar fail-open, sandbox `host`, registration-order short-circuit) are
+untouched.
+
+Not verified — **resolved 2026-09-30 later the same day.** A durable checkout was created at
+`~/repos/harness-refs/strands-harness-sdk` (origin `https://github.com/strands-agents/sdk-python.git`,
+`blob:none`) and re-read at `4dfeca8c`:
+
+| Question | Answer at `4dfeca8c` |
+|---|---|
+| New version tags? | **No.** `git describe --tags` gives `harness-cli/v0.1.4-37-g4dfeca8c`, two commits past the `a9a62d4e` value of `harness-cli/v0.1.4-35-ga9a62d4e`. Newest tag is still `harness-cli/v0.1.4`; Python SDK still `python/v1.57.1`, TypeScript `sdk-typescript`-side tags unchanged, harness still `0.1.x` |
+| Version numbers in §6? | Still Python **1.57.1**, TypeScript **1.19.0**, harness **0.1.x** — unchanged across both windows |
+
+The earlier ⚠️ was a **tooling artifact, not a fact about the repository**: the `blob:none` probe
+could not answer a tag query, and a tag query that returns nothing is indistinguishable from a
+clone that never fetched tags. A durable checkout answers it. **Do not record a negative result
+that came from a thin clone** — that is the same shape as the four false "0"s in
+[`SYNTHESIS.md` §7](../../../SYNTHESIS.md).
+
+**Next baseline: `4dfeca8c`.** The durable checkout now exists, so the next re-read does not need
+a temporary clone.
