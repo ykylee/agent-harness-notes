@@ -28,8 +28,19 @@
 
 ## 5. 다음 세션 시작 포인트
 
-- **`docs/` 본문에 `thread/goal/*` params 목록이 있는지 먼저 grep 한다.** 있으면 `origin` 필드를 반영하고, `docs/99-sources.md` §E 에 드리프트 2건을 기록한다. 반영 전까지 위 발견은 **소스 확인만 되고 문서 미반영** 상태다.
-- [`backlog/tasks/TASK-2026-09-30-feat-auto-20260930-a5e9e422-001.md`](./backlog/tasks/TASK-2026-09-30-feat-auto-20260930-a5e9e422-001.md) 의 Follow-up 3건.
+- **`check_wiki_freshness.py` 가 stale 6건을 알린다. 고치지 말고 읽어라.** 이번 커밋(`aa528cc`)은
+  `--no-verify` 로 相关 있는 concept 2개만 담았다. 나머지 6개
+  (`agent-client-protocol`·`os-sandbox-policy`·`thread-turn-item` ← `docs/02`;
+  `capability-distribution`·`harness` ← `docs/12`; `retained-reasoning` ← `docs/99`)
+  는 **이번 드리프트와 무관**하므로 내용 변경 없이 남겼다. 이력 모드가
+  "원 문서 커밋 시각 > concept 커밋 시각" 으로만 판정하므로 stale 로 뜬다
+  (`scripts/check_wiki_freshness.py:112` `check_history`). **커밋이 끝난 뒤 자동으로 생기는 상태이지
+  새 누락이 아니다.** 해당 `docs/` 를 다음에 다시 건드릴 때 그때 갱신한다.
+  참고로 `os-sandbox-policy` 가 인용하는 `bcd6d9ab6b` 는 여전히 유효 — 그 커밋 이후 샌드박스 변경이 없다.
+- `docs/` 본문 반영은 끝났다: `02` §9 에 `ThreadGoalSetParams`/`ClearParams` 절 신설,
+  `12` §2.2 goals 항목 보강, `99` §E.5 드리프트 기록 + 헤더 기준선 갱신.
+- [`backlog/tasks/TASK-2026-09-30-feat-auto-20260930-a5e9e422-001.md`](./backlog/tasks/TASK-2026-09-30-feat-auto-20260930-a5e9e422-001.md) 의 남은 follow-up 2건:
+  `SYNTHESIS.md` §2 에 게이트 가용성 축 편입 여부, `model_catalog_in_context` 의 providers-as-data 해석.
 - 작업 범위를 벗어나는 변경은 다른 워크스페이스와 충돌할 수 있으므로 backlog 에 별도 task 로 남긴다.
 
 #### 이번 세션 발견 (소스 ✅ / 라이브 ⚠️)
@@ -46,5 +57,9 @@
 ## 6. 남은 리스크
 
 - 위 발견은 **전부 소스 읽기**다. 라이브 앱서버에 `origin` 이 실제로 어떻게 오가는지는 관찰하지 않았다(⚠️).
-- `docs/` 문서가 이미 옛 wire 를 적고 있을 가능성을 아직 grep 으로 확인하지 않았다 — 반영 누락 여부는 다음 세션 첫 수.
-- main 브랜치의 `TASK-2026-09-27-main-002`(agent-ux GUI 패스)는 이 워크스페이스에 넘어오지 않았다. 앱별 스크래치 프로젝트 지정이 여전히 필요한 blocked 상태.
+- **`check_wiki_freshness.py` 가 stale 6건을 알린다 — 새 누락이 아니다**(§5 첫 항목). 커밋이 끝난 뒤
+  자동 생성되는 상태이고, 근거 없는 concept 갱신으로 메우면 개념 축이 오염된다.
+- `model_catalog_in_context` 는 providers-as-data 축에 어떻게 붙는지 판단하지 않았다. §2.3 의
+  "공유 wire 전제" 한정과 관계가 있을 수 있으나 **미분석** — 단정하지 말 것.
+- main 브랜치의 `TASK-2026-09-27-main-002`(agent-ux GUI 패스)는 이 워크스페이스에 넘어오지 않았다.
+  앱별 스크래치 프로젝트 지정이 여전히 필요한 blocked 상태.
