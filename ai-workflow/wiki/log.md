@@ -217,6 +217,24 @@ Notes:
 - Wiki §6 (Agents load path) no longer carries the Codex exception; it lives in §2.1.
 - `retained-reasoning` facts are unchanged (date bump only, because `docs/99-sources.md` moved).
 
+## [2026-09-30] ingest | Aside Computer Use spawn + JSON-lines IPC (TASK-008)
+
+Sources: `browser-agents/10-aside-enforcement-and-native.md` §2.3–2.5,
+`browser-agents/99-sources.md`.
+
+Pages updated (4):
+`concepts/os-sandbox-policy`, `concepts/perception-model`,
+`concepts/approval-gate` (date bump — 10.md moved, approval facts unchanged),
+`concepts/primary-source-verification` (date bump — 99-sources CU row)
+
+Notes:
+- Daemon `NativeContextAwarenessHelperManager` spawns `aside-computer-use` with stdin/stdout
+  pipes. JSON-line commands: invoke / pause / resume / shutdown / health / permissions /
+  policy / menu. `invoke` names cover iMessage, KakaoTalk, Contacts, applications.list.
+- One-shot CLI path when `dbPath` is set. Runtime copy at `~/.aside/runtime-computer-use/`.
+- Stdout events: `mac_ax` snapshots (fullTree / diffFromPrevious), mouse/keyboard, screen.ocr.
+- Swift internals unread; helper not executed (Linux).
+
 ## [2026-09-30] ingest | Dia macOS binary + Neon netinstaller stub (TASK-007)
 
 Sources: `browser-agents/12-dia-binary.md`, `browser-agents/11-dia-and-neon.md`,

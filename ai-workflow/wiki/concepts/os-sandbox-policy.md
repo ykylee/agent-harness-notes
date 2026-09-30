@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-09-30 (Dia Seatbelt profiles around bundled Claude Code)
+- Updated: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -186,17 +186,26 @@ Files use `readableRoots`/`writableRoots` plus `outsideRead`/`outsideWrite` (`de
 Separately from browser automation, Aside ships a native process called **`Aside Computer Use`**. It
 appears in no product document.
 
-| Capability | Symbols |
+The daemon (`NativeContextAwarenessHelperManager`) copies the helper to
+`~/.aside/runtime-computer-use/` and **spawns it with stdin/stdout pipes**. JSON lines in:
+`invoke` / `pause` / `resume` / `shutdown` / `health` / `permissions` / `policy` / `menu`.
+`invoke` carries `{id, name, payload}` — iMessage, KakaoTalk, Contacts, `applications.list`.
+JSON lines out: `mac_ax` snapshots (`fullTree` / `diffFromPrevious`), mouse/keyboard events,
+`screen.ocr`. One-shot CLI (`aside-computer-use <cmd> --json`) is the offline-`dbPath` path.
+([10](../../../browser-agents/10-aside-enforcement-and-native.md) §2.3)
+
+| Capability | Mechanism |
 |---|---|
-| System-wide accessibility tree | `AXUIElementRef`, **`AXTreeSerializer`** |
+| System-wide accessibility tree | `AXUIElementRef`, **`AXTreeSerializer`**, stdout `content.snapshot` |
 | Event tap (observe and inject) | `CGEventTapCreate/Enable` |
-| Screen capture and image analysis | `ScreenCaptureKit`, **`Vision.framework`** |
-| Contacts | **`Contacts.framework`** |
+| Screen capture and image analysis | `ScreenCaptureKit`, **`Vision.framework`**, `screen.ocr` |
+| Contacts / Messages | `Contacts.framework`; AppleEvents into Messages.app |
 
 > 📌 The perception philosophy is consistent — just as the browser uses an accessibility tree, the OS
-> layer serialises one.
+> layer serialises one, and the daemon already diffs it (`diffFromPrevious`).
 > ⚠️ But **the reach is the whole desktop, not a tab.** Read together with prompt injection
 > ([[concepts/indirect-prompt-injection]]), a fooled agent's range extends beyond the browser.
+> Swift internals were not decompiled; the helper was not run (Linux host).
 
 ## §8.7 Observation — Dia sandboxes a bundled coding agent  {#s8-7-dia-seatbelt}
 

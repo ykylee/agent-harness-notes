@@ -110,7 +110,7 @@ original Markdown.** That is primary text, not a summary of a rendered page.
 | Transport | ✅ **Resolved** — the CLI attaches to a local daemon (`127.0.0.1:21420`, canary `21421`); a 353MB Node SEA daemon does the planning. [09 §5](09-aside-browser-internals.md) |
 | Permission enforcement | ✅ **Resolved** — the zod policy schema (tool globs plus argument eq/regex, browser and network matchers, four buckets) and `resolvePermission`/`checkPermission`. [10 §1](10-aside-enforcement-and-native.md) |
 | The shape of the approval UI | ✅ **Resolved** — three suspension kinds, **designed to render in a chat channel.** [10 §1.5](10-aside-enforcement-and-native.md) |
-| `Aside Computer Use` | ✅ **Partly resolved** — a native binary reaching the system-wide accessibility tree, an event tap, screen capture, Vision and Contacts. Control flow not traced. [10 §2](10-aside-enforcement-and-native.md) |
+| `Aside Computer Use` | ✅ **Resolved (2026-09-30)** — long-running helper, JSON-lines stdin (`invoke`/`policy`/`permissions`/…), stdout event kinds (`mac_ax` snapshots, mouse/keyboard, OCR). iMessage/Kakao/Contacts are `invoke` names. Swift internals unread. [10 §2.3](10-aside-enforcement-and-native.md) |
 | Company details (YC batch, team size, founders) | ⚠️ Secondary sources say "YC Fall 2025 / three people / founded 2024," which is **internally inconsistent** (an F25 batch with a 2024 founding). Not primary-confirmed — not stated as fact in the body |
 
 > 📌 Many of these cells started as "not published." That was **not because the product was immature
@@ -194,7 +194,7 @@ engineering, not a specification Perplexity guarantees. It follows that:
 - [x] ~~Open the browser binary~~ → [09](09-aside-browser-internals.md)
 - [x] ~~Permission enforcement / `Aside Computer Use` / Secure Enclave and post-quantum~~ → [10](10-aside-enforcement-and-native.md)
 - [x] ~~Dia and Opera Neon primary documentation~~ → [11](11-dia-and-neon.md)
-- [ ] Trace `Aside Computer Use`'s control flow (symbols only so far)
+- [x] ~~Trace `Aside Computer Use`'s control flow~~ → [10 §2.3](10-aside-enforcement-and-native.md). Daemon spawn + JSON-lines IPC. Swift internals ⚠️
 - [ ] Dynamic observation — what goes to a server. Beyond static analysis
 - [ ] **Confirm the browser GUI on a macOS/Windows machine** — impossible on Linux
 - [ ] Details of Neon's Tasks — the FAQ answers were not extracted completely

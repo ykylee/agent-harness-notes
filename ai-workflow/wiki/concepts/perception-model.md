@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/08-aside-code-level.md + browser-agents/04-comet-architecture.md + browser-agents/05-comparables.md + SYNTHESIS.md §6 + SYNTHESIS.md §6.5
+last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/08-aside-code-level.md + browser-agents/04-comet-architecture.md + browser-agents/05-comparables.md + browser-agents/10-aside-enforcement-and-native.md + SYNTHESIS.md §6 + SYNTHESIS.md §6.5
 related_pages: [concepts/harness, concepts/indirect-prompt-injection, concepts/control-plane-execution-plane, concepts/credential-shielding, concepts/os-sandbox-policy, concepts/capability-distribution, concepts/thread-turn-item, concepts/primary-source-verification]
 created: 2026-09-23
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: what representation an agent reads a web page (or a screen) through, and what failure mode each choice produces.
 - Scope: four approaches, symmetry between perception and action, the cost ladder, recovery
 - Character: **a surface-specific axis.** A shell-based harness (Codex) does not have this problem
-- Updated: 2026-09-30 (date bump: `SYNTHESIS.md` §2/§8 Dia binary facts; §6 perception claims this page draws on are unchanged)
+- Updated: 2026-09-30 (Aside Computer Use stdout events: `mac_ax` snapshot fullTree/diffFromPrevious)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -119,8 +119,9 @@ How to escape when perception was wrong. What Browser Use publishes:
 ## §6 When it extends to the OS  {#s6-os}
 
 Aside's `Computer Use` carries the same philosophy onto the desktop — **`AXTreeSerializer`**
-serialises the whole screen's accessibility tree. Reading structure before screenshot coordinates is
-consistent. Detail in [[concepts/os-sandbox-policy]] §8.6.
+serialises the whole screen's accessibility tree. The long-running helper emits JSON-line events
+(`content.snapshot` as `fullTree` or `diffFromPrevious`, plus mouse/keyboard/`screen.ocr`). Reading
+structure before screenshot coordinates is consistent. Detail in [[concepts/os-sandbox-policy]] §8.6.
 
 ## §7 Read next  {#s7-next}
 

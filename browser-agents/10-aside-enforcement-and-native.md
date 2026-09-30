@@ -134,11 +134,19 @@ network → "Network: {url}"
 ## 2. Aside Computer Use — an undocumented OS-control axis
 
 The separate binary whose existence was noted in [09 §5](09-aside-browser-internals.md).
+Control flow traced 2026-09-30 against `Aside-1.0.928.1.dmg` (SHA-256
+`c6997299dc1ea7c0b15e3efbc6ebca104f331205c9bb83fb2b424c2c5500258c`) — the daemon's Node SEA
+payload plus the helper's Mach-O strings. Nothing was executed.
 
 | Item | Value |
 |---|---|
 | Form | **native Mach-O** (not Node), 2.0MB |
-| Location | `AsideDaemon/mac-{arm64,x64}/Aside Computer Use.app` |
+| Location in the DMG | `AsideDaemon/mac-{arm64,x64}/Aside Computer Use.app` |
+| Bundle ID | `at.studio.AsideBrowser.computer-use` |
+| Version | **1.26.928.1922** (same line as the daemon; browser shell is `1.0.928.1`) |
+| `LSUIElement` | **true** — no Dock icon |
+| Runtime copy | `~/.aside/runtime-computer-use/Aside Computer Use.app` (`ditto` + quarantine strip + `codesign --verify`) |
+| CLI usage | `aside-computer-use <command> [--json <payload>] [--no-dialog]` |
 
 ### 2.1 Linked system frameworks
 
@@ -170,6 +178,71 @@ ScreenCaptureKit, Security, Vision
 >
 > This component appears in **no product document.** The existence of an iMessage skill
 > ([08 §7](08-aside-code-level.md)) and the `Contacts.framework` link point the same way.
+
+### 2.3 How the daemon turns it on
+
+`NativeContextAwarenessHelperManager` in the daemon SEA owns the helper. Two modes, both
+macOS-only at the JS gate (`Computer Use Helper is only available on macOS` — Windows has a
+separate `helper.json` `protocolVersion` 1 path).
+
+**Long-running process (Context Awareness).** Spawn
+`COMPUTER_USE_HELPER_BIN_PATH` with **no command**, `stdio: [pipe, pipe, pipe]`. JSON lines on
+stdin; JSON lines on stdout. Windows adds `--runtime-root` and `--parent-pid`. Heartbeat every
+10s; health timeout 35s; recorder liveness 5 min; idle-exit 5 min once Context Awareness is off
+and no `invoke` is in flight.
+
+**One-shot exec.** `aside-computer-use <cmd> --json <payload> [--no-dialog]`, stdout envelope
+`{ok, data}` / `{error}`. Used when a caller passes `dbPath` (read the local Messages/Kakao
+SQLite without a permission dialog). `imessage.send` timeout is 120s; everything else 30s.
+
+The packaged app is copied to `~/.aside/runtime-computer-use/` before first use (`ditto`,
+`xattr -d com.apple.quarantine`, `codesign --verify --strict`).
+
+### 2.4 Stdin protocol (JSON line, one object)
+
+| `command` | Payload | Role |
+|---|---|---|
+| `invoke` | `{id, name, payload}` | RPC. `id` is `inv-N`. `invoke requires id and name` is a helper string |
+| `pause` / `resume` | — | Context Awareness recording |
+| `shutdown` | — | process exit (also `lifecycle.shutdown` as a CLI command) |
+| `health` | — | status ping |
+| `permissions` | `{kind: "observer" \| "messages"}` | TCC sheets |
+| `policy` | `excludedBundleIds`, `excludedDomains`, `captureTypedText`, `screenText` | do-not-observe rules + typed-text / OCR switches |
+| `menu` | `recentApplications[]` | menubar recents with per-app / per-domain exclusion flags |
+
+`name` values the daemon actually sends:
+
+| Group | Names |
+|---|---|
+| iMessage | `imessage.list-chats`, `imessage.get-history`, `imessage.search`, `imessage.send`, `imessage.max-rowid` |
+| KakaoTalk | `kakaotalk.list-chats`, `kakaotalk.get-history`, `kakaotalk.search` |
+| Contacts | `contacts.search`, `contacts.resolve` |
+| Desktop | `applications.list`, `applications.icons`, `discard-context-awareness-buffer` |
+| Probe | `permissions.check` |
+
+The helper binary also contains `imessage.chat-exists`, `imessage.find-chat-guids`,
+`imessage.most-active-sibling`, `imessage.outgoing-delivery`, `keyboard.*`, `mouse.context_menu`,
+`applications.list`. Those are reachable as CLI `<command>` names; the daemon does not call every
+one.
+
+### 2.5 Stdout events — a second perception surface
+
+The long-running helper emits typed events the daemon validates with zod. Source is one of
+`aside_dom` · **`mac_ax`** · `win_uia`. Kinds:
+
+`content.snapshot` (AX `fullTree` or `diffFromPrevious`) · `session.started` / `session.ended` ·
+`window.changed` · `mouse.click` / `mouse.context_menu` / `mouse.drag` · `keyboard.shortcut` /
+`keyboard.text_input` / `keyboard.submit` · `selection.changed` · `screen.ocr`
+
+> 📌 **Browser `snapshot()` and Computer Use share a tree-plus-diff idea, on different surfaces.**
+> The browser tree is a tab. This one is the desktop accessibility tree, with an event tap and
+> optional OCR beside it. Context Awareness is the product name for keeping that recorder on.
+
+TCC usage strings in `Info.plist` split the two jobs: Accessibility + Input Monitoring are
+**Context Awareness**; AppleEvents + Contacts are **Messages**.
+
+> ⚠️ Swift internals (`EventProtocol.swift`, `AccessibilityRecorder`, `MessagesDB`, `TreeDiffer`)
+> were read as strings, not as a decompiled call graph. The process was not run (Linux host).
 
 ## 3. Native cryptography — adjudicating three claims
 
@@ -256,7 +329,7 @@ The same analysis shows the other side.
 |---|---|
 | The exact meaning of the `approved` bucket | ⚠️ inference |
 | The hybrid KEM combination | ⚠️ inference |
-| `Aside Computer Use`'s actual control flow | ⚠️ symbols only; the call graph was not traced |
+| `Aside Computer Use`'s actual control flow | ✅ **daemon-side closed 2026-09-30** — spawn + JSON-lines IPC (§2.3–2.5). Swift internals still strings, not a decompiled graph. Not executed |
 | Fallback on hardware without a Secure Enclave | ⚠️ unverified |
 | What goes to a server | ⚠️ beyond static analysis; requires runtime observation |
 | **GUI and visual design** | ⚠️ requires execution; no Linux build exists |

@@ -11,7 +11,7 @@ updated: 2026-09-30
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: the ten server→client requests, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents extend it
-- Updated: 2026-09-30 (Dia perception-reduction sentences absent from binary; prompt untrusted-data exists)
+- Updated: 2026-09-30 (date bump: `browser-agents/10` Computer Use IPC; approval facts this page draws on are unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-007 Dia macOS 바이너리 · Neon netinstaller 스텁)
+- Updated: 2026-09-30 (TASK-008 Aside Computer Use 호출 흐름)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-008 Aside Computer Use 호출 흐름 (데몬 spawn + JSON-lines IPC): done
 - TASK-2026-09-30-main-007 Dia macOS 바이너리 정적 분석 · Neon netinstaller 스텁: done
 - TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
@@ -30,7 +31,7 @@
 - TASK-2026-09-30-main-002 형제 스킬 overlay·캐시 중복 정리: done
 - TASK-2026-09-30-main-001 session-start overlay 중복 정리: done
 - TASK-2026-09-27-main-001 ChatGPT webview 전용 메서드의 수신 엔진 추적: done
-- TASK-2026-09-22-agent-harness-notes-003 Agents API 서버측 모델 목록 검증: done
+
 
 > 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
@@ -44,6 +45,7 @@
 
 ## Key Changes
 
+- **Aside Computer Use 호출 흐름 (TASK-008)** — `Aside-1.0.928.1.dmg`. 데몬이 `aside-computer-use` 를 stdin/stdout 파이프로 spawn. JSON-line `invoke`/`policy`/`permissions`/…. iMessage·카카오·Contacts 는 invoke 이름. stdout 은 `mac_ax` 스냅샷(fullTree/diff). Swift 내부 미분해, 미실행. `browser-agents/10` §2.3
 - **Dia macOS 바이너리 열림 (TASK-007)** — `Dia-1.50.1-87750.dmg`. ArcCore Chromium fork + 로컬 `agent-server` 가 bundled Claude Code 2.1.270 을 Seatbelt 안에서 spawn. 보안 페이지 문장(LLM URL 비추적·verbatim URL 차단·요소 숨김)은 번들에 없고, 프롬프트 층 untrusted-data + `url://` 단축 + Seatbelt 가 있다. 스냅샷 요소 숨김은 ⚠️. Neon 공개 URL 은 4.1MB netinstaller 스텁(Linux 404). MCP 방향이 반대: Dia 는 import, Aside·Neon 은 export. `browser-agents/12`, 위키 10종 재ingest
 - **ChatGPT 앱은 엔진을 둘 몬다 (TASK-2026-09-27-main-001)** — 로컬 `codex app-server` + 클라우드 `durable`("Long-lived", `wss://codex-cloud-backend.chatgpt.com/`). durable 전용 어댑터가 방언 변환(`thread/queue/add`→`turn/addUserMessage`, `thread/start`→`thread/prewarm`)하고 `config/*` 는 클라이언트 메모리에서 답한다. webview 전용 8개 재분류, 그중 `plugin/codex` 는 메서드가 아니었다(09-26 스윕 오류). 이 계정엔 durable 미개통(로그 `state=disconnected`). `docs/99` §E.3
 - **agent-ux 수동 GUI 패스 (TASK-2026-09-27-main-002, 일부)** — `orca computer` 로 설치 5종 캡처. 레이아웃 확인, **amber 규칙 완화**(ChatGPT 는 Full access 위험 상태를 주황으로, Claude 작업 중 = 점토색 스파크). `agent-ux/99` GUI pass 절. 스크린샷은 사용자 데이터라 저장소에 넣지 않았다
@@ -76,7 +78,7 @@
 
 **브라우저 조사 (`browser-agents/`)**
 - [x] ~~검증 비대칭 해소 (Dia)~~ — macOS DMG 정적 분석 [12]. ArcCore + 로컬 Claude Code 2.1.270. Neon 은 netinstaller 스텁만 (Linux 404). TASK-2026-09-30-main-007
-- [ ] `Aside Computer Use` 호출 흐름 추적 (심볼만 봤다)
+- [x] ~~`Aside Computer Use` 호출 흐름~~ — 데몬 spawn + JSON-lines IPC ([10] §2.3). Swift 내부는 ⚠️. TASK-2026-09-30-main-008
 - [ ] 동적 관찰 (서버로 가는 내용) — **macOS 환경에서 이제 가능**
 - [ ] 브라우저 GUI 1차 확인 — **macOS 환경에서 이제 가능** (리눅스 빌드는 없다)
 
