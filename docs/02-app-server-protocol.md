@@ -545,6 +545,37 @@ type TurnStartParams = {
 > select a style, `model/list` always returns `supportsPersonality: false`, and `features.personality`
 > is ignored.
 
+### `ThreadGoalSetParams` / `ThreadGoalClearParams` *(added 2026-09-30, #49598)*
+
+```ts
+type ThreadGoalMutationOrigin = 'user' | 'automatic'
+
+type ThreadGoalSetParams = {
+  threadId: string,
+  origin?: ThreadGoalMutationOrigin | null,
+  objective?: string | null,
+  status?: ThreadGoalStatus | null,        // active | paused | (see generated enum)
+  tokenBudget?: number | null,             // double option: null clears the budget
+}
+
+type ThreadGoalClearParams = {
+  threadId: string,
+  origin?: ThreadGoalMutationOrigin | null,
+}
+```
+
+> **`origin` is a provenance discriminator, not a permission token.** The generated schema carries
+> the rule in the field's own description: *"Missing provenance does not supply user
+> authorization."* The server records a user fragment into model history **only** when
+> `origin === 'user'` and `objective` or `status` is present
+> (`app-server/src/request_processors/thread_goal_processor.rs`); every other combination still
+> changes goal state but leaves history untouched. `thread_goal_user_context.rs` states the boundary
+> directly: *"tool-created goals never use this path."*
+
+This matters when reading the goal API against the rest of §7: adding `origin` did **not** widen
+who may change a goal. It narrowed *provenance* — an explicit user mutation is now distinguishable
+in the rollout from a lifecycle mutation, and only the former is replayed into model history.
+
 ### `UserInput` kinds (per protocol_v1)
 
 | type | Description |

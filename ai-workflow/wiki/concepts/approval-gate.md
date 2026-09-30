@@ -88,6 +88,7 @@ execution might have succeeded without the result being saved, check the outcome
 | 3 | Approval gates are **protocol-level safety mechanisms, not UI conveniences** |
 | 4 | Separate untrusted content from user input **at the type level** — the Python SDK's `ExternalMessage` is the model (it retains tool-level authority but confers no user authorization) |
 | 5 | In the managed API, when `requires_action` is set **nothing proceeds until every required action is handled** |
+| 6 | **A gate's availability is a separate axis from its correctness** (2026-09-30, `#49584`). Guardian now skips host skill/plugin discovery because that discovery could block its startup when the primary executor is offline — a gate that cannot run denies nothing. The regression test disconnects the executor and asserts Guardian still **denies** a network permission, so availability was fixed without weakening the gate. Read a "skip" commit as a loosening only after finding what it skips and what still runs. |
 
 ## §6.5 Observation — how browser agents extend this  {#s6-5-browser}
 

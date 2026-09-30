@@ -61,7 +61,9 @@ thread/loaded/list       thread/unsubscribe
 Once users have hundreds of threads, **naming, sectioning, archiving, and attaching external
 resources stop being optional.** Specific ideas worth stealing:
 
-- **Goals** (`thread/goal/*`) are separate from instructions and survive across turns
+- **Goals** (`thread/goal/*`) are separate from instructions and survive across turns. As of
+  2026-09-30 (`#49598`) mutations carry an `origin` (`user` | `automatic`) so an explicit user
+  edit is distinguishable from lifecycle churn in the rollout — see [02 §9](02-app-server-protocol.md)
 - **Attachments** are idempotent on `(threadId, attachmentType, identityKey)` and can be manipulated
   **without loading the thread** — essential at scale
 - **`thread/loaded/list`** distinguishes *loaded* from *stored*. Memory management is explicit
