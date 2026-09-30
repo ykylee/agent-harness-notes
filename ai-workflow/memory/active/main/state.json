@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-09-30-main-011 — ACP 엔진측 독해",
       "TASK-2026-09-30-main-010 — Strands TS SDK 세부 직접 확인",
       "TASK-2026-09-30-main-009 — Strands harness 0.x 드리프트 재확인",
       "TASK-2026-09-30-main-008 — Aside Computer Use 호출 흐름 추적",
@@ -44,15 +45,14 @@
       "TASK-2026-09-30-main-005 — Agents 플러그인 ./ 규칙과 onboardingSkill 예외 관계",
       "TASK-2026-09-30-main-004 — CLAUDE.md kit 1.16.0 갱신",
       "TASK-2026-09-30-main-003 — 다른 저장소 workflow overlay plugin-only 위임",
-      "TASK-2026-09-30-main-002 — 형제 스킬 overlay·캐시 중복 정리",
-      "TASK-2026-09-30-main-001 — session-start overlay 중복 정리"
+      "TASK-2026-09-30-main-002 — 형제 스킬 overlay·캐시 중복 정리"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-09-30.md",
-    "task_count": 13,
+    "task_count": 14,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -68,7 +68,8 @@
       "TASK-2026-09-30-main-007 — Dia·Neon 바이너리 정적 분석으로 검증 비대칭 축소",
       "TASK-2026-09-30-main-008 — Aside Computer Use 호출 흐름 추적",
       "TASK-2026-09-30-main-009 — Strands harness 0.x 드리프트 재확인",
-      "TASK-2026-09-30-main-010 — Strands TS SDK 세부 직접 확인"
+      "TASK-2026-09-30-main-010 — Strands TS SDK 세부 직접 확인",
+      "TASK-2026-09-30-main-011 — ACP 엔진측 독해"
     ]
   },
   "next_documents": [

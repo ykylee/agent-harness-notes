@@ -38,7 +38,7 @@
 | ChatGPT/Codex | Allow once · Allow this conversation · Always allow · **Allow commands that start with {command}** (prefix rule) · Deny |
 | Cursor | Allow · Allow all · Always run · Add to allowlist |
 | Antigravity 2.0 | Allow Once · Always Allow · Deny — **target string editable in the card** |
-| Devin Desktop | `allow_once · allow_always · reject_once · reject_always` (ACP) — **command editable, or rewritten from a description by a fast model** |
+| Devin Desktop | `allow_once · allow_always · reject_once · reject_always` (ACP `PermissionOptionKind`, [10](10-acp.md) §5) — **command editable, or rewritten from a description by a fast model** |
 | Superset | Allow · Allow for session · Deny |
 | Conductor | Yes · (per tool) "Allow all edits during this session" / "Yes, and don't ask again for: …" / "Yes for this session" · No |
 | **Paseo** | **none** — no client ever sends a standing grant; persistence comes only from choosing a mode |

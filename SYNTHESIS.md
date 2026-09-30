@@ -618,7 +618,7 @@ works, follow the links `llms.txt` gives rather than building URLs.**
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | How clients render the primitives (UX/UI) | [`agent-ux/README.md`](agent-ux/README.md) — start at [09](agent-ux/09-design-language.md) |
 | An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) — start at [07](strands/07-security.md) for the gate findings |
-| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 17 concepts |
+| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 18 concepts |
 | **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and two models measured against injected instructions |
 | Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
 

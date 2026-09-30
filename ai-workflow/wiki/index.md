@@ -24,8 +24,12 @@ The three conversation primitives. Item lifecycle, thread unloading (60 seconds)
 eviction, the sticky semantics of turn overrides.
 
 ### [[concepts/approval-gate]] {#approval-gate}
-Approval as a protocol primitive rather than a UI convenience. Ten server→client requests; without
-them the turn stalls.
+Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.
+ACP: one `session/request_permission`. Without an answer the turn stalls.
+
+### [[concepts/agent-client-protocol]] {#agent-client-protocol}
+Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission option kinds
+`allow_once` · `allow_always` · `reject_once` · `reject_always`. Distinct from model `WireApi`.
 
 ### [[concepts/wire-protocol-boundary]] {#wire-protocol-boundary}
 `WireApi` has one variant — Responses. The boundary deciding whether the core is reusable, and

@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: the attack surface created when an agent reads untrusted content, and which mitigations are actually implemented.
 - Scope: the attack chain, the structural cause, the four mitigation categories and where each product stands, the unsolved status
 - Character: **a surface-specific axis** — though a shell harness reading files or the web develops the same problem
-- Updated: 2026-09-30 (Dia binary: security-page sentences absent; prompt-layer untrusted-data + `url://` shortlinks present)
+- Updated: 2026-09-30 (date bump: `strands/07` ACP permission line; injection facts this page draws on are unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

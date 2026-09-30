@@ -301,3 +301,26 @@ Notes:
   skipped on throw (`agent.ts:2276-2349`).
 - Stateful Responses formatter resends the full invocation `input` plus `previous_response_id`.
   No mid-invocation slice. API outcome still ⚠️.
+
+## [2026-09-30] ingest | ACP engine-side (TASK-011)
+
+Sources: `agent-ux/10-acp.md`, `agent-ux/99-sources.md`, `strands/06-multi-agent-and-exposure.md` §5.4,
+`strands/99-sources.md`, `strands/07-security.md`, `docs/02-app-server-protocol.md` §7.
+Spec clone `~/repos/harness-refs/agent-client-protocol` @ `9b26a3ea`.
+
+Pages updated (8):
+`concepts/agent-client-protocol` (new), `concepts/approval-gate`,
+`concepts/primary-source-verification`, `concepts/wire-protocol-boundary` (cross-link),
+`concepts/agent-client-design-language` (cross-link), `concepts/harness` (cross-link),
+`concepts/credential-shielding` (date bump — 07 ACP line; credential facts unchanged),
+`concepts/indirect-prompt-injection` (date bump — 07 ACP line; injection facts unchanged)
+
+Notes:
+- Stable ACP wire is `protocolVersion` **1**. Crate 1.9.1 / schema-v1.23.0 / SDK 1.3.0 are
+  artifact versions. v2 is an unstable draft.
+- Permission is one method, `session/request_permission`. Kinds: `allow_once` · `allow_always` ·
+  `reject_once` · `reject_always`. JS accessor is camelCase; wire is hyphenated.
+- Codex App Server remains ten typed server→client requests.
+- Strands harness ACP path (`server.ts:102-147`) never sends the permission RPC. Source-agent
+  path does. Live client ⚠️.
+- 18 concepts now.

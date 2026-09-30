@@ -32,6 +32,8 @@
 | `strands-agents/samples` | `11dd549` | 2026-09-21 | still separate |
 | `strands-agents/agent-builder` | `136b6f9` | 2026-05-12 | not analysed beyond existence |
 | `strands-agents/docs` · `sdk-typescript` · `mcp-server` | — | archived 2026-06-02 / 2026-06-02 / 2026-07-27 | archive notices read |
+| **`agentclientprotocol/agent-client-protocol`** | **`9b26a3ea`** | 2026-09-30 | ACP spec + `schema/v1/schema.json`. Local `~/repos/harness-refs/agent-client-protocol`. Engine-side notes in [`agent-ux/10`](../agent-ux/10-acp.md) |
+| `@agentclientprotocol/sdk` **1.3.0** | tag `v1.3.0` / git `fa325709` | 2026-07-21 | Strands CLI pin. `PROTOCOL_VERSION = 1`; wire method `session/request_permission` |
 
 Inside the monorepo:
 
@@ -139,7 +141,7 @@ Claims are quoted from the source named; the contradicting code is cited in the 
 | Stateful Responses mode resending the invocation's items alongside `previous_response_id` inside a tool loop | formatter confirmed: full `input` + `previous_response_id`, no slice ([02](02-agent-loop.md) §4.2). API outcome not captured. TS live integ exists, body unasserted | ✅ formatter · ⚠️ API |
 | Native Anthropic provider on a redacted-only thinking block (`KeyError` suspected) | not run | ⚠️ |
 | Snapshot portability between the Python and TS SDKs | message key names differ; not run | ⚠️ |
-| The harness ACP path not forwarding permission requests to the client | not run against an ACP client | ⚠️ |
+| The harness ACP path not forwarding permission requests to the client | source: no `session/request_permission` in `server.ts:102-147`; spec method confirmed hyphenated. Not run against an ACP client | ✅ source absence · ⚠️ runtime |
 | Anything a live model would do with the injection paths in [07](07-security.md) §2 | no model was used | ⚠️ |
 | The benchmark repository `strands-labs/benchmark-harnesses` | not fetched | 📣 |
 | The Evals SDK (`strands-agents/evals`) | separate repository, not inspected | — |

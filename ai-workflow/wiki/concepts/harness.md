@@ -2,7 +2,7 @@
 type: concept
 status: active
 last_ingested_from: docs/01-overview.md + docs/06-choosing.md + docs/12-product-surface.md + browser-agents/01-landscape.md + browser-agents/06-architecture-axes.md + browser-agents/12-dia-binary.md + strands/01-overview.md + strands/README.md
-related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model]
+related_pages: [concepts/harness-engineering, concepts/thread-turn-item, concepts/control-plane-execution-plane, concepts/wire-protocol-boundary, concepts/perception-model, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-09-30
 ---

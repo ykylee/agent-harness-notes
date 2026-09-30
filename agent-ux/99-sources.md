@@ -100,8 +100,11 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
   second, cloud-hosted engine the app drives (`durable`, "Long-lived"), or never leave the client.
 - **Antigravity ↔ Windsurf:** a shared protobuf engine (`exa.cortex_pb`) is a protocol surface this
   repository has not read on the engine side.
-- **ACP** (Agent Client Protocol) now appears in Devin Desktop, Paseo, Superset and Strands' CLI — a
-  candidate for its own engine-side reading.
+- ~~**ACP** (Agent Client Protocol) now appears in Devin Desktop, Paseo, Superset and Strands' CLI~~ —
+  **read 2026-09-30** ([10](10-acp.md)). Spec repo HEAD `9b26a3ea`, stable `protocolVersion` **1**,
+  permission method `session/request_permission`, option kinds `allow_once` · `allow_always` ·
+  `reject_once` · `reject_always`. Strands harness ACP path still has no permission RPC; live
+  client ⚠️.
 
 ## 7. What was not verified
 

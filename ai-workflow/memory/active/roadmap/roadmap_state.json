@@ -190,6 +190,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 로드맵 밖 Strands TS SDK 후속 점검",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-010.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-011",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 로드맵 밖 ACP 프로토콜 엔진측 독해",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-011.md"
     }
   ],
   "issues": []

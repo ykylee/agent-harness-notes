@@ -26,6 +26,7 @@ Researched 2026-09-26 · scope recorded in [`PURPOSE.md` §0.2](../ai-workflow/m
 | [07-paseo-conductor.md](07-paseo-conductor.md) | Approval as a request object with four renderers; message-while-pending denies; Conductor's worktree-first cockpit |
 | [08-primitives-rendered.md](08-primitives-rendered.md) | **Cross-product matrix by primitive** |
 | [09-design-language.md](09-design-language.md) | **The answer**: the shared design language and where the philosophies part |
+| [10-acp.md](10-acp.md) | **ACP engine-side**: JSON-RPC methods, `session/request_permission`, option kinds; Codex App Server and Strands CLI contrasted |
 | [99-sources.md](99-sources.md) | Builds and hashes, grades, refutation ledger, leads for other studies |
 
 ## In one line

@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-010 Strands TS SDK 세부 직접 확인)
+- Updated: 2026-09-30 (TASK-011 ACP 엔진측 독해)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-011 ACP 엔진측 독해 (스펙·스키마 vs Strands CLI / Codex App Server): done
 - TASK-2026-09-30-main-010 Strands TS SDK 세부 직접 확인 (event union · modelState · stateful formatter): done
 - TASK-2026-09-30-main-009 Strands harness 0.x 드리프트 재확인 (`15da9dc`→`a9a62d4e`, 31커밋): done
 - TASK-2026-09-30-main-008 Aside Computer Use 호출 흐름 (데몬 spawn + JSON-lines IPC): done
@@ -30,10 +31,9 @@
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
 - TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
 - TASK-2026-09-30-main-003 다른 저장소 workflow overlay plugin-only 위임: done
-- TASK-2026-09-30-main-002 형제 스킬 overlay·캐시 중복 정리: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -45,6 +45,7 @@
 
 ## Key Changes
 
+- **ACP 엔진측 독해 (TASK-011)** — 스펙 HEAD `9b26a3ea`. 안정 와이어는 `protocolVersion` **1** (crate 1.9.1 / schema-v1.23.0 / SDK 1.3.0 은 산출물 버전). 승인은 메서드 하나 `session/request_permission`, kind 네 개 `allow_once` · `allow_always` · `reject_once` · `reject_always`. Codex App Server 는 요청 10종. Strands harness ACP 경로는 그 RPC 를 안 보냄 (소스 ✅, 라이브 클라이언트 ⚠️). `agent-ux/10`, 위키 개념 `agent-client-protocol` (18종)
 - **Strands TS SDK 직접 확인 (TASK-010)** — `AgentStreamEvent` 16종. `modelState` 는 미들웨어 전 스냅샷, temp `StateStore` 로 모델에 전달, 성공 시에만 write-back. stateful Responses formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. `strands/02` §3.2·§4.2
 - **Strands 0.x 드리프트 재확인 (TASK-009)** — `15da9dc`→`a9a62d4e` 31커밋. 버전 태그 없음 (1.57.1 / 1.19.0 / 0.1.x). 승인 기본 off · Cedar fail-open · sandbox host · 등록순 합성 유지. Cedar/intervention/sandbox 빈 diff 라 P1–P5 미재실행. R19 README 문장 #4696 에서 삭제. #4447 은 squash `4095cf5a`. 로컬 `~/repos/harness-refs/strands-harness-sdk`. `strands/99` §6
 - **Aside Computer Use 호출 흐름 (TASK-008)** — `Aside-1.0.928.1.dmg`. 데몬이 `aside-computer-use` 를 stdin/stdout 파이프로 spawn. JSON-line `invoke`/`policy`/`permissions`/…. iMessage·카카오·Contacts 는 invoke 이름. stdout 은 `mac_ax` 스냅샷(fullTree/diff). Swift 내부 미분해, 미실행. `browser-agents/10` §2.3
@@ -94,8 +95,8 @@
 **agent-ux 조사 (`agent-ux/`)**
 - [ ] GUI 패스 — 수동 패스 완료(설치 5종). 남은 것: 앱별 스크래치 프로젝트에서 에이전트 실행해 승인 카드·상태 관찰. 미설치 5종(Cursor·Devin·Superset·Paseo·Conductor)은 ⚠️ 그대로
 - [x] ~~Codex 드리프트 단서 3종~~ — TASK-002 에서 판정: 드리프트 아님, webview 전용 (`agent-ux/03` §1.2.1 갱신)
-- [ ] ACP(Agent Client Protocol) 엔진측 독해 — Devin Local·Paseo·Superset·Strands CLI 가 모두 쓴다
-- [ ] `REPORT`(영/한) 개념 수 16→17 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)
+- [x] ~~ACP(Agent Client Protocol) 엔진측 독해~~ — `agent-ux/10`. 안정 와이어 1, 승인 RPC 하나. 라이브 클라이언트와 Devin/Paseo/Superset 트레이스는 남음. TASK-2026-09-30-main-011
+- [ ] `REPORT`(영/한) 개념 수 16→18 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)
 - [ ] 모바일 컴패니언(Orca·Superset·Paseo)은 이번 패스에서 제외
 
 **저장소**

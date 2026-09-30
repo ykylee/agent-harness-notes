@@ -2,9 +2,9 @@
 type: concept
 status: active
 last_ingested_from: agent-ux/09-design-language.md + agent-ux/08-primitives-rendered.md + agent-ux/01-landscape.md
-related_pages: [concepts/approval-gate, concepts/thread-turn-item, concepts/harness, concepts/perception-model]
+related_pages: [concepts/approval-gate, concepts/thread-turn-item, concepts/harness, concepts/perception-model, concepts/agent-client-protocol]
 created: 2026-09-26
-updated: 2026-09-27
+updated: 2026-09-30
 ---
 
 # Agent Client Design Language — how harness primitives are shown to people
@@ -12,7 +12,7 @@ updated: 2026-09-27
 - Purpose: the shared design language of agent clients, and where their theories of supervision part.
 - Scope: structure, visual system, vocabulary, behaviours; the three client families
 - Primary source: ten shipped clients (installers unpacked, source at pinned commits), 2026-09-26 — [`agent-ux/`](../../../agent-ux/README.md)
-- Updated: 2026-09-27 (agent-ux/08 §6.2 GUI-pass narrowing of the amber rule)
+- Updated: 2026-09-30 (date bump: `agent-ux/08` ACP enum citation; design-language facts unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

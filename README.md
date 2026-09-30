@@ -27,7 +27,7 @@ Codex's `responses_lite` request-shape branching. Strands, the third case, tests
 a different axis — no wire between caller and loop — and found that an approval gate outside the loop
 is necessary but not sufficient (SYNTHESIS §2.7).
 
-Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (17 concepts).
+Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (18 concepts).
 
 ## Start with the report
 

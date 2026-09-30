@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/99-sources.md + strands/01-overview.md
+last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/99-sources.md + strands/01-overview.md + agent-ux/10-acp.md + agent-ux/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
 updated: 2026-09-30
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (Strands TS event union / modelState / stateful formatter re-read)
+- Updated: 2026-09-30 (ACP: crate/SDK/schema version ≠ `protocolVersion`; TASK-011)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -101,6 +101,17 @@ Traces of a capability in a fork's binary **may have been inherited from upstrea
 
 **Rule: cross-check primary sources against each other too. When they diverge, take the more specific
 one and record the contradiction itself.**
+
+### Crate, SDK and schema release numbers are not the wire
+
+> Real case: Agent Client Protocol. The spec crate is `1.9.1`, generated schema `schema-v1.23.0`,
+> Strands CLI pins `@agentclientprotocol/sdk` **1.3.0**, npm latest is **1.5.1**. The **wire** is
+> the integer `protocolVersion` exchanged at `initialize`, and that is **`1`**. The spec README
+> says not to infer wire compatibility from artifact versions
+> ([`agent-ux/10`](../../../agent-ux/10-acp.md) §2).
+
+**Rule: when a protocol publishes both a wire version and artifact versions, cite the negotiated
+wire field. SDK pin drift is capability surface, not a different protocol.**
 
 ## §3.7 Do not read an information gap as a maturity gap  {#s3-7-asymmetry}
 
@@ -260,6 +271,10 @@ confirmed from `strands-ts` source ([`strands/02`](../../../strands/02-agent-loo
 Stateful Responses formatter resends the full invocation `input` with `previous_response_id`; the
 API outcome is still unverified.
 
+**ACP engine-side 2026-09-30** (TASK-011). Spec @ `9b26a3ea`, stable `protocolVersion` 1, permission
+method `session/request_permission`, four `PermissionOptionKind` values. Strands harness ACP path
+has no such call (source ✅). Live client ⚠️. See [[concepts/agent-client-protocol]].
+
 ## §10 Read next  {#s10-next}
 
 - [[concepts/os-sandbox-policy]] §6 — where the inferred grade is actually applied
@@ -267,3 +282,4 @@ API outcome is still unverified.
 - [[concepts/credential-shielding]] §4 — where the inheritance trap was actually avoided
 - Originals: [`docs/99-sources.md`](../../../docs/99-sources.md), [`browser-agents/99-sources.md`](../../../browser-agents/99-sources.md)
 - Strands case: [`strands/99-sources.md`](../../../strands/99-sources.md)
+- ACP: [[concepts/agent-client-protocol]], [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md)

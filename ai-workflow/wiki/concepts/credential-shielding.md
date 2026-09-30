@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: compare the design patterns that let an agent work behind a login without seeing the credentials.
 - Scope: three approaches, separating the axes, what the implementation really is, what remains
 - Character: **a surface-specific axis** — though "separate permission level from secret exposure" is a general principle
-- Updated: 2026-09-30 (Dia element hiding still ⚠️ in native snapshot; Seatbelt/Keychain is a process constraint)
+- Updated: 2026-09-30 (date bump: `strands/07` ACP permission line; credential facts this page draws on are unchanged)
 
 ## §1 The problem  {#s1-problem}
 

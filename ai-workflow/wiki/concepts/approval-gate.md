@@ -1,8 +1,8 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md
-related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding]
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md
+related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-09-30
 ---
@@ -10,8 +10,8 @@ updated: 2026-09-30
 # Approval Gate — making human intervention a protocol primitive
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
-- Scope: the ten server→client requests, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents extend it
-- Updated: 2026-09-30 (date bump: `browser-agents/10` Computer Use IPC; approval facts this page draws on are unchanged)
+- Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
+- Updated: 2026-09-30 (ACP engine-side: one permission RPC vs Codex's ten; Strands harness path never sends it)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -19,7 +19,7 @@ updated: 2026-09-30
 |---|---|---|
 | 1 | Direction | **server → client.** This is why the protocol is bidirectional |
 | 2 | Effect | **the turn stops** until the client responds |
-| 3 | Request types | ten |
+| 3 | Request types | Codex: **ten**. ACP: **one** (`session/request_permission`) |
 | 4 | Implementation obligation | without them **the turn simply stalls** |
 | 5 | Managed API counterpart | `requires_action` plus `required_actions[]` |
 
@@ -183,6 +183,23 @@ From [`agent-ux/08`](../../../agent-ux/08-primitives-rendered.md) §1–2 (extra
 | Middle rung | a **machine reviewer** — "Auto", "Approve for me", "Auto-review" — between ask and never |
 | Default | three orchestrators launch wrapped agents with **approvals off** — §7.5's first property missing |
 
+## §7.7 Observation — ACP's one permission request  {#s7-7-acp}
+
+[[concepts/agent-client-protocol]]. Spec `protocolVersion` **1**, method
+`session/request_permission` (hyphen on the wire; TypeScript accessor `requestPermission`). The
+agent supplies labelled options whose `kind` is one of `allow_once` · `allow_always` ·
+`reject_once` · `reject_always`. The turn waits on that RPC; on `session/cancel` every pending
+request must return `cancelled`.
+
+Codex types the *thing* being approved as the method name and lets the response carry a policy
+amendment (§2). ACP types nothing: **the options are data**, which is why Paseo can put one
+request on four renderers ([07](../../../agent-ux/07-paseo-conductor.md)).
+
+**Strands CLI** implements the RPC only on the imported source-agent path. The harness path
+(`createHarness`, default `interventions=None`) never calls it
+([`strands/06`](../../../strands/06-multi-agent-and-exposure.md) §5.4,
+[`agent-ux/10`](../../../agent-ux/10-acp.md) §7). Source absence ✅; live ACP client ⚠️.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the turn that approval stops
@@ -191,3 +208,4 @@ From [`agent-ux/08`](../../../agent-ux/08-primitives-rendered.md) §1–2 (extra
 - Originals: [`docs/02-app-server-protocol.md`](../../../docs/02-app-server-protocol.md) §7, [`docs/06-choosing.md`](../../../docs/06-choosing.md) §5
 - Strands case: [`strands/03-tools-and-approval.md`](../../../strands/03-tools-and-approval.md)
 - Client rendering: [`agent-ux/08-primitives-rendered.md`](../../../agent-ux/08-primitives-rendered.md)
+- ACP wire: [[concepts/agent-client-protocol]], [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md)

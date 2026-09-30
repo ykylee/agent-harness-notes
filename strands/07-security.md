@@ -148,7 +148,8 @@ and everything else asks. But:
 - **"Always allow" is per tool name** — allowing `shell` once allows every command. ✅
 - **Every Cedar deny, even an explicit `forbid`, becomes an ask** — there is no hard-deny tier. ✅
 - **`-p`, plain mode (any non-TTY stdin) and ACP run with no gate and no workspace sandbox** — the
-  README says so. ✅ And the harness's ACP path forwards no permission requests to the ACP client ⚠️.
+  README says so. ✅ And the harness's ACP path contains no `session/request_permission` call
+  (`server.ts:102-147`) ✅; a live ACP client was not attached ⚠️. Spec: [`agent-ux/10`](../agent-ux/10-acp.md).
 
 Compare Aside's policy engine ([`browser-agents/10`](../browser-agents/10-aside-enforcement-and-native.md)
 §1): tool-name globs **plus per-argument regex**, four buckets. Strands' finest grain is the tool name.
@@ -207,6 +208,6 @@ primitive, with a Cedar backend — and yet:
   authority — the natural next probe, and a heddle-side measurement (out of this repository's scope;
   its result would be admitted here as a measurement, per `PURPOSE.md` §0.1) ⚠️
 - Whether memory extraction carries injected instructions across sessions in practice ⚠️
-- Whether the ACP harness path's missing permission forwarding is reachable by a real ACP client ⚠️
+- Whether the ACP harness path's missing `session/request_permission` is reachable by a real ACP client ⚠️ (source absence is ✅; see [`agent-ux/10`](../agent-ux/10-acp.md) §7.2)
 - The `python_repl` in-process path (`interactive=False`) could set `BYPASS_TOOL_CONSENT` after one
   approval and disable consent for every later tool — read, not run ⚠️

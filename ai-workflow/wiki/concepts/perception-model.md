@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: what representation an agent reads a web page (or a screen) through, and what failure mode each choice produces.
 - Scope: four approaches, symmetry between perception and action, the cost ladder, recovery
 - Character: **a surface-specific axis.** A shell-based harness (Codex) does not have this problem
-- Updated: 2026-09-30 (Aside Computer Use stdout events: `mac_ax` snapshot fullTree/diffFromPrevious)
+- Updated: 2026-09-30 (date bump: `SYNTHESIS.md` concept count 17→18; perception facts this page draws on are unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -261,21 +261,29 @@ instrumentation patches (`strands/tools/mcp/mcp_instrumentation.py:166-173`) ✅
 `strands --acp-server` "exposes the agent to an ACP client over stdin/stdout. It creates a harness
 agent for each ACP session, supports client-supplied MCP servers, and supports loading saved sessions
 with transcript replay" (`strands-cli/README.md:465-470`). It is built on `@agentclientprotocol/sdk`
-`1.3.0` (`strands-cli/package.json:62`).
+`1.3.0` (`strands-cli/package.json:62`). Spec-side reading (wire version, method table, permission
+kinds): [`agent-ux/10-acp.md`](../agent-ux/10-acp.md).
 
 - `initialize` advertises `loadSession`, image and embedded-context prompts, and MCP over http/sse
-  (`strands-cli/src/tui/acp/server.ts:57-74`).
+  (`strands-cli/src/tui/acp/server.ts:57-74`). Negotiated `protocolVersion` is capped at the SDK's
+  `PROTOCOL_VERSION`, which is **`1`** at this pin.
+- `createAcpApp` registers `initialize`, `session/new`, `session/load`, `authenticate` (empty `{}`),
+  `session/prompt`, `session/cancel` (`server.ts:209-221`). That is a legal v1 subset.
 - One workspace per process. A second `cwd` throws (`server.ts:194-206`).
 - One prompt at a time per session (`server.ts:107-109`).
-- **Approval asymmetry.** When the CLI serves an *imported Python source agent*, tool-permission
-  requests become ACP `session/requestPermission` round-trips (`strands-cli/src/tui/project/acp.ts:66-82`).
-  The *harness* path streams events and usage but contains no `requestPermission` call
+- **Approval asymmetry, against the spec method name.** The wire method is hyphenated
+  `session/request_permission` (JSON Schema `x-method`, Rust constant, SDK
+  `CLIENT_METHODS.session_request_permission`). The TypeScript accessor is camelCase
+  `acp.methods.client.session.requestPermission`. When the CLI serves an *imported Python source
+  agent*, tool-permission events become that RPC (`strands-cli/src/tui/project/acp.ts:66-82`). A
+  non-`selected` outcome, including spec `cancelled`, is forwarded as `'deny'` (`acp.ts:79-81`).
+  The *harness* path streams events and usage but contains **no** `requestPermission` call
   (`server.ts:102-147`) ✅. The harness default is `interventions=None` (`harness-py/README.md`,
   interface block). So by default an ACP client driving the harness gets no approval prompts. ⚠️ Not
   exercised at runtime; see [approval-gate](../ai-workflow/wiki/concepts/approval-gate.md) and
   [03-tools-and-approval.md](03-tools-and-approval.md).
 - `agentInfo.version` is hard-coded `'0.0.1'` (`server.ts:65-69`), although `HARNESS_VERSION` is
-  imported in the same file (`server.ts:16`).
+  imported in the same file (`server.ts:16`) and used for MCP `applicationVersion`.
 
 ## 6. Deployment
 
@@ -332,7 +340,7 @@ guide gets it right: it builds the `Agent` inside `handler()` (`deploy/deploy_to
 ## 8. Open questions
 
 - The A2A wire (JSON-RPC method names, SSE framing, card path) and the behaviour difference of the "compliant" stream were not read from `a2a-sdk` and not exercised.
-- Does the harness ACP path really run tools ungated under `interventions=None`, or does something in the CLI or TUI add a gate? This needs a run against a mock model.
+- Does the harness ACP path really run tools ungated under `interventions=None`, or does something in the CLI or TUI add a gate? Source has no `session/request_permission` on that path ([`agent-ux/10`](../agent-ux/10-acp.md) §7.2); a mock-model run against an ACP client is still required.
 - Does AgentCore Runtime's per-session isolation neutralise the module-level `Agent` pattern (§6.3)?
 - The TypeScript Graph/Swarm were not read. Is the `max_handoffs`/`max_iterations` conflation present there too?
 - Does Graph's `asyncio` batch parallelism give real concurrency for synchronous (non-async) tools, or do they serialise on the thread pool?

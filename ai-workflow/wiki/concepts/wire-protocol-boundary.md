@@ -2,7 +2,7 @@
 type: concept
 status: active
 last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md
-related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness]
+related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-09-30
 ---
@@ -142,3 +142,4 @@ AZURE_TOOL_CALL_PROVIDERS  = new Set([`openai`, `openai-codex`, `opencode`, `azu
 - [[concepts/retained-reasoning]] — what an adapter loses
 - [[concepts/provider-as-data]] — modelling providers as data rather than code branches
 - Originals: [`docs/15-model-providers.md`](../../../docs/15-model-providers.md), [`docs/16-responses-chat-adapter.md`](../../../docs/16-responses-chat-adapter.md)
+- Editor↔agent JSON-RPC is a different wire: [[concepts/agent-client-protocol]]
