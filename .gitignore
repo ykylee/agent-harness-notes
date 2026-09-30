@@ -1,0 +1,2 @@
+# git worktree 작업 공간 — 로컬 전용. 커밋 대상이 아니다.
+.worktrees/
