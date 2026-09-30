@@ -25,6 +25,12 @@ means for building a harness of our own.
 > served behind a wire. It invalidated nothing here either; it **qualified two findings** and
 > corroborated several others from the negative side, in
 > [§ A third case](#a-third-case-what-strands-tested).
+>
+> **Update (2026-09-26 / 09-30).** A fourth investigation, [`agent-ux/`](agent-ux/README.md), read
+> how ten clients **render** those primitives, and [`agent-ux/10`](agent-ux/10-acp.md) read the
+> Agent Client Protocol several of them speak. Nothing here was invalidated. Rec. 7 gained a
+> client-side confirmation; rec. 9's "on by default" gained a failure mode at the wrapper.
+> See [§ The client side](#the-client-side-how-ten-clients-render-the-primitives).
 
 ## Summary — one requirement collides with the platform
 
@@ -190,6 +196,25 @@ And one record for this report's own claims: Strands' benchmark headline — "28
 equal or better accuracy" — is contradicted by its chart's own data in 7 of 19 same-model pairs.
 With no variance reported, that refutes the **wording**, not a ranking.
 
+## The client side: how ten clients render the primitives
+
+The three engine-side studies found the primitives. [`agent-ux/`](agent-ux/README.md) (2026-09-26)
+read ten clients that show them to a person — Claude desktop, ChatGPT/Codex, Cursor, Antigravity,
+Devin Desktop (formerly Windsurf), Orca, Superset, Paseo, Conductor, plus Aside. Strings, tokens
+and enums are extracted; how anything **looks** is ⚠️. On 2026-09-30 the Agent Client Protocol
+those editors speak was read from the spec ([`agent-ux/10`](agent-ux/10-acp.md)).
+
+| Finding here | What the clients showed |
+|---|---|
+| **Approval must be a protocol primitive** (rec. 7) | Confirmed from the other side of the glass. The sentence is **"Allow ⟨agent⟩ to ⟨verb⟩?"** — an action, never a tool name. Paseo makes the request an object with **four renderers** (GUI, CLI, MCP, push) and turns "or just reply" into a protocol rule: a message sent while a prompt is pending **denies it with a reason**. ACP collapses command / file / ask into **one** RPC, `session/request_permission`, whose options are data (`allow_once` · `allow_always` · `reject_once` · `reject_always`). Codex types the *thing* being approved as the method name (ten server→client requests). Both shapes work when the client can render the request |
+| **The gate outside the loop is necessary, not sufficient** (rec. 9) | **The first property — on by default — is where the orchestrators fail.** Orca launches every wrapped agent with its bypass flag; Superset does so in the terminal; Conductor runs local Claude sessions in `bypassPermissions` unless the user opts in. The reviewer-agent rung (Claude "Auto", OpenAI "Approve for me", Cursor "Auto-review") is the industry's answer to prompt fatigue; one vendor states its limit: "Auto-review is not a security boundary" |
+| **Settle the wire first** (rec. 1) | ACP is a **different** wire from Codex App Server and from model `WireApi`. Compatibility is the integer `protocolVersion` at `initialize` (**stable is `1`**), not crate `1.9.1` or SDK `1.3.0`. Strands' harness ACP path never sends the permission RPC |
+
+The styles converged — quiet chrome, amber for "needs you", a machine reviewer in the middle of
+the autonomy dial. **The theories of supervision did not**: watch steps, review deliverables, or
+direct a board. That choice, not any token, decides the layout
+([`agent-ux/09`](agent-ux/09-design-language.md), [`SYNTHESIS.md` §2.8](SYNTHESIS.md)).
+
 ## Recommendations
 
 1. **Settle the wire protocol boundary first.** It determines whether Codex core is reusable at all.
@@ -224,6 +249,12 @@ Two more after the Strands study, grounded in what its error paths did when prob
 10. **Keep the harness's own credentials out of every tool process's environment,** and never tell
     the model that an authority marker can appear in tool results unless every tool result escapes it.
 
+One more after the client study, grounded in how wrappers actually launch:
+
+11. **If you wrap another vendor's agent, leave its approval on.** Three orchestrators ship the
+    wrapped agent with a bypass flag. Rec. 9's first property then fails at the wrapper, before the
+    engine's gate is asked.
+
 ## Method
 
 Most corrections came from reading generated schemas and Rust source rather than prose. The method
@@ -256,9 +287,17 @@ The Strands study added one more:
   mattered. Designs committed beside code look authoritative; they are graded as intent (📐), never as
   behaviour.
 
-Three items remain open by design: a corrected secondary-source error kept on the record, the Windows
-internals labelled as inference, and the Agents API server-side model list, which is a different
-surface from the client catalog. See [99-sources.md](docs/99-sources.md).
+The ACP reading added one more:
+
+- **Crate, SDK and schema release numbers are not the wire.** Agent Client Protocol's stable
+  `protocolVersion` is the integer `1`. Crate `1.9.1`, `schema-v1.23.0` and `@agentclientprotocol/sdk`
+  `1.3.0` are artifact versions of that same wire. Negotiate the field; use capabilities for optional
+  methods.
+
+Two items that this section used to leave open are now settled in the table above: Windows sandbox
+internals (source-read 2026-09-30) and the Agents API server-side model list (three surfaces,
+2026-09-30). A corrected secondary-source error stays on the record. See
+[99-sources.md](docs/99-sources.md).
 
 ## Read next
 
@@ -267,12 +306,14 @@ surface from the client catalog. See [99-sources.md](docs/99-sources.md).
 | Codex detail | [`docs/`](docs/) — 16 documents |
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) |
-| **All three, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
-| By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 16 concepts |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) |
+| How clients render the primitives | [`agent-ux/README.md`](agent-ux/README.md) · ACP: [`agent-ux/10`](agent-ux/10-acp.md) |
+| **All four, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 18 concepts |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
 
 ---
 
 Findings reflect the state of `openai/codex` on 2026-09-15, with the App Server protocol re-counted
 at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86). External corroboration added 2026-09-23. The
-Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`).
+Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`). The client study added 2026-09-26;
+ACP engine-side 2026-09-30 (spec `9b26a3ea`). Wiki concepts: 18.

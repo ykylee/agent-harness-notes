@@ -6,12 +6,12 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-011 ACP 엔진측 독해)
+- Updated: 2026-09-30 (TASK-012 REPORT 개념 18종 · agent-ux 편입)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
-- **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사가 둘(`docs/` Codex · `browser-agents/` 브라우저형), 위키 개념 16종이 둘을 재색인, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거 반영.
+- **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사 넷(`docs/` Codex · `browser-agents/` · `strands/` · `agent-ux/`), 위키 개념 18종, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거·Strands·클라이언트 절 반영.
 - **조사 ↔ 구현 되먹임 루프가 자리잡았다.** 구현은 `ykylee/heddle` (private), 이 저장소 범위 밖이다(`PURPOSE.md` §0.1: **측정만 편입하고 코드는 밖에 둔다**). 이번 세션에 그 경로로 들어온 것이 `SYNTHESIS.md` §6 이다 — 반박 5건, 확인 6건, 방어 공격 5건 관통, 모델 실측 2공급자.
 - **주입 위협 모델 재검토 완료 (TASK-015).** Brave 원문을 다시 읽으니 유출은 "공격자 서버로 navigate"가 아니라 **Reddit 댓글에 답글 달기(쓰기 1회)** 였다. 체인 어디에도 공격자 목적지가 없다. 어긋남은 시연과 실측 사이가 아니라 **우리 한 줄 요약과 원문 사이**에 있었고, 그 요약이 heddle 프로브 설계까지 흘러갔다. 정정하면 시연과 실측은 일치한다 — **목적지 기반 방어는 둘 다 못 막는다. 쓰기를 게이트해야 한다.**
 - **세 번째 사례 Strands 편입 (TASK-2026-09-26-main-001).** `strands/` 8편 — AWS Strands Agents SDK 와 2026-09-22 에 나온 **Strands harness**(`create_harness()`)를 `harness-sdk@15da9dc` 소스로 읽었다. 호출자와 루프 사이에 wire 가 없는 **임베드형** 하네스라 Codex·Aside 와 다른 축에서 추상을 시험한다. 결론: **루프 밖 승인 게이트는 필요조건일 뿐** — Strands 는 그 게이트를 가졌지만 기본 off, 오류 경로 fail-open(Cedar·steering, 🧪 대조군 포함), 등록순 합성, hard deny 없음 (`SYNTHESIS.md` §2.7). provider-as-data 는 **공유 wire 전제에서만** 성립한다는 한정도 붙었다 (§2.3)
@@ -21,6 +21,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-012 REPORT 개념 수 16→18 및 agent-ux 편입: done
 - TASK-2026-09-30-main-011 ACP 엔진측 독해 (스펙·스키마 vs Strands CLI / Codex App Server): done
 - TASK-2026-09-30-main-010 Strands TS SDK 세부 직접 확인 (event union · modelState · stateful formatter): done
 - TASK-2026-09-30-main-009 Strands harness 0.x 드리프트 재확인 (`15da9dc`→`a9a62d4e`, 31커밋): done
@@ -30,10 +31,9 @@
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
 - TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
 - TASK-2026-09-30-main-004 CLAUDE.md kit 1.16.0 갱신: done
-- TASK-2026-09-30-main-003 다른 저장소 workflow overlay plugin-only 위임: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -45,6 +45,7 @@
 
 ## Key Changes
 
+- **REPORT 개념 18종 · agent-ux 편입 (TASK-012)** — 영/한 REPORT에 § The client side / § 클라이언트 쪽, 권고 11(래퍼는 감싼 에이전트 승인을 켜 둔다). 개념 수 16→18. Method에 ACP 산출물≠와이어. Windows 내부·Agents API 모델 목록은 정착으로 표기. PSV 재ingest
 - **ACP 엔진측 독해 (TASK-011)** — 스펙 HEAD `9b26a3ea`. 안정 와이어는 `protocolVersion` **1** (crate 1.9.1 / schema-v1.23.0 / SDK 1.3.0 은 산출물 버전). 승인은 메서드 하나 `session/request_permission`, kind 네 개 `allow_once` · `allow_always` · `reject_once` · `reject_always`. Codex App Server 는 요청 10종. Strands harness ACP 경로는 그 RPC 를 안 보냄 (소스 ✅, 라이브 클라이언트 ⚠️). `agent-ux/10`, 위키 개념 `agent-client-protocol` (18종)
 - **Strands TS SDK 직접 확인 (TASK-010)** — `AgentStreamEvent` 16종. `modelState` 는 미들웨어 전 스냅샷, temp `StateStore` 로 모델에 전달, 성공 시에만 write-back. stateful Responses formatter 는 invocation 전체 `input` + `previous_response_id` (슬라이스 없음). API 반응은 ⚠️. `strands/02` §3.2·§4.2
 - **Strands 0.x 드리프트 재확인 (TASK-009)** — `15da9dc`→`a9a62d4e` 31커밋. 버전 태그 없음 (1.57.1 / 1.19.0 / 0.1.x). 승인 기본 off · Cedar fail-open · sandbox host · 등록순 합성 유지. Cedar/intervention/sandbox 빈 diff 라 P1–P5 미재실행. R19 README 문장 #4696 에서 삭제. #4447 은 squash `4095cf5a`. 로컬 `~/repos/harness-refs/strands-harness-sdk`. `strands/99` §6
@@ -96,7 +97,7 @@
 - [ ] GUI 패스 — 수동 패스 완료(설치 5종). 남은 것: 앱별 스크래치 프로젝트에서 에이전트 실행해 승인 카드·상태 관찰. 미설치 5종(Cursor·Devin·Superset·Paseo·Conductor)은 ⚠️ 그대로
 - [x] ~~Codex 드리프트 단서 3종~~ — TASK-002 에서 판정: 드리프트 아님, webview 전용 (`agent-ux/03` §1.2.1 갱신)
 - [x] ~~ACP(Agent Client Protocol) 엔진측 독해~~ — `agent-ux/10`. 안정 와이어 1, 승인 RPC 하나. 라이브 클라이언트와 Devin/Paseo/Superset 트레이스는 남음. TASK-2026-09-30-main-011
-- [ ] `REPORT`(영/한) 개념 수 16→18 및 agent-ux 반영 여부 (REPORT 수정 시 `primary-source-verification` 재ingest 필요)
+- [x] ~~`REPORT`(영/한) 개념 수 16→18 및 agent-ux 반영~~ — § The client side / § 클라이언트 쪽, 권고 11, 개념 18종. PSV 재ingest. TASK-2026-09-30-main-012
 - [ ] 모바일 컴패니언(Orca·Superset·Paseo)은 이번 패스에서 제외
 
 **저장소**

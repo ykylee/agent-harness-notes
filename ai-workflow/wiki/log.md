@@ -324,3 +324,16 @@ Notes:
 - Strands harness ACP path (`server.ts:102-147`) never sends the permission RPC. Source-agent
   path does. Live client ⚠️.
 - 18 concepts now.
+
+## [2026-09-30] ingest | REPORT 영/한 개념 18종 · agent-ux 편입 (TASK-012)
+
+Sources: `REPORT.md`, `REPORT.ko.md`. Cross-check `agent-ux/09`, `agent-ux/10`, `SYNTHESIS.md` §2.8.
+
+Pages updated (1):
+`concepts/primary-source-verification`
+
+Notes:
+- Codex report now has § The client side and rec. 11 (wrappers leave wrapped-agent approval on).
+- Wiki concept count in the report: 16 → 18 (`agent-client-design-language`, `agent-client-protocol`).
+- Method: ACP crate/SDK/schema ≠ `protocolVersion`. Windows internals and Agents API model list
+  marked settled. Visual claims in `agent-ux/` remain ⚠️.

@@ -25,6 +25,12 @@ OpenAI가 실제로 무엇을 열었는지를 발표문이 아니라 소스에�
 > Strands harness를 읽었습니다. 와이어 너머에서 서비스되는 것이 아니라 호출자 프로세스 안에 링크되는
 > 하네스입니다. 이 조사로도 무효가 된 것은 없고, **두 결론에 단서가 붙었으며** 여러 결론이 반대편에서
 > 확인됐습니다 — [§ 세 번째 사례](#세-번째-사례--strands가-시험한-것)에 모았습니다.
+>
+> **추가 (2026-09-26 / 09-30).** 네 번째 조사 [`agent-ux/`](agent-ux/README.md)는 그 원시값을
+> 열 개 클라이언트가 **어떻게 그리는지** 읽었고, [`agent-ux/10`](agent-ux/10-acp.md)는 그중 여럿이
+> 쓰는 Agent Client Protocol을 읽었습니다. 여기 내용 중 무효가 된 것은 없습니다. 권고 7은
+> 클라이언트 쪽에서 확인됐고, 권고 9의 "기본으로 켜짐"은 래퍼에서 깨지는 실패 모드를 얻었습니다 —
+> [§ 클라이언트 쪽](#클라이언트-쪽--열-개-클라이언트가-원시값을-그리는-방식)에 모았습니다.
 
 ## 요약 — 요구사항 하나가 플랫폼과 충돌합니다
 
@@ -186,6 +192,25 @@ Codex와 Aside는 둘 다 에이전트를 조종하는 쪽과 루프 사이에 �
 데이터로 같은 모델 19쌍 중 7쌍에서 반박됩니다. 분산이 보고되지 않았으므로 반박되는 것은 **문구**이지
 순위가 아닙니다.
 
+## 클라이언트 쪽 — 열 개 클라이언트가 원시값을 그리는 방식
+
+엔진 쪽 조사 셋이 원시값을 찾았습니다. [`agent-ux/`](agent-ux/README.md)(2026-09-26)는 그것을
+사람에게 보여주는 클라이언트 열 개를 읽었습니다 — Claude desktop, ChatGPT/Codex, Cursor,
+Antigravity, Devin Desktop(구 Windsurf), Orca, Superset, Paseo, Conductor, 그리고 Aside.
+문자열·토큰·열거형은 추출했고, **어떻게 보이는지**는 ⚠️입니다. 2026-09-30에는 그 에디터들이
+쓰는 Agent Client Protocol을 스펙에서 읽었습니다 ([`agent-ux/10`](agent-ux/10-acp.md)).
+
+| 이 보고서의 결론 | 클라이언트가 보여준 것 |
+|---|---|
+| **승인은 프로토콜 원시값이어야 한다** (권고 7) | 유리 반대편에서 확인됐습니다. 문장은 **"Allow ⟨agent⟩ to ⟨verb⟩?"** — 도구 이름이 아니라 행위입니다. Paseo는 요청을 **렌더러 넷**(GUI, CLI, MCP, push)을 가진 객체로 두고, "그냥 답장"을 프로토콜 규칙으로 만듭니다: 프롬프트가 대기 중일 때 보낸 메시지는 **사유와 함께 거부**됩니다. ACP는 명령·파일·질문을 메서드 **하나** `session/request_permission`으로 접고, 선택지는 데이터입니다 (`allow_once` · `allow_always` · `reject_once` · `reject_always`). Codex는 *무엇을* 승인하는지를 메서드 이름에 넣습니다 (서버→클라이언트 요청 10종). 클라이언트가 요청을 그릴 수 있으면 두 모양 모두 됩니다 |
+| **루프 밖 게이트는 필요조건이지 충분조건이 아니다** (권고 9) | **첫 속성 — 기본으로 켜짐 — 이 오케스트레이터에서 깨집니다.** Orca는 감싼 에이전트마다 bypass 플래그로 띄우고, Superset은 터미널에서 그렇게 하며, Conductor는 사용자가 켜지 않는 한 로컬 Claude 세션을 `bypassPermissions`로 돌립니다. 리뷰어-에이전트 단(Claude "Auto", OpenAI "Approve for me", Cursor "Auto-review")은 프롬프트 피로에 대한 업계의 답이고, 한 벤더는 한계를 말합니다: "Auto-review is not a security boundary" |
+| **와이어를 먼저 정하라** (권고 1) | ACP는 Codex App Server와도, 모델 `WireApi`와도 **다른** 와이어입니다. 호환은 `initialize`의 정수 `protocolVersion`(**안정판은 `1`**)이지 crate `1.9.1`이나 SDK `1.3.0`이 아닙니다. Strands의 harness ACP 경로는 승인 RPC를 보내지 않습니다 |
+
+스타일은 수렴했습니다 — 조용한 크롬, "당신이 필요함"은 주황, 자율성 다이얼 한가운데의 기계 리뷰어.
+**감독 이론은 갈렸습니다**: 단계를 볼 것인지, 산출물을 리뷰할 것인지, 보드를 지휘할 것인지.
+레이아웃을 정하는 것은 토큰이 아니라 그 선택입니다
+([`agent-ux/09`](agent-ux/09-design-language.md), [`SYNTHESIS.md` §2.8](SYNTHESIS.md)).
+
 ## 권고
 
 1. **와이어 프로토콜 경계를 가장 먼저 정하십시오.** Codex 코어를 재사용할 수 있는지가 여기서
@@ -216,6 +241,11 @@ Strands 조사 이후 두 가지를 더합니다. 오류 경로를 프로브했�
 10. **하네스 자신의 자격증명을 모든 도구 프로세스의 환경에서 빼십시오.** 그리고 모든 도구 결과가
     권위 표지를 이스케이프하지 않는 한, 모델에게 그 표지가 도구 결과에 나타날 수 있다고 말하지 마십시오.
 
+클라이언트 조사 이후 하나를 더합니다. 래퍼가 실제로 어떻게 띄우는가에 근거합니다.
+
+11. **다른 벤더의 에이전트를 감쌀 때는 그 승인을 켜 두십시오.** 오케스트레이터 셋이 감싼 에이전트를
+    bypass 플래그로 출하합니다. 그러면 권고 9의 첫 속성은 엔진 게이트에 묻기도 전에 래퍼에서 깨집니다.
+
 ## 조사 방법
 
 정정 대부분은 산문이 아니라 생성된 스키마와 Rust 소스를 읽어서 나왔습니다. 메서드 목록, 정확한 요청
@@ -245,9 +275,16 @@ Strands 조사가 하나를 더했습니다.
   구현돼 있었고, 중요한 지점에서 설계와 달랐습니다. 코드 옆에 커밋된 설계는 권위 있어 보이지만,
   의도(📐)로 등급을 매기고 동작의 증거로 쓰지 않습니다.
 
-세 항목은 의도적으로 열어 두었습니다. 정정된 2차 출처 오류의 기록, 추론임을 명시한 Windows 내부
-구조, 그리고 클라이언트 카탈로그와는 다른 표면인 Agents API 서버 측 모델 목록입니다.
-[99-sources.md](docs/99-sources.md)를 참고하십시오.
+ACP 독해가 하나를 더했습니다.
+
+- **crate·SDK·스키마 릴리스 번호는 와이어가 아닙니다.** Agent Client Protocol의 안정
+  `protocolVersion`은 정수 `1`입니다. crate `1.9.1`, `schema-v1.23.0`,
+  `@agentclientprotocol/sdk` `1.3.0`은 그 같은 와이어의 산출물 버전입니다. 필드를 협상하고,
+  선택 메서드는 capability로 다룹니다.
+
+이 절이 열어 두었던 두 항목은 위의 표에서 정착됐습니다. Windows 샌드박스 내부(2026-09-30 소스
+독해)와 Agents API 서버 측 모델 목록(표면 셋, 2026-09-30). 정정된 2차 출처 오류는 기록으로
+남깁니다. [99-sources.md](docs/99-sources.md)를 참고하십시오.
 
 ## 다음에 읽을 문서
 
@@ -256,12 +293,14 @@ Strands 조사가 하나를 더했습니다.
 | Codex 상세 | [`docs/`](docs/) — 문서 16편 |
 | 브라우저형 에이전트 | [`browser-agents/README.md`](browser-agents/README.md) |
 | 임베드형 SDK 하네스 (Strands) | [`strands/README.md`](strands/README.md) |
-| **셋을 가로질러** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
-| 개념 단위 | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 개념 16종 |
-| 어떤 주장을 믿어도 되나 | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) |
+| 클라이언트가 원시값을 그리는 방식 | [`agent-ux/README.md`](agent-ux/README.md) · ACP: [`agent-ux/10`](agent-ux/10-acp.md) |
+| **넷을 가로질러** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| 개념 단위 | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 개념 18종 |
+| 어떤 주장을 믿어도 되나 | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
 
 ---
 
 내용은 2026-09-15 시점의 `openai/codex` 상태를 반영하며, App Server 프로토콜은 2026-09-30 HEAD
 `bcd6d9ab6b` 에서 재집계했습니다 (107 / 10 / 86). 변화가 빠른 저장소입니다.
 외부 증거는 2026-09-23에, Strands 사례는 2026-09-26에 추가했습니다 (`harness-sdk` @ `15da9dc`).
+클라이언트 조사는 2026-09-26, ACP 엔진측은 2026-09-30 (스펙 `9b26a3ea`). 위키 개념 18종.

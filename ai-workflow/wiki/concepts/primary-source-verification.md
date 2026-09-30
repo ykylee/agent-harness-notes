@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (ACP: crate/SDK/schema version ≠ `protocolVersion`; TASK-011)
+- Updated: 2026-09-30 (REPORT 영/한: 개념 18종, agent-ux 절·권고 11; TASK-012)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -258,6 +258,12 @@ say nothing either way.
 
 These three now also stand in [`REPORT.md`](../../../REPORT.md) § Method and § A third case (and the
 Korean edition), so the report and this page rest on the same record (G4).
+
+**REPORT 2026-09-30** (TASK-012). The Codex report now carries the client study: § The client side,
+rec. 11 (wrappers leave wrapped-agent approval on), 18 wiki concepts, and the ACP artifact-vs-wire
+rule in § Method. Korean edition in lockstep. Windows internals and the Agents API server-side
+model list, previously left open in that Method paragraph, are marked settled. The visual layer of
+`agent-ux/` remains ⚠️.
 
 **Drift re-check 2026-09-30** ([`strands/99`](../../../strands/99-sources.md) §6). HEAD `a9a62d4e`,
 31 commits past the study pin, no new version tags. Cedar / interventions / sandbox / `create_harness`
