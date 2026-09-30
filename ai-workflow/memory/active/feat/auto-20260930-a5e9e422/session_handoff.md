@@ -11,6 +11,9 @@
 
 - 현재 기준선: **조사 축 3곳(Codex · Strands · ACP) 전부 대조 완료, 남은 ⚠️ 0건.** 다음 드리프트
   기준선 — Codex `92bc601ad6` · Strands `4dfeca8c` · ACP `7d794e0e`. **반박 0건.**
+- **다섯 번째 조사 축 신설 — `gas-town/`** (Gas Town, `649b832b76`, 오케스트레이션). 목적은
+  **오케스트레이션 기법 참고**였고, 기법 11종(A1–A11)을 `gas-town/04` 에 발쑌다.
+  범위는 `PURPOSE.md` §0.3 에 기재. ⚠️ **관찰 0건 — 바이너리 미실행, 전부 source-read.**
 - **정본 참조 클론 2개를 재생성했다** — `~/repos/harness-refs/strands-harness-sdk` (`4dfeca8c74`),
   `~/repos/harness-refs/agent-client-protocol` (`7d794e0e2d`). 이제 임시 클론이 필요 없다.
 - 현재 주 작업 축: 조사 드리프트 점검 — Codex / Strands / ACP 기존 사실을 1차 출처로 재확인 (main 기준선 계승)
@@ -33,6 +36,11 @@
 - TASK-2026-09-30-feat-auto-20260930-a5e9e422-001 — Codex 8커밋 대조: goal API `origin` 신설, Guardian 스킵 warmup.
 
 ## 5. 다음 세션 시작 포인트
+
+- **Gas Town 런타임 검증이 미완이다 — `gas-town/` 의 가장 큰 구멍.** 전부 소스 읽기였고 실행은 0건.
+  `gt` 로 소규모(3~5 polecat) town 을 구성해 sling→merge 사이클을 재현하면 §5 의 Stalled/Zombie
+  상태와 propulsion 이 **관찰** 가능해진다. 별도 task 로 등록하는 게 좋다.
+- Gas City(분해 SDK)와 Beads standalone 은 미독 — 개념 축 연속성 확인용.
 
 - **남은 ⚠️ 가 없다.** ACP #2223(승인과의 관계)과 Strands 태그/버전 모두 해소됐다(§6).
   조사 축의 다음 수는 새 드리프트가 쌓이는 것 — Codex `92bc601ad6` · Strands `4dfeca8c` ·

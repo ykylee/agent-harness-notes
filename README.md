@@ -7,10 +7,10 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-## Four studies, one subject
+## Five studies, one subject
 
-This repository now holds **four investigations into agent harnesses** — three from the engine side,
-one from the client side:
+This repository now holds **five investigations into agent harnesses** — three from the engine side,
+one from the client side, and one from *above* them:
 
 | Study | Subject | Execution surface |
 |---|---|---|
@@ -18,6 +18,7 @@ one from the client side:
 | [`browser-agents/`](browser-agents/README.md) | Browser-type agents (Aside, Comet, Dia, Neon, Browser Use) | browser · OS |
 | [`strands/`](strands/README.md) | Strands Agents SDK and Strands harness (AWS) — an embeddable library | shell · filesystem, **linked into the caller's process** |
 | [`agent-ux/`](agent-ux/README.md) | UX/UI of ten agent clients (Claude, ChatGPT/Codex, Cursor, Antigravity, Devin/Windsurf, Orca, Superset, Paseo, Conductor, Aside) | the **client** — how harness primitives are shown to people |
+| [`gas-town/`](gas-town/01-vocabulary.md) | Gas Town (Steve Yegge) — **orchestrating many harness instances at once** | the **fleet** — who assigns work, and where state lives when a session dies |
 
 **→ [SYNTHESIS.md](SYNTHESIS.md)** crosses them: which design axes are surface-independent
 (approval, permissions, providers, control/execution plane) and which are surface-specific
@@ -25,9 +26,13 @@ one from the client side:
 **meet in code** — Aside's daemon registers `openai-codex` as a model provider and implements
 Codex's `responses_lite` request-shape branching. Strands, the third case, tests the abstraction on
 a different axis — no wire between caller and loop — and found that an approval gate outside the loop
-is necessary but not sufficient (SYNTHESIS §2.7).
+is necessary but not sufficient (SYNTHESIS §2.7). The fifth study sits one level *above* all of
+them: it tests whether those axes survive at fleet cardinality, and contributes the sharpest form
+of the control/execution split — **the plane boundary has to be drawn around credentials, not just
+files**, because a worker that can write its own result ledger can forge its own work
+([`gas-town/04`](gas-town/04-orchestration-techniques.md) Part B).
 
-Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (18 concepts).
+Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (19 concepts).
 
 ## Start with the report
 

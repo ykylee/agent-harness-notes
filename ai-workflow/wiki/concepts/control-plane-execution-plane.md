@@ -2,7 +2,7 @@
 type: concept
 status: active
 last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md
-related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data]
+related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data, concepts/multi-agent-orchestration]
 created: 2026-09-22
 updated: 2026-09-30
 ---
@@ -94,9 +94,28 @@ a different place by each product**, which makes the axis sharper.
 > locally on the device," while the product FAQ says **planning uses cloud LLMs.** Two first-party
 > sources from the same company disagree.
 
+## §5.6 Observation — orchestration sharpens the boundary to a credential  {#s5-6-orchestration}
+
+[[concepts/multi-agent-orchestration]] contributes the sharpest form of this axis so far, from
+Gas Town's sandbox proposal. Every version of the boundary on this page asks *where execution runs*.
+The orchestration case asks a different question: when a worker is moved somewhere untrusted, **the
+thing at risk is not only the filesystem — it is the worker's ability to write its own results.**
+An orchestrator's identity plus ledger-write access is enough to forge a completed task.
+
+So the boundary is not *(planning | execution)* but:
+
+> **(credential-bearing control | untrusted execution)**
+
+The control channel — assign work, report status, update the result ledger — stays reachable and
+credentialed on the host; the execution plane (inference, file edits, `git`) goes where it is
+constrained. **A harness that sandboxes files but leaves the result ledger writable has not
+separated the planes.** This also explains why §3's "key separation" needs the *channel* protected
+and not only the compute: the ledger is a control surface.
+
 ## §6 Read next  {#s6-next}
 
 - [[concepts/execution-environment-topology]] — the three shapes of the execution plane
 - [[concepts/provider-as-data]] — who chooses the model, which follows from planning location
 - [[concepts/os-sandbox-policy]] — OS-level defence inside the execution plane
+- [[concepts/multi-agent-orchestration]] — the layer above the harness; §5.6 is its contribution here
 - Original: [`docs/09-agents-api-environments.md`](../../../docs/09-agents-api-environments.md)
