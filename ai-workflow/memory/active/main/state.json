@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사 넷(`docs/` Codex · `browser-agents/` · `strands/` · `agent-ux/`), 위키 개념 18종, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거·Strands·클라이언트 절 반영.",
-    "current_axis": "**이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사 넷(`docs/` Codex · `browser-agents/` · `strands/` · `agent-ux/`), 위키 개념 18종, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거·Strands·클라이언트 절 반영.",
+    "current_baseline": "**2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**",
+    "current_axis": "**2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**",
     "current_focus": "TASK-2026-09-27-main-002",
     "in_progress_items": [],
     "blocked_items": [

@@ -6,11 +6,18 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-09-30 (TASK-013 Anthropic redacted_thinking KeyError)
+- Updated: 2026-09-30 (저녁: 드리프트 3축 대조 + Gas Town 오케스트레이션 축, 병합 `6a2bb44`)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
+- **2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**
+  - **Codex** `bcd6d9ab6b` → `92bc601ad6` (8커밋·134파일): `thread/goal/set|clear` params 에 `origin`(user|automatic) 신설. Rust 정의 + **생성 Python SDK** 양쪽 확인 = 와이어 계약. 계약 문구 "Missing provenance does not supply user authorization." 서버는 `origin == User` 일 때만 user fragment 를 히스토리에 기록. `thread_goal_user_context.rs:2` — "tool-created goals never use this path." → **기록 출처 판별자이지 권한 확장이 아니다.** Guardian 스킵 warmup(`a5cce8895a`) = **게이트 가용성과 정확성이 분리된 축**(회귀 테스트가 executor 오프라인 상태에서 deny 를 검증). `model_catalog_in_context`(`2e5fea64ee`, off 기본) = providers-as-data 축 후보. `docs/02` §9 · `docs/12` §2.2 · `docs/99` §E.5 반영
+  - **Strands** `a9a62d4e` → `4dfeca8c` (2커밋): bidi reconnect → **restart** 리팩터링 + prettier bump. `git diff --name-only | grep -iE "approval|permission|consent|cedar|sandbox|intervention|harness"` **출력 없음** → 승인 기본 off·Cedar fail-open·sandbox `host`·등록순 단축이 그대로 성립, **P1–P5 재실행 불필요**(2개 창 연속 확인)
+  - **ACP** `9b26a3ea` → `7d794e0e` (8커밋): **`schema/v1/schema.json` 바이트 동일** — 안정 와이어 무변경, 승인 RPC(메서드 하나·kind 4종) 그대로. CHANGELOG 3건은 **전부 `*(unstable)*`** 라서 스키마가 안 바뀐 것 — 6,791줄 diff 를 "계약 변경"으로 읽으면 오판이다. **MCP-over-ACP request-scoped(#2223)는 승인과 무관** — `mcp/message` payload 에 `sessionId`·`toolCall`·`PermissionOption` 을 실을 자리가 없고, `MessageMcpResponse` 가 outer ACP error 를 "binding and runtime failures" 로 예약한다. **근거는 페이로드 형태이지 "스키마 불변" 이 아니다**
+  - **Gas Town 신설 — `gas-town/` 6편, 위키 19종.** Steve Yegge `gastownhall/gastown` @ `649b832b76`. 목적은 **오케스트레이션 기법 참고**였고 A1–A11 을 발쑌다(`gas-town/04`). **기여하지 않는 축을 명시** — approval 은 약화가 아니라 대비(post-hoc 신뢰 모델), provider-as-data 는 wire 전제 유지. **관찰 0건** — 바이너리 미실행, 전부 source-read
+  - **문서 오류 1건 정정 — 존재하지 않던 참조 클론 2개.** `~/repos/harness-refs/{strands-harness-sdk,agent-client-protocol}` 가 문서에 정본 경로로 적혀 있으나 실재하지 않았다. 재생성함
+  - **기존 축 1곳 강화** — control/execution plane 을 **credential 경계**로: 파일만 격리하고 결과 원장이 쓰기 가능하면 plane 분리는 실패다(`control-plane-execution-plane` §5.6 신설)
 - **이 저장소의 조사는 안정 상태다. 남은 작업은 전부 기기나 동적 관찰을 요구하거나, 기존 사실의 드리프트 점검이다.** 조사 넷(`docs/` Codex · `browser-agents/` · `strands/` · `agent-ux/`), 위키 개념 18종, `SYNTHESIS.md` 가 교차 종합, `REPORT`(영/한)에 외부 증거·Strands·클라이언트 절 반영.
 - **조사 ↔ 구현 되먹임 루프가 자리잡았다.** 구현은 `ykylee/heddle` (private), 이 저장소 범위 밖이다(`PURPOSE.md` §0.1: **측정만 편입하고 코드는 밖에 둔다**). 이번 세션에 그 경로로 들어온 것이 `SYNTHESIS.md` §6 이다 — 반박 5건, 확인 6건, 방어 공격 5건 관통, 모델 실측 2공급자.
 - **주입 위협 모델 재검토 완료 (TASK-015).** Brave 원문을 다시 읽으니 유출은 "공격자 서버로 navigate"가 아니라 **Reddit 댓글에 답글 달기(쓰기 1회)** 였다. 체인 어디에도 공격자 목적지가 없다. 어긋남은 시연과 실측 사이가 아니라 **우리 한 줄 요약과 원문 사이**에 있었고, 그 요약이 heddle 프로브 설계까지 흘러갔다. 정정하면 시연과 실측은 일치한다 — **목적지 기반 방어는 둘 다 못 막는다. 쓰기를 게이트해야 한다.**
@@ -21,6 +28,8 @@
 
 ## Work Status
 
+- 2026-09-30 저녁 (병합 `6a2bb44`): Codex 8커밋 · Strands 2커밋 · ACP 8커밋 드리프트 대조 + Gas Town 오케스트레이션 조사 — **done**. **반박 0건.** 상세는 `ai-workflow/memory/active/feat/auto-20260930-a5e9e422/`
+- 2026-09-30 저녁 드리프트 3축 + Gas Town 조사: done
 - TASK-2026-09-30-main-013 Anthropic redacted_thinking KeyError 확인: done
 - TASK-2026-09-30-main-012 REPORT 개념 수 16→18 및 agent-ux 편입: done
 - TASK-2026-09-30-main-011 ACP 엔진측 독해 (스펙·스키마 vs Strands CLI / Codex App Server): done
@@ -72,6 +81,15 @@
 - **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. **이 결과는 `SYNTHESIS.md` §6 으로 편입됐다.**
 
 ## Next Actions
+
+**2026-09-30 저녁 세션이 남긴 것 (feat 워크스페이스에서 이월)**
+- [ ] **Gas Town 런타임 검증 — 이 축의 가장 큰 구멍.** `gt`/`bd` 미실행이라 관찰 0건. 소규모(3~5 polecat) town 을 구성해 sling→merge 사이클을 재현하면 `gas-town/03` §5 의 Stalled/Zombie 상태와 propulsion 이 **관찰** 가능해진다
+- [ ] `model_catalog_in_context`(`2e5fea64ee`, off 기본) 의 providers-as-data 축 해석 — **미분석, 단정하지 말 것** (§2.3 의 "공유 wire 전제" 한정과 관계 있음)
+- [ ] `SYNTHESIS.md` §2 에 **게이트 가용성 축** 편입 여부 (Guardian 스킵 warmup 근거)
+- [ ] `SYNTHESIS.md` §2.4 에 **credential plane** 편입 — `control-plane-execution-plane` §5.6 에 이미 기록됨
+- [ ] Gas City(분해 SDK) · Beads standalone 미독 — 개념 축 연속성 확인용
+- [ ] Strands 태그/버전은 `4dfeca8c` 까지만 확인 — 다음 창에서 재확인
+- [ ] `check_wiki_freshness.py` 가 stale 을 알린다 — **근거 없는 갱신으로 메우지 말 것**(§ Risks)
 
 **Codex 조사 (`docs/`)**
 - [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 2026-09-30 HEAD `bcd6d9ab6b` 후속 107 / 10 / 86. 다음 드리프트 기준은 `bcd6d9ab6b`
