@@ -37,6 +37,11 @@ does not replace that finding: its city-write grants authorize config mutations,
 writes, and its ACP session provider leaves `session/request_permission` unanswered
 ([`gas-city/04`](gas-city/04-orchestration-techniques.md) Part B).
 
+A separate note, not a sixth study: [`rrsi/`](rrsi/README.md) reads Google Cloud AI Research's
+RRSI, a search that edits a harness while the model stays frozen
+(`google-research/rrsi` @ `be50316e1d`). The published benchmark table is the authors' report
+and is not adopted.
+
 Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (19 concepts).
 
 ## Start with the report

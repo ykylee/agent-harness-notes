@@ -137,6 +137,23 @@ adopted where the tree disagrees.
 Added: **`gas-city/`**. The concept page remains `multi-agent-orchestration` — a second reading,
 not a new concept. The boundary is unchanged: study the orchestration, do not adopt `gc`.
 
+## 0.5 Scope note, 2026-10-01 — a search over harnesses, not a new harness
+
+RRSI (Regularized Recursive Self-Improvement of Agent Harnesses, Google Cloud AI Research,
+arXiv:2609.24972, code `google-research/rrsi`) is a procedure that edits a harness while the
+model stays frozen, and regularizes the search so the edit does not memorize the eval set.
+The name is easy to hear as "RIIS". Dream-RSI is a different paper and is not this note.
+
+It belongs on the harness-engineering axis already in scope:
+
+1. **The object is the harness.** Weights are not a search parameter. The incumbent is a git
+   commit on `evolve/<domain>`.
+2. **The published scores are the authors' measurements.** They are recorded as self-reported
+   and are not a comparison against anything else in this repository.
+
+Added: **`rrsi/`**. No new concept page. The boundary is unchanged: study the method, do not
+adopt the search as this repository's workflow, and do not re-run the benchmarks here.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -178,7 +195,9 @@ not a new concept. The boundary is unchanged: study the orchestration, do not ad
 - CLI `codex exec`, the TypeScript and Python SDKs
 - Model provider configuration, and the feasibility of a Responses↔Chat Completions adapter
 - The native Windows sandbox, marketplace and plugin distribution formats
-- Harness engineering operating principles (OpenAI's internal experiment)
+- Harness engineering operating principles (OpenAI's internal experiment), and a search
+  procedure that edits a harness while the model stays frozen (`rrsi/`, 2026-10-01, §0.5).
+  The procedure's published scores are not adopted.
 - Source verification records and the history of refutations (`99-sources.md`)
 - **Control surface, perception model and credential design of browser-type agents**
   (`browser-agents/`)

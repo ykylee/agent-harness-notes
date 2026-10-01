@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/07-harness-engineering.md
+last_ingested_from: docs/07-harness-engineering.md + rrsi/01-what-it-edits.md + rrsi/02-the-loop.md + rrsi/03-measurement.md + rrsi/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/primary-source-verification]
 created: 2026-09-22
-updated: 2026-09-23
+updated: 2026-10-01
 ---
 
 # Harness Engineering — the discipline of governing an autonomous runtime
@@ -12,7 +12,7 @@ updated: 2026-09-23
 - Purpose: the operating principles drawn from OpenAI's internal "zero hand-written code" experiment.
 - Scope: the experiment's facts, redefining the engineer's role, legibility, mechanical enforcement, entropy and garbage collection, how to apply it
 - Primary source: [Harness engineering](https://openai.com/index/harness-engineering/), Ryan Lopopolo, 2026-02-11
-- Updated: 2026-09-23
+- Updated: 2026-10-01 (RRSI: regularize the search that edits the harness; non-structural tags stick only via domain signals; scores not adopted)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -156,8 +156,37 @@ Stated directly in the "Codex as a platform" post:
 
 **Two harness-level settings, not a model change.** Detail in [[concepts/retained-reasoning]].
 
-## §11 Read next  {#s11-next}
+## §11 Regularize the search, not the contents  {#s11-rrsi}
+
+§10 says two harness settings changed a score while the model stayed put. RRSI
+(`google-research/rrsi` @ `be50316e1d`, paper arXiv:2609.24972) takes the next step and lets a
+search edit the harness itself: prompts, control flow, tools, memory, sub-agents. The weights
+stay frozen. The incumbent is a commit on `evolve/<domain>`.
+
+The paper's point, and the part that is source-read, is that an open edit space overfits the
+evolve set unless the **search** is constrained: an annealed cap on how many edits one candidate
+may bundle, a history of failed hypotheses, a stall slot for components never tried, a critic
+that rejects task-specific diffs before evaluation, a noise floor, a cost rule, and a prune list
+for components whose recent yield is not positive. The critic is another model call plus a
+regex. It is a screen, not a proof.
+
+The tag vocabulary is fixed at nine names. A declared tag is kept only when the diff matches a
+signal for it. Generic signals recognise only the four structural tags (memory, skill, tool,
+subagent). `control_flow`, `config`, `context_mgmt` and `output_plumbing` stick only when that
+domain's `component_signals` match; otherwise the tag falls back to `prompt`. A false tag would
+corrupt the tried-set and the novelty term.
+
+A missing trial counts as reward 0 so a candidate cannot drop the tasks it finds hard. If the
+missing fraction exceeds the configured cap (0.20 on the coding instance), the round is invalid
+and retried once, rather than accepted as a score. Inside the cap, an infrastructure miss and a
+wrong answer still add.
+
+The published score table (Terminal-Bench 74.2 → 80.2, and the rest) is the authors' report.
+It is not a finding of this page. Full record: [`rrsi/`](../../../rrsi/README.md).
+
+## §12 Read next  {#s12-next}
 
 - [[concepts/harness]] — the structure of what is being governed
 - [[concepts/retained-reasoning]] — a concrete case of harness settings changing performance
+- RRSI, the search: [`rrsi/02-the-loop.md`](../../../rrsi/02-the-loop.md)
 - Original: [`docs/07-harness-engineering.md`](../../../docs/07-harness-engineering.md)

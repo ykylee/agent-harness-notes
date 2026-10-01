@@ -17,7 +17,8 @@ split between surface-specific and surface-independent axes.
 
 ### [[concepts/harness-engineering]] {#harness-engineering}
 Five months with no hand-written code. The bottleneck was the environment, not the model — legibility,
-mechanical enforcement, continuous garbage collection.
+mechanical enforcement, continuous garbage collection. §11 adds RRSI: a search that edits the
+harness while the model stays frozen. The published scores are not adopted.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
 The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity
