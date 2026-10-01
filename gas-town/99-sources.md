@@ -42,7 +42,7 @@
 |---|---|
 | Runtime behaviour | **not run.** No `gt`/`bd` binary executed, no town created, no Dolt server started. Every mechanism here is read from source and design docs |
 | Hosted "Gas Town by Kilo" and the Wasteland federation | secondary coverage only; not read from a first-party repo here |
-| Gas City (the v2 declarative toolkit) | mentioned in the ecosystem; **not read** from source in this pass |
+| Gas City (the platform this operating model was extracted into) | read in [`gas-city/`](../gas-city/99-sources.md) @ `3ef7fadd42`. This row is closed |
 | Beads (`gastownhall/beads`) as a separate project | used here only through Gas Town's `internal/beads` + docs; the standalone project was not cloned |
 | Cost, throughput, and merge-conflict-rate numbers | not measured; see 📣 above |
 | Live behaviour of a polecat under the (proposed) sandbox | the doc is a **Proposal**; the split is a design, not an observed deployment |

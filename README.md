@@ -7,10 +7,11 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15)
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-## Five studies, one subject
+## Five subjects, the last one read twice
 
-This repository now holds **five investigations into agent harnesses** — three from the engine side,
-one from the client side, and one from *above* them:
+This repository holds **five investigations into agent harnesses** — three from the engine side,
+one from the client side, and one from *above* them. The one above is recorded twice: the
+operating model, then the platform that operating model was extracted into.
 
 | Study | Subject | Execution surface |
 |---|---|---|
@@ -18,7 +19,8 @@ one from the client side, and one from *above* them:
 | [`browser-agents/`](browser-agents/README.md) | Browser-type agents (Aside, Comet, Dia, Neon, Browser Use) | browser · OS |
 | [`strands/`](strands/README.md) | Strands Agents SDK and Strands harness (AWS) — an embeddable library | shell · filesystem, **linked into the caller's process** |
 | [`agent-ux/`](agent-ux/README.md) | UX/UI of ten agent clients (Claude, ChatGPT/Codex, Cursor, Antigravity, Devin/Windsurf, Orca, Superset, Paseo, Conductor, Aside) | the **client** — how harness primitives are shown to people |
-| [`gas-town/`](gas-town/01-vocabulary.md) | Gas Town (Steve Yegge) — **orchestrating many harness instances at once** | the **fleet** — who assigns work, and where state lives when a session dies |
+| [`gas-town/`](gas-town/01-vocabulary.md) | Gas Town — one operating model for **orchestrating many harness instances** | the **fleet** — named roles, a town tree, a ledger |
+| [`gas-city/`](gas-city/01-vocabulary.md) | Gas City — the platform that model was extracted into | the **fleet** — roles as pack config, formula graphs driven outside the model session |
 
 **→ [SYNTHESIS.md](SYNTHESIS.md)** crosses them: which design axes are surface-independent
 (approval, permissions, providers, control/execution plane) and which are surface-specific
@@ -30,7 +32,10 @@ is necessary but not sufficient (SYNTHESIS §2.7). The fifth study sits one leve
 them: it tests whether those axes survive at fleet cardinality, and contributes the sharpest form
 of the control/execution split — **the plane boundary has to be drawn around credentials, not just
 files**, because a worker that can write its own result ledger can forge its own work
-([`gas-town/04`](gas-town/04-orchestration-techniques.md) Part B).
+([`gas-town/04`](gas-town/04-orchestration-techniques.md) Part B). Gas City, read at `3ef7fadd42`,
+does not replace that finding: its city-write grants authorize config mutations, not result-ledger
+writes, and its ACP session provider leaves `session/request_permission` unanswered
+([`gas-city/04`](gas-city/04-orchestration-techniques.md) Part B).
 
 Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (19 concepts).
 

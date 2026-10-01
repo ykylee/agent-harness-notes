@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md
+last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md + gas-town/02-architecture.md + gas-town/04-orchestration-techniques.md + gas-city/02-architecture.md + gas-city/04-orchestration-techniques.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data, concepts/multi-agent-orchestration]
 created: 2026-09-22
 updated: 2026-09-30
@@ -111,6 +111,13 @@ credentialed on the host; the execution plane (inference, file edits, `git`) goe
 constrained. **A harness that sandboxes files but leaves the result ledger writable has not
 separated the planes.** This also explains why §3's "key separation" needs the *channel* protected
 and not only the compute: the ledger is a control surface.
+
+Gas City (`3ef7fadd42`) adds a second door and does not close the first. `internal/citywriteauth`
+verifies ed25519 single-use grants for **city configuration** mutations, bound to one request.
+The package mints nothing; the bundled dashboard is rejected once the gate is on. That credential
+does not cover `bd` writes, and a worker that can write a control bead can strand a workflow
+([`gas-city/02`](../../../gas-city/02-architecture.md) §6, [`gas-city/04`](../../../gas-city/04-orchestration-techniques.md) A1).
+Prefix isolation between rigs is a `bd` query filter on a shared server, not a credential either.
 
 ## §6 Read next  {#s6-next}
 

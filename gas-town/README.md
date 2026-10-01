@@ -74,3 +74,5 @@ and folded into
 - [`agent-ux/`](../agent-ux/README.md) — the client side, one level down
 - [`strands/`](../strands/README.md) — the embeddable-harness case, whose `sandbox: host` default
   this study's plane split connects to
+- [`gas-city/`](../gas-city/README.md) — the platform this operating model was extracted into,
+  read at `3ef7fadd42`. Roles move into a pack; the credential finding does not move with them

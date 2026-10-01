@@ -211,6 +211,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 로드맵 밖 Strands Anthropic redacted_thinking 확인",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-013.md"
+    },
+    {
+      "task_id": "TASK-2026-09-30-main-014",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 노트 저장소. 초안 제품 로드맵(M-001~004) 밖이며 PURPOSE §0.3 오케스트레이션 축의 연속 조사다.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-09-30-main-014.md"
     }
   ],
   "issues": []

@@ -28,6 +28,7 @@
 
 ## Work Status
 
+- TASK-2026-09-30-main-014 Gas City 오케스트레이션 조사: done. `gas-city/` @ `3ef7fadd42`. 역할 enum 없음, 번들 Gastown 팩은 있음. formula v2 기본 on. ACP `session/request_permission` 미응답. **미실행**
 - 2026-09-30 저녁 (병합 `6a2bb44`): Codex 8커밋 · Strands 2커밋 · ACP 8커밋 드리프트 대조 + Gas Town 오케스트레이션 조사 — **done**. **반박 0건.** 상세는 `ai-workflow/memory/active/feat/auto-20260930-a5e9e422/`
 - 2026-09-30 저녁 드리프트 3축 + Gas Town 조사: done
 - TASK-2026-09-30-main-013 Anthropic redacted_thinking KeyError 확인: done
@@ -39,10 +40,9 @@
 - TASK-2026-09-30-main-007 Dia macOS 바이너리 정적 분석 · Neon netinstaller 스텁: done
 - TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
 - TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
-- TASK-2026-09-22-agent-harness-notes-004 Windows 샌드박스 내부 구조 추론→확인 승격: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -87,7 +87,8 @@
 - [ ] `model_catalog_in_context`(`2e5fea64ee`, off 기본) 의 providers-as-data 축 해석 — **미분석, 단정하지 말 것** (§2.3 의 "공유 wire 전제" 한정과 관계 있음)
 - [ ] `SYNTHESIS.md` §2 에 **게이트 가용성 축** 편입 여부 (Guardian 스킵 warmup 근거)
 - [ ] `SYNTHESIS.md` §2.4 에 **credential plane** 편입 — `control-plane-execution-plane` §5.6 에 이미 기록됨
-- [ ] Gas City(분해 SDK) · Beads standalone 미독 — 개념 축 연속성 확인용
+- [x] Gas City — `gas-city/` @ `3ef7fadd42` (TASK-2026-09-30-main-014). 소스 독해, 미실행
+- [ ] Beads standalone (`gastownhall/beads`) 미독 — 개념 축 연속성 확인용
 - [ ] Strands 태그/버전은 `4dfeca8c` 까지만 확인 — 다음 창에서 재확인
 - [ ] `check_wiki_freshness.py` 가 stale 을 알린다 — **근거 없는 갱신으로 메우지 말 것**(§ Risks)
 

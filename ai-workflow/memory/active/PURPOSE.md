@@ -113,6 +113,30 @@ repository's existing axes. A dedicated knowledge entry lives in the wiki concep
 The boundary to hold: **study the orchestration, do not adopt the tool.** No Gas Town binary
 enters this repository's workflow, and nothing in `ai-workflow/` is reorganised to imitate it.
 
+## 0.4 Scope extension, 2026-09-30 — the platform the operating model was extracted into
+
+Gas Town (§0.3) is one operating model: named roles, a town tree, a witness and a refinery.
+Gas City (`gastownhall/gascity`, MIT) is the toolkit that model was extracted into. The
+orchestrator's Go types name no role. Formulas compile to a bead graph whose control steps the
+dispatcher runs outside any model session. The Gastown roster still ships, as a pack the `gc`
+binary embeds.
+
+It belongs on the same axis, not as a sixth subject:
+
+1. **It is the decomposition §0.3 was a single instance of.** Identity versus session, a ledger
+   instead of a coordinator's context, and a credential boundary around who may write results
+   are all still the question. Gas City answers them with config and control-bead kinds rather
+   than with a role enum.
+2. **It touches a gate this repository already graded.** Its ACP session provider does not answer
+   `session/request_permission`. Hosting the wire is not implementing the approval primitive.
+
+**What is admitted is the design, at one commit, unread at runtime.** Same rule as §0.3: source-read
+claims are ✅, slogans ("zero roles", "hundreds of agents") are graded against the tree and not
+adopted where the tree disagrees.
+
+Added: **`gas-city/`**. The concept page remains `multi-agent-orchestration` — a second reading,
+not a new concept. The boundary is unchanged: study the orchestration, do not adopt `gc`.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -164,7 +188,8 @@ enters this repository's workflow, and nothing in `ai-workflow/` is reorganised 
   and the shared design language (`agent-ux/`, 2026-09-26, §0.2)
 - **Multi-agent orchestration over harness instances** — how one operator drives many agent
   sessions at once: persistent work ledgers, identity and attribution, dispatch under a
-  capacity cap, and the control/execution plane split (`gas-town/`, 2026-09-30, §0.3).
+  capacity cap, and the control/execution plane split (`gas-town/`, 2026-09-30, §0.3;
+  `gas-city/`, the platform that operating model was extracted into, §0.4).
   Read as an orchestration study, not as a product review.
 - **The axes shared by agent harnesses generally** — the concept layer
   (`ai-workflow/wiki/concepts/`) and the cross-study synthesis (`SYNTHESIS.md`)

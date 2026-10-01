@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-09-30
@@ -11,7 +11,7 @@ updated: 2026-09-30
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-09-30 (ACP engine-side: one permission RPC vs Codex's ten; Strands harness path never sends it)
+- Updated: 2026-09-30 (Gas City ACP client leaves `session/request_permission` unanswered)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -225,6 +225,13 @@ is not a transport-level concern, and #2223 did not move anything closer to it.*
 (`createHarness`, default `interventions=None`) never calls it
 ([`strands/06`](../../../strands/06-multi-agent-and-exposure.md) §5.4,
 [`agent-ux/10`](../../../agent-ux/10-acp.md) §7). Source absence ✅; live ACP client ⚠️.
+
+**Gas City's ACP session provider** is a client of the same method and does not answer it.
+`Pending` and `Respond` return `ErrInteractionUnsupported`. `TestACPProtocolPermissionTimeoutRejects`
+(`gastownhall/gascity` @ `3ef7fadd42`) starts a fake agent with `--request-permission` and asserts
+the timeout path: the peek buffer contains `permission rejected`, and `responses.jsonl` has no
+client replies. Hosting the ACP wire is not implementing this gate
+([`gas-city/03`](../../../gas-city/03-roles-and-lifecycle.md) §6). Source ✅; not run ⚠️.
 
 ## §8 Read next  {#s8-next}
 

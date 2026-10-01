@@ -51,7 +51,8 @@ execution.
 ### [[concepts/multi-agent-orchestration]] {#multi-agent-orchestration}
 The layer *above* a harness. Durable work ledgers, persistent identity vs ephemeral session,
 capacity-capped dispatch, two-channel liveness, and stateless coordination (no agent holds the
-thread). Source-read from Gas Town; **not executed**.
+thread). Source-read from Gas Town and, at `3ef7fadd42`, from Gas City (the platform that model
+was extracted into). **Not executed**.
 
 ### [[concepts/execution-environment-topology]] {#execution-environment-topology}
 `none` / `openai_hosted` / `self_hosted`, the file-artifact asymmetry, the self-hosted lifecycle, the

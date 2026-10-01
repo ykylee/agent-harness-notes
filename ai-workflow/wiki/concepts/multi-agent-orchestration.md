@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: gas-town/01-vocabulary.md + gas-town/02-architecture.md + gas-town/03-roles-and-lifecycle.md + gas-town/04-orchestration-techniques.md + gas-town/99-sources.md
+last_ingested_from: gas-town/01-vocabulary.md + gas-town/02-architecture.md + gas-town/03-roles-and-lifecycle.md + gas-town/04-orchestration-techniques.md + gas-town/99-sources.md + gas-city/01-vocabulary.md + gas-city/02-architecture.md + gas-city/03-roles-and-lifecycle.md + gas-city/04-orchestration-techniques.md + gas-city/99-sources.md
 related_pages: [concepts/control-plane-execution-plane, concepts/approval-gate, concepts/harness, concepts/agent-client-protocol, concepts/stateless-conversation-wire, concepts/primary-source-verification]
 created: 2026-09-30
 updated: 2026-09-30
@@ -13,10 +13,10 @@ updated: 2026-09-30
   about scheduling, attributing and reconciling many of them.
 - Scope: the container and role taxonomy, durable work state, identity and attribution, dispatch
   under a capacity cap, liveness, and the control/execution split when workers are untrusted
-- Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`), read from source
-  and first-party design docs. **Not run** — no binary executed, so every mechanism here is
-  source-read, never observed
-- Updated: 2026-09-30 (first ingest; Gas Town v1.2.1-era)
+- Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
+  `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
+  **Not run** — no binary executed, so every mechanism here is source-read, never observed
+- Updated: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -142,13 +142,44 @@ Recorded because a graded concept page has to carry its own negative findings.
 
 ## §9 Read next  {#s9-next}
 
-- Primary study: [`gas-town/`](../../../gas-town/01-vocabulary.md) —
+- Operating model: [`gas-town/`](../../../gas-town/01-vocabulary.md) —
   [vocabulary](../../../gas-town/01-vocabulary.md) ·
   [architecture](../../../gas-town/02-architecture.md) ·
   [roles & lifecycle](../../../gas-town/03-roles-and-lifecycle.md) ·
   [techniques & cross-mapping](../../../gas-town/04-orchestration-techniques.md) ·
   [sources](../../../gas-town/99-sources.md)
+- Platform extraction: [`gas-city/`](../../../gas-city/01-vocabulary.md) —
+  [vocabulary](../../../gas-city/01-vocabulary.md) ·
+  [architecture](../../../gas-city/02-architecture.md) ·
+  [roles & lifecycle](../../../gas-city/03-roles-and-lifecycle.md) ·
+  [techniques](../../../gas-city/04-orchestration-techniques.md) ·
+  [sources](../../../gas-city/99-sources.md)
 - Method that produced it: [[concepts/primary-source-verification]] — the same false-positive
-  discipline appears here as the two-channel liveness rule.
+  discipline appears here as the two-channel liveness rule, and again as Gas City's
+  `ObservationIncomplete`.
 - The synthesis it feeds: [`SYNTHESIS.md`](../../../../SYNTHESIS.md) §2.4 (planes), §2.7 (gates),
   §6.5–6.7 (context drift and lying checks), §7 (method).
+
+## §10 The platform extraction  {#s10-gas-city}
+
+Gas Town (§1–§8) is one operating model with named roles. Gas City is that machinery pulled into
+a toolkit. Two grades, both source-read at `3ef7fadd42`, neither executed:
+
+| Claim | Grade |
+|---|---|
+| `config.Agent` has no role enum. A reviewer is a prompt | ✅ |
+| The `gc` binary embeds the Gastown pack (mayor, deacon, witness, refinery, polecat) and polecat-named formulas | ✅ — "zero roles" is the type system, not the product |
+| v2 formulas (default **on**) split control beads from work beads. `ProcessControl` switches on eight `gc.kind` values | ✅ |
+| The process that runs control is a reconciled session, `control-dispatcher`, whose command is `gc convoy control --serve` | ✅ — "no agent" means no model |
+| One Dolt server per city; rigs isolate by `issue_prefix`. The April 2026 glossary's "own database per rig" is stale | ✅ |
+| `ObservationIncomplete` must not be read as absence. ACP and subprocess seams used to drop that third outcome | ✅ |
+| Workers must `gc hook --claim` because `bd ready` hides wisps (`ga-tmzjx6`) | ✅ first-party prompt + code comment |
+| ACP `Pending`/`Respond` return `ErrInteractionUnsupported`. The permission conformance test expects no client reply and a rejected tool | ✅ |
+| City-write grants (ed25519, single-use, request-bound) authorize **config** mutations. They do not close ledger writes | ✅ — does not replace §7 |
+
+The five moves in §3 still stand. Gas City adds five that sit on top of them: judgment in the
+pack and control-flow in the bead kind; incomplete as a liveness result; one claim command;
+prefix isolation as a client filter rather than a trust boundary; three doors (config, ledger,
+session sidecar) and a grant on only one of them.
+
+Full record: [`gas-city/04`](../../../gas-city/04-orchestration-techniques.md).
