@@ -157,7 +157,7 @@ Recorded because a graded concept page has to carry its own negative findings.
 - Method that produced it: [[concepts/primary-source-verification]] — the same false-positive
   discipline appears here as the two-channel liveness rule, and again as Gas City's
   `ObservationIncomplete`.
-- The synthesis it feeds: [`SYNTHESIS.md`](../../../../SYNTHESIS.md) §2.4 (planes), §2.7 (gates),
+- The synthesis it feeds: [`SYNTHESIS.md`](../../../SYNTHESIS.md) §2.4 (planes), §2.7 (gates),
   §6.5–6.7 (context drift and lying checks), §7 (method).
 
 ## §10 The platform extraction  {#s10-gas-city}
