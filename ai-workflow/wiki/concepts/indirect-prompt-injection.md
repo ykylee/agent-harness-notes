@@ -4,7 +4,7 @@ status: active
 last_ingested_from: browser-agents/07-security.md (§2 corrected, §10) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + SYNTHESIS.md §6.4 + SYNTHESIS.md §6.5 + Brave original (re-read 2026-09-23) + strands/07-security.md
 related_pages: [concepts/perception-model, concepts/credential-shielding, concepts/approval-gate, concepts/os-sandbox-policy]
 created: 2026-09-23
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Indirect Prompt Injection — the structural risk of this class
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: the attack surface created when an agent reads untrusted content, and which mitigations are actually implemented.
 - Scope: the attack chain, the structural cause, the four mitigation categories and where each product stands, the unsolved status
 - Character: **a surface-specific axis** — though a shell harness reading files or the web develops the same problem
-- Updated: 2026-09-30 (date bump: `strands/07` ACP permission line; injection facts this page draws on are unchanged)
+- Updated: 2026-10-19 (date bump: `SYNTHESIS.md` §2 additions; injection facts this page draws on are unchanged). Previous: 2026-09-30 (date bump: `strands/07` ACP permission line; injection facts this page draws on are unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

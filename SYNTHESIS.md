@@ -129,6 +129,24 @@ and a bare string in the core `Agent` is always a Bedrock model id.
 > reasoning) and no operator-level extension. **Provider-as-data holds where the wire is shared;
 > where it is not, the converter is the unit, and it is code.**
 
+**The catalog itself became data (2026-10-19).** Three shipped artifacts, read in
+[`harness-artifacts/`](harness-artifacts/README.md), move the premise one level up: not only *a
+provider* but *the list of models* is served, not compiled. Codex added `model_catalog_url` (#46561,
+a per-provider remote catalog) and `model_catalog_in_context` (#49560, model listings as bounded
+developer `<model_catalog>` messages instead of tool-description text) — the second is absent from
+the 0.159.3 build and present in the 0.163.0 build that ChatGPT desktop bundles
+([`harness-artifacts/01`](harness-artifacts/01-single-file-executables.md) §3.3). Claude Desktop
+2.42304.2 fetches `https://downloads.claude.ai/model-catalog/v1/catalog.json` and carries policy keys
+`availableModels`, `deniedModels`, `modelPricing.{multiplier,overrides}` in its shell
+([`harness-artifacts/02`](harness-artifacts/02-desktop-shells.md) §2.1). Gemini CLI 0.42.0's
+bundle holds a local LiteRT-served Gemma endpoint next to the Google API client
+([`harness-artifacts/01`](harness-artifacts/01-single-file-executables.md) §2).
+
+> 📌 **"Who chooses" gains a third chooser: the organisation.** Configuration (Codex), the user
+> (Aside) and the product (Neon) were the three; `deniedModels` / `availableModels` in a managed
+> policy is a fourth voice that filters whatever the served catalog offers. The axis is now
+> *catalog source × chooser × policy filter*, and only the first is shared wire data.
+
 ### 2.4 Control plane / execution plane
 
 The boundary the Agents API declares — **harness (loop, routing, model calls) vs. compute (files,
@@ -158,6 +176,16 @@ the default, "no isolation"), `DockerSandbox`, `SshSandbox` — and every harnes
 > ⚠️ **Check which side a vendor means by "local."** Opera's `llms.txt` says "All AI processes run
 > locally"; the product FAQ says "**it uses cloud-based LLMs to generate the plans.**" Two
 > first-party sources from the same company disagree.
+
+**The boundary is drawn around a credential, not a file (2026-09-30 → 2026-10-19).** The
+orchestration study sharpened this axis: a worker that can write its own result ledger can forge
+its own work, so the line is *(credential-bearing control | untrusted execution)*, recorded in the
+wiki at [`control-plane-execution-plane` §5.6](ai-workflow/wiki/concepts/control-plane-execution-plane.md).
+The desktop drift pass found both vendors *relying* on that line: Claude Desktop is the device-side
+bridge for cloud Cowork sessions and carries `sandbox.credentials.{sigv4,awsPairs,allowPlaintextInject}`
+policy keys; ChatGPT desktop drives a local engine and a durable cloud host from one shell
+([`harness-artifacts/02`](harness-artifacts/02-desktop-shells.md) §2.1, §3.1). Each client that becomes
+a bridge is a place where the credential plane and the execution plane meet in one process.
 
 ### 2.5 Capability distribution and units of reuse
 
@@ -213,9 +241,11 @@ a probe of its error paths ([`strands/07`](strands/07-security.md) §3, 🧪 wit
 | **Composes by explicit precedence** | no — registration order, first short-circuit wins, despite documented precedence |
 | **Keeps a hard deny** | no — the CLI turns every deny into an ask |
 | **Authorizes the final input** | no — a later hook or middleware can rewrite the call after authorization |
+| **Stays available when the rest of the system is not** | ⚠️ not probed in Strands. Codex #49584 (2026-09-30) is the reference case: Guardian's skill warmup and per-turn snapshot short-circuit when the primary executor is offline, and the regression test disconnects that executor and asserts Guardian still **denies** — availability fixed without weakening the decision ([`docs/99`](docs/99-sources.md) §E.5) |
 
-> 📌 **Placement is one property of six.** Each missing one was found only by running the error path —
-> the design documents describe the right behaviour for four of them.
+> 📌 **Placement is one property of seven.** Each missing one was found only by running the error path —
+> the design documents describe the right behaviour for four of them. The seventh, availability, is a
+> separate axis from correctness: a gate that cannot start is bypassed by accident, not by policy.
 
 ### 2.8 The client side — how the primitives are rendered
 
@@ -251,6 +281,44 @@ Three findings bear on the engine-side conclusions:
 > reads and what colour "needs you" is. They disagree on whether a person watches steps, reviews
 > deliverables or directs a board — "there is no IDE" (Antigravity 2.0) against "a full IDE with an agent
 > manager built in" (Devin Desktop). [`agent-ux/09`](agent-ux/09-design-language.md) has the full account.
+
+### 2.9 One engine, many clients
+
+The artifact pass ([`harness-artifacts/02`](harness-artifacts/02-desktop-shells.md) §3.1) settled a
+question the client study had left implicit: the desktop apps are not second implementations of
+the loop. They are **shells around the same engine binary the CLI ships**, and the engine is a
+process on the far side of a wire.
+
+| Vendor | Engine | Clients derived from it | The contract |
+|---|---|---|---|
+| OpenAI | `codex` (Rust), run as `app-server` | CLI/TUI, ChatGPT desktop (bundles 0.163.0), IDE extensions, SDK | JSON-RPC over stdio JSONL or WebSocket; approvals are server→client requests (§2.1); the shell version-checks the engine (`app-server daemon version`, minimum `0.141.0`) and shares `CODEX_HOME` with the CLI |
+| Anthropic | Claude Code CLI (Bun executable) / Agent SDK | terminal, Claude Desktop Code tab (`node-pty`, SDK embedded), the device-side bridge for cloud Cowork, Dispatch from a phone | SDK embedding plus hooks and permission modes; the desktop renders cards and a React-free consent window ([`agent-ux/02`](agent-ux/02-claude-desktop.md) §3.1) |
+| opencode | the same binary in server mode | TUI, desktop, app | the engine knows `client ∈ {app, cli, desktop}` and gates tools on it ([`harness-artifacts/03`](harness-artifacts/03-tool-use-patterns.md) §5.2) |
+| ACP | vendor-neutral wire | Devin Desktop, Paseo, Superset, Strands CLI | one permission request, capability advertisement ([`agent-ux/10`](agent-ux/10-acp.md)) |
+| **Strands** | **linked into the caller's process** | — | no wire; §2.7 is the cost |
+
+Four observations follow, each with a cost the artifacts showed:
+
+> 📌 **The version contract is the first message.** ChatGPT's shell distinguishes `update-required`
+> from `restart-required` and refuses engines below `0.141.0`; the desktop ships a newer engine than
+> npm did the same week. Claude Desktop, which embeds the SDK into its bundle, lost a visible SDK
+> version between 2.9939.2 and 2.42304.2 — the price of not having a wire to version.
+>
+> 📌 **Approval lives in the engine; rendering lives in the client.** The session approval cache
+> (Codex: `environment_id, executable, canonical command, cwd, tty, sandbox_permissions`) and the
+> policy evaluation are engine state; CLI menus, desktop cards and consent windows only answer. The
+> orchestrators that broke §2.7's "on by default" (Orca, Superset, Conductor) are exactly the clients
+> that reached past the wire with a bypass flag.
+>
+> ⚠️ **Two engines are a dialect problem.** ChatGPT desktop drives a second, cloud engine whose wire
+> differs (`thread/queue/add` → `turn/addUserMessage`), so the shell carries an adapter
+> ([`agent-ux/03`](agent-ux/03-openai-codex-chatgpt.md) §1.2.1). Transport abstraction (stdio, WebSocket,
+> WSL, SSH, cloud) is what makes remote clients cheap; a second engine is what makes them drift.
+>
+> 📌 **Not everything goes through the engine.** ChatGPT's Chat half talks to chatgpt.com directly,
+> and both Electron shells carry 300–500 MB of engine binaries and sidecars. One engine, many clients
+> means the client package is the engine's distribution channel, and the parts kept outside the engine
+> are a design decision, not an omission.
 
 ## 3. Surface-specific axes — what the browser study produced
 
@@ -618,12 +686,13 @@ works, follow the links `llms.txt` gives rather than building URLs.**
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | How clients render the primitives (UX/UI) | [`agent-ux/README.md`](agent-ux/README.md) — start at [09](agent-ux/09-design-language.md) |
 | An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) — start at [07](strands/07-security.md) for the gate findings |
-| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 18 concepts |
+| What the shipped binaries say, and how tools are invoked | [`harness-artifacts/README.md`](harness-artifacts/README.md) — Bun/Electron packaging, desktop drift, [03](harness-artifacts/03-tool-use-patterns.md) for tool-use mechanics across six references |
+| **By concept** | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 19 concepts |
 | **Which conclusions were tested by building them** | [§6](#6-implementation-feedback--what-survived-contact-with-code) — five refuted, six confirmed, five defences breached under attack, and two models measured against injected instructions |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`browser-agents/99-sources.md`](browser-agents/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) · [`harness-artifacts/99-sources.md`](harness-artifacts/99-sources.md) |
 
 > ⚠️ **Evidence grade differs cell by cell.** Strongest first: the claims in [§6](#6-implementation-feedback--what-survived-contact-with-code)
 > were measured in a running implementation, §6.5 against a live model; Aside was verified down to its binaries; Dia's macOS app was opened the same way ([12](browser-agents/12-dia-binary.md) — ArcCore + seatbelted Claude Code 2.1.270); Codex was read
-> out of generated schemas and Rust source; Strands was read out of source, with five approval behaviours probed against a scripted mock model; Neon remains product documentation plus a netinstaller stub; Comet relies
+> out of generated schemas and Rust source, and its shipped 0.159.3 / 0.163.0 binaries were checked for wire literals and tag ancestry; the two desktop shells were read from their Linux packages with REA (fuses, windows, bundles — never run); Strands was read out of source, with five approval behaviours probed against a scripted mock model; Neon remains product documentation plus a netinstaller stub; Comet relies
 > on third-party reverse engineering. Do not read the comparison tables without that remaining asymmetry in
 > mind — and note that §6 grades **this repository's own conclusions**, not any vendor's.

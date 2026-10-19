@@ -28,7 +28,8 @@ eviction, the sticky semantics of turn overrides.
 
 ### [[concepts/approval-gate]] {#approval-gate}
 Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.
-ACP: one `session/request_permission`. Without an answer the turn stalls.
+ACP: one `session/request_permission`. Without an answer the turn stalls. §7.9 adds availability as
+a seventh gate property (Codex Guardian warmup, #49584) and where the gate lives behind the wire.
 
 ### [[concepts/agent-client-protocol]] {#agent-client-protocol}
 Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission option kinds
@@ -71,7 +72,8 @@ artifact, install ≠ enable ≠ share.
 
 ### [[concepts/provider-as-data]] {#provider-as-data}
 Providers as data, not code branches. Command-backed token minting, and the deny-list on
-project-local configuration.
+project-local configuration. §6.6: the catalog itself is served (`model_catalog_url`, Claude's
+`model-catalog/v1/catalog.json`) and a managed policy filters it — a fourth chooser.
 
 ### [[concepts/perception-model]] {#perception-model}
 How an agent sees a screen. Four representations, **symmetry between perception and action**, the

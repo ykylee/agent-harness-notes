@@ -105,9 +105,9 @@
 
 **2026-09-30 저녁 세션이 남긴 것 (feat 워크스페이스에서 이월)**
 - [ ] **Gas Town 런타임 검증 — 이 축의 가장 큰 구멍.** `gt`/`bd` 미실행이라 관찰 0건. 소규모(3~5 polecat) town 을 구성해 sling→merge 사이클을 재현하면 `gas-town/03` §5 의 Stalled/Zombie 상태와 propulsion 이 **관찰** 가능해진다
-- [ ] `model_catalog_in_context`(`2e5fea64ee`, off 기본) 의 providers-as-data 축 해석 — **미분석, 단정하지 말 것** (§2.3 의 "공유 wire 전제" 한정과 관계 있음)
-- [ ] `SYNTHESIS.md` §2 에 **게이트 가용성 축** 편입 여부 (Guardian 스킵 warmup 근거)
-- [ ] `SYNTHESIS.md` §2.4 에 **credential plane** 편입 — `control-plane-execution-plane` §5.6 에 이미 기록됨
+- [x] ~~`model_catalog_in_context` 의 providers-as-data 축 해석~~ — `SYNTHESIS` §2.3 에 "카탈로그 자체가 데이터"로 편입(Codex `model_catalog_url`·`_in_context`(0.163.0), Claude Desktop `model-catalog/v1/catalog.json` + `deniedModels`, Gemini 로컬 LiteRT). 네 번째 선택자 = 조직. wiki `provider-as-data` §6.6
+- [x] ~~`SYNTHESIS.md` §2 게이트 가용성 축 편입~~ — §2.7 표에 일곱 번째 속성으로 추가(Codex #49584). wiki `approval-gate` §7.9
+- [x] ~~`SYNTHESIS.md` §2.4 credential plane 편입~~ — §2.4 에 단락 추가(§5.6 참조 + 데스크탑 브리지 근거). 신설 §2.9 "One engine, many clients" (엔진–클라이언트 파생 구조, 네 관찰)
 - [x] Gas City — `gas-city/` @ `3ef7fadd42` (TASK-2026-09-30-main-014). 소스 독해, 미실행
 - [x] RRSI — `rrsi/` @ `be50316e1d` (TASK-2026-10-01-main-001). 소스 독해, 미실행, 점수 미채택
 - [x] AI-native SDLC playbook — `ai-sdlc/` (TASK-2026-10-06-main-001). 원문 독해, 플레이 미실행, 시간 목표 미채택. 세션 종료(2026-10-19) 커밋에 포함

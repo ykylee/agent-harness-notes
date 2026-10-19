@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md + harness-artifacts/01-single-file-executables.md + harness-artifacts/02-desktop-shells.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Provider as Data — model providers as data, not code branches
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
+- Updated: 2026-10-19 (§6.6 served catalogs and the organisation as chooser). Previous: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -126,6 +126,18 @@ Realtime connections use separate routing configuration and are exempt from this
 >
 > The choice is bound to the planning location in [[concepts/control-plane-execution-plane]].
 > Planning has to be local for a user's own subscription to be usable.
+
+## §6.6 Observation — the catalog itself is served, and a fourth chooser filters it  {#s6-6-catalog}
+
+Read from shipped artifacts on 2026-10-19 (`harness-artifacts/01` §3.3, `02` §2.1): Codex serves a
+per-provider remote catalog (`model_catalog_url`, #46561) and can move model listings into bounded
+`<model_catalog>` developer messages (`model_catalog_in_context`, #49560 — in the 0.163.0 build
+bundled by ChatGPT desktop, not in npm 0.159.3); Claude Desktop 2.42304.2 fetches
+`downloads.claude.ai/model-catalog/v1/catalog.json` and carries managed-policy keys
+`availableModels`, `deniedModels`, `modelPricing.{multiplier,overrides}`; Gemini CLI 0.42.0 bundles a
+local LiteRT-served Gemma endpoint. §5's three choosers (configuration, user, product) gain a fourth —
+the organisation — that filters whatever the served catalog offers. The axis becomes *catalog source ×
+chooser × policy filter*; only the first is shared wire data (`SYNTHESIS` §2.3).
 
 ## §7 Checklist for a multi-provider harness  {#s7-checklist}
 

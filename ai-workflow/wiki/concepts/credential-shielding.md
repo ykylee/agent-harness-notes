@@ -4,7 +4,7 @@ status: active
 last_ingested_from: browser-agents/06-architecture-axes.md + browser-agents/09-aside-browser-internals.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + SYNTHESIS.md §6.4 + strands/04-harness-and-cli.md + strands/07-security.md
 related_pages: [concepts/indirect-prompt-injection, concepts/perception-model, concepts/approval-gate, concepts/control-plane-execution-plane, concepts/primary-source-verification]
 created: 2026-09-23
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Credential Shielding — logging an agent in without giving it the secret
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: compare the design patterns that let an agent work behind a login without seeing the credentials.
 - Scope: three approaches, separating the axes, what the implementation really is, what remains
 - Character: **a surface-specific axis** — though "separate permission level from secret exposure" is a general principle
-- Updated: 2026-09-30 (date bump: `strands/07` ACP permission line; credential facts this page draws on are unchanged)
+- Updated: 2026-10-19 (date bump: `SYNTHESIS.md` §2.3·§2.4·§2.7·§2.9 additions (catalog, credential boundary, availability, engine/client); credential facts this page draws on are unchanged). Previous: 2026-09-30 (date bump: `strands/07` ACP permission line; credential facts this page draws on are unchanged)
 
 ## §1 The problem  {#s1-problem}
 

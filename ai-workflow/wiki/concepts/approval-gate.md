@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md + docs/99-sources.md + harness-artifacts/02-desktop-shells.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
-updated: 2026-10-06
+updated: 2026-10-19
 ---
 
 # Approval Gate — making human intervention a protocol primitive
@@ -252,6 +252,19 @@ The playbook's "close to impossible" is the page's claim. The silent-disable row
 not yet the fail-closed property in §7.5. Managed settings can stop an engineer turning the hook
 off (`allowManagedHooksOnly`; `disableAllHooks` below the managed tier does not reach managed
 hooks). That key was seen. The rest of the playbook's settings example was not checked key by key.
+
+## §7.9 Observation — availability is a separate axis from correctness  {#s7-9-availability}
+
+Codex #49584 (2026-09-30, `docs/99` §E.5): Guardian's skill warmup (`core/src/session/session.rs`)
+and per-turn snapshot (`turn_context.rs`) short-circuit when the primary executor is offline, and the
+regression test disconnects that executor and asserts Guardian still **denies** a network permission
+request. The gate's availability was fixed without touching its decision. `SYNTHESIS` §2.7 now lists
+this as a seventh property next to the six probed in Strands: a gate that cannot start is bypassed by
+accident, and no client-side rendering can notice.
+
+The artifact pass (`harness-artifacts/02` §3.1) adds where the gate *lives* when one engine serves
+many clients: the approval cache and policy evaluation are engine state behind a wire, and the shells
+(CLI menu, desktop card, consent window) only answer — the split `SYNTHESIS` §2.9 records.
 
 ## §8 Read next  {#s8-next}
 

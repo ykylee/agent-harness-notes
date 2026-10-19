@@ -246,6 +246,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 노트 후속. 하네스 실행·수정 없음.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-002.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-003",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 종합 문서 갱신. 하네스 실행·수정 없음.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-003.md"
     }
   ],
   "issues": []
