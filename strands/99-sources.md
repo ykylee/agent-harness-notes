@@ -232,7 +232,7 @@ The earlier ⚠️ was a **tooling artifact, not a fact about the repository**: 
 could not answer a tag query, and a tag query that returns nothing is indistinguishable from a
 clone that never fetched tags. A durable checkout answers it. **Do not record a negative result
 that came from a thin clone** — that is the same shape as the four false "0"s in
-[`SYNTHESIS.md` §7](../../../SYNTHESIS.md).
+[`SYNTHESIS.md` §7](../SYNTHESIS.md).
 
 **Next baseline: `4dfeca8c`.** The durable checkout now exists, so the next re-read does not need
 a temporary clone.
