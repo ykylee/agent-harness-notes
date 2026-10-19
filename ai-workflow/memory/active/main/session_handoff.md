@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-19 저녁 (REA 로 선적 산출물 6종 정적 독해 + 데스크탑 드리프트 + tool 사용 교차 비교. 실행 0건)
+- Updated: 2026-10-19 밤 세션 종료 (REA 산출물 독해 → 드리프트 패스 → REPORT/웹 아티팩트 → Claude Code 엔진 계약. TASK-001~009 전부 done, 실행 0건)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -45,20 +45,9 @@
 - TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
 - TASK-2026-10-01-main-001 RRSI 하네스 자기개선 조사: done. `rrsi/` @ `be50316e1d`. 가중치 고정, incumbent는 `evolve/<domain>` 커밋. 검색 제약 5개. 점수 표는 자기보고. **미실행**
 - TASK-2026-09-30-main-014 Gas City 오케스트레이션 조사: done. `gas-city/` @ `3ef7fadd42`. 역할 enum 없음, 번들 Gastown 팩은 있음. formula v2 기본 on. ACP `session/request_permission` 미응답. **미실행**
-- 2026-09-30 저녁 (병합 `6a2bb44`): Codex 8커밋 · Strands 2커밋 · ACP 8커밋 드리프트 대조 + Gas Town 오케스트레이션 조사 — **done**. **반박 0건.** 상세는 `ai-workflow/memory/active/feat/auto-20260930-a5e9e422/`
-- 2026-09-30 저녁 드리프트 3축 + Gas Town 조사: done
-- TASK-2026-09-30-main-013 Anthropic redacted_thinking KeyError 확인: done
-- TASK-2026-09-30-main-012 REPORT 개념 수 16→18 및 agent-ux 편입: done
-- TASK-2026-09-30-main-011 ACP 엔진측 독해 (스펙·스키마 vs Strands CLI / Codex App Server): done
-- TASK-2026-09-30-main-010 Strands TS SDK 세부 직접 확인 (event union · modelState · stateful formatter): done
-- TASK-2026-09-30-main-009 Strands harness 0.x 드리프트 재확인 (`15da9dc`→`a9a62d4e`, 31커밋): done
-- TASK-2026-09-30-main-008 Aside Computer Use 호출 흐름 (데몬 spawn + JSON-lines IPC): done
-- TASK-2026-09-30-main-007 Dia macOS 바이너리 정적 분석 · Neon netinstaller 스텁: done
-- TASK-2026-09-30-main-006 harness-refs/codex origin 을 GitHub 로 고정: done
-- TASK-2026-09-30-main-005 Agents 플러그인 `./` 규칙과 onboardingSkill 예외 관계: done
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-013·012·011·010·009·008·007·006·005 (redacted_thinking, REPORT 18종, ACP 엔진측, Strands TS, Strands 드리프트, Aside IPC, Dia 바이너리, codex origin, onboardingSkill), 09-30 저녁 드리프트 3축+Gas Town(`6a2bb44`), 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -104,7 +93,7 @@
 - [x] ~~Claude Code CLI 번들의 REA 그래프~~ — 상위 150 청크 `--source-path` 로 완료(`ev_c2ff746e…`, 11,355 노드, 리터럴 URL 0). 확장자 없는 `cli` 는 inventory 에 없어 거부됨. `harness-artifacts/01` §1.2
 - [x] ~~gemini-cli 0.42.0 분할 분석~~ — 14.7MB 청크 3개 제외 69 소스 완료(`ev_fb798187…`, 3,269 노드). 리터럴 엔드포인트는 로컬 LiteRT/Gemma `localhost:${port}/.../generateContent` 뿐(⚠️ 미추적). 핵심 7VV 청크는 그래프 밖. `harness-artifacts/01` §2
 - [x] ~~ChatGPT 동봉 `resources/codex` 버전 식별~~ — **0.163.0**(substring ×31; `rust-v0.163.0` 2026-10-15). `model_catalog_in_context` 리터럴 8건 → 0.159.3 의 0건은 `git merge-base --is-ancestor` 로 "태그에 미포함"으로 확정. `harness-artifacts/01` §3.3·§3.4
-- [x] ~~엔진 중심 파생 요약을 my_harness 로 이관~~ — `my_harness/docs/references/engine-centric-derivation.md`(2026-10-19, 미커밋 — 사용자 커밋 대기). 레퍼런스 4종+반례 1, 결정 항목 7개, 원문 링크는 GitHub `main` 기준이라 **이 저장소 푸시 이후에만 유효**
+- [x] ~~엔진 중심 파생 요약을 my_harness 로 이관~~ — `my_harness/docs/references/engine-centric-derivation.md`(2026-10-19, my_harness `aff26b8` 로 커밋, **미푸시**). 레퍼런스 4종+반례 1, 결정 항목 7개, 원문 링크는 GitHub `main` 기준이라 **이 저장소 푸시 이후에만 유효**
 - [ ] `harness-artifacts/03` 의 채택 후보 12개 — **my_harness MVP 에서 실측하기로 결정(10-19)**, 그 전까지 보류. 결과만 §8 에 편입
 - [ ] `claude-code/` 후속: `onFailure:"block"`·`decision_reason_type` 을 `ai-sdlc/03` §7.8 서술에 반영; `agent-ux/02` §3 의 데스크톱 승인 카드가 `can_use_tool` 의 어느 필드를 그리는지 교차; 다음 SDK/CLI 드리프트 기준 0.3.303 / 2.1.303
 - [ ] ChatGPT 셸이 엔진을 `app-server` 로 구동하는 세부(최소 버전 0.141.0, WSL/SSH/durable 호스트)를 `harness-artifacts/02` §3.1 에 기록함 — `agent-ux/03` §1.2 와 교차 확인은 다음 드리프트 패스에서
