@@ -6,26 +6,34 @@
 - Scope: project overview, document layout, standard commands, validation points, policy exceptions
 - Audience: developers, operators, AI agents, anyone onboarding
 - Status: draft
-- Updated: 2026-09-23
+- Updated: 2026-10-19 (nine study folders, 19 concepts, drift baselines; was 2026-09-23)
 - Related: [PURPOSE](../ai-workflow/memory/active/PURPOSE.md), [SYNTHESIS](../SYNTHESIS.md)
 
 ## 1. Project overview
 - 프로젝트명: Codex Harness — Study Notes
 - Purpose: investigate agent harnesses against primary sources and record the findings. Codex is the
-  first case; browser-type agents are the contrast group.
+  first case; browser-type agents, an embeddable SDK (Strands), ten clients and ACP, two
+  orchestration layers (Gas Town, Gas City) followed; three notes (RRSI, the AI-native SDLC playbook,
+  the shipped artifacts read with REA) sit beside them. `SYNTHESIS.md` crosses all of it.
 - Stakeholders: ykylee (sole researcher and maintainer)
 - Nature: **a research repository with no code.** The deliverables are the Markdown documents under
-  `docs/` and `browser-agents/`, plus `REPORT.md` / `REPORT.ko.md` and `SYNTHESIS.md`. There is no
-  build, no deploy, no runtime. "Testing" here therefore means **re-verifying sources**, not running
-  anything.
+  the nine study folders, plus `REPORT.md` / `REPORT.ko.md` and `SYNTHESIS.md`. There is no build, no
+  deploy, no runtime. "Testing" here therefore means **re-verifying sources**, not running anything.
+  Measurements come in from the separate implementation repository (`ykylee/heddle`) as results only
+  (`PURPOSE.md` §0.1); shipped binaries are read as bytes, never executed (`PURPOSE.md` §0.7).
 
 ## 2. Document layout
-- 문서 위키 홈: `README.md` · Codex study: `docs/` (16 documents)
-- Browser-agent study: `browser-agents/` (13 documents)
+- 문서 위키 홈: `README.md` · Codex study: `docs/` (16 documents + `99-sources.md`)
+- Browser-agent study: `browser-agents/` (13 documents) · Strands: `strands/` (8) · clients and ACP:
+  `agent-ux/` (11) · orchestration: `gas-town/` (5), `gas-city/` (5) · notes: `rrsi/` (4),
+  `ai-sdlc/` (4), `harness-artifacts/` (4) — each folder has a `README.md` and a `99-sources.md`
 - Cross-study synthesis: `SYNTHESIS.md`
-- Reports: `REPORT.md` (English), `REPORT.ko.md` (Korean)
-- Source and verification records: `docs/99-sources.md`, `browser-agents/99-sources.md`
-- Concept re-index: `ai-workflow/wiki/` (16 concepts)
+- Reports: `REPORT.md` (English), `REPORT.ko.md` (Korean); web versions linked from `README.md`
+- Source and verification records: every `99-sources.md`; drift ledgers in `docs/99` §E and
+  `strands/99` §6
+- Concept re-index: `ai-workflow/wiki/` (19 concepts)
+- Reference checkouts (outside this repo): `~/repos/harness-refs/{codex,strands-harness-sdk,
+  agent-client-protocol,gascity,rrsi,beads}` — pinned commits are recorded in each `99-sources.md`
 - 환경 기록 위치: `ai-workflow/memory/active/repository_assessment.md`
 - 운영 문서 위치: `ai-workflow/memory/active/`
 - 백로그 위치: `ai-workflow/memory/active/<branch>/backlog/`
@@ -36,8 +44,9 @@
 - Run locally: none — there is nothing to run
 - 빠른 테스트: `python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept
   re-index has kept up with its source documents
-- 격리 테스트: `grep -rn "](" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken
-  relative links
+- 격리 테스트: `grep -rn "](" docs/ browser-agents/ strands/ agent-ux/ gas-town/ gas-city/ rrsi/ ai-sdlc/ harness-artifacts/ README.md SYNTHESIS.md`
+  to eyeball broken relative links (a Python walk that resolves each target is what the sessions
+  actually run)
 - Smoke check: re-fetch a primary source. Appending `.md` to an OpenAI (and many other) documentation
   URL returns the raw Markdown; `/llms.txt` is often a full index.
 
@@ -58,7 +67,8 @@
 
 ## 5. Enforcing wiki re-ingest
 
-`ai-workflow/wiki/` is a re-index of `docs/` and `browser-agents/`. If a source document changes and
+`ai-workflow/wiki/` is a re-index of the study folders (`docs/`, `browser-agents/`, `strands/`,
+`agent-ux/`, `gas-town/`, `gas-city/`, `ai-sdlc/`, `harness-artifacts/`, `rrsi/`, and `SYNTHESIS.md`). If a source document changes and
 the re-index does not follow, the wiki goes quietly stale. The mapping exists in exactly one place —
 each concept page's `last_ingested_from` — and is read at three points.
 
@@ -96,6 +106,14 @@ default-mode check into CI.
     2026-09-22/23; the Strands study reflects `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25); the agent-client UX
     study reflects builds downloaded on 2026-09-26 (two products were renamed or merged that year). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.
+  - **Current drift baselines (2026-10-19):** Codex `b1fd48c48` (generated schema 108 / 10 / 87;
+    `docs/99` §E.6), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
+    Gas City `3ef7fadd42`, ACP spec `9b26a3ea`. Desktop builds read: Claude Desktop 2.42304.2 and
+    ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
+    Code 2.1.303, Codex 0.159.3 / 0.163.0, opencode 1.17.12, Gemini CLI 0.42.0.
+  - **The artifact method's host matrix matters.** REA 6.7.0 on this Linux host has no Hopper, Ghidra,
+    IDA or pwntools; native and Apple analyses are ⚠️ until run on a host that has them
+    (`harness-artifacts/README.md`).
   - Dates diverge between primary sources because of time zones. Record publication dates in UTC and
     add a conversion table where it matters.
 - **Language: document bodies are English. Commit messages and operational documents

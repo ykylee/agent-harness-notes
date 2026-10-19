@@ -35,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-008 저장소 자기 서술 정합성: done. PROJECT_PROFILE(조사 9 폴더·개념 19·드리프트 기준선·REA 호스트 매트릭스·참조 체크아웃 6), README 서두(6 조사+3 노트, 108/67), wiki index 서두. 기계 판독 한글 라벨은 유지
 - TASK-2026-10-19-main-007 REPORT 웹 아티팩트(영/한) 갱신: done. 영문 v3 `claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo`, 한국어 v2 `claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh` — 같은 디자인 토큰 유지, 후속 조사 5 대조표·검증 기록 12행·권고 13·방법 6·근거 자료 14링크. HTML 원본은 세션 스크래치에만(저장소 미보관)
 - TASK-2026-10-19-main-006 REPORT(영/한) 갱신 + Gas City prefix 필터 위치 확정: done. REPORT 에 "선적된 산출물" 절, 권고 12·13, 방법 노트 3, 읽기 순서; prefix 격리는 DB 명명(`doltlite_read_store.go:125-142`), `beads-topology.md` 의 쿼리층 필터 문장은 1차 문서 vs 1차 소스 모순으로 기록
 - TASK-2026-10-19-main-005 docs/02 보완 + Beads standalone 독해: done. docs/02 §4 Item 표(imageGeneration 새 형태·subAgentActivity 모델)·§9 27필드(실험 12 ⚗); Beads 반박 1(prefix 필터)·확인 다수, wiki control-plane §5.6 addendum

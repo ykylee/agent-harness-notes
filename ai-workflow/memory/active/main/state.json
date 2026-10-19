@@ -15,7 +15,7 @@
   },
   "project": {
     "project_name": "Codex Harness — Study Notes",
-    "document_home": "README.md` · Codex study: `docs/` (16 documents)",
+    "document_home": "README.md` · Codex study: `docs/` (16 documents + `99-sources.md`)",
     "operations_path": "ai-workflow/memory/active/",
     "backlog_path": "ai-workflow/memory/active/<branch>/backlog/",
     "handoff_path": "ai-workflow/memory/active/<branch>/session_handoff.md",
@@ -23,7 +23,7 @@
   },
   "commands": {
     "quick_tests": "python3 scripts/check_wiki_freshness.py --show-uncovered` — checks that the concept",
-    "isolated_tests": "grep -rn \"](\" docs/ browser-agents/ README.md SYNTHESIS.md` to eyeball broken",
+    "isolated_tests": "grep -rn \"](\" docs/ browser-agents/ strands/ agent-ux/ gas-town/ gas-city/ rrsi/ ai-sdlc/ harness-artifacts/ README.md SYNTHESIS.md",
     "runtime_checks": null
   },
   "session": {
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
       "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
@@ -44,15 +45,14 @@
       "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
       "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
       "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사",
-      "TASK-2026-10-01-main-001 — RRSI 하네스 자기개선 조사",
-      "TASK-2026-09-30-main-014 — Gas City 오케스트레이션 조사"
+      "TASK-2026-10-01-main-001 — RRSI 하네스 자기개선 조사"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
-    "task_count": 7,
+    "task_count": 8,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -62,7 +62,8 @@
       "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
       "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
-      "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화"
+      "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
+      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로"
     ]
   },
   "next_documents": [

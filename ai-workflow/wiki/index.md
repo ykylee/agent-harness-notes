@@ -3,8 +3,9 @@
 # Master Knowledge Index
 
 > Format and rules in [`./SCHEMA.md`](./SCHEMA.md). Entries are added as ingests create pages.
-> The sources are `docs/` (the Codex harness), `browser-agents/` (browser-type agents) and, since
-> 2026-09-26, `strands/` (the Strands SDK and harness), plus the client-side `agent-ux/` — this wiki **re-indexes them by concept.** The cross-study synthesis is [`SYNTHESIS.md`](../../SYNTHESIS.md).
+> The sources are the study folders — `docs/` (the Codex harness), `browser-agents/`, `strands/`,
+> `agent-ux/`, `gas-town/`, `gas-city/`, and the notes `rrsi/`, `ai-sdlc/`, `harness-artifacts/` —
+> plus [`SYNTHESIS.md`](../../SYNTHESIS.md); this wiki **re-indexes them by concept** (19 pages, 2026-10-19).
 >
 > For the split between **surface-specific** axes (perception, injection, credentials) and
 > **surface-independent** ones (approval, providers, capability, planes), see [[concepts/harness]] §7.6.
