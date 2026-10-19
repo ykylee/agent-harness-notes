@@ -30,10 +30,11 @@
   `demangle-swift` / `inspect-native-dispatch-metadata` refused ("Native macOS utilities require
   macOS" / provider unavailable). What *did* work: `inspect-electron-fuses`,
   `analyze-javascript-application`, `inspect-rust-binary` (under 256 MiB), `decode-interface-builder`.
-- **REA's JavaScript analyser has budgets.** Three of six graphs are partial: the Claude Code CLI
-  bundle (2,439 sources) exhausted the parent result capacity at source 526; the Gemini CLI bundle
-  (three 14.7 MB chunks) hit the 300 s per-source default, and a 1,800 s re-run was stopped by
-  hand after an hour at 16/102 under memory pressure; the ChatGPT shell retained only static
+- **REA's JavaScript analyser has budgets.** Three of six graphs were partial on the first pass: the Claude Code CLI
+  bundle (2,439 sources) exhausted the parent result capacity at source 526, and a `--source-path`
+  run on its 150 largest chunks completed in the evening; the Gemini CLI bundle
+  (three 14.7 MB chunks) hit the 300 s per-source default, a 1,800 s re-run was stopped by hand
+  after an hour at 16/102, and a `--source-path` run on the other 69 sources completed; the ChatGPT shell retained only static
   facts for its largest modules. Each partial result is marked ⚠️ where it is used.
 - The user-facing REA Evidence JSON (several hundred MB) lives in the session scratch directory
   and is **not committed**. Evidence IDs and SHA-256 digests are recorded in
@@ -67,24 +68,26 @@
    2,431 of 2,433 modules to JSC bytecode next to the source, bundles 79 Markdown files (skills,
    READMEs) and 141 zstd-compressed assets, while opencode ships source only plus 134 UI assets.
    Neither vendor documents the layout; [01 §1](01-single-file-executables.md) records the parse
-   that recovered it, so it can be re-checked when Bun changes.
+   that recovered it and its confirmation against Bun's own `StandaloneModuleGraph` source (1.3.14 Zig,
+   1.4.3 Rust), including the flag bits that say Claude Code is built for bytecode-first startup.
 2. **The desktop clients moved in three weeks, in the same direction.** Both shells are the
    same Electron skeleton as before, with the same six (Claude) and two (ChatGPT) renderer HTML
    entries. What changed is *around* the agent: Claude Desktop added four main-process entries
    (`designWindow`, `claudePagePreview`, `coworkArtifact`, `computerUseTeach`) and ships a Linux
-   Cowork VM toolchain (QEMU/KVM, `virtiofsd`, a 27 MB `smol-bin.x64.img`); ChatGPT added a
-   **permission-mode dropdown** whose labels are now `Ask for approval` / `Approve for me` /
-   `Full access` with `Custom (config.toml)` and `Managed by enterprise policy`, an `Approve for me`
-   nudge that says it "may use more credits", a **Chronicle** ("Computer history") settings page, a
+   Cowork VM toolchain (QEMU/KVM, `virtiofsd`, a 27 MB `smol-bin.x64.img`); ChatGPT's permission
+   dropdown (`Ask for approval` / `Approve for me` / `Full access` / `Custom (config.toml)` /
+   `Managed`, labels already recorded in September) now shows its explanatory copy and an
+   `Approve for me` nudge that says it "may use more credits", a **Chronicle** ("Computer history") settings page, a
    **hooks** settings page, workspace **Agents**, and a hardware keypad onboarding (Work Louder
    "Codex Micro"). Fuses are identical except one bit: Claude grants `GrantFileProtocolExtraPrivileges`,
    ChatGPT does not. [02](02-desktop-shells.md).
-3. **A string's absence in a stripped binary proves nothing.** The 0.159.3 `codex` binary carries
-   `approval_policy` (44), `sandbox_mode` (39), `responses_lite` (18), `thread/goal/set` (4) and
-   `guardian` (310) as expected from the source read, but **0** hits for `model_catalog_in_context`,
-   the feature flag added on 2026-09-30. Rust serialises enum variants and feature names at compile
-   time; a flag can be present with no literal left. The source read stands; the binary neither
-   confirms nor refutes it ([01 §3](01-single-file-executables.md)).
+3. **A string's absence in a stripped binary is a question, not an answer.** The 0.159.3 `codex`
+   binary carries `approval_policy` (44), `sandbox_mode` (39), `responses_lite` (18),
+   `thread/goal/set` (4) and `guardian` (310) as expected from the source read, but **0** hits for
+   `model_catalog_in_context`, the feature flag added on 2026-09-30. Rust can serialise a flag with
+   no literal left, so the zero on its own proved nothing; tag ancestry did: the flag commit is not
+   in `rust-v0.159.3` and is in `rust-v0.163.0`, and the 0.163.0 build that ChatGPT desktop bundles
+   carries the literal 8 times ([01 §3](01-single-file-executables.md)).
 
 ## Method notes worth keeping
 

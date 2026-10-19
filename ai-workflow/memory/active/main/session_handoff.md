@@ -93,13 +93,15 @@
 ## Next Actions
 
 **2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
-- [ ] `agent-ux/08` §2 자율 모드 표의 ChatGPT 행을 `Ask for approval · Approve for me · Full access` 로 갱신 (근거 `harness-artifacts/02` §3.2) — 편집 시 approval-gate 재ingest 필요
-- [ ] Claude Code CLI 번들의 REA 그래프: `--source-path` 로 분할해 재시도 (이번엔 526/2,439 에서 result capacity 소진)
-- [ ] gemini-cli 0.42.0: 14.7MB 청크 3개를 제외한 `--source-path` 선택 분석, 또는 메모리 여유 있는 호스트에서
-- [ ] ChatGPT 동봉 `resources/codex`(296,885,960 B) 버전 식별 — npm 0.159.3 과 다른 빌드
-- [ ] `harness-artifacts/03` 의 채택 후보 10개를 heddle/my_harness 측에서 실측하면 결과만 편입 (측정 전까지 ⚠️)
-- [ ] Ghidra 를 갖춘 호스트가 생기면 codex static-pie 의 `model_catalog_in_context` 유무를 심볼이 아닌 코드 경로로 판정
-- [ ] Bun `.bun` 레코드 필드명을 Bun 소스(`StandaloneModuleGraph.zig`, v1.3.14/v1.4.4)로 대조해 추정→확정
+- [x] ~~`agent-ux/08` §2 ChatGPT 행 갱신~~ — 확인 결과 **이미 일치**(9월 읽기에 `Approve for me`·`Custom`·`Managed` 있음). `harness-artifacts/02` §3.3 의 "새 라벨" 서술을 정정(설명문·크레딧 넛지만 추가). 재ingest 불필요
+- [x] ~~Claude Code CLI 번들의 REA 그래프~~ — 상위 150 청크 `--source-path` 로 완료(`ev_c2ff746e…`, 11,355 노드, 리터럴 URL 0). 확장자 없는 `cli` 는 inventory 에 없어 거부됨. `harness-artifacts/01` §1.2
+- [x] ~~gemini-cli 0.42.0 분할 분석~~ — 14.7MB 청크 3개 제외 69 소스 완료(`ev_fb798187…`, 3,269 노드). 리터럴 엔드포인트는 로컬 LiteRT/Gemma `localhost:${port}/.../generateContent` 뿐(⚠️ 미추적). 핵심 7VV 청크는 그래프 밖. `harness-artifacts/01` §2
+- [x] ~~ChatGPT 동봉 `resources/codex` 버전 식별~~ — **0.163.0**(substring ×31; `rust-v0.163.0` 2026-10-15). `model_catalog_in_context` 리터럴 8건 → 0.159.3 의 0건은 `git merge-base --is-ancestor` 로 "태그에 미포함"으로 확정. `harness-artifacts/01` §3.3·§3.4
+- [x] ~~엔진 중심 파생 요약을 my_harness 로 이관~~ — `my_harness/docs/references/engine-centric-derivation.md`(2026-10-19, 미커밋 — 사용자 커밋 대기). 레퍼런스 4종+반례 1, 결정 항목 7개, 원문 링크는 GitHub `main` 기준이라 **이 저장소 푸시 이후에만 유효**
+- [ ] `harness-artifacts/03` 의 채택 후보 12개를 heddle/my_harness 측에서 실측하면 결과만 편입 (측정 전까지 ⚠️)
+- [ ] ChatGPT 셸이 엔진을 `app-server` 로 구동하는 세부(최소 버전 0.141.0, WSL/SSH/durable 호스트)를 `harness-artifacts/02` §3.1 에 기록함 — `agent-ux/03` §1.2 와 교차 확인은 다음 드리프트 패스에서
+- [x] ~~Ghidra 로 `model_catalog_in_context` 유무 판정~~ — 불필요해짐. 태그 조상 검사가 답을 냈다(0.159.3 미포함, 0.163.0 포함)
+- [x] ~~Bun `.bun` 레코드 필드명 확정~~ — `StandaloneModuleGraph.zig`@1.3.14 와 `.rs`@1.4.3 로 대조. 레코드 = StringPointer×6 + u8×4 (처음 추정의 'u32×5 꼬리'는 오류, 정정). Flags 비트 해독: Claude Code 0x1bff = 바이트코드·소스 해시·prelinked graph·startup count. **`Bun v1.4.4` 는 공개 태그 없음(⚠️)**. `harness-artifacts/01` §1.1
 
 **2026-09-30 저녁 세션이 남긴 것 (feat 워크스페이스에서 이월)**
 - [ ] **Gas Town 런타임 검증 — 이 축의 가장 큰 구멍.** `gt`/`bd` 미실행이라 관찰 0건. 소규모(3~5 polecat) town 을 구성해 sling→merge 사이클을 재현하면 `gas-town/03` §5 의 Stalled/Zombie 상태와 propulsion 이 **관찰** 가능해진다

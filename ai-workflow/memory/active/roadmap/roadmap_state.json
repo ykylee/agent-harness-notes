@@ -239,6 +239,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 노트. PURPOSE G1(바이너리 독해) 축. 하네스를 실행·수정하지 않는다.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-001.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-002",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 노트 후속. 하네스 실행·수정 없음.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-002.md"
     }
   ],
   "issues": []

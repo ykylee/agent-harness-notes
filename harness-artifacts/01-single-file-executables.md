@@ -19,17 +19,44 @@
 | Bundle section | `.bun` PROGBITS, 0x0a420443 B (172,098,627) at file offset 0x6c63000, plus `.bun_builtins` (0x2858dc B) | `.bun` PROGBITS, 73,951,046 B at 0x593f000; no `.bun_builtins` section listed |
 | Trailer | `\n---- Bun! ----\n` | same |
 
-The module graph lives in the `.bun` section ✅. Its layout was **not** taken from Bun's source;
-it was recovered by parsing and then checked for self-consistency (every name pointer resolved to
-a `/$bunfs/root/…` string in both binaries, 0 failures). Treat the field names as 추정:
+The module graph lives in the `.bun` section ✅. The layout below was first recovered by parsing
+(every name pointer resolved to a `/$bunfs/root/…` string in both binaries, 0 failures) and then
+**confirmed against Bun's source on 2026-10-19 evening** — `src/standalone_graph/StandaloneModuleGraph.zig`
+at `bun-v1.3.14` (opencode's runtime) and the Rust rewrite
+`src/standalone_graph/StandaloneModuleGraph.rs` at `bun-v1.4.3` (the newest public tag; Claude Code
+reports `Bun v1.4.4`, which has **no public tag or release** ⚠️, so its layout is assumed equal to
+1.4.3). Both versions define the same three structures ✅:
 
 ```
-section = u64 byte_count_without_header ‖ data … ‖ Offsets(32 B) ‖ "\n---- Bun! ----\n"
-Offsets = { byte_count: u64, modules: {offset: u32, len: u32}, entry_point_id: u32,
-            compile_argv: {offset: u32, len: u32}, flags: u32 }          # offsets are from data start
-module record (52 B) = name{off,len} contents{off,len} sourcemap{off,len} bytecode{off,len}
-                       + 5 × u32 (loader / encoding / module-format / side flags; last word 0x010101 or 0x01000100)
+section = u64 byte_count ‖ data … ‖ Offsets(32 B) ‖ "\n---- Bun! ----\n"   # "the final 8 bytes … are the length of the module graph"
+Offsets  = #[repr(C)] { byte_count: usize, modules_ptr: StringPointer, entry_point_id: u32,
+                        compile_exec_argv_ptr: StringPointer, flags: Flags(u32) }      # offsets from data start
+record   = #[repr(C)] CompiledModuleGraphFile (52 B) { name, contents, sourcemap, bytecode, module_info,
+                        bytecode_origin_path: StringPointer ×6 ; encoding, loader, module_format, side: u8 ×4 }
 ```
+
+The first parse had read the 20-byte tail as five `u32`s; it is two more `StringPointer`s
+(`module_info`, `bytecode_origin_path` — "must match exactly at runtime for bytecode cache hits") plus
+four `u8` enums. The 1.4.3 `Flags` bitset decodes the two binaries' `flags` words:
+
+| Bit | 1.4.3 name | Claude Code `0x1bff` | opencode `0x3` |
+|---|---|---|---|
+| 0–3 | `DISABLE_DEFAULT_ENV_FILES`, `DISABLE_AUTOLOAD_BUNFIG`, `_TSCONFIG`, `_PACKAGE_JSON` | all four | env files + bunfig only |
+| 4 | `SOURCE_TEXT_CONTIGUOUS` | ✓ | — |
+| 5 | `HAS_SOURCE_HASHES` ("loading a module from bytecode never has to hash — i.e. page in — its source text") | ✓ | — |
+| 6 | `HAS_BUILTIN_BYTECODE` | ✓ | — |
+| 7 | `HAS_BYTECODE_STRING_TABLE` | ✓ | — |
+| 8 | `HAS_STARTUP_MODULE_COUNT` ("the entry point's static import closure … load before the first `import()`") | ✓ | — |
+| 9 | `HAS_MODULE_INFO_STRING_TABLE` | ✓ | — |
+| 10 | `CROSS_COMPILED_BYTECODE` | — | — |
+| 11 | `HAS_PRELINKED_MODULE_GRAPH` | ✓ | — |
+| 12 | `HAS_RUNTIME_OPTIONS` | ✓ | — |
+| 13 | `HAS_LINKED_BYTECODE_PAYLOAD` | — | — |
+
+So Claude Code 2.1.303 is built with bytecode, source hashes, a prelinked module graph and a
+startup-closure count — the Bun features that avoid paging in source text at launch — and opencode
+uses none of them (1.3.14 only defines bits 0–3). Bits 4–13 did not exist in 1.3.14, which is why a
+1.3.14 reader would reject the Claude binary's flags word.
 
 | | Claude Code | opencode |
 |---|---|---|
@@ -64,18 +91,28 @@ timeout, 2 GiB analyser heap).
 | | Result |
 |---|---|
 | opencode | ✅ Complete graph, evidence `ev_9ad22e97…`, directory digest `d30dcd7a…`. 5,014 nodes: 1,976 `javascript-module`, 1,063 `javascript-asset`, 108 `source-map` (REA's inference from vendored maps), 54 `endpoint`, 1 `native-addon`, 1 `electron-renderer` (a false positive on an HTML asset — REA lists it as a candidate, not a fact). Literal endpoint paths: `/chat/completions`, `/responses`, `/embeddings`, `/images/generations` — the OpenAI-shaped provider surface. Limitations quoted by REA: "JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed", and two chunks exceeded the parent result budget so only static facts were kept for them. |
-| Claude Code CLI | ⚠️ `resource_constraint`: "The parent's result capacity was exhausted after retaining static facts for chunk-750bqvg0.js; remaining sources were not analyzed" — at source 526 of 2,439. No Evidence was retained. A smaller `--source-path` selection would be the next step; it was not done in this pass. |
+| Claude Code CLI | First run ⚠️ `resource_constraint`: "The parent's result capacity was exhausted after retaining static facts for chunk-750bqvg0.js; remaining sources were not analyzed" — at source 526 of 2,439, no Evidence retained. **Evening re-run on the 150 largest `chunk-*.js`** ✅ (evidence `ev_c2ff746e…`; a first attempt that named the extension-less entry `cli` was refused — "Select an exact relevant file path from the artifact inventory"): 11,355 nodes — 6,238 `javascript-module` (REA splits the bundler chunks into their logical modules), 2,429 `javascript-asset`, 107 `endpoint`, 3 `worker`, 2 `native-addon`. None of the 107 endpoint nodes is a literal URL (the API hosts are assembled at runtime; the tool-use note found them by grep instead). REA's caveats: "Caller-selected source analysis leaves 2289 inventoried files outside analysis scope", and several chunks (e.g. `chunk-07svn3rg.js`) kept static facts only — 292 limitation lines. |
 
-## 2. Gemini CLI 0.42.0 — a bundle REA could not finish on this host
+## 2. Gemini CLI 0.42.0 — a bundle REA could finish only without its three largest chunks
 
 `/usr/local/lib/node_modules/@google/gemini-cli/bundle/`: 91 MB, 102 JS chunks of which three
 are 14.7 MB each (`chunk-DN4XSYRG.js`, `chunk-DMWX7UP6.js`, `chunk-7VVHSNDQ.js`) ✅. Entry
 `gemini.js` is a plain ESM shim. REA's first run stopped at the 300,000 ms per-source default
-("Parsing and projecting chunk-7VVHSNDQ.js (14/102)"), returning a `partial_observation` with the
-inventory graph. The 1,800 s re-run (4 GiB heap) was still at 16/102 after an hour and was
-stopped by hand because three analysers were sharing a 14 GiB host. **No application graph for
-Gemini CLI** ⚠️. The tool-use reading in [03](03-tool-use-patterns.md) used grep on the bundle
-instead.
+("Parsing and projecting chunk-7VVHSNDQ.js (14/102)"); a 1,800 s re-run was still at 16/102
+after an hour and was stopped by hand.
+
+**Evening re-run with `--source-path` on the other 69 JS sources** ✅ (evidence `ev_fb798187…`):
+3,269 nodes — 2,210 `javascript-module`, 763 `javascript-chunk`, 86 `javascript-asset`, 56
+`endpoint`, 3 `source-map`. REA's own caveats: "Caller-selected source analysis leaves 33
+inventoried files outside analysis scope", and two chunks (`chunk-IUUIT4SU.js`, `chunk-JEW7ZIWE.js`,
+the tool-definition chunk) kept static facts only because their relationship expansion exceeded the
+parent's result budget — 111 limitation lines in all. Of the 56 endpoint nodes only two are literal
+enough to read, and they are the same string: a **local model endpoint**
+``http://localhost:${port}/${LITERT_API_VERSION}/models/${GEMMA_MODEL_NAME}:generateContent``
+(`mechanism: "call:fetch"`) — the CLI carries a LiteRT-served Gemma path next to the Google API
+client ⚠️ (not traced further). The core 14.7 MB chunk that holds the scheduler and policy engine
+(`7VV` in [03 §5.1](03-tool-use-patterns.md)) is **not in this graph**; the tool-use reading used
+grep on it instead.
 
 ## 3. Codex 0.159.3 — a stripped Rust static-pie, read with `strings`
 
@@ -119,18 +156,24 @@ Linux x64 payload under `vendor/x86_64-unknown-linux-musl/`:
 | `guardian` | 310 | the approval-executor feature ✅ |
 | `codex-code-mode-host` | 3 | the main binary names its sidecar ✅ |
 | `chatgpt.com/backend-api` / `api.openai.com` | 39 / 8 | two backends ✅ |
-| `model_catalog_in_context` | **0** | ⚠️ the feature flag from `2e5fea64ee` leaves **no literal**. Rust serialises `serde` names and enum variants at compile time and the symbol table is stripped, so absence here is not absence of the feature. The source read in `docs/99` §E.5 stands; the binary neither confirms nor refutes it. |
+| `model_catalog_in_context` | **0** | the feature flag from `2e5fea64ee` leaves no literal. **Resolved 2026-10-19 evening:** `git merge-base --is-ancestor 2e5fea64ee rust-v0.159.3` → **no** (the commit is dated 2026-09-30 09:52 UTC, the tag 21:46 UTC the same day, on a release branch that does not contain it); `… rust-v0.163.0` → **yes**. The 0.163.0 build bundled in ChatGPT desktop (§3.4) carries the literal **8 times**. So the zero was true, and the right tool to prove it was tag ancestry, not `strings`. The source read in `docs/99` §E.5 stands for HEAD; 0.159.3 ships without the flag ✅ |
 | `Missing provenance does not supply user authorization.` | 0 | expected: a doc comment never reaches a binary |
 | `/rustc/<40 hex>/` | 85, one hash `59807616e1…` | same toolchain hash as the code-mode host (same build) ✅ |
-| `0.159.3` as a bare version line | not matched | the CLI version is formatted at runtime from `CODEX_VERSION` (present as an env/constant name) |
+| `0.159.3` | 18 (as a substring; the earlier whole-line probe `^0\.159\.3$` missed it because adjacent literals are merged) | version present ✅ |
 
-> 📌 The point of the table is the zero row. A stripped Rust binary is a **weak oracle for
-> feature flags** and a **good oracle for wire literals** (method names, enum strings, URLs).
-> Use it to confirm the wire contract, not to adjudicate what a feature does.
+> 📌 The point of the table is the zero row, and what it took to read it. A stripped Rust binary is a
+> **good oracle for wire literals** (method names, enum strings, URLs, the version substring) and an
+> **ambiguous oracle for feature flags**: a zero can mean "not compiled in" or "serialised without a
+> literal". Here it meant the former, but only `git merge-base --is-ancestor` against the release
+> tag could say so. Record the tag, not the count.
 
-### 3.4 Also bundled: the same binaries inside ChatGPT desktop
+### 3.4 Also bundled: a newer Codex inside ChatGPT desktop
 
 The ChatGPT deb carries `resources/codex` (296,885,960 B, SHA-256 `70ea33b7…`) and
-`resources/codex-code-mode-host` (74,277,776 B) — a **different build** from the npm 0.159.3
-(sizes differ by 9.8 MB; the desktop's version string was not matched by the `^0\.1xx\.y$` probe ⚠️).
-See [02 §2](02-desktop-shells.md).
+`resources/codex-code-mode-host` (74,277,776 B). `strings` finds the substring `0.163.0` **31
+times** and `0.159.3` none, so the desktop bundles **Codex 0.163.0** (tag `rust-v0.163.0`,
+2026-10-15 18:57 UTC, four days after the npm 0.159.3 build) ✅. Same `rustc` toolchain hash
+`59807616e1…` (86 path strings). Term counts, 0.163.0 vs 0.159.3: `model_catalog_in_context`
+**8 vs 0**, `responses_lite` 19 vs 18, `thread/goal/set` 4 vs 4, `guardian` 337 vs 310,
+`code_mode` 92 vs 84, `durable` 29 vs 29, `aeon` 0 vs 0 (the webview's name for durable threads
+does not reach the engine). See [02 §1](02-desktop-shells.md).

@@ -139,6 +139,20 @@ present), `https://ab.chatgpt.com/v1` (Statsig), `chat.openai.com/ces/v1/telemet
 `updates.oaistatic.com/codex/app/appcast`, `persistent.oaistatic.com/codex-app-prod/windows-release.json`
 and `…/windows-store-update.json`, `gov.chatgpt.com`, `pay.openai.com`, `auth.openai.com`.
 
+**The engine is the bundled `codex` binary, driven as `app-server`** ✅
+(`application-network-startup-DB1VeU3v.js`): the shell builds the launch as
+`[…, "app-server", …overrides, "--analytics-default-enabled"]`, reads its stdout as JSONL
+("Failed to parse app-server stdout JSONL message") or a WebSocket ("Codex app-server websocket is
+not open"), version-checks it with `app-server daemon version` (2.5 s timeout) and refuses anything
+below `0.141.0` (`codex-app-server-version-unsupported:` → `update-required`;
+`codex-app-server-version-restart-available:` → `restart-required`), and shares `CODEX_HOME`
+(`${CODEX_HOME:-$HOME/.codex}`) with the CLI, so sessions, config and login are the same files. Host
+kinds: `local`; WSL on Windows (the Linux `codex` is spawned inside `wsl.exe`, `codex.exe` /
+`codex-code-mode-host.exe` mapped to `codex` / `code-mode-host`); an `ssh-websocket-v0` transport;
+and the durable cloud host `wss://codex-cloud-backend.chatgpt.com/` (`hostConfig.websocket_url`).
+The sibling `codex-code-mode-host` is launched next to it (`windowsSiblingExecutableNames`). The
+"Chat" half of the app (`chatgpt-conversation-*` chunks) talks to chatgpt.com, not to the engine.
+
 Three preloads instead of one ✅: `preload.js` (the app), `sandbox-preload.js`, and
 `browser-page-preload.js` (the in-app browser's pages). The webview CSP ✅ allows `child-src` /
 `frame-src` on `codex-sandbox://*.web-sandbox.oaiusercontent.com` and
@@ -182,13 +196,17 @@ information architecture is legible from the file list alone. Labels in quotes a
 
 ### 3.3 Drift from 26.924.22138 (what the September note did not have)
 
-- **The permission chip has new words.** September read `Ask for approval` / `Full access` and an
-  orange risk chip from screenshots. The dropdown now carries a middle setting **`Approve for me`**
-  with the explanation `Only ask for actions detected as potentially unsafe` and a nudge that
-  names its cost (`This may use more credits`) — the same shape as Claude's `Auto` mode and its
-  `Auto mode is using Claude Code's built-in classifier … those classifier requests are billed`
-  ([`agent-ux/02` §3.2](../agent-ux/02-claude-desktop.md)). Both vendors now **price the
-  classifier in the UI** ✅.
+- **The permission dropdown's labels are not new.** [`agent-ux/08` §2](../agent-ux/08-primitives-rendered.md)
+  already listed `Ask for approval · Approve for me · Full access · Custom (config.toml) · Managed`
+  for 26.924.22138, so the 2026-09-26 read had them. What this pass adds is the **surrounding
+  copy**: the one-line explanations (`Only ask for actions detected as potentially unsafe`,
+  `Unrestricted access to the internet and any file on your computer`), the
+  `Managed by enterprise policy` / `Disabled by requirements.toml` / `Unavailable while working in
+  the cloud` states, the `Enable Full Access for Cyber model?` gate, and the `Approve for me` nudge
+  that names its cost (`This may use more credits`) — the same shape as Claude's `Auto mode is using
+  Claude Code's built-in classifier … those classifier requests are billed`
+  ([`agent-ux/02` §3.2](../agent-ux/02-claude-desktop.md)). Whether the nudge existed in 26.924 is
+  ⚠️ (not recorded then). Both vendors **price the classifier in the UI** ✅.
 - **Hooks have a settings page** (`hooks-settings-*`) ✅; the engine side is in `codex-rs/hooks`
   and the Claude side is `code.claude.com/docs/en/hooks` (10 refs in Claude's shell). The
   control-ladder rung "a hook" ([`ai-sdlc/03`](../ai-sdlc/03-the-control-ladder.md)) is now a
@@ -242,5 +260,5 @@ What `strings` on `ChatGPT.framework` (114,840,064 B, arm64) gives instead ✅:
 ## 5. What this changes in the earlier notes
 
 - [`agent-ux/02`](../agent-ux/02-claude-desktop.md): version 2.9939.2 → 2.42304.2; `node_modules/@anthropic-ai/claude-agent-sdk` no longer visible as a package; four new main-process windows; Linux Cowork VM toolchain shipped; 93 approval templates; `Claude Design` surface. Modes and the six renderer windows unchanged.
-- [`agent-ux/03`](../agent-ux/03-openai-codex-chatgpt.md): version 26.924.22138 → 26.1013.40934; permission dropdown adds `Approve for me` and `Managed by enterprise policy`; `hooks`, `chronicle`, workspace agents, Codex Micro keypad; three preloads; TPM dependencies. Electron 42.3.0 and the OWL runtime unchanged; the legacy native app unchanged.
-- [`agent-ux/08`](../agent-ux/08-primitives-rendered.md) §2 (autonomy modes): ChatGPT's row should read `Ask for approval · Approve for me · Full access` (+ `Use Work settings`, `Custom (config.toml)`, `Managed`). Not edited in this pass; recorded here and in the handoff.
+- [`agent-ux/03`](../agent-ux/03-openai-codex-chatgpt.md): version 26.924.22138 → 26.1013.40934; permission dropdown labels unchanged, explanatory copy and the `Approve for me` credit nudge recorded; `hooks`, `chronicle`, workspace agents, Codex Micro keypad; three preloads; TPM dependencies. Electron 42.3.0 and the OWL runtime unchanged; the legacy native app unchanged.
+- [`agent-ux/08`](../agent-ux/08-primitives-rendered.md) §2 (autonomy modes): the ChatGPT row already matches the shipped labels; no edit needed. The explanatory copy and the credit nudge above are the additions.
