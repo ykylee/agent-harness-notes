@@ -16,7 +16,7 @@ updated: 2026-10-19
 - Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
   `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
   **Not run** — no binary executed, so every mechanism here is source-read, never observed
-- Updated: 2026-10-19 (standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
+- Updated: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -87,7 +87,9 @@ That is a client convention, graded as such.
 
 > ⚠️ **Corrected 2026-10-19.** Standalone Beads applies no prefix filter: `issue_prefix` names the
 > database and generates ids, nothing more ([`gas-city/02`](02-architecture.md) §2 note, `99` §C).
-> "A hard filter" is at most the client integration's doing, and the caveat below — a client-side
+> "A hard filter" is Gas City's topology page talking (`beads-topology.md:85-90`); Gas City's own
+> read store resolves a database per scope from `metadata.json` (`doltlite_read_store.go:125-142`),
+> so isolation is database naming, not a query filter. The caveat below — a client-side
 > filter is not a server-side grant — is now the whole statement: the Dolt server auto-started by
 > `bd` is `root` with no password by default (`docs/architecture/dolt.md:204-210`).
 

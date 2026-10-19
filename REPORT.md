@@ -31,6 +31,15 @@ means for building a harness of our own.
 > Agent Client Protocol several of them speak. Nothing here was invalidated. Rec. 7 gained a
 > client-side confirmation; rec. 9's "on by default" gained a failure mode at the wrapper.
 > See [§ The client side](#the-client-side-how-ten-clients-render-the-primitives).
+>
+> **Update (2026-10-19).** The **shipped binaries** were read for the first time as a method rather
+> than a one-off — Claude Code 2.1.303, Codex 0.159.3 and 0.163.0, opencode, Gemini CLI, and the
+> Claude and ChatGPT desktop apps, with REA as the instrument ([`harness-artifacts/`](harness-artifacts/README.md));
+> a three-week drift pass over Codex (719 commits) and Strands (176) found **no refutation**; and
+> the standalone Beads ledger was read. Nothing here was invalidated. Rec. 1 gained a structural
+> corollary (one engine, many clients), rec. 4 gained vendor corroboration (the catalog itself is
+> served), and two recommendations were added. See
+> [§ The shipped artifacts](#the-shipped-artifacts-what-the-binaries-added).
 
 ## Summary — one requirement collides with the platform
 
@@ -215,6 +224,27 @@ the autonomy dial. **The theories of supervision did not**: watch steps, review 
 direct a board. That choice, not any token, decides the layout
 ([`agent-ux/09`](agent-ux/09-design-language.md), [`SYNTHESIS.md` §2.8](SYNTHESIS.md)).
 
+## The shipped artifacts: what the binaries added
+
+Everything above was read from source, schemas and docs. On 2026-10-19 the **installed artifacts**
+were read too — as inert bytes, never run — with [REA](https://github.com/morluto/rea) 6.7.0 for the
+Electron and JavaScript parts and `readelf`/`strings` where REA needed an engine this host lacks.
+Four things changed what this report can say.
+
+| Finding here | What the artifacts showed |
+|---|---|
+| **Settle the wire boundary first** (rec. 1) | **A structural corollary.** ChatGPT desktop is not a second loop: it bundles the same `codex` binary the CLI ships (0.163.0, four days newer than npm's 0.159.3) and drives it as `app-server` over stdio JSONL or WebSocket, version-checks it (`app-server daemon version`, minimum `0.141.0`), and shares `CODEX_HOME` with the CLI. Claude Desktop embeds the Agent SDK and `node-pty`; opencode's server mode knows which client it serves; ACP is the vendor-neutral form. The one design with no wire — Strands — is the one whose gate failed six properties. [`SYNTHESIS` §2.9](SYNTHESIS.md). |
+| **Ship an explicit model catalog** (rec. 4) | **Corroborated, and moved up a level.** Codex serves a per-provider remote catalog (`model_catalog_url`) and can put listings in-context (`model_catalog_in_context`, in 0.163.0, not 0.159.3); Claude Desktop fetches `downloads.claude.ai/model-catalog/v1/catalog.json` and carries `deniedModels` / `availableModels` / `modelPricing.*` policy keys. The catalog is data; a fourth chooser — the organisation — filters it. |
+| **The plane boundary runs through the credential** (Gas Town, `SYNTHESIS` §2.4) | **A property of the substrate, by its own account.** Standalone Beads states that the actor on a ledger write "is NOT the authenticated principal … a correctness fence against CONCURRENT claims, not an authorization boundary", and that it ships "No built-in … access control". The orchestrator above it has to draw the line; the ledger will not. One Gas City claim fell with it: `issue_prefix` filters nothing — isolation is database naming. |
+| **The approval gate's six properties** (rec. 9) | **A seventh, from the engine side.** Codex #49584 fixed Guardian's availability when the primary executor is offline without weakening its decision; the regression test asserts a deny with the executor disconnected. Availability is a separate axis from correctness. After 719 further commits the ten server→client approval requests and every `ReviewDecision` variant are byte-identical; what moved narrowed the gate (a Guardian approval no longer pre-approves an escalated retry). |
+
+Two smaller records. **Two of the four CLIs are Bun single-file executables**, and only Claude
+Code compiles its modules to bytecode and bundles its skills as files — the layout was parsed and
+then confirmed against Bun's own source ([`harness-artifacts/01`](harness-artifacts/01-single-file-executables.md)).
+And a **feature-flag literal missing from the 0.159.3 binary proved nothing until tag ancestry
+did**: the commit is absent from `rust-v0.159.3` and present in `rust-v0.163.0`, whose build carries
+the literal eight times. Record the tag, not the count.
+
 ## Recommendations
 
 1. **Settle the wire protocol boundary first.** It determines whether Codex core is reusable at all.
@@ -255,6 +285,19 @@ One more after the client study, grounded in how wrappers actually launch:
     wrapped agent with a bypass flag. Rec. 9's first property then fails at the wrapper, before the
     engine's gate is asked.
 
+Two more after the artifact pass, grounded in what two vendors shipped the same month:
+
+12. **Treat the engine as a daemon behind a versioned wire, and derive every client from it.** The
+    first message of that wire is the version contract (ChatGPT's shell distinguishes
+    `update-required` from `restart-required`); policy evaluation and the session approval cache live
+    in the engine, and clients only render and answer. A second engine is a dialect problem — the
+    desktop's cloud host already needs an adapter — so decide early what does *not* go through the
+    engine.
+13. **Do not expect the ledger to draw the credential boundary.** Beads, the substrate under both
+    orchestration studies, documents its actor field as caller-asserted provenance and its
+    conditional update as a concurrency fence. Whatever sits above it must hold the credential and
+    keep the result-ledger write on the control side of the line.
+
 ## Method
 
 Most corrections came from reading generated schemas and Rust source rather than prose. The method
@@ -294,6 +337,20 @@ The ACP reading added one more:
   `1.3.0` are artifact versions of that same wire. Negotiate the field; use capabilities for optional
   methods.
 
+The artifact pass added three:
+
+- **A stripped binary is a good oracle for wire literals and an ambiguous one for feature flags.**
+  Method names, enum strings, URLs and the version substring are there; a flag can be compiled in
+  with no literal left. When a count is zero, `git merge-base --is-ancestor` against the release tag
+  is the proof, not more `strings`.
+- **A tool's limitations array is part of its result.** REA returned every graph with sentences such
+  as "unavailable facts remain explicit and must not be read as absence" and "IPC pairing is an
+  inference"; three of six graphs were partial on budget. The numbers were copied with those
+  sentences next to them.
+- **Keep the counting script with the count.** Two re-counts of the same protocol file differed by
+  one (`mock/experimentalMethod`); the delta was comparable only because one script ran on both
+  revisions.
+
 Two items that this section used to leave open are now settled in the table above: Windows sandbox
 internals (source-read 2026-09-30) and the Agents API server-side model list (three surfaces,
 2026-09-30). A corrected secondary-source error stays on the record. See
@@ -307,13 +364,15 @@ internals (source-read 2026-09-30) and the Agents API server-side model list (th
 | Browser-type agents | [`browser-agents/README.md`](browser-agents/README.md) |
 | An embeddable SDK harness (Strands) | [`strands/README.md`](strands/README.md) |
 | How clients render the primitives | [`agent-ux/README.md`](agent-ux/README.md) · ACP: [`agent-ux/10`](agent-ux/10-acp.md) |
-| **All four, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
-| By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 18 concepts |
-| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
+| What the shipped binaries say; how tools are invoked | [`harness-artifacts/README.md`](harness-artifacts/README.md) · [03](harness-artifacts/03-tool-use-patterns.md) |
+| **All of them, crossed** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| By concept | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 19 concepts |
+| Which claims to trust | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) · [`harness-artifacts/99-sources.md`](harness-artifacts/99-sources.md) |
 
 ---
 
 Findings reflect the state of `openai/codex` on 2026-09-15, with the App Server protocol re-counted
 at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86). External corroboration added 2026-09-23. The
 Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`). The client study added 2026-09-26;
-ACP engine-side 2026-09-30 (spec `9b26a3ea`). Wiki concepts: 18.
+ACP engine-side 2026-09-30 (spec `9b26a3ea`). Artifact pass and drift re-checks 2026-10-19: Codex
+`b1fd48c48` (108 / 10 / 87), Strands `bd0b6a94`, Beads `4f9174e6b`. Wiki concepts: 19.

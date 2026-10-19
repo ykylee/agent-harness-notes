@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-10-19 (two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
+- Updated: 2026-10-19 (night: REPORT §Method carries the two 2026-10-19 notes; a first-party doc page refuted by first-party source (`gas-city/99` §C) joins the examples; two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
 
 ## §1 TL;DR  {#s1-tldr}
 

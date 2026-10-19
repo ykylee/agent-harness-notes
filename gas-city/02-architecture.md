@@ -33,9 +33,16 @@ Two facts are both true, and the older glossary collapses them.
   > [99 §C](99-sources.md)): in Beads itself `issue_prefix` is used only to generate ids and to name
   > the per-project Dolt database (`internal/storage/issueops/create.go:281`,
   > `docs/architecture/dolt.md:743`); **there is no read/write filter keyed on the prefix in Beads.**
-  > The "not found" behaviour is therefore Gas City's `bd` integration or the per-project database
-  > split, not a Beads property (⚠️ which of the two was not traced). A4 in [04](04-orchestration-techniques.md)
-  > is corrected the same way.
+  > The sentence above came from Gas City's own `docs/reference/internal/beads-topology.md` (lines 9,
+  > 85-90: "prefix scoping enforced at the `bd` query layer … not isolated databases either"). Gas
+  > City's *code* says otherwise: the read store resolves a database **per scope** from
+  > `.beads/metadata.json` (`dolt_database`, then `database`, then `"hq"` —
+  > `internal/beads/doltlite_read_store.go:125-142`), and id routing matches
+  > `id == prefix || HasPrefix(id, prefix+"-")` only for *relocated classes*
+  > (`bdsql_relocation.go:103-109`). So the "not found" is **database separation**, and the
+  > topology page's "one shared store with prefix scoping" is a documentation claim contradicted by
+  > both substrate and embedder source. Recorded in [99 §C](99-sources.md); A4 in
+  > [04](04-orchestration-techniques.md) is corrected the same way.
 - `gc.endpoint_origin` is `managed_city` at the city and `inherited_city` at a default rig. Rigs
   do not run Dolt. `gc bd --rig <name>` is "cd and run `bd`", not a federation join.
 

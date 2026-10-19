@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-10-19 (standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
+- Updated: 2026-10-19 (night: prefix isolation = database naming, `beads-topology.md` claim refuted; REPORT §Shipped artifacts mirrors §5.6; standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -128,7 +128,11 @@ therefore a correctness fence against CONCURRENT claims, not an authorization bo
 orchestration policy outside Beads. So §5.6's boundary is not a Gas Town defect to patch but a
 line every orchestrator on this substrate must draw itself. One claim in `gas-city/02` was wrong at
 the substrate level: `issue_prefix` filters nothing in Beads — it names the database and generates
-ids — so prefix isolation is client behaviour or database separation, never a grant.
+ids — so prefix isolation is client behaviour or database separation, never a grant. Resolved the same
+night: Gas City's own read store picks one database **per scope** from `metadata.json`
+(`internal/beads/doltlite_read_store.go:125-142`) — it is database separation, and the "query-layer
+filter" sentence in Gas City's `beads-topology.md` is a first-party doc claim contradicted by
+first-party source on both sides (`gas-city/99` §C).
 
 ## §6 Read next  {#s6-next}
 

@@ -31,6 +31,13 @@ OpenAI가 실제로 무엇을 열었는지를 발표문이 아니라 소스에�
 > 쓰는 Agent Client Protocol을 읽었습니다. 여기 내용 중 무효가 된 것은 없습니다. 권고 7은
 > 클라이언트 쪽에서 확인됐고, 권고 9의 "기본으로 켜짐"은 래퍼에서 깨지는 실패 모드를 얻었습니다 —
 > [§ 클라이언트 쪽](#클라이언트-쪽--열-개-클라이언트가-원시값을-그리는-방식)에 모았습니다.
+>
+> **갱신 (2026-10-19).** **선적된 바이너리**를 일회성이 아니라 방법으로 읽었습니다 — Claude Code
+> 2.1.303, Codex 0.159.3·0.163.0, opencode, Gemini CLI, Claude·ChatGPT 데스크톱 앱을 REA 를 도구로
+> ([`harness-artifacts/`](harness-artifacts/README.md)); Codex(719 커밋)·Strands(176 커밋) 3주 드리프트
+> 재확인에서 **반박 0건**; 독립 저장소 Beads 원장을 읽었습니다. 여기서 무효화된 것은 없습니다. 권고 1에
+> 구조적 따름정리(엔진 하나, 클라이언트 여럿)가, 권고 4에 벤더 측 확증(카탈로그 자체가 서빙됨)이
+> 붙었고 권고 둘이 추가됐습니다. [§ 선적된 산출물](#선적된-산출물--바이너리가-더한-것) 참조.
 
 ## 요약 — 요구사항 하나가 플랫폼과 충돌합니다
 
@@ -211,6 +218,26 @@ Antigravity, Devin Desktop(구 Windsurf), Orca, Superset, Paseo, Conductor, 그�
 레이아웃을 정하는 것은 토큰이 아니라 그 선택입니다
 ([`agent-ux/09`](agent-ux/09-design-language.md), [`SYNTHESIS.md` §2.8](SYNTHESIS.md)).
 
+## 선적된 산출물 — 바이너리가 더한 것
+
+위의 모든 내용은 소스·스키마·문서에서 읽은 것입니다. 2026-10-19에는 **설치된 산출물**도 읽었습니다 —
+실행하지 않은 바이트로, Electron·JavaScript 부분은 [REA](https://github.com/morluto/rea) 6.7.0 으로,
+REA 에 엔진이 필요한 부분은 `readelf`/`strings` 로. 이 보고서가 말할 수 있는 것이 네 가지 바뀌었습니다.
+
+| 이 보고서의 결론 | 산출물이 보여준 것 |
+|---|---|
+| **와이어 경계를 먼저 정하라** (권고 1) | **구조적 따름정리.** ChatGPT 데스크톱은 두 번째 루프가 아닙니다. CLI 가 배포하는 바로 그 `codex` 바이너리(0.163.0, npm 의 0.159.3 보다 나흘 새것)를 동봉해 `app-server` 로 stdio JSONL 또는 WebSocket 위에서 구동하고, 버전을 검문하며(`app-server daemon version`, 최소 `0.141.0`), `CODEX_HOME` 을 CLI 와 공유합니다. Claude Desktop 은 Agent SDK 와 `node-pty` 를 임베드하고, opencode 의 서버 모드는 어느 클라이언트를 섬기는지 알며, ACP 는 벤더 중립형입니다. 와이어가 없는 유일한 설계 Strands 가 게이트 속성 여섯을 놓친 바로 그 설계입니다. [`SYNTHESIS` §2.9](SYNTHESIS.md). |
+| **명시적 모델 카탈로그를 출하하라** (권고 4) | **확증되고 한 단계 올라갔습니다.** Codex 는 프로바이더별 원격 카탈로그(`model_catalog_url`)를 서빙하고 목록을 컨텍스트에 넣을 수 있으며(`model_catalog_in_context`, 0.163.0 에 있고 0.159.3 에 없음), Claude Desktop 은 `downloads.claude.ai/model-catalog/v1/catalog.json` 을 받아 `deniedModels` / `availableModels` / `modelPricing.*` 정책 키를 지닙니다. 카탈로그가 데이터이고, 네 번째 선택자 — 조직 — 가 그것을 거릅니다. |
+| **플레인 경계는 자격증명을 지난다** (Gas Town, `SYNTHESIS` §2.4) | **기판 스스로 밝힌 속성.** 독립 Beads 는 원장 쓰기의 actor 가 "NOT the authenticated principal … a correctness fence against CONCURRENT claims, not an authorization boundary" 이며 "No built-in … access control" 로 출하된다고 적습니다. 선을 긋는 것은 그 위의 오케스트레이터이지 원장이 아닙니다. Gas City 의 주장 하나가 함께 무너졌습니다: `issue_prefix` 는 아무것도 거르지 않고, 격리는 데이터베이스 이름입니다. |
+| **승인 게이트의 여섯 속성** (권고 9) | **엔진 쪽에서 일곱 번째.** Codex #49584 는 주 executor 가 꺼진 상태에서 Guardian 의 가용성을 결정을 약화하지 않고 고쳤고, 회귀 테스트는 executor 가 끊긴 채 거부를 단언합니다. 가용성은 정확성과 별개의 축입니다. 그 뒤 719 커밋 동안 서버→클라이언트 승인 요청 10종과 `ReviewDecision` 전 변형은 바이트 동일했고, 움직인 것은 게이트를 좁혔습니다(Guardian 승인이 에스컬레이션 재시도를 사전 승인하지 않음). |
+
+작은 기록 둘. **CLI 넷 중 둘은 Bun 단일 실행파일**이고, Claude Code 만 모듈을 바이트코드로 컴파일하고
+스킬을 파일로 동봉합니다 — 레이아웃을 파싱한 뒤 Bun 소스로 확정했습니다
+([`harness-artifacts/01`](harness-artifacts/01-single-file-executables.md)). 그리고 **0.159.3 바이너리에
+없는 기능 플래그 리터럴은 태그 조상 검사가 있기 전까지 아무것도 증명하지 못했습니다**: 그 커밋은
+`rust-v0.159.3` 에 없고 `rust-v0.163.0` 에 있으며, 그 빌드에는 리터럴이 여덟 번 있습니다. 개수가 아니라
+태그를 기록하십시오.
+
 ## 권고
 
 1. **와이어 프로토콜 경계를 가장 먼저 정하십시오.** Codex 코어를 재사용할 수 있는지가 여기서
@@ -245,6 +272,17 @@ Strands 조사 이후 두 가지를 더합니다. 오류 경로를 프로브했�
 
 11. **다른 벤더의 에이전트를 감쌀 때는 그 승인을 켜 두십시오.** 오케스트레이터 셋이 감싼 에이전트를
     bypass 플래그로 출하합니다. 그러면 권고 9의 첫 속성은 엔진 게이트에 묻기도 전에 래퍼에서 깨집니다.
+
+산출물 조사 이후 둘을 더합니다. 두 벤더가 같은 달에 출하한 것에 근거합니다.
+
+12. **엔진을 버전 있는 와이어 뒤의 데몬으로 두고, 모든 클라이언트를 거기서 파생하십시오.** 그 와이어의
+    첫 메시지는 버전 계약입니다(ChatGPT 셸은 `update-required` 와 `restart-required` 를 구분합니다).
+    정책 평가와 세션 승인 캐시는 엔진에 있고 클라이언트는 그리고 답할 뿐입니다. 엔진이 둘이면 방언
+    문제가 됩니다 — 데스크톱의 클라우드 호스트는 이미 어댑터가 필요합니다 — 그러니 무엇을 엔진에
+    *태우지 않을지* 를 일찍 정하십시오.
+13. **원장이 자격증명 경계를 그어 주리라 기대하지 마십시오.** 두 오케스트레이션 조사의 기판인 Beads 는
+    actor 필드를 호출자 자기신고 출처로, 조건부 갱신을 동시성 울타리로 문서화합니다. 그 위에 앉는 것이
+    자격증명을 쥐고 결과 원장 쓰기를 통제 쪽에 두어야 합니다.
 
 ## 조사 방법
 
@@ -282,6 +320,17 @@ ACP 독해가 하나를 더했습니다.
   `@agentclientprotocol/sdk` `1.3.0`은 그 같은 와이어의 산출물 버전입니다. 필드를 협상하고,
   선택 메서드는 capability로 다룹니다.
 
+산출물 조사가 셋을 더했습니다.
+
+- **stripped 바이너리는 와이어 리터럴에는 좋은 오라클, 기능 플래그에는 모호한 오라클입니다.** 메서드
+  이름·enum 문자열·URL·버전 substring 은 들어 있지만, 플래그는 리터럴 없이 컴파일될 수 있습니다. 개수가
+  0 이면 증명은 `strings` 를 더 돌리는 게 아니라 릴리스 태그에 대한 `git merge-base --is-ancestor` 입니다.
+- **도구의 limitations 배열은 결과의 일부입니다.** REA 는 모든 그래프에 "unavailable facts remain explicit
+  and must not be read as absence", "IPC pairing is an inference" 같은 문장을 붙여 돌려줬고, 여섯 중 셋은
+  예산 때문에 부분이었습니다. 숫자는 그 문장 옆에 함께 옮겼습니다.
+- **집계 스크립트를 집계와 함께 남기십시오.** 같은 프로토콜 파일의 재집계 둘이 하나 차이였습니다
+  (`mock/experimentalMethod`). 델타가 비교 가능했던 이유는 한 스크립트가 두 리비전에 돌았기 때문입니다.
+
 이 절이 열어 두었던 두 항목은 위의 표에서 정착됐습니다. Windows 샌드박스 내부(2026-09-30 소스
 독해)와 Agents API 서버 측 모델 목록(표면 셋, 2026-09-30). 정정된 2차 출처 오류는 기록으로
 남깁니다. [99-sources.md](docs/99-sources.md)를 참고하십시오.
@@ -294,13 +343,15 @@ ACP 독해가 하나를 더했습니다.
 | 브라우저형 에이전트 | [`browser-agents/README.md`](browser-agents/README.md) |
 | 임베드형 SDK 하네스 (Strands) | [`strands/README.md`](strands/README.md) |
 | 클라이언트가 원시값을 그리는 방식 | [`agent-ux/README.md`](agent-ux/README.md) · ACP: [`agent-ux/10`](agent-ux/10-acp.md) |
-| **넷을 가로질러** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
-| 개념 단위 | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 개념 18종 |
-| 어떤 주장을 믿어도 되나 | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) |
+| 선적 바이너리가 말하는 것; 도구 호출 방식 | [`harness-artifacts/README.md`](harness-artifacts/README.md) · [03](harness-artifacts/03-tool-use-patterns.md) |
+| **전부를 가로질러** | **[`SYNTHESIS.md`](SYNTHESIS.md)** |
+| 개념 단위 | [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) — 개념 19종 |
+| 어떤 주장을 믿어도 되나 | [`docs/99-sources.md`](docs/99-sources.md) · [`strands/99-sources.md`](strands/99-sources.md) · [`agent-ux/99-sources.md`](agent-ux/99-sources.md) · [`harness-artifacts/99-sources.md`](harness-artifacts/99-sources.md) |
 
 ---
 
 내용은 2026-09-15 시점의 `openai/codex` 상태를 반영하며, App Server 프로토콜은 2026-09-30 HEAD
 `bcd6d9ab6b` 에서 재집계했습니다 (107 / 10 / 86). 변화가 빠른 저장소입니다.
 외부 증거는 2026-09-23에, Strands 사례는 2026-09-26에 추가했습니다 (`harness-sdk` @ `15da9dc`).
-클라이언트 조사는 2026-09-26, ACP 엔진측은 2026-09-30 (스펙 `9b26a3ea`). 위키 개념 18종.
+클라이언트 조사는 2026-09-26, ACP 엔진측은 2026-09-30 (스펙 `9b26a3ea`). 산출물 조사와 드리프트 재확인은
+2026-10-19: Codex `b1fd48c48` (108 / 10 / 87), Strands `bd0b6a94`, Beads `4f9174e6b`. 위키 개념 19종.
