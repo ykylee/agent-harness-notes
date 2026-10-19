@@ -6,11 +6,18 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-19 (세션 종료. AI-native SDLC playbook 조사는 이 커밋에 포함. 원문 독해, 플레이 미실행, 시간 목표 미채택)
+- Updated: 2026-10-19 저녁 (REA 로 선적 산출물 6종 정적 독해 + 데스크탑 드리프트 + tool 사용 교차 비교. 실행 0건)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
+- **2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**
+  - **포장 형태**: Claude Code CLI 2.1.303 과 opencode 1.17.12 는 **Bun 단일 실행파일**(`.bun` ELF 섹션, 52B 모듈 레코드, 트레일러 `---- Bun! ----`). Claude Code 만 2,431/2,433 모듈에 **JSC 바이트코드** 동봉 + SKILL/README `.md.zst` 141개. Codex 0.159.3 은 287MB static-pie stripped — REA 256MiB 한도로 거부, `strings` 수준 대조만. gemini-cli 0.42.0 은 14.7MB 청크 3개 때문에 REA 분석 미완(⚠️)
+  - **"stripped 바이너리에서 문자열 부재는 부재의 증거가 아니다"**: `model_catalog_in_context` 0건이 예. 와이어 리터럴(`responses_lite` 18, `thread/goal/set` 4, `approval_policy` 44)은 확인됨
+  - **데스크탑 드리프트**(agent-ux/02·03 대비 3주): Claude Desktop 2.9939.2→**2.42304.2**(리눅스 deb, 당일 발행) — 렌더러 창 6종 동일, 메인 엔트리 4종 신설(`designWindow`·`claudePagePreview`·`coworkArtifact`·`computerUseTeach`), 리눅스 Cowork VM 툴체인(QEMU/KVM, virtiofsd, smol-bin.img) 동봉, `Claude Design` 문자열 109, 승인 템플릿 93. ChatGPT 26.924.22138→**26.1013.40934** — 권한 드롭다운 `Ask for approval / Approve for me / Full access / Custom (config.toml) / Managed by enterprise policy`, `Approve for me` 넛지가 "may use more credits", hooks 설정 페이지, **Chronicle(Computer history)**, workspace Agents, Codex Micro 키패드, TPM(libtss2) 의존. 퓨즈는 `GrantFileProtocolExtraPrivileges` 한 비트만 다름(Claude on / ChatGPT off)
+  - **레거시 네이티브 ChatGPT 1.2026.183 은 바이트 동일**(sha `49b33cad…`); UI 타입 638종 인벤토리만 추가. REA Apple 도구는 macOS 필요(⚠️)
+  - **tool 사용 교차 비교** `harness-artifacts/03`: Claude Code·Codex·Gemini·opencode·Strands·REA 의 카탈로그/지연 노출/병렬/절단/캐시/승인 메커니즘을 수치와 파일 위치로 정리 (보조 에이전트 4개 조사 + 통합). 권고는 "검증 가능한 채택 후보" 형식, 특정 하네스 설계 아님
+  - **REA 평가**: 퓨즈·JS 그래프·Rust 메타는 유용, 단 크기/시간 예산이 첫 실패 지점. Evidence JSON 은 스크래치에만, 노트에는 evidence_id·sha256 기록 (`harness-artifacts/99`)
 - **2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**
   - **Codex** `bcd6d9ab6b` → `92bc601ad6` (8커밋·134파일): `thread/goal/set|clear` params 에 `origin`(user|automatic) 신설. Rust 정의 + **생성 Python SDK** 양쪽 확인 = 와이어 계약. 계약 문구 "Missing provenance does not supply user authorization." 서버는 `origin == User` 일 때만 user fragment 를 히스토리에 기록. `thread_goal_user_context.rs:2` — "tool-created goals never use this path." → **기록 출처 판별자이지 권한 확장이 아니다.** Guardian 스킵 warmup(`a5cce8895a`) = **게이트 가용성과 정확성이 분리된 축**(회귀 테스트가 executor 오프라인 상태에서 deny 를 검증). `model_catalog_in_context`(`2e5fea64ee`, off 기본) = providers-as-data 축 후보. `docs/02` §9 · `docs/12` §2.2 · `docs/99` §E.5 반영
   - **Strands** `a9a62d4e` → `4dfeca8c` (2커밋): bidi reconnect → **restart** 리팩터링 + prettier bump. `git diff --name-only | grep -iE "approval|permission|consent|cedar|sandbox|intervention|harness"` **출력 없음** → 승인 기본 off·Cedar fail-open·sandbox `host`·등록순 단축이 그대로 성립, **P1–P5 재실행 불필요**(2개 창 연속 확인)
@@ -28,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-001 REA 로 설치 하네스 4종+데스크탑 2종 산출물 대조: done. `harness-artifacts/` README·01·02·03·99. **실행 0건**, REA 그래프 3/6 부분(⚠️ 명시)
 - TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
 - TASK-2026-10-01-main-001 RRSI 하네스 자기개선 조사: done. `rrsi/` @ `be50316e1d`. 가중치 고정, incumbent는 `evolve/<domain>` 커밋. 검색 제약 5개. 점수 표는 자기보고. **미실행**
 - TASK-2026-09-30-main-014 Gas City 오케스트레이션 조사: done. `gas-city/` @ `3ef7fadd42`. 역할 enum 없음, 번들 Gastown 팩은 있음. formula v2 기본 on. ACP `session/request_permission` 미응답. **미실행**
@@ -83,6 +91,15 @@
 - **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. **이 결과는 `SYNTHESIS.md` §6 으로 편입됐다.**
 
 ## Next Actions
+
+**2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
+- [ ] `agent-ux/08` §2 자율 모드 표의 ChatGPT 행을 `Ask for approval · Approve for me · Full access` 로 갱신 (근거 `harness-artifacts/02` §3.2) — 편집 시 approval-gate 재ingest 필요
+- [ ] Claude Code CLI 번들의 REA 그래프: `--source-path` 로 분할해 재시도 (이번엔 526/2,439 에서 result capacity 소진)
+- [ ] gemini-cli 0.42.0: 14.7MB 청크 3개를 제외한 `--source-path` 선택 분석, 또는 메모리 여유 있는 호스트에서
+- [ ] ChatGPT 동봉 `resources/codex`(296,885,960 B) 버전 식별 — npm 0.159.3 과 다른 빌드
+- [ ] `harness-artifacts/03` 의 채택 후보 10개를 heddle/my_harness 측에서 실측하면 결과만 편입 (측정 전까지 ⚠️)
+- [ ] Ghidra 를 갖춘 호스트가 생기면 codex static-pie 의 `model_catalog_in_context` 유무를 심볼이 아닌 코드 경로로 판정
+- [ ] Bun `.bun` 레코드 필드명을 Bun 소스(`StandaloneModuleGraph.zig`, v1.3.14/v1.4.4)로 대조해 추정→확정
 
 **2026-09-30 저녁 세션이 남긴 것 (feat 워크스페이스에서 이월)**
 - [ ] **Gas Town 런타임 검증 — 이 축의 가장 큰 구멍.** `gt`/`bd` 미실행이라 관찰 0건. 소규모(3~5 polecat) town 을 구성해 sling→merge 사이클을 재현하면 `gas-town/03` §5 의 Stalled/Zombie 상태와 propulsion 이 **관찰** 가능해진다
@@ -141,6 +158,8 @@
 
 ## Risks & Blockers
 
+- **REA 의 결과는 `limitations` 배열까지가 결과다.** 그래프 6개 중 3개가 예산 초과로 부분이었고, 요약 수치(`browser_windows: 15` 등)는 분석된 소스에 대한 수치다. 노트에는 그 문장을 옆에 그대로 옮겼다 — 숫자만 떼어 인용하지 말 것
+- **pkill 패턴이 자기 셸을 죽인다.** 백그라운드 REA 를 `pkill -f "<명령 문자열>"` 로 멈추다 호출한 Bash 자체(exit 144)도 종료됐다. 다음엔 pid 로 죽일 것
 - **"0 은 입력이 도달했음을 증명할 수 있을 때만 증거다."** 이번 작업에서 전달 실패가 *좋은 숫자*로 찍힌 사례가 네 번 나왔다 — 프레임 미순회, charset 모지바케, interactive 모드가 페이로드를 버림, 그리고 공급자가 404 를 200번 내는데 **완벽한 방어로 렌더**. 네 번 다 assertion 은 리뷰에서 멀쩡해 보였고, 실제로 도달한 것을 출력해서야 잡혔다. `SYNTHESIS.md` §7 에 방법론 항목으로 올렸다
 - **근거 등급이 칸마다 다르다.** Aside 는 바이너리까지, Dia macOS 는 같은 방법으로 열림 ([12] — ArcCore + seatbelted Claude Code), Neon 은 문서+netinstaller 스텁, Comet 은 3자 리버싱이다. 비교표를 읽을 때 이 비대칭을 잊으면 안 된다 — `SYNTHESIS.md` §8 에 경고로 달아뒀다.
 - 두 분야 모두 빠르게 낡는다. Codex 는 2026-09-15, 브라우저는 2026-09-22/23 기준이다. 재조사의 첫 수는 **기존 사실의 드리프트 확인**이다.

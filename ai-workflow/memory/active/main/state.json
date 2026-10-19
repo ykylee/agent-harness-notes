@@ -10,7 +10,7 @@
     "daily_backlog_dir": "ai-workflow/memory/active/main/backlog",
     "tasks_dir": "ai-workflow/memory/active/main/backlog/tasks",
     "sessions_dir": "ai-workflow/memory/active/main/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-06.md",
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**",
-    "current_axis": "**2026-09-30 저녁 — 드리프트 3축 대조 + 오케스트레이션 축 신설 완료 (병합 `6a2bb44`).** worktree `feat/auto-20260930-a5e9e422` 에서 수행해 main 에 `--no-ff` 병합. **반박 0건.**",
+    "current_baseline": "**2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**",
+    "current_axis": "**2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**",
     "current_focus": "TASK-2026-09-27-main-002",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
       "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사",
       "TASK-2026-10-01-main-001 — RRSI 하네스 자기개선 조사",
       "TASK-2026-09-30-main-014 — Gas City 오케스트레이션 조사",
@@ -44,25 +45,24 @@
       "TASK-2026-09-30-main-011 — ACP 엔진측 독해",
       "TASK-2026-09-30-main-010 — Strands TS SDK 세부 직접 확인",
       "TASK-2026-09-30-main-009 — Strands harness 0.x 드리프트 재확인",
-      "TASK-2026-09-30-main-008 — Aside Computer Use 호출 흐름 추적",
-      "TASK-2026-09-30-main-007 — Dia·Neon 바이너리 정적 분석으로 검증 비대칭 축소"
+      "TASK-2026-09-30-main-008 — Aside Computer Use 호출 흐름 추적"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-06.md",
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
     "task_count": 1,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사"
+      "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약"
     ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/main/session_handoff.md",
-    "ai-workflow/memory/active/main/backlog/2026-10-06.md",
+    "ai-workflow/memory/active/main/backlog/2026-10-19.md",
     "ai-workflow/memory/active/PURPOSE.md",
     "ai-workflow/memory/active/main/state.json",
     "ai-workflow/memory/active/main/backlog"

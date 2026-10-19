@@ -1,5 +1,10 @@
 # 02. Claude Desktop — Chat, Cowork and Code in one Electron shell
 
+> **Drift pass 2026-10-19.** The Linux build 2.42304.2 (vs 2.9939.2 here) was re-read with REA in
+> [`harness-artifacts/02`](../harness-artifacts/02-desktop-shells.md): fuses, windows, preloads,
+> the UI composition from chunk names and message catalogues, and what moved in three weeks. This
+> document is left as the 2026-09-26 reading.
+
 > Product: Anthropic **Claude Desktop 2.9939.2**, including the Chat, Cowork and Code tabs and the agent surfaces they host (Claude Code sessions, Cowork tasks, computer use, Dispatch, Quick Entry).
 > Obtained from the public Squirrel update feed on 2026-09-26: `https://downloads.claude.ai/releases/win32/x64/RELEASES` → `AnthropicClaude-2.9939.2-full.nupkg` (sha1 `c4d5e0fe…6b62`, 255,805,374 B). The macOS universal `RELEASES.json` names the same version (pub_date 2026-09-24). The `claude.ai/api/desktop/…/redirect` installer links return 403 to scripted clients.
 >

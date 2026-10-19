@@ -46,6 +46,13 @@ Another note, also not a product study: [`ai-sdlc/`](ai-sdlc/README.md) reads An
 "The AI-native SDLC playbook" (Louis Claxton, 2026-08-21) as an operating prescription for
 Claude Code. The plays were not run. The page's time-to-intent targets are not adopted.
 
+A third note, about **method**: [`harness-artifacts/`](harness-artifacts/README.md) reads the
+shipped binaries of six harnesses (Claude Code CLI 2.1.303, Codex 0.159.3, opencode 1.17.12,
+Gemini CLI 0.42.0, Claude Desktop 2.42304.2, ChatGPT 26.1013.40934) with REA 6.7.0 as the
+instrument — Bun single-file layouts, Electron fuses and windows, the desktop UI composition
+recovered from chunk names, a drift pass on the two desktop studies, and a cross-reference of how
+each harness defines, invokes and truncates **tools**. Nothing was executed.
+
 Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (19 concepts).
 
 ## Start with the report

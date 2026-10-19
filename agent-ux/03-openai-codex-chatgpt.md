@@ -1,5 +1,10 @@
 # 03. OpenAI — the Codex desktop app, which is now the ChatGPT desktop app
 
+> **Drift pass 2026-10-19.** The Linux build 26.1013.40934 (vs 26.924.22138 here) was re-read with REA in
+> [`harness-artifacts/02`](../harness-artifacts/02-desktop-shells.md): fuses, windows, preloads,
+> the UI composition from chunk names and message catalogues, and what moved in three weeks. This
+> document is left as the 2026-09-26 reading.
+
 > Products:
 > - **ChatGPT desktop "superapp"**: Codex lineage, Electron code on OpenAI's "OWL" Chromium shell, 26.924.22138
 >   (`codexBuildNumber` 11645). Obtained as the Linux `.deb` from

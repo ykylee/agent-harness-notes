@@ -232,6 +232,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 노트. 초안 제품 로드맵 밖이며 PURPOSE의 하네스 엔지니어링 축이다. 플레이는 실행하지 않는다.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-06-main-001.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-001",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 노트. PURPOSE G1(바이너리 독해) 축. 하네스를 실행·수정하지 않는다.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-001.md"
     }
   ],
   "issues": []

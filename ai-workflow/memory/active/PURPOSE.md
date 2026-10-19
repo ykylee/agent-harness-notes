@@ -171,6 +171,27 @@ Added: **`ai-sdlc/`**. No new concept page. The boundary is unchanged: study the
 not run the plays as this repository's workflow, and do not treat the managed-settings example as
 a config to deploy.
 
+## 0.7 Scope note, 2026-10-19 — the binary leg becomes a method
+
+Reading a shipped binary was already in G1 ("generated schemas, source, or a binary"), but it had
+been done once (`browser-agents/12`). `harness-artifacts/` makes it repeatable: REA
+(`morluto/rea` 6.7.0) as the instrument, an engine matrix per host, explicit limitations copied
+from the tool, and a parse of the Bun single-file layout that two of the CLIs ship in. The same
+pass re-read the two desktop clients three weeks after `agent-ux/02`–`03` (drift) and compared
+how six references define, invoke and truncate tools.
+
+1. **The object is the artifact, not the product.** Versions, digests and evidence IDs are
+   recorded so a later read can diff against this one.
+2. **Absence in a stripped binary is not absence.** Recorded as a rule, with the
+   `model_catalog_in_context` zero row as the example.
+3. **The tool-use comparison describes what the references do.** Recommendations in
+   `harness-artifacts/03` are stated as testable adoption candidates, not as a design for any
+   particular harness; that design lives elsewhere.
+
+Added: **`harness-artifacts/`**. No new concept page. REA itself is studied only as an
+instrument and as a tool-design reference; its reverse-engineering providers are not adopted as
+this repository's workflow.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -219,6 +240,9 @@ a config to deploy.
   (`ai-sdlc/`, 2026-10-06, §0.6): Anthropic's AI-native SDLC playbook, read as a control
   ladder next to `docs/07`. The plays were not executed. The page's time-to-intent targets
   are not adopted.
+- Shipped-artifact reading as a method (`harness-artifacts/`, 2026-10-19, §0.7): Bun and
+  Electron packaging, fuses, UI composition from bundles, desktop drift, and a cross-reference of
+  tool-use mechanics. Nothing executed; REA is the instrument, not a subject.
 - Source verification records and the history of refutations (`99-sources.md`)
 - **Control surface, perception model and credential design of browser-type agents**
   (`browser-agents/`)
