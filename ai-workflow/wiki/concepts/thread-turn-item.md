@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md
+last_ingested_from: docs/02-app-server-protocol.md + claude-code/01-wire-protocol.md + claude-code/03-sessions-context-and-clients.md
 related_pages: [concepts/harness, concepts/approval-gate, concepts/stateless-conversation-wire]
 created: 2026-09-22
 updated: 2026-10-19
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-10-19 (evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-10-19 (`claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -139,6 +139,19 @@ absent from the engine. Unload delay (60 s) unchanged, now applied per thread (#
 listed as the full 27-field Rust definition with the 12 experimental fields marked ⚗ — the
 engine-side half of the client's durable-host dialect (`environments`, `dynamicTools`,
 `selectedCapabilityRoots`, `experimentalRawEvents`).
+
+## §8.6 Observation — the flat alternative: `session_id` + `uuid` + `parent_tool_use_id`  {#s8-6-claude-code}
+
+Claude Code has no Thread/Turn/Item ([`claude-code/01`](../../../claude-code/01-wire-protocol.md) §3):
+a message is the item (`SDKMessage`, 39 members, 11 top-level types), `result` closes the turn with
+usage, cost and `permission_denials`, and `session_id` is the thread. Lineage is `uuid` per message
+and `parent_tool_use_id` for subagent output; `conversation_reset` swaps the thread inside one
+process. Persistence is a JSONL transcript per session under `~/.claude/projects/<cwd>/`, with
+`parentUuid`, `isSidechain` and `compact_boundary` lines; there is **no unload timer** — the process
+is the session and a dropped one reloads from disk, swept after `cleanupPeriodDays` (30) except
+Desktop and Cowork transcripts ([`claude-code/03`](../../../claude-code/03-sessions-context-and-clients.md) §1).
+`/branch` copies the transcript and keeps session approvals; `--fork-session` is a new process and
+drops them.
 
 ## §7 Read next  {#s7-next}
 

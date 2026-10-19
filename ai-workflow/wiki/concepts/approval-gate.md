@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md + docs/99-sources.md + harness-artifacts/02-desktop-shells.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md + docs/99-sources.md + harness-artifacts/02-desktop-shells.md + claude-code/02-approval-and-permissions.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-10-19
@@ -11,7 +11,7 @@ updated: 2026-10-19
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-19 (night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-19 (`claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -274,6 +274,23 @@ a bundle content hash (#54619); the controller's decision is now typed as
 `SandboxOverride { NoOverride, EscalatedSandboxWithRestrictions, BypassSandboxFirstAttempt }`.
 Wider: sandbox integrity checks are observe-only ("failures and timeouts do not prevent command
 execution", #51843). Strands' gate core is byte-identical over the same window (`strands/99` §6.2).
+
+## §7.10 Observation — the second engine: an approval that rewrites the input  {#s7-10-claude-code}
+
+Claude Code's gate, read from the Agent SDK 0.3.303 types and the 2.1.303 binary
+([`claude-code/02`](../../../claude-code/02-approval-and-permissions.md)): one engine→client request,
+`can_use_tool`, carries `permission_suggestions` (the rule set an "always allow" sends back) and a
+`decision_reason_type` enum (`rule | mode | hook | classifier | sandboxOverride | safetyCheck …`);
+the answer is `allow` with optional **`updatedInput`** and `updatedPermissions` (rules, mode,
+directories, each with a persistence `destination`), or `deny` with a required `message`. Codex's
+`ReviewDecision` carries the policy amendment; Claude Code's also carries the rewritten command.
+Six modes (`default, acceptEdits, plan, auto, bypassPermissions, dontAsk`); the interactive default
+reviewer is the `auto` classifier, which denies when it cannot answer. Against the seven properties:
+fail-closed inside the engine (a `null` result blocks forever, an invalid one becomes deny, a crashed
+check denies "rather than running an unverified command"), **fail-open by default in the hook layer**
+(missing script, timeout, non-0/2 exit) until `onFailure: "block"` (2.1.295); hook precedence
+`deny > defer > ask > allow` is a literal rank table in the binary; a hard deny survives
+`bypassPermissions`; the only hole named is a mod's `tool.check` outside managed deployments.
 
 ## §8 Read next  {#s8-next}
 

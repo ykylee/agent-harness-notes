@@ -35,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-009 Claude Code 를 엔진으로 읽기: done. `claude-code/` README·01(와이어)·02(승인/권한)·03(세션/컨텍스트/클라이언트)·99. SDK 0.3.303 `sdk.d.ts` 가 생성 계약: control subtype 40(클라→엔진 36, 엔진→클라 5+런타임 8), SDKMessage 39, options 69, 훅 33, 모드 6. 구조 차이 3: Thread/Turn/Item 없음(평탄), 요청 유니언이 방향 미구분, initialize 는 설정 주입. 승인 답이 입력까지 재작성(`updatedInput`), 게이트는 엔진 안 fail-closed·훅 층 fail-open 기본(`onFailure:"block"` 2.1.295). 번들은 타입의 2~4배 subtype(브리지·TUI–워커). SYNTHESIS §2.9 Claude 행 와이어 수준으로, wiki approval-gate §7.10·thread-turn-item §8.6·wire-protocol-boundary 재ingest
 - TASK-2026-10-19-main-008 저장소 자기 서술 정합성: done. PROJECT_PROFILE(조사 9 폴더·개념 19·드리프트 기준선·REA 호스트 매트릭스·참조 체크아웃 6), README 서두(6 조사+3 노트, 108/67), wiki index 서두. 기계 판독 한글 라벨은 유지
 - TASK-2026-10-19-main-007 REPORT 웹 아티팩트(영/한) 갱신: done. 영문 v3 `claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo`, 한국어 v2 `claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh` — 같은 디자인 토큰 유지, 후속 조사 5 대조표·검증 기록 12행·권고 13·방법 6·근거 자료 14링크. HTML 원본은 세션 스크래치에만(저장소 미보관)
 - TASK-2026-10-19-main-006 REPORT(영/한) 갱신 + Gas City prefix 필터 위치 확정: done. REPORT 에 "선적된 산출물" 절, 권고 12·13, 방법 노트 3, 읽기 순서; prefix 격리는 DB 명명(`doltlite_read_store.go:125-142`), `beads-topology.md` 의 쿼리층 필터 문장은 1차 문서 vs 1차 소스 모순으로 기록
@@ -105,6 +106,7 @@
 - [x] ~~ChatGPT 동봉 `resources/codex` 버전 식별~~ — **0.163.0**(substring ×31; `rust-v0.163.0` 2026-10-15). `model_catalog_in_context` 리터럴 8건 → 0.159.3 의 0건은 `git merge-base --is-ancestor` 로 "태그에 미포함"으로 확정. `harness-artifacts/01` §3.3·§3.4
 - [x] ~~엔진 중심 파생 요약을 my_harness 로 이관~~ — `my_harness/docs/references/engine-centric-derivation.md`(2026-10-19, 미커밋 — 사용자 커밋 대기). 레퍼런스 4종+반례 1, 결정 항목 7개, 원문 링크는 GitHub `main` 기준이라 **이 저장소 푸시 이후에만 유효**
 - [ ] `harness-artifacts/03` 의 채택 후보 12개 — **my_harness MVP 에서 실측하기로 결정(10-19)**, 그 전까지 보류. 결과만 §8 에 편입
+- [ ] `claude-code/` 후속: `onFailure:"block"`·`decision_reason_type` 을 `ai-sdlc/03` §7.8 서술에 반영; `agent-ux/02` §3 의 데스크톱 승인 카드가 `can_use_tool` 의 어느 필드를 그리는지 교차; 다음 SDK/CLI 드리프트 기준 0.3.303 / 2.1.303
 - [ ] ChatGPT 셸이 엔진을 `app-server` 로 구동하는 세부(최소 버전 0.141.0, WSL/SSH/durable 호스트)를 `harness-artifacts/02` §3.1 에 기록함 — `agent-ux/03` §1.2 와 교차 확인은 다음 드리프트 패스에서
 - [x] ~~Ghidra 로 `model_catalog_in_context` 유무 판정~~ — 불필요해짐. 태그 조상 검사가 답을 냈다(0.159.3 미포함, 0.163.0 포함)
 - [x] ~~Bun `.bun` 레코드 필드명 확정~~ — `StandaloneModuleGraph.zig`@1.3.14 와 `.rs`@1.4.3 로 대조. 레코드 = StringPointer×6 + u8×4 (처음 추정의 'u32×5 꼬리'는 오류, 정정). Flags 비트 해독: Claude Code 0x1bff = 바이트코드·소스 해시·prelinked graph·startup count. **`Bun v1.4.4` 는 공개 태그 없음(⚠️)**. `harness-artifacts/01` §1.1

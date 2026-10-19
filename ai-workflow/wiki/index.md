@@ -4,7 +4,7 @@
 
 > Format and rules in [`./SCHEMA.md`](./SCHEMA.md). Entries are added as ingests create pages.
 > The sources are the study folders — `docs/` (the Codex harness), `browser-agents/`, `strands/`,
-> `agent-ux/`, `gas-town/`, `gas-city/`, and the notes `rrsi/`, `ai-sdlc/`, `harness-artifacts/` —
+> `agent-ux/`, `gas-town/`, `gas-city/`, `claude-code/`, and the notes `rrsi/`, `ai-sdlc/`, `harness-artifacts/` —
 > plus [`SYNTHESIS.md`](../../SYNTHESIS.md); this wiki **re-indexes them by concept** (19 pages, 2026-10-19).
 >
 > For the split between **surface-specific** axes (perception, injection, credentials) and
@@ -25,12 +25,12 @@ plays were not run.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
 The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity
-eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (108/10/87, turn lineage, read state, open `codexErrorInfo`).
+eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (108/10/87, turn lineage, read state, open `codexErrorInfo`). §8.6: Claude Code's flat `session_id` + `uuid` alternative, JSONL transcripts, no unload timer.
 
 ### [[concepts/approval-gate]] {#approval-gate}
 Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.
 ACP: one `session/request_permission`. Without an answer the turn stalls. §7.9 adds availability as
-a seventh gate property (Codex Guardian warmup, #49584) and where the gate lives behind the wire.
+a seventh gate property (Codex Guardian warmup, #49584) and where the gate lives behind the wire. §7.10: Claude Code's `can_use_tool` answer can rewrite the input; fail-open hook layer by default.
 
 ### [[concepts/agent-client-protocol]] {#agent-client-protocol}
 Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission option kinds
@@ -38,7 +38,7 @@ Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission op
 
 ### [[concepts/wire-protocol-boundary]] {#wire-protocol-boundary}
 `WireApi` has one variant — Responses. The boundary deciding whether the core is reusable, and
-`responses_lite` as a second request shape.
+`responses_lite` as a second request shape. 2026-10-19: Claude Code's `sdk.d.ts` as a second filtered contract.
 
 ### [[concepts/stateless-conversation-wire]] {#stateless-conversation-wire}
 `store: false` plus no `previous_response_id` exempts you from session stores, id registries and

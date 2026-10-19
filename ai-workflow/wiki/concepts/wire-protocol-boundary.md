@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md
+last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md + claude-code/01-wire-protocol.md
 related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness, concepts/agent-client-protocol]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Wire Protocol Boundary — what decides whether the core is reusable
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: which wire protocol Codex core presumes, and what that presumption forces on a custom harness.
 - Scope: the current state of `WireApi`, three ways out, the in-repo proxy precedent, and the two request shapes
 - Primary sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly), `codex-rs/core/src/client.rs`
-- Updated: 2026-09-30 (Agents catalog re-read: 11 entries)
+- Updated: 2026-10-19 (`claude-code/01`: a second generated contract and what its binary runs beyond it — note before Read next). Previous: 2026-09-30 (Agents catalog re-read: 11 entries)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -135,6 +135,15 @@ AZURE_TOOL_CALL_PROVIDERS  = new Set([`openai`, `openai-codex`, `opencode`, `azu
 >
 > This is where this repository's two studies meet at the level of source, and it shows the
 > recommendation in §5 — that an adapter must handle both shapes — being demanded in practice.
+
+**Observation 2026-10-19 — the second engine's contract.** Claude Code's wire is type-tagged
+JSONL over stdio (or WebSocket/SSE in a browser, or a bridge to Anthropic's server for Remote
+Control), with one control-request union that does not encode direction; `initialize` injects
+hooks, MCP servers, agents and skills and returns `claude_code_version`. Its generated contract
+(`sdk.d.ts`, 40 control subtypes, 39 messages) is to the 2.1.303 binary what Codex's generated
+schema is to its engine: a filtered view — the binary runs roughly 160 subtypes, the Remote Control
+bridge and the TUI–worker split almost entirely outside the types
+([`claude-code/01`](../../../claude-code/01-wire-protocol.md) §7).
 
 ## §6 Read next  {#s6-next}
 

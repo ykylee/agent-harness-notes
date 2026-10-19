@@ -7,9 +7,9 @@ and the generated schemas in the [`openai/codex`](https://github.com/openai/code
 Research date: 2026-09-14 (Agents API deep dive: 2026-09-15); drift-checked through 2026-10-19
 Repository: <https://github.com/ykylee/agent-harness-notes>
 
-## Six subjects and three notes
+## Seven subjects and three notes
 
-This repository holds **six investigations into agent harnesses** — three from the engine side,
+This repository holds **seven investigations into agent harnesses** — four from the engine side,
 one from the client side, and two from *above* them (an operating model, then the platform it was
 extracted into) — plus three notes that are not product studies: a harness-search procedure, an
 operating prescription, and a method for reading the shipped binaries.
@@ -17,6 +17,7 @@ operating prescription, and a method for reading the shipped binaries.
 | Study | Subject | Execution surface |
 |---|---|---|
 | [`docs/`](docs/) + [REPORT.md](REPORT.md) | OpenAI Codex harness | shell · filesystem |
+| [`claude-code/`](claude-code/README.md) | Anthropic Claude Code, read as an engine from the Agent SDK's generated types | shell · filesystem, **driven over stream-json by twelve clients** |
 | [`browser-agents/`](browser-agents/README.md) | Browser-type agents (Aside, Comet, Dia, Neon, Browser Use) | browser · OS |
 | [`strands/`](strands/README.md) | Strands Agents SDK and Strands harness (AWS) — an embeddable library | shell · filesystem, **linked into the caller's process** |
 | [`agent-ux/`](agent-ux/README.md) | UX/UI of ten agent clients (Claude, ChatGPT/Codex, Cursor, Antigravity, Devin/Windsurf, Orca, Superset, Paseo, Conductor, Aside) | the **client** — how harness primitives are shown to people |

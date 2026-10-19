@@ -34,10 +34,9 @@
     "blocked_items": [
       "TASK-2026-09-27-main-002"
     ],
-    "planned_items": [
-      "TASK-2026-10-19-main-009"
-    ],
+    "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
@@ -46,8 +45,7 @@
       "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
       "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
       "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
-      "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사",
-      "TASK-2026-10-01-main-001 — RRSI 하네스 자기개선 조사"
+      "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
@@ -65,7 +63,8 @@
       "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
-      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로"
+      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
+      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리"
     ]
   },
   "next_documents": [

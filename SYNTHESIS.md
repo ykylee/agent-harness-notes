@@ -241,7 +241,7 @@ a probe of its error paths ([`strands/07`](strands/07-security.md) §3, 🧪 wit
 | **Composes by explicit precedence** | no — registration order, first short-circuit wins, despite documented precedence |
 | **Keeps a hard deny** | no — the CLI turns every deny into an ask |
 | **Authorizes the final input** | no — a later hook or middleware can rewrite the call after authorization |
-| **Stays available when the rest of the system is not** | ⚠️ not probed in Strands. Codex #49584 (2026-09-30) is the reference case: Guardian's skill warmup and per-turn snapshot short-circuit when the primary executor is offline, and the regression test disconnects that executor and asserts Guardian still **denies** — availability fixed without weakening the decision ([`docs/99`](docs/99-sources.md) §E.5) |
+| **Stays available when the rest of the system is not** | ⚠️ not probed in Strands. Claude Code: "permission prompts have no park deadline", a classifier chain server → local → deny, and a fail-open hook layer by default ([`claude-code/02`](claude-code/02-approval-and-permissions.md) §7). Codex #49584 (2026-09-30) is the reference case: Guardian's skill warmup and per-turn snapshot short-circuit when the primary executor is offline, and the regression test disconnects that executor and asserts Guardian still **denies** — availability fixed without weakening the decision ([`docs/99`](docs/99-sources.md) §E.5) |
 
 > 📌 **Placement is one property of seven.** Each missing one was found only by running the error path —
 > the design documents describe the right behaviour for four of them. The seventh, availability, is a
@@ -292,7 +292,7 @@ process on the far side of a wire.
 | Vendor | Engine | Clients derived from it | The contract |
 |---|---|---|---|
 | OpenAI | `codex` (Rust), run as `app-server` | CLI/TUI, ChatGPT desktop (bundles 0.163.0), IDE extensions, SDK | JSON-RPC over stdio JSONL or WebSocket; approvals are server→client requests (§2.1); the shell version-checks the engine (`app-server daemon version`, minimum `0.141.0`) and shares `CODEX_HOME` with the CLI |
-| Anthropic | Claude Code CLI (Bun executable) / Agent SDK | terminal, Claude Desktop Code tab (`node-pty`, SDK embedded), the device-side bridge for cloud Cowork, Dispatch from a phone | SDK embedding plus hooks and permission modes; the desktop renders cards and a React-free consent window ([`agent-ux/02`](agent-ux/02-claude-desktop.md) §3.1) |
+| Anthropic | Claude Code CLI (Bun executable), driven as a child over **stream-json** or through the Agent SDK | terminal, SDK hosts, Claude Desktop Code tab (`node-pty`, SDK embedded), VS Code, Remote Control (a bridge to Anthropic's server, engine stays local), cloud sessions (engine in a VM), channels, agent teams | type-tagged JSONL with one control-request union; `initialize` injects hooks/MCP/agents/skills and returns `claude_code_version`; approvals are `can_use_tool` requests whose answer can rewrite the input; the SDK release pins the CLI build ([`claude-code/01`](claude-code/01-wire-protocol.md)) |
 | opencode | the same binary in server mode | TUI, desktop, app | the engine knows `client ∈ {app, cli, desktop}` and gates tools on it ([`harness-artifacts/03`](harness-artifacts/03-tool-use-patterns.md) §5.2) |
 | ACP | vendor-neutral wire | Devin Desktop, Paseo, Superset, Strands CLI | one permission request, capability advertisement ([`agent-ux/10`](agent-ux/10-acp.md)) |
 | **Strands** | **linked into the caller's process** | — | no wire; §2.7 is the cost |
@@ -301,8 +301,10 @@ Four observations follow, each with a cost the artifacts showed:
 
 > 📌 **The version contract is the first message.** ChatGPT's shell distinguishes `update-required`
 > from `restart-required` and refuses engines below `0.141.0`; the desktop ships a newer engine than
-> npm did the same week. Claude Desktop, which embeds the SDK into its bundle, lost a visible SDK
-> version between 2.9939.2 and 2.42304.2 — the price of not having a wire to version.
+> npm did the same week. Claude Code puts `claude_code_version` in the `initialize` reply and pins
+> the CLI build in the SDK's `manifest.json`, so the SDK release *is* the version contract; Claude
+> Desktop, which embeds the SDK into its bundle, lost a visible SDK version between 2.9939.2 and
+> 2.42304.2 — the client package absorbed it.
 >
 > 📌 **Approval lives in the engine; rendering lives in the client.** The session approval cache
 > (Codex: `environment_id, executable, canonical command, cwd, tty, sandbox_permissions`) and the

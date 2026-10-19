@@ -192,6 +192,25 @@ Added: **`harness-artifacts/`**. No new concept page. REA itself is studied only
 instrument and as a tool-design reference; its reverse-engineering providers are not adopted as
 this repository's workflow.
 
+## 0.8 Scope note, 2026-10-19 — Claude Code read as an engine
+
+The Codex study read one vendor's engine from its generated schema and source. Claude Code, so far,
+appears here only as what other things embed or render (Dia's bundled agent-server, Claude Desktop's
+Code tab, the playbook's control ladder, the shipped binary's layout). `claude-code/` reads it the
+same way Codex was read: the Agent SDK's generated types (`@anthropic-ai/claude-agent-sdk` `sdk.d.ts`,
+the analogue of Codex's generated schema), the official documentation as Markdown, and the strings of
+the 2.1.303 binary's split modules — never the binary running.
+
+1. **The object is the contract**: stream-json wire, control requests, permission modes and rules,
+   hooks, session persistence, compaction, and the clients that drive the engine (terminal, Desktop,
+   Remote Control, cloud, channels).
+2. **Quotation stays at identifier and string level.** Claude Code is shipped under Anthropic's
+   commercial terms; the split modules are not committed and are cited by chunk name only.
+3. **It is the second case for `SYNTHESIS` §2.9** (one engine, many clients), read at wire level.
+
+Added: **`claude-code/`**. No new concept page unless the reading forces one; existing concepts
+(`approval-gate`, `thread-turn-item`, `wire-protocol-boundary`, `harness`) are re-ingested instead.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -240,6 +259,8 @@ this repository's workflow.
   (`ai-sdlc/`, 2026-10-06, §0.6): Anthropic's AI-native SDLC playbook, read as a control
   ladder next to `docs/07`. The plays were not executed. The page's time-to-intent targets
   are not adopted.
+- Claude Code as an engine (`claude-code/`, 2026-10-19, §0.8): the Agent SDK's generated types,
+  official docs, and binary strings read for the wire, approval, session and client contract.
 - Shipped-artifact reading as a method (`harness-artifacts/`, 2026-10-19, §0.7): Bun and
   Electron packaging, fuses, UI composition from bundles, desktop drift, and a cross-reference of
   tool-use mechanics. Nothing executed; REA is the instrument, not a subject.

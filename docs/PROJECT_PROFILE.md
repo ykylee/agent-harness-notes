@@ -24,6 +24,7 @@
 
 ## 2. Document layout
 - 문서 위키 홈: `README.md` · Codex study: `docs/` (16 documents + `99-sources.md`)
+- Claude Code as an engine: `claude-code/` (3 documents + `99-sources.md`)
 - Browser-agent study: `browser-agents/` (13 documents) · Strands: `strands/` (8) · clients and ACP:
   `agent-ux/` (11) · orchestration: `gas-town/` (5), `gas-city/` (5) · notes: `rrsi/` (4),
   `ai-sdlc/` (4), `harness-artifacts/` (4) — each folder has a `README.md` and a `99-sources.md`
@@ -68,7 +69,7 @@
 ## 5. Enforcing wiki re-ingest
 
 `ai-workflow/wiki/` is a re-index of the study folders (`docs/`, `browser-agents/`, `strands/`,
-`agent-ux/`, `gas-town/`, `gas-city/`, `ai-sdlc/`, `harness-artifacts/`, `rrsi/`, and `SYNTHESIS.md`). If a source document changes and
+`agent-ux/`, `gas-town/`, `gas-city/`, `ai-sdlc/`, `harness-artifacts/`, `rrsi/`, `claude-code/`, and `SYNTHESIS.md`). If a source document changes and
 the re-index does not follow, the wiki goes quietly stale. The mapping exists in exactly one place —
 each concept page's `last_ingested_from` — and is read at three points.
 
