@@ -43,7 +43,7 @@
 | Runtime behaviour | **not run.** No `gt`/`bd` binary executed, no town created, no Dolt server started. Every mechanism here is read from source and design docs |
 | Hosted "Gas Town by Kilo" and the Wasteland federation | secondary coverage only; not read from a first-party repo here |
 | Gas City (the platform this operating model was extracted into) | read in [`gas-city/`](../gas-city/99-sources.md) @ `3ef7fadd42`. This row is closed |
-| Beads (`gastownhall/beads`) as a separate project | used here only through Gas Town's `internal/beads` + docs; the standalone project was not cloned |
+| Beads (`gastownhall/beads`) as a separate project | **Read 2026-10-19** @ `4f9174e6b` (`~/repos/harness-refs/beads`). The forgeable-ledger finding of [02](02-architecture.md) §5 / [04](04-orchestration-techniques.md) B1 is a **Beads property** (`claim.go:48-58`, `SECURITY.md:160-162`, `serve.go:106-108`); orchestrator types incl. `role` were removed from Beads core and `role_bead` is a schema column only; Beads ships its own `merge_slot.go` (label `gt:slot`, Metadata JSON, transactional check-and-set) distinct from Gas Town's `beads_merge_slot.go`; per-rig databases match Beads' shared-server mode ("each project uses its own database (prefix-based)"). Details in [`gas-city/99`](../gas-city/99-sources.md) §C. ✅ |
 | Cost, throughput, and merge-conflict-rate numbers | not measured; see 📣 above |
 | Live behaviour of a polecat under the (proposed) sandbox | the doc is a **Proposal**; the split is a design, not an observed deployment |
 

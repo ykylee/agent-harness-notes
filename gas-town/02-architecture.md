@@ -51,7 +51,9 @@ Three things in that tree are worth pausing on:
    one canonical clone. Spawn cost is a worktree, not a clone.
 2. **`directives/<role>.md` is operator policy, injected at prime time.** The role definition is a
    document, not code — the operator can rewrite what a Witness *is* without recompiling. (Role
-   beads are the equivalent in the ledger, referenced by a `role_bead` field.)
+   beads are the equivalent in the ledger, referenced by a `role_bead` field. *2026-10-19:* in
+   standalone Beads the `role` type was "removed from beads core" and `role_bead` survives only as a
+   schema column — it is Gas Town's field, stored by Beads; [99 §C](99-sources.md).)
 3. **Formula overlays are a per-rig override layer for workflows** — the same layering idea as
    `property-layers.md` applied to process rather than config.
 
@@ -113,6 +115,14 @@ mitigates it with `hide_users.rs` / Seatbelt / restricted tokens; Strands defaul
 `sandbox: host`. Gas Town's contribution is the observation that **the orchestration identity is
 itself a credential** — `BD_ACTOR` plus mail access is enough to forge a completed task — so the
 plane split has to include the control channel, not just the filesystem.
+
+> 📌 **Standalone Beads confirms this is a property of the substrate, not a Gas Town accident**
+> (2026-10-19, `gastownhall/beads` @ `4f9174e6b`, [99 §C](99-sources.md)): `claim.go` states that the
+> actor "is NOT the authenticated principal … exactly as any local process can pass any --actor to
+> the CLI", `SECURITY.md` records "No built-in … access control (relies on filesystem permissions)",
+> and `serve.go` names the consequence — "any peer could … claim work as any actor". Beads
+> documents the ledger as an audit trail with a concurrency fence, by charter outside orchestration
+> policy. The credential boundary therefore has to be drawn by the orchestrator above it.
 
 ## 6. The dispatcher — capacity as a first-class control
 

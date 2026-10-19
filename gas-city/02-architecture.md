@@ -29,6 +29,13 @@ Two facts are both true, and the older glossary collapses them.
 - One Dolt sql-server per city. The port is `.beads/dolt-server.port` at the city root.
 - Each scope has an `issue_prefix` (`mc`, `riga`, …). `bd` filters every read and write to that
   prefix. From rig A, rig B's bead id is "not found" even though the row is on the same server.
+  > ⚠️ **Corrected 2026-10-19 after reading standalone Beads** (`gastownhall/beads` @ `4f9174e6b`,
+  > [99 §C](99-sources.md)): in Beads itself `issue_prefix` is used only to generate ids and to name
+  > the per-project Dolt database (`internal/storage/issueops/create.go:281`,
+  > `docs/architecture/dolt.md:743`); **there is no read/write filter keyed on the prefix in Beads.**
+  > The "not found" behaviour is therefore Gas City's `bd` integration or the per-project database
+  > split, not a Beads property (⚠️ which of the two was not traced). A4 in [04](04-orchestration-techniques.md)
+  > is corrected the same way.
 - `gc.endpoint_origin` is `managed_city` at the city and `inherited_city` at a default rig. Rigs
   do not run Dolt. `gc bd --rig <name>` is "cd and run `bd`", not a federation join.
 

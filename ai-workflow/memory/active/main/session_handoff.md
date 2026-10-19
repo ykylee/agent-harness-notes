@@ -35,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-005 docs/02 보완 + Beads standalone 독해: done. docs/02 §4 Item 표(imageGeneration 새 형태·subAgentActivity 모델)·§9 27필드(실험 12 ⚗); Beads 반박 1(prefix 필터)·확인 다수, wiki control-plane §5.6 addendum
 - TASK-2026-10-19-main-004 드리프트 패스 (Codex `d42056091`→`b1fd48c48` 719 커밋 · Strands `a9a62d4e`→`bd0b6a94` 176 커밋): done. **반박 0건.** Codex +4 메서드/+1 알림(108/10/87), 승인 요청 10종·ReviewDecision 불변, `codexErrorInfo` 열린 집합(#49806), Guardian 에스컬레이션 재시도 비승인(#54263), 플래그 192키(code_mode 계열 기본값 불변), 03 §3 수치 전부 동일(+3 변경). **다음 기준 Codex `b1fd48c48` · Strands `bd0b6a94`.** `docs/99` §E.6, `docs/02` 3곳, `strands/99` §6.2, wiki 6 페이지 재ingest
 - TASK-2026-10-19-main-001 REA 로 설치 하네스 4종+데스크탑 2종 산출물 대조: done. `harness-artifacts/` README·01·02·03·99. **실행 0건**, REA 그래프 3/6 부분(⚠️ 명시)
 - TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
@@ -112,7 +113,7 @@
 - [x] Gas City — `gas-city/` @ `3ef7fadd42` (TASK-2026-09-30-main-014). 소스 독해, 미실행
 - [x] RRSI — `rrsi/` @ `be50316e1d` (TASK-2026-10-01-main-001). 소스 독해, 미실행, 점수 미채택
 - [x] AI-native SDLC playbook — `ai-sdlc/` (TASK-2026-10-06-main-001). 원문 독해, 플레이 미실행, 시간 목표 미채택. 세션 종료(2026-10-19) 커밋에 포함
-- [ ] Beads standalone (`gastownhall/beads`) 미독 — 개념 축 연속성 확인용
+- [x] ~~Beads standalone 독해~~ — 2026-10-19 `4f9174e6b` (`~/repos/harness-refs/beads`). **위조 가능한 원장은 Beads 속성**(`claim.go` "caller-ASSERTED … not an authorization boundary", `SECURITY.md` 접근 제어 없음) → §5.6 강화. **반박 1**: `gas-city/02·04` 의 "`issue_prefix` 하드 필터" — Beads 는 ID 생성·DB 명명에만 씀, 필터 없음(정정). formula v2·control/work bead 는 Gas City 추가 확인. `role_bead` 는 스키마 화석. `gas-city/99` §C, `gas-town/99`
 - [x] ~~Strands 드리프트 재확인~~ — 2026-10-19 `bd0b6a94`(176 커밋, python 1.61.1 / ts 1.21.0 / harness 0.3.1): 게이트 코어 바이트 동일, P1–P6 코드 경로 불변(P6 는 재작성됐으나 순서 동일), 하네스 ContextOffloader 배선 제거, 반증 0. **다음 기준 `bd0b6a94`** (`strands/99` §6.2)
 - [ ] `check_wiki_freshness.py` 가 stale 을 알린다 — **근거 없는 갱신으로 메우지 말 것**(§ Risks)
 

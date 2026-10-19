@@ -4,7 +4,7 @@ status: active
 last_ingested_from: gas-town/01-vocabulary.md + gas-town/02-architecture.md + gas-town/03-roles-and-lifecycle.md + gas-town/04-orchestration-techniques.md + gas-town/99-sources.md + gas-city/01-vocabulary.md + gas-city/02-architecture.md + gas-city/03-roles-and-lifecycle.md + gas-city/04-orchestration-techniques.md + gas-city/99-sources.md
 related_pages: [concepts/control-plane-execution-plane, concepts/approval-gate, concepts/harness, concepts/agent-client-protocol, concepts/stateless-conversation-wire, concepts/primary-source-verification]
 created: 2026-09-30
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Multi-Agent Orchestration — driving many harness instances at once
@@ -16,7 +16,7 @@ updated: 2026-09-30
 - Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
   `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
   **Not run** — no binary executed, so every mechanism here is source-read, never observed
-- Updated: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
+- Updated: 2026-10-19 (standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 

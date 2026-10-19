@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md + gas-town/02-architecture.md + gas-town/04-orchestration-techniques.md + gas-city/02-architecture.md + gas-city/04-orchestration-techniques.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data, concepts/multi-agent-orchestration]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Control Plane / Execution Plane — separating the harness from compute
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
+- Updated: 2026-10-19 (standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -118,6 +118,17 @@ The package mints nothing; the bundled dashboard is rejected once the gate is on
 does not cover `bd` writes, and a worker that can write a control bead can strand a workflow
 ([`gas-city/02`](../../../gas-city/02-architecture.md) §6, [`gas-city/04`](../../../gas-city/04-orchestration-techniques.md) A1).
 Prefix isolation between rigs is a `bd` query filter on a shared server, not a credential either.
+
+**Addendum 2026-10-19 — the substrate says so itself.** Standalone Beads (`gastownhall/beads` @
+`4f9174e6b`, [`gas-city/99`](../../../gas-city/99-sources.md) §C) documents the ledger as an audit
+trail with a concurrency fence and nothing more: `internal/httpapi/claim.go:48-58` "The actor is
+caller-ASSERTED provenance for the audit trail and is NOT the authenticated principal … The CAS is
+therefore a correctness fence against CONCURRENT claims, not an authorization boundary";
+`SECURITY.md:160-162` "No built-in encryption or access control"; `PROJECT_CHARTER.md` places
+orchestration policy outside Beads. So §5.6's boundary is not a Gas Town defect to patch but a
+line every orchestrator on this substrate must draw itself. One claim in `gas-city/02` was wrong at
+the substrate level: `issue_prefix` filters nothing in Beads — it names the database and generates
+ids — so prefix isolation is client behaviour or database separation, never a grant.
 
 ## §6 Read next  {#s6-next}
 

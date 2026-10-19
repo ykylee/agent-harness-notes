@@ -85,6 +85,12 @@ that every bead class shares a file. And a prefix filter enforced in the client 
 local `config.yaml`) is not a server-side grant. A client that skips the filter sees every row.
 That is a client convention, graded as such.
 
+> ⚠️ **Corrected 2026-10-19.** Standalone Beads applies no prefix filter: `issue_prefix` names the
+> database and generates ids, nothing more ([`gas-city/02`](02-architecture.md) §2 note, `99` §C).
+> "A hard filter" is at most the client integration's doing, and the caveat below — a client-side
+> filter is not a server-side grant — is now the whole statement: the Dolt server auto-started by
+> `bd` is `root` with no password by default (`docs/architecture/dolt.md:204-210`).
+
 ### A5. Config is code; bead text is data
 
 **The technique.** Packs, agent commands, `scale_check`, order checks, and exec orders are

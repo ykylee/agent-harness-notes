@@ -260,6 +260,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 드리프트 점검. 실행 없음.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-004.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-005",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 노트 보완·대조. 실행 없음.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-005.md"
     }
   ],
   "issues": []
