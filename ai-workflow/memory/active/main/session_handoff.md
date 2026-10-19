@@ -35,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-007 REPORT 웹 아티팩트(영/한) 갱신: done. 영문 v3 `claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo`, 한국어 v2 `claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh` — 같은 디자인 토큰 유지, 후속 조사 5 대조표·검증 기록 12행·권고 13·방법 6·근거 자료 14링크. HTML 원본은 세션 스크래치에만(저장소 미보관)
 - TASK-2026-10-19-main-006 REPORT(영/한) 갱신 + Gas City prefix 필터 위치 확정: done. REPORT 에 "선적된 산출물" 절, 권고 12·13, 방법 노트 3, 읽기 순서; prefix 격리는 DB 명명(`doltlite_read_store.go:125-142`), `beads-topology.md` 의 쿼리층 필터 문장은 1차 문서 vs 1차 소스 모순으로 기록
 - TASK-2026-10-19-main-005 docs/02 보완 + Beads standalone 독해: done. docs/02 §4 Item 표(imageGeneration 새 형태·subAgentActivity 모델)·§9 27필드(실험 12 ⚗); Beads 반박 1(prefix 필터)·확인 다수, wiki control-plane §5.6 addendum
 - TASK-2026-10-19-main-004 드리프트 패스 (Codex `d42056091`→`b1fd48c48` 719 커밋 · Strands `a9a62d4e`→`bd0b6a94` 176 커밋): done. **반박 0건.** Codex +4 메서드/+1 알림(108/10/87), 승인 요청 10종·ReviewDecision 불변, `codexErrorInfo` 열린 집합(#49806), Guardian 에스컬레이션 재시도 비승인(#54263), 플래그 192키(code_mode 계열 기본값 불변), 03 §3 수치 전부 동일(+3 변경). **다음 기준 Codex `b1fd48c48` · Strands `bd0b6a94`.** `docs/99` §E.6, `docs/02` 3곳, `strands/99` §6.2, wiki 6 페이지 재ingest

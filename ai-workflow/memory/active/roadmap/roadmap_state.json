@@ -274,6 +274,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "보고서 동기화·조사 정정. 실행 없음.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-006.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-007",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "보고서 배포 판본 동기화.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-007.md"
     }
   ],
   "issues": []
