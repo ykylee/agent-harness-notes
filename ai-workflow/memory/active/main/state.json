@@ -34,7 +34,9 @@
     "blocked_items": [
       "TASK-2026-09-27-main-002"
     ],
-    "planned_items": [],
+    "planned_items": [
+      "TASK-2026-10-19-main-009"
+    ],
     "recent_done_items": [
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
@@ -52,7 +54,7 @@
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
-    "task_count": 8,
+    "task_count": 9,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
