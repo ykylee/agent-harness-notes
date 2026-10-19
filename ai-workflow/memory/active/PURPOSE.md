@@ -154,6 +154,23 @@ It belongs on the harness-engineering axis already in scope:
 Added: **`rrsi/`**. No new concept page. The boundary is unchanged: study the method, do not
 adopt the search as this repository's workflow, and do not re-run the benchmarks here.
 
+## 0.6 Scope note, 2026-10-06 — an operating prescription, not a new harness
+
+Anthropic's "The AI-native SDLC playbook" (Louis Claxton, 2026-08-21) is a stage-by-stage
+prescription for running Claude Code across a software lifecycle: a committed artifact chain
+(`intent.md`, `spec.md`, `plan.md`, the diff, the review, a new intent when a band breaks) and a
+control ladder (a context file, an advisory skill, a hook, a human the writer cannot pass,
+managed settings the engineer cannot edit).
+
+It belongs on the harness-engineering axis already in scope, next to `docs/07`:
+
+1. **The object is how a harness is governed**, not a new execution engine. There is no binary to pin.
+2. **The indicators are instructions.** Time-to-intent targets are the page's expectations. They are not measurements, and they are not adopted.
+
+Added: **`ai-sdlc/`**. No new concept page. The boundary is unchanged: study the prescription, do
+not run the plays as this repository's workflow, and do not treat the managed-settings example as
+a config to deploy.
+
 ## 1. Goals
 
 - **G1**: record the **actual contract** of agent harnesses by reading **generated schemas, source
@@ -198,6 +215,10 @@ adopt the search as this repository's workflow, and do not re-run the benchmarks
 - Harness engineering operating principles (OpenAI's internal experiment), and a search
   procedure that edits a harness while the model stays frozen (`rrsi/`, 2026-10-01, §0.5).
   The procedure's published scores are not adopted.
+- An operating prescription for running one vendor's coding agent across an SDLC
+  (`ai-sdlc/`, 2026-10-06, §0.6): Anthropic's AI-native SDLC playbook, read as a control
+  ladder next to `docs/07`. The plays were not executed. The page's time-to-intent targets
+  are not adopted.
 - Source verification records and the history of refutations (`99-sources.md`)
 - **Control surface, perception model and credential design of browser-type agents**
   (`browser-agents/`)

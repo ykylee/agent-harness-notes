@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-01 (RRSI 조사. 소스 독해, 미실행, 점수 미채택)
+- Updated: 2026-10-19 (세션 종료. AI-native SDLC playbook 조사는 이 커밋에 포함. 원문 독해, 플레이 미실행, 시간 목표 미채택)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -28,6 +28,7 @@
 
 ## Work Status
 
+- TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
 - TASK-2026-10-01-main-001 RRSI 하네스 자기개선 조사: done. `rrsi/` @ `be50316e1d`. 가중치 고정, incumbent는 `evolve/<domain>` 커밋. 검색 제약 5개. 점수 표는 자기보고. **미실행**
 - TASK-2026-09-30-main-014 Gas City 오케스트레이션 조사: done. `gas-city/` @ `3ef7fadd42`. 역할 enum 없음, 번들 Gastown 팩은 있음. formula v2 기본 on. ACP `session/request_permission` 미응답. **미실행**
 - 2026-09-30 저녁 (병합 `6a2bb44`): Codex 8커밋 · Strands 2커밋 · ACP 8커밋 드리프트 대조 + Gas Town 오케스트레이션 조사 — **done**. **반박 0건.** 상세는 `ai-workflow/memory/active/feat/auto-20260930-a5e9e422/`
@@ -90,6 +91,7 @@
 - [ ] `SYNTHESIS.md` §2.4 에 **credential plane** 편입 — `control-plane-execution-plane` §5.6 에 이미 기록됨
 - [x] Gas City — `gas-city/` @ `3ef7fadd42` (TASK-2026-09-30-main-014). 소스 독해, 미실행
 - [x] RRSI — `rrsi/` @ `be50316e1d` (TASK-2026-10-01-main-001). 소스 독해, 미실행, 점수 미채택
+- [x] AI-native SDLC playbook — `ai-sdlc/` (TASK-2026-10-06-main-001). 원문 독해, 플레이 미실행, 시간 목표 미채택. 세션 종료(2026-10-19) 커밋에 포함
 - [ ] Beads standalone (`gastownhall/beads`) 미독 — 개념 축 연속성 확인용
 - [ ] Strands 태그/버전은 `4dfeca8c` 까지만 확인 — 다음 창에서 재확인
 - [ ] `check_wiki_freshness.py` 가 stale 을 알린다 — **근거 없는 갱신으로 메우지 말 것**(§ Risks)

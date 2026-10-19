@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/07-harness-engineering.md + rrsi/01-what-it-edits.md + rrsi/02-the-loop.md + rrsi/03-measurement.md + rrsi/99-sources.md
+last_ingested_from: docs/07-harness-engineering.md + rrsi/01-what-it-edits.md + rrsi/02-the-loop.md + rrsi/03-measurement.md + rrsi/99-sources.md + ai-sdlc/01-the-loop.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/primary-source-verification]
 created: 2026-09-22
-updated: 2026-10-01
+updated: 2026-10-06
 ---
 
 # Harness Engineering — the discipline of governing an autonomous runtime
@@ -12,7 +12,7 @@ updated: 2026-10-01
 - Purpose: the operating principles drawn from OpenAI's internal "zero hand-written code" experiment.
 - Scope: the experiment's facts, redefining the engineer's role, legibility, mechanical enforcement, entropy and garbage collection, how to apply it
 - Primary source: [Harness engineering](https://openai.com/index/harness-engineering/), Ryan Lopopolo, 2026-02-11
-- Updated: 2026-10-01 (RRSI: regularize the search that edits the harness; non-structural tags stick only via domain signals; scores not adopted)
+- Updated: 2026-10-06 (AI-native SDLC playbook: context file, advisory skill, hook, human gate; plays not run; targets not adopted)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -184,9 +184,28 @@ wrong answer still add.
 The published score table (Terminal-Bench 74.2 → 80.2, and the rest) is the authors' report.
 It is not a finding of this page. Full record: [`rrsi/`](../../../rrsi/README.md).
 
-## §12 Read next  {#s12-next}
+## §12 One vendor's control ladder  {#s12-ai-sdlc}
+
+§5 says enforce invariants and leave the implementation free, with the lint error carrying the
+fix. Anthropic's AI-native SDLC playbook (Louis Claxton, 2026-08-21; read 2026-10-06, not run)
+names the same split for Claude Code:
+
+- `CLAUDE.md` is context, read every session, under a page. It does not enforce.
+- A skill is advisory. The page says nothing forces the session to comply.
+- A hook is the deterministic layer. Exit 2 on `PreToolUse` blocks the tool call, and a JSON allow cannot override it (hooks reference, same day). A missing script and a timed-out command hook do not block, so "close to impossible" stays the page's claim.
+- The writer of a change cannot approve it. Branch protection still requires a code owner.
+- Detection of a production breach is a script. The model is invoked only after a band breaks.
+
+The page's time-to-intent targets are instructions, not results. Plan mode blocks edits until the
+plan is approved, except in an interactive terminal where bypass permissions are in the mode
+cycle. Auto mode in the docs, from v2.1.283, is a classifier and the built-in start mode. The
+playbook describes an older step: turn auto-accept on after the guardrails exist. Full record:
+[`ai-sdlc/`](../../../ai-sdlc/README.md).
+
+## §13 Read next  {#s13-next}
 
 - [[concepts/harness]] — the structure of what is being governed
 - [[concepts/retained-reasoning]] — a concrete case of harness settings changing performance
 - RRSI, the search: [`rrsi/02-the-loop.md`](../../../rrsi/02-the-loop.md)
+- The playbook's ladder: [`ai-sdlc/03-the-control-ladder.md`](../../../ai-sdlc/03-the-control-ladder.md)
 - Original: [`docs/07-harness-engineering.md`](../../../docs/07-harness-engineering.md)

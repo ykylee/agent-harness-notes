@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "workflow_kit.common.state.roadmap.generate_roadmap_state",
-  "generated_at": "2026-10-01",
+  "generated_at": "2026-10-19",
   "milestones": [
     {
       "id": "M-001",
@@ -225,6 +225,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "조사 노트. 초안 제품 로드맵 밖이며 PURPOSE의 하네스 엔지니어링 축이다. 벤치마크 재현은 하지 않는다.",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-01-main-001.md"
+    },
+    {
+      "task_id": "TASK-2026-10-06-main-001",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "조사 노트. 초안 제품 로드맵 밖이며 PURPOSE의 하네스 엔지니어링 축이다. 플레이는 실행하지 않는다.",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-06-main-001.md"
     }
   ],
   "issues": []

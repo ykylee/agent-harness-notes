@@ -42,6 +42,10 @@ RRSI, a search that edits a harness while the model stays frozen
 (`google-research/rrsi` @ `be50316e1d`). The published benchmark table is the authors' report
 and is not adopted.
 
+Another note, also not a product study: [`ai-sdlc/`](ai-sdlc/README.md) reads Anthropic's
+"The AI-native SDLC playbook" (Louis Claxton, 2026-08-21) as an operating prescription for
+Claude Code. The plays were not run. The page's time-to-intent targets are not adopted.
+
 Concept-level index: [`ai-workflow/wiki/index.md`](ai-workflow/wiki/index.md) (19 concepts).
 
 ## Start with the report

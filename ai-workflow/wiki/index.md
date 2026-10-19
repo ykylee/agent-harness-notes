@@ -18,7 +18,9 @@ split between surface-specific and surface-independent axes.
 ### [[concepts/harness-engineering]] {#harness-engineering}
 Five months with no hand-written code. The bottleneck was the environment, not the model — legibility,
 mechanical enforcement, continuous garbage collection. §11 adds RRSI: a search that edits the
-harness while the model stays frozen. The published scores are not adopted.
+harness while the model stays frozen. The published scores are not adopted. §12 reads Anthropic's
+AI-native SDLC playbook as the same split (context file, advisory skill, hook, human gate). The
+plays were not run.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
 The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity

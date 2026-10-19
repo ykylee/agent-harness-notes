@@ -1,17 +1,17 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-06
 ---
 
 # Approval Gate — making human intervention a protocol primitive
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-09-30 (Gas City ACP client leaves `session/request_permission` unanswered)
+- Updated: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -233,6 +233,26 @@ the timeout path: the peek buffer contains `permission rejected`, and `responses
 client replies. Hosting the ACP wire is not implementing this gate
 ([`gas-city/03`](../../../gas-city/03-roles-and-lifecycle.md) §6). Source ✅; not run ⚠️.
 
+## §7.8 Observation — a hook that blocks only when it runs  {#s7-8-claude-code}
+
+Anthropic's AI-native SDLC playbook (2026-08-21) treats a Claude Code hook as the deterministic
+rung under an advisory skill, and a code-owner approval as the gate the writer cannot pass.
+Checked against the hooks reference and the permission-modes page on 2026-10-06
+([`ai-sdlc/03`](../../../ai-sdlc/03-the-control-ladder.md)). Not run.
+
+| Property | Claude Code, as those two pages state it |
+|---|---|
+| Exit 2 on `PreToolUse` | blocks the tool call. A JSON `allow` cannot override it |
+| Exit 0 with no decision | does not approve. The normal permission flow continues |
+| Exit 1, a missing script, a timed-out command hook | does not block. A mistyped path leaves the gate silently disabled |
+| Several hooks | `deny` > `defer` > `ask` > `allow`. Exit 2 routes as deny |
+| Plan mode | blocks edits until the plan is approved, except an interactive terminal where bypass permissions are in the mode cycle |
+
+The playbook's "close to impossible" is the page's claim. The silent-disable row is why a hook is
+not yet the fail-closed property in §7.5. Managed settings can stop an engineer turning the hook
+off (`allowManagedHooksOnly`; `disableAllHooks` below the managed tier does not reach managed
+hooks). That key was seen. The rest of the playbook's settings example was not checked key by key.
+
 ## §8 Read next  {#s8-next}
 
 - [[concepts/thread-turn-item]] — the turn that approval stops
@@ -242,3 +262,4 @@ client replies. Hosting the ACP wire is not implementing this gate
 - Strands case: [`strands/03-tools-and-approval.md`](../../../strands/03-tools-and-approval.md)
 - Client rendering: [`agent-ux/08-primitives-rendered.md`](../../../agent-ux/08-primitives-rendered.md)
 - ACP wire: [[concepts/agent-client-protocol]], [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md)
+- Claude Code hook, read not run: [`ai-sdlc/03-the-control-ladder.md`](../../../ai-sdlc/03-the-control-ladder.md)
