@@ -6,6 +6,10 @@
 > (`codex-rs/app-server-protocol/schema/`). Where they disagree, the generated schemas are authoritative.
 > Drift-checked against `openai/codex@e72da2b538` (2026-09-26); re-counted at HEAD `bcd6d9ab6b`
 > (2026-09-30): generated `ClientRequest` **107**, `ServerRequest` **10**, `ServerNotification` **86**.
+> Re-counted at `b1fd48c48` (2026-10-19): **108 / 10 / 87** — four methods and one notification added,
+> none removed; approval requests unchanged; `codexErrorInfo` is now an open set. Details in
+> [99 §E.6](99-sources.md#e6-drift-re-check-2026-10-19--d42056091--b1fd48c48); this document keeps the
+> 2026-09-30 reading except where marked *(2026-10-19)*.
 
 ## 1. Basic shape of the protocol
 
@@ -210,7 +214,7 @@ To see the actual JSON for a full turn:
 codex debug app-server send-message-v2 "run tests and summarize failures"
 ```
 
-## 6. Client → server methods (107 stable; 170 including experimental)
+## 6. Client → server methods (107 stable; 170 including experimental — 108 / 175 at `b1fd48c48`, 2026-10-19)
 
 The full *stable* `ClientRequest` list, grouped by domain. *(corrected 2026-09-26: the committed
 `schema/typescript/ClientRequest.ts` is generated without `#[experimental]` methods — 104 stable of
@@ -381,7 +385,7 @@ by the host application**. It is the protocol-level implementation of the divisi
 "your application owns product context, business rules, and tools; Codex provides the agent loop
 and sandboxed execution."
 
-## 8. Server notifications (86 as of 2026-09-30; 85 at 2026-09-26)
+## 8. Server notifications (86 as of 2026-09-30; 85 at 2026-09-26; 87 at 2026-10-19)
 
 ### 8.1 Thread lifecycle
 ```
@@ -512,6 +516,8 @@ type ThreadStartResponse = {
 
 ### `TurnStartParams`
 
+*(2026-10-19)* `b1fd48c48` adds stable `parentTurnId` and `rootTurnId` (turn lineage, #51415; `Turn.rootTurnId` is also persisted) and experimental `responsesapiClientMetadataPatch` (#54053). The listing below is the 2026-09-30 shape.
+
 ```ts
 type TurnStartParams = {
   threadId: string,
@@ -618,6 +624,8 @@ Turn failures arrive inside `turn/completed`:
   }
 }
 ```
+
+*(2026-10-19)* `codexErrorInfo` is an **open set** since #49806: an `untagged` `Other` variant accepts `"other" | string | object`, and the exported schema became `anyOf` with `{"type":["string","object"]}` — do not `match` it as a closed enum.
 
 Common `codexErrorInfo` values: `contextWindowExceeded`, `usageLimitExceeded`,
 `{ httpConnectionFailed: { httpStatusCode } }`, `sandboxError`. *(corrected 2026-09-26: wire values

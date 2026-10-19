@@ -35,6 +35,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-004 드리프트 패스 (Codex `d42056091`→`b1fd48c48` 719 커밋 · Strands `a9a62d4e`→`bd0b6a94` 176 커밋): done. **반박 0건.** Codex +4 메서드/+1 알림(108/10/87), 승인 요청 10종·ReviewDecision 불변, `codexErrorInfo` 열린 집합(#49806), Guardian 에스컬레이션 재시도 비승인(#54263), 플래그 192키(code_mode 계열 기본값 불변), 03 §3 수치 전부 동일(+3 변경). **다음 기준 Codex `b1fd48c48` · Strands `bd0b6a94`.** `docs/99` §E.6, `docs/02` 3곳, `strands/99` §6.2, wiki 6 페이지 재ingest
 - TASK-2026-10-19-main-001 REA 로 설치 하네스 4종+데스크탑 2종 산출물 대조: done. `harness-artifacts/` README·01·02·03·99. **실행 0건**, REA 그래프 3/6 부분(⚠️ 명시)
 - TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
 - TASK-2026-10-01-main-001 RRSI 하네스 자기개선 조사: done. `rrsi/` @ `be50316e1d`. 가중치 고정, incumbent는 `evolve/<domain>` 커밋. 검색 제약 5개. 점수 표는 자기보고. **미실행**
@@ -112,11 +113,11 @@
 - [x] RRSI — `rrsi/` @ `be50316e1d` (TASK-2026-10-01-main-001). 소스 독해, 미실행, 점수 미채택
 - [x] AI-native SDLC playbook — `ai-sdlc/` (TASK-2026-10-06-main-001). 원문 독해, 플레이 미실행, 시간 목표 미채택. 세션 종료(2026-10-19) 커밋에 포함
 - [ ] Beads standalone (`gastownhall/beads`) 미독 — 개념 축 연속성 확인용
-- [ ] Strands 태그/버전은 `4dfeca8c` 까지만 확인 — 다음 창에서 재확인
+- [x] ~~Strands 드리프트 재확인~~ — 2026-10-19 `bd0b6a94`(176 커밋, python 1.61.1 / ts 1.21.0 / harness 0.3.1): 게이트 코어 바이트 동일, P1–P6 코드 경로 불변(P6 는 재작성됐으나 순서 동일), 하네스 ContextOffloader 배선 제거, 반증 0. **다음 기준 `bd0b6a94`** (`strands/99` §6.2)
 - [ ] `check_wiki_freshness.py` 가 stale 을 알린다 — **근거 없는 갱신으로 메우지 말 것**(§ Risks)
 
 **Codex 조사 (`docs/`)**
-- [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 2026-09-30 HEAD `bcd6d9ab6b` 후속 107 / 10 / 86. 다음 드리프트 기준은 `bcd6d9ab6b`
+- [x] ~~TASK-002: 2026-09-15 이후 `openai/codex` 변경분 대조~~ — 완료, `docs/99` §E. 2026-09-30 HEAD `bcd6d9ab6b` 후속 107 / 10 / 86. 다음 드리프트 기준은 `bcd6d9ab6b` → 10-19 재확인 후 **`b1fd48c48`**
 - [x] ~~webview 전용 메서드의 수신 엔진~~ — 클라우드 durable 호스트(TASK-2026-09-27-main-001). 남은 것: durable(Aeon) 엔진의 실체·동작은 개통된 계정에서만 관찰 가능
 - [x] ~~`docs/10` L200 Agents API 플러그인 `./` 규칙과 `onboardingSkill` 예외~~ — 두 표면. Agents 는 `./` 강제·필드 없음. Codex overlay 만 `./` 생략 허용 (`resolve_openai_onboarding_skill`, #46544). TASK-2026-09-30-main-005
 - [x] ~~참조 체크아웃 `~/repos/harness-refs/codex` origin~~ — 이 Linux 호스트에는 경로가 없어 GitHub origin 으로 생성 (`blob:none`, HEAD `d42056091a`). 다른 기기에서 origin 이 개인 Gitea 이면 `upstream` 으로 GitHub 를 fetch. TASK-2026-09-30-main-006

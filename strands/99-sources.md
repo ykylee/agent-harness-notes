@@ -3,7 +3,7 @@
 > Applies this repository's [method of knowing](../ai-workflow/wiki/concepts/primary-source-verification.md)
 > unchanged: **committed artifacts over prose**, no secondary source settled before cross-checking,
 > inference labelled as inference, refutations kept rather than deleted. Researched 2026-09-26.
-> Drift re-check: 2026-09-30 against HEAD `a9a62d4e` — see [§6](#6-drift-re-check-2026-09-30).
+> Drift re-check: 2026-09-30 against HEAD `a9a62d4e` — see [§6](#6-drift-re-check-2026-09-30); 2026-10-19 against `bd0b6a94` — [§6.2](#62-drift-re-check-2026-10-19--a9a62d4e--bd0b6a94): gate core byte-identical, harness context path moved, no refutation.
 
 ## 1. Grade vocabulary
 
@@ -236,3 +236,58 @@ that came from a thin clone** — that is the same shape as the four false "0"s 
 
 **Next baseline: `4dfeca8c`.** The durable checkout now exists, so the next re-read does not need
 a temporary clone.
+
+### 6.2 Drift re-check 2026-10-19 — `a9a62d4e` → `bd0b6a94`
+
+176 commits, 817 files. Tags in range: `python/v1.57.2` (09-30) … **`python/v1.61.1`** (10-15),
+`typescript/v1.20.0` → **`v1.21.0`** (10-14), `harness-python/v0.2.0` (10-07) → **`v0.3.1`** (10-15),
+`harness-typescript/v0.2.0` → `v0.3.0`, `harness-cli/v0.2.0` → `v0.2.1`. (`v1.39–1.41` are May 2026
+tags under the old naming and are not in range.) The durable checkout stays at `a9a62d4e`; everything
+below was read with `git show origin/main:<path>`. **No new refutation.** Next baseline: **`bd0b6a94`**.
+
+- **The §6 grep returns 63 hits; 6 touch approval code, 57 are `harness-*` paths, docs and tests.**
+  The six: the HITL classifier (py `vended_interventions/hitl/classifier.py:111`, ts
+  `classifier.ts:75`) and the LLM steering handler now resolve their model as `configured > agent.aux_model
+  > agent.model` (#4658, #4783 — a new `Agent(aux_model=)`); the CLI's default Cedar policy gains
+  `permit (principal, action == Action::"retrieve_context", resource)` (`strands-cli/src/tui/permissions/policy.ts:27-31`,
+  #4701); `WorkspaceSandbox` gains `writeFile`/`removeFile` overrides for Windows (#4978).
+- **The gate core is byte-identical.** `git diff --stat` is empty for `vended_interventions/cedar/`,
+  `interventions/`, `vended_plugins/steering/core/`, `hitl.py`/`hitl.ts`, `hooks/`, `sandbox/`,
+  `multiagent/a2a/`, the harness's `interventions.py`/`defaults.py`/`config.py`, and `strands-cli/src/tui/acp/`.
+  `session/request_permission` is still absent from the ACP server. **P1–P5 stand on the same code;
+  no re-run** (third consecutive window).
+- **P6 — the path was rewritten, the order was not.** `tools/executors/_executor.py` was rewritten
+  (399 lines; #4976 public middleware, #4833 `agent.cancel()`): `BeforeToolCallEvent` (l.210) →
+  `cancel_tool` → `selected_tool` → **`agent._middleware_registry.invoke(ExecuteToolStage, …)`**
+  (l.313) → `AfterToolCallEvent` (l.359). `INTERVENTION_INPUT = 90` (`hooks/registry.py:40`) is
+  unchanged, and the now-public `strands.middleware` (`Input → Wrap → Output`) can still
+  `replace(tool=, tool_use=)` after authorization. The same middleware exposes `MiddlewareInterruptResult`
+  — "gate behind a human-in-the-loop interrupt" — a fourth approval channel (⚠️ not probed).
+- **Harness context path moved (#4701, harness-python 0.2.0).** The harness no longer wires the
+  `ContextOffloader` plugin or `FileStorage`; `context_manager="auto"` is the SDK `ContextManager()`
+  default — `_AUTO_TRUNCATE_THRESHOLD = 1_500`, `_TRUNCATE_PREVIEW_TOKENS = 750`,
+  `_AUTO_SUMMARIZE_UTILIZATION = 0.85`, `_AGENTIC_TRUNCATE_THRESHOLD = 8_000`
+  (`strands-py/src/strands/_context_manager/context_manager.py:30-33`). The baseline's
+  `tempfile.mkdtemp("strands-offload-")` path is gone; with a session, the stash goes to session
+  storage ("the context manager's stash goes to files, not into the snapshot"); without one it stays in
+  memory. The plugin itself keeps 2,500/1,000 (`plugin.py:144,147`).
+- **Numbers re-checked, all unchanged:** `retrieve_context` 10,000; SlidingWindow 40 / `_PRESERVE_CHARS`
+  200; Summarizing 0.3 / 10; presets 5 / 0.7; `programmatic_tool_caller` 200,000 / 10 / 60 s / 256 MB
+  (`_SKIP_CONTEXT_OFFLOAD_KEY` removed); `read` 2,000 lines; `shell` 120 s and still no byte cap; swarm
+  20/20/900/300 (R16 holds); `DEFAULT_SUBAGENT_MAX_DEPTH = 2` now also in the SDK's new
+  `vended_tools/subagent/types.py:14`; Anthropic "at most one cache point" (`anthropic.py:409-413`);
+  Bedrock `cachePoint` after tools (`bedrock.py:606`).
+- **New in the SDK, not in the harness:** vended `subagent` (py #4841, ts #4971; policy axes
+  `Fixed/Inherit/Open/Choice` in `multiagent/spec.py`, default `context = Fixed("none")`, inherits
+  **sandbox only** — interventions/hooks inheritance grep 0; the harness's own `subagent.py` still
+  passes `interventions` to the child, `agent.py:463`), vended `python_repl` (`_DEFAULT_TIMEOUT = 120`,
+  no consent path; not in the harness's 8 built-ins), vended `swarm` (`_DEFAULT_MAX_AGENTS = 20`), TS
+  `mcp-router`, TS `DecisionModel`/`LLMDecisionModel` (#4942), MCP task execution (#4977).
+  `create_harness()` gained **no** options. `strands-cli/package.json:68` still pins
+  `"@strands-agents/harness": "~0.1.1"`.
+- **Wording to adjust, meaning unchanged:** [03](03-tools-and-approval.md) §4.5 / [07](07-security.md)
+  §3.2 "the classifier uses the parent agent's model" → `aux_model` first; [03](03-tools-and-approval.md)
+  §4.7 "subagents inherit interventions, hooks and sandbox" is true of the harness subagent and **not**
+  of the SDK's new vended subagent; `file_tools.py` now accepts Windows absolute paths too (R6's "any
+  absolute path" widened, #4978); `subagent.py` reports `cancelled | content_filtered | refusal` as
+  `status: "error"` (#5165).

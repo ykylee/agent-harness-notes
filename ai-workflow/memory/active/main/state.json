@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
       "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
       "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
       "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
@@ -44,21 +45,21 @@
       "TASK-2026-09-30-main-014 — Gas City 오케스트레이션 조사",
       "TASK-2026-09-30-main-013 — Anthropic redacted_thinking KeyError 확인",
       "TASK-2026-09-30-main-012 — REPORT 개념 수와 agent-ux 반영",
-      "TASK-2026-09-30-main-011 — ACP 엔진측 독해",
-      "TASK-2026-09-30-main-010 — Strands TS SDK 세부 직접 확인"
+      "TASK-2026-09-30-main-011 — ACP 엔진측 독해"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
-    "task_count": 3,
+    "task_count": 4,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
       "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
-      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생"
+      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
+      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)"
     ]
   },
   "next_documents": [

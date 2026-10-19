@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/99-sources.md + strands/01-overview.md + agent-ux/10-acp.md + agent-ux/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Primary-Source Verification — this repository's method of knowing
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
+- Updated: 2026-10-19 (two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -369,6 +369,15 @@ API outcome is still unverified.
 **ACP engine-side 2026-09-30** (TASK-011). Spec @ `9b26a3ea`, stable `protocolVersion` 1, permission
 method `session/request_permission`, four `PermissionOptionKind` values. Strands harness ACP path
 has no such call (source ✅). Live client ⚠️. See [[concepts/agent-client-protocol]].
+
+**Two method notes, 2026-10-19.** (1) A feature-flag literal missing from a stripped release binary
+(`model_catalog_in_context`, 0 hits in Codex 0.159.3) proved nothing by itself; `git merge-base
+--is-ancestor <commit> <release-tag>` did (absent from `rust-v0.159.3`, present in `rust-v0.163.0`,
+8 literals in the 0.163.0 build) — *record the tag, not the count*
+(`harness-artifacts/01` §3.3). (2) Two independent re-counts of the same `common.rs` differed by one
+(170/63 vs 171/64) because one excluded `mock/experimentalMethod`; the delta was still comparable
+only because the same script ran on both revisions — *keep the counting script with the count*
+(`docs/99` §E.6).
 
 ## §10 Read next  {#s10-next}
 

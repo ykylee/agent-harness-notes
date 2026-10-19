@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/02-app-server-protocol.md
 related_pages: [concepts/harness, concepts/approval-gate, concepts/stateless-conversation-wire]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # Thread / Turn / Item — the conversation primitives
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-10-19 (drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -120,6 +120,18 @@ two layers, so check the layer before reading.
 | Compatibility | `EventMsg::TurnStarted`/`TurnComplete` serialise as `task_started`/`task_complete` |
 
 > For a new integration use **the App Server protocol, not protocol_v1.**
+
+## §8.5 Observation — three weeks of drift, `d42056091` → `b1fd48c48`  {#s8-5-drift-2026-10-19}
+
+`docs/99` §E.6: four client methods and one notification added, none removed or renamed —
+generated `ClientRequest` 107 → **108**, `ServerRequest` 10, `ServerNotification` 86 → **87**.
+`TurnStartParams` gains `parentTurnId` / `rootTurnId` (#51415, turn lineage is now wire data);
+`ThreadForkParams.experimentalPredictionMode`; experimental **thread read state**
+(`thread/readState/update`, `thread/items/read`, `thread/readState/changed`, `-32600` +
+`readStateConflict` on a stale `expectedRevision`); `subAgentActivity` carries `model` and
+`reasoningEffort`; `imageGeneration` restructured. `codexErrorInfo` is an **open set** (#49806) — a
+client that matches a closed enum breaks. The durable-host dialect of `agent-ux/03` §1.2.1 is still
+absent from the engine. Unload delay (60 s) unchanged, now applied per thread (#55270).
 
 ## §7 Read next  {#s7-next}
 

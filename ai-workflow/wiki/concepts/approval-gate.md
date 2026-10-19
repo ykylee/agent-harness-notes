@@ -11,7 +11,7 @@ updated: 2026-10-19
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-19 (drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -265,6 +265,15 @@ accident, and no client-side rendering can notice.
 The artifact pass (`harness-artifacts/02` §3.1) adds where the gate *lives* when one engine serves
 many clients: the approval cache and policy evaluation are engine state behind a wire, and the shells
 (CLI menu, desktop card, consent window) only answer — the split `SYNTHESIS` §2.9 records.
+
+**Addendum, drift 2026-10-19 (`docs/99` §E.6).** The ten server→client requests and every
+`ReviewDecision` variant are byte-identical after 719 commits. Inside the engine the gate got
+*narrower*: a Guardian approval no longer pre-approves an escalated (unsandboxed) retry
+(`RequireEscalated`, #54263), grants bind to the issuing turn (#49880), plugin-hook approvals bind to
+a bundle content hash (#54619); the controller's decision is now typed as
+`SandboxOverride { NoOverride, EscalatedSandboxWithRestrictions, BypassSandboxFirstAttempt }`.
+Wider: sandbox integrity checks are observe-only ("failures and timeouts do not prevent command
+execution", #51843). Strands' gate core is byte-identical over the same window (`strands/99` §6.2).
 
 ## §8 Read next  {#s8-next}
 

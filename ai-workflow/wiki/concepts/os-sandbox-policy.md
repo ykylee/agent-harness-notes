@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/12-dia-binary.md
 related_pages: [concepts/approval-gate, concepts/control-plane-execution-plane, concepts/execution-environment-topology, concepts/primary-source-verification, concepts/credential-shielding, concepts/indirect-prompt-injection]
 created: 2026-09-22
-updated: 2026-09-30
+updated: 2026-10-19
 ---
 
 # OS Sandbox Policy — defence inside the execution plane
@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
+- Updated: 2026-10-19 (drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc availability probe — note under the last section). Previous: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -220,6 +220,14 @@ touch Keychain, cannot run `curl`/`python`/`git`, and that network is localhost/
 > process, not around Chromium tab isolation.
 >
 > ⚠️ The profiles were read as files; `sandbox-exec` was not exercised (Linux host).
+
+**Drift 2026-10-19 (`docs/99` §E.6).** `execpolicy` grammar untouched; `PowerShellLiteral` command
+origin (#54076). Sandbox integrity runner (bwrap / Seatbelt / MXC) is **observe-only** — "failures
+and timeouts do not prevent command execution" (#51843). Network proxy: no DNS lookup before
+allow-list or policy approval, Seatbelt's external port-53 allowance removed (#51650); broker
+credential aliases block MITM-hook bypass (`403 blocked-by-mitm-hook`, #52661); `credential_masking`
+(off) gives the shell placeholders and lets the proxy inject real credentials (#52302). Windows `mxc`
+moved to split crates and `is_available()` now probes by creating a security environment (#52707).
 
 ## §9 Read next  {#s9-next}
 

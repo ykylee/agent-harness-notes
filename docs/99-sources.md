@@ -3,7 +3,7 @@
 Research date: 2026-09-14 (Agents API reference extracted 2026-09-15)
 Drift re-check: 2026-09-26 against `openai/codex@e72da2b538` — see [§E](#e-drift-re-check-2026-09-26).
 Follow-up: 2026-09-30 against HEAD `bcd6d9ab6b` — App Server notifications 86; Agents roster three surfaces; Windows internals source-read.
-Second follow-up: 2026-09-30 against HEAD `92bc601ad6` — goal API `origin` field; Guardian skill-warmup skip; `model_catalog_in_context` ([§E.5](#e5-drift-re-check-2026-09-30-afternoon--bcd6d9ab6b--92bc601ad6)).
+Second follow-up: 2026-09-30 against HEAD `92bc601ad6` — goal API `origin` field; Guardian skill-warmup skip; `model_catalog_in_context` ([§E.5](#e5-drift-re-check-2026-09-30-afternoon--bcd6d9ab6b--92bc601ad6)). Third: 2026-10-19 against `b1fd48c48` — +4 methods, +1 notification, approval surface unchanged, `codexErrorInfo` open set, feature defaults ([§E.6](#e6-drift-re-check-2026-10-19--d42056091--b1fd48c48)).
 Local checkout: `~/repos/harness-refs/codex`, origin `https://github.com/openai/codex.git` (created 2026-09-30; at creation HEAD `d42056091a`, one TUI commit past the recheck).
 
 ## A. Primary sources — verified directly ✅
@@ -493,4 +493,111 @@ drifts and one research-axis item. Method counts (107 stable / 170 experimental,
   generated SDK. Live App Server traffic for the new `origin` field ⚠️ **not observed** — the
   behavioural description above is read from the server's own branching, not from a trace.
 
-**Next drift baseline: `92bc601ad6`.**
+**Next drift baseline: `92bc601ad6`.** *(superseded by §E.6)*
+
+### E.6 Drift re-check, 2026-10-19 — `d42056091` → `b1fd48c48`
+
+719 commits, 3,281 files, +173,115 / −44,857; tags `rust-v0.160.0` (10-01) … `rust-v0.163.0`
+(10-15) in range. Read in three scoped passes (protocol; engine core, features and policy; see
+[`harness-artifacts/`](../harness-artifacts/README.md) for the shipped 0.159.3 and 0.163.0 binaries
+read the same day). **No refutation** — nothing recorded at the baseline was wrong at the baseline.
+The first seven commits of the range are §E.5's. Counts re-done with §E.2's method on both revisions
+(the script and both method lists are kept in the session scratch; 171/64 at the baseline against
+§E.5's 170/63 — the earlier tally evidently excluded `mock/experimentalMethod`; stable 107 agrees).
+
+| Count | `d42056091` | `b1fd48c48` | Δ |
+|---|---|---|---|
+| Client requests in `common.rs` (stable + experimental) | 171 (107 + 64) | **175** (108 + 67) | +4 |
+| Generated `ClientRequest.ts` (stable only) | 107 | **108** | +1 |
+| Server → client requests (`ServerRequest.ts`) | 10 | 10 | 0 |
+| Notifications in `common.rs` / generated `ServerNotification.ts` | 85 / 86 | **86 / 87** | +1 |
+
+- **Protocol — four methods and one notification added, none removed or renamed.**
+  `thread/attachmentOwner/list` (stable, #50094); `thread/readState/update` and `thread/items/read`
+  (experimental, #52395, #52637; `-32600` + `{reason:"readStateConflict", readState}` on a stale
+  `expectedRevision`); `account/bedrock/checkGovCloudRequirements` (experimental, #49817);
+  notification `thread/readState/changed` (experimental but exported — §E.2's rule holds).
+  `TurnStartParams` gains **`parentTurnId` / `rootTurnId`** (stable, #51415 "Expose and persist turn
+  lineage") and `responsesapiClientMetadataPatch` (experimental, #54053); `ThreadForkParams.experimentalPredictionMode`
+  (#51884); `ThreadListParams.excludedThreadIds` (≤100, #51595); `subAgentActivity` items carry
+  `model` and `reasoningEffort` (#51463); `imageGeneration` restructured to `image: GeneratedImageRef`
+  + `inputImages[]` (#54398). `ThreadStartParams` unchanged (27 fields, 12 experimental — all already
+  at the baseline; [02 §9](02-app-server-protocol.md) lists the generated 15).
+- **The approval surface is unchanged.** The ten server→client requests, `CommandExecutionRequestApprovalParams`
+  (17 fields), `FileChangeRequestApprovalParams` (7), `ToolRequestUserInputParams` (7) and every
+  `ReviewDecision` variant are byte-identical. What moved is *inside* the engine: `SandboxOverride
+  { NoOverride, EscalatedSandboxWithRestrictions, BypassSandboxFirstAttempt }` types the controller's
+  decision (`protocol/src/sandbox.rs`); MCP elicitation cancellations carry a reason
+  (`McpApprovalCancellationReason { User, Interrupted, NonInteractive }`, #54679) and an
+  `ElicitationAbandonedEvent`; **Guardian approvals no longer pre-approve an escalated retry**
+  (#54263, `RequireEscalated`, `additional_permissions` reset), grants bind to the issuing turn
+  (#49880), plugin-hook approvals bind to a bundle content hash (#54619). Widened: `write_stdin`
+  review path when held permissions match an active grant (#54119); tools advertised before the
+  environment is ready (#54098); sandbox integrity checks are observe-only ("failures and timeouts
+  do not prevent command execution", #51843). `item/tool/requestOptionPicker` still has 0 hits in
+  the engine — §E.3 stands.
+- **The durable-host dialect is still not in the open-source engine.** `turn/addUserMessage`,
+  `thread/prewarm`, `thread/startAeon`, `environmentConfigId`, `deferredEnvironment`: 0 files, 0
+  commits by `git log -S`. `thread/rollback` survives only as the README removal notice. The
+  "read state" feature's word *durable* means locally persisted threads, not the host of §E.3.
+- **`codexErrorInfo` became an open set (#49806).** `v2/shared.rs:121-127` adds an `untagged`
+  `Other` variant (`"other" | string | {[key]: unknown}`) and the schema export rewrites
+  `/definitions/CodexErrorInfo` from `oneOf` to `anyOf` + `{"type":["string","object"]}`. A client
+  that `match`es a closed enum breaks. New `-32600` data: `{"reason":"serverShuttingDown"}`;
+  `-32603` when `useStateDbOnly:true` cannot answer ("not evidence that history is exhausted").
+- **Transport.** WebSocket zstd negotiation (#54930): header `x-codex-app-server-compression`,
+  protocol `zstd-stream-v1`, binary frames afterwards; behind `app_server_websocket_compression`
+  (UnderDevelopment, off). stdio JSONL and `--listen` unchanged. `codex remote-control` now uses the
+  managed daemon by default and `--no-daemon` opts **out** (#50803) — §E.4's reading is inverted.
+  `verified_local_daemon_socket()` guards against an SSH-forwarded default socket (#54421). The
+  exec-server compatibility baseline rose `0.156.1` → `0.162.1` and became date-selected (#52700,
+  #54623); `fs/writeBlock` streaming (#49778), scoped executor credentials (#54346), remote credential
+  masking (#54309) are exec-server ↔ app-server internals. No minimum-version string was added on the
+  engine side; the one that exists (`0.141.0`) is in the ChatGPT desktop shell
+  ([`harness-artifacts/02`](../harness-artifacts/02-desktop-shells.md) §3.1).
+- **Features (`features/src/lib.rs`, 168 → 192 keys, 0 removed as keys).** Defaults that flipped:
+  `code_mode_interrupt` false→true (Stable, #51835), `instant_interrupt` false→true (#51812),
+  `api_key_model_discovery` false→true, `api_key_cyber_access_programs` false→true (#53717);
+  `worktrees` and `realtime_conversation` became always-on (#54175); `apply_patch_preserve_line_endings`
+  removed (always preserve, #51203). Unchanged: `code_mode` off, `code_mode_only` off,
+  `code_mode_host` on, `tool_search` always on, `unified_exec` on, `guardianv2` off,
+  `guardian_approval` on, `memories` off, `model_catalog_in_context` off, `shell_snapshot` on,
+  `hooks` on. Added (24), all off unless noted: `code_mode_tool_search` (#51209,
+  `await tools.tool_search({query, limit: 8})`), `code_mode_host_grpc`, `code_mode_only_strict_3p_tools`
+  (#50687), `credential_masking` (#52302), `async_compaction` (#53595), `retain_client_tool_outputs`
+  (#52937, 64,000-token budget), `mcp_tool_list_changed` (#54656), `guardian_trust_orchestrator_connectors`
+  (#52250), `subagent_default_context_limits`, `wake_on_agent_messages`, `executor_capability_discovery_v2`,
+  `output_token_replay`, `app_server_websocket_compression`; on: `cli_daybreak` (#53701),
+  `ultrafast_mode` (#51253, `service_tier_enabled("ultrafast")`).
+- **Tool catalog.** 29 tool names unchanged. `exec_command` always carries `shell` and `login`
+  (#54098); `request_permissions` / `view_image` no longer require `has_environment()`;
+  `tool_search` exposure condition changed from `supports_search_tool && namespace_tools_enabled`
+  to `supports_search_tool && tool_policy.allows && deferred ≥ 1` (#50447 removed the
+  `namespace_tools` capability gate; `spec_plan.rs:392-397`). MCP exposure rule unchanged (search on →
+  all `Deferred`). Parallel read-lock paths widened to skill/memory/history reads, plugin and agent
+  listings, `get_context_remaining`, `get_goal` and dynamic tools (#52245, #54654). `ToolExposure`
+  has **six** variants (`DirectModelOnly`, `CodeModeOnly` in addition to the four) — already at the
+  baseline; [`harness-artifacts/03`](../harness-artifacts/03-tool-use-patterns.md) §3 corrected.
+- **Numeric limits** (03 §3 table): every value the same or moved by a few lines (exec 1 MiB; model
+  output 10,000 tokens; unified_exec 250–30,000 / 5,000 / 300,000 ms / 64; tool_search 8; MCP spec
+  8,000 / 64,000 B; code mode 10,000 / 10,000 / 10,000; rejection 900 tokens; 95 % window;
+  compaction 20,000 / 64,000; image 7,373 B; file-search 20; wait_agent 30,000 ms; transport 15
+  MiB; 4 bytes/token). Changed: `executed_tool_call` argument caps (8 KiB / 32 KiB) **removed**
+  (#52268); memories gained `MAX_ROLLOUT_BYTES` 8 MiB and `MAX_RECORD_BYTES` 1 MiB (#53940);
+  memory extension resources kept 7 → 14 days (#54033). Corrections to 03 §3 made the same day:
+  the 95 % constant lives in `models-manager/src/model_info.rs` (there is no `openai_models.rs`);
+  AGENTS.md is capped in **bytes** (`DEFAULT_PROJECT_DOC_MAX_BYTES = 32 * 1024`), the 10,000-token
+  figure is the skill-metadata budget. `models.json`: 11 slugs, `gpt-5.5` the only non-lite — unchanged.
+- **Policy, sandbox, network.** `execpolicy` grammar untouched (0 commits); `ExecPolicyCommandOrigin::PowerShellLiteral`
+  (#54076). Approval cache key `UnifiedExecApprovalKey { environment_id, executable, command, cwd,
+  tty, sandbox_permissions, additional_permissions }` unchanged. Network proxy: DNS lookups only
+  after allow-list or policy approval, Seatbelt's external port-53 allowance removed (#51650);
+  broker credential aliases block MITM-hook bypass (`403 blocked-by-mitm-hook`, #52661). Windows:
+  `mxc` moved to split crates and `is_available()` now probes by creating a security environment
+  (#52707). Hooks: `PreModelRequest` / `PostModelRequest` observe-only (#55144).
+- **Not read (deliberately):** `codex-rs/tui` (1,076 files — TUI ergonomics), `ext/` (175),
+  `rmcp-client`, `thread-store`/`state` internals, `.github`. The counts above are the comparable
+  measure; everything else in the 719 commits is ⚠️ unread.
+- **Verification status.** Source, generated schemas and SDK read statically ✅; live traffic ⚠️.
+
+**Next drift baseline: `b1fd48c48`.**

@@ -24,7 +24,7 @@ plays were not run.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
 The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity
-eviction, the sticky semantics of turn overrides.
+eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (108/10/87, turn lineage, read state, open `codexErrorInfo`).
 
 ### [[concepts/approval-gate]] {#approval-gate}
 Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.
@@ -64,7 +64,7 @@ two provider rosters.
 
 ### [[concepts/os-sandbox-policy]] {#os-sandbox-policy}
 Four policy values and per-OS mechanisms. Two Windows modes, two independent network switches,
-authority from OS package identity. Windows internals source-read 2026-09-30.
+authority from OS package identity. Windows internals source-read 2026-09-30. Drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc probe.
 
 ### [[concepts/capability-distribution]] {#capability-distribution}
 Circulating plugins, marketplaces and skills. The vendor-neutral manifest, catalog versus installed
@@ -93,7 +93,7 @@ a machine reviewer in the autonomy dial — and where their theories of supervis
 
 ### [[concepts/primary-source-verification]] {#primary-source-verification}
 This repository's method of knowing. Grade vocabulary, preserving refutations, the record and traps
-of the `llms.txt` technique.
+of the `llms.txt` technique. 2026-10-19: record the tag, not the string count; keep the counting script with the count.
 
 ## Topics
 
