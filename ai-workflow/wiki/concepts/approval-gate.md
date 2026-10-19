@@ -11,7 +11,7 @@ updated: 2026-10-19
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-19 (drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-19 (evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 

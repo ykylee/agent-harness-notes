@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-10-19 (drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc availability probe — note under the last section). Previous: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
+- Updated: 2026-10-19 (evening: `docs/02` §9 supplement — `sandbox` vs ⚗ `permissions` profile id listed; sandbox facts unchanged; drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc availability probe — note under the last section). Previous: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
 
 ## §1 TL;DR  {#s1-tldr}
 

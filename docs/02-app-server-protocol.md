@@ -153,8 +153,9 @@ terminal payload on `completed`.
 | `dynamicToolCall` | `namespace`, `tool`, `arguments`, `status`, `contentItems`, `success`, `durationMs` |
 | `functionCallOutput` | `name`, `namespace`, `output` |
 | `collabAgentToolCall` | `tool`, `status`, `senderThreadId`, `receiverThreadIds[]`, `prompt`, `model`, `reasoningEffort`, `agentsStates` |
-| `subAgentActivity` | `kind`, `agentThreadId`, `agentPath` |
-| `webSearch` / `imageView` / `imageGeneration` / `sleep` | Dedicated payloads |
+| `subAgentActivity` | `kind`, `agentThreadId`, `agentPath`; *(2026-10-19, #51463)* `model`, `reasoningEffort` — "Resolved model at sub-agent creation; absent from older records" |
+| `imageGeneration` | *(2026-10-19, #54398/#54420; moved to `codex-rs/ext/items/src/image_generation.rs`)* `status`, `revisedPrompt`, **`image: GeneratedImageRef`** (untagged: `{ fileId }` | `{ result }` — the inline base64 `result` is kept for compatibility, a file reference is the new shape), `transparentBackground`, `failure: ImageGenerationFailure`, `savedPath`, `inputImages: ImageGenerationInputImage[]` (`path`, `sha256` "of the file bytes read before image normalization") |
+| `webSearch` / `imageView` / `sleep` | Dedicated payloads |
 | `enteredReviewMode` / `exitedReviewMode` | `review` |
 | `contextCompaction` | — |
 
@@ -476,25 +477,48 @@ windows/worldWritableWarning        windowsSandbox/setupCompleted
 
 ### `ThreadStartParams`
 
+The generated (stable) schema lists 15 fields; the Rust definition at `b1fd48c48` has **27**, of
+which 12 are `#[experimental(...)]` and therefore filtered from the schema ([99 §E.2](99-sources.md)).
+Both are shown; experimental fields are marked ⚗ and were already present at the 2026-09-30 baseline
+(none were added in the 2026-10-19 window).
+
 ```ts
 type ThreadStartParams = {
   model?: string | null,
   modelProvider?: string | null,
+  allowProviderModelFallback?: boolean,          // ⚗ a provider with an authoritative static catalog may substitute its default
   serviceTier?: string | null,
   cwd?: string | null,
-  approvalPolicy?: AskForApproval | null,
+  runtimeWorkspaceRoots?: AbsolutePathBuf[] | null, // ⚗ replace the thread's workspace roots
+  approvalPolicy?: AskForApproval | null,          // (nested experimental variants)
   approvalsReviewer?: ApprovalsReviewer | null,  // where approval requests are routed
   sandbox?: SandboxMode | null,
+  permissions?: string | null,                   // ⚗ named permission profile id; cannot be combined with `sandbox`
   config?: Record<string, JsonValue> | null,
   serviceName?: string | null,
   baseInstructions?: string | null,
   developerInstructions?: string | null,
   personality?: Personality | null,   // @deprecated 2026-09-26 (#45809): friendly/pragmatic no longer select a style
+  multiAgentMode?: MultiAgentMode | null,        // ⚗ @deprecated "Ignored. Use Ultra reasoning effort for proactive multi-agent behavior."
   ephemeral?: boolean | null,                     // a thread that is not persisted
+  historyMode?: ThreadHistoryMode | null,        // ⚗ persisted history contract
   sessionStartSource?: ThreadStartSource | null,
   threadSource?: ThreadSource | null,
+  projectId?: string | null,                     // ⚗ durable threads persist it; ephemeral threads expose it only in live responses
+  daybreakEnabled?: boolean | null,              // ⚗ initial Daybreak choice; "does not select a turn's cyberAccessProgram or grant access"
+  environments?: TurnEnvironmentParams[] | null, // ⚗ sticky environments; empty disables environment access
+  dynamicTools?: DynamicToolSpec[] | null,       // ⚗ client-provided tools (see 6.12)
+  selectedCapabilityRoots?: SelectedCapabilityRoot[] | null, // ⚗ "selected for this thread by the hosting platform"
+  mockExperimentalField?: string | null,         // ⚗ test-only, validates experimental gating
+  experimentalRawEvents?: boolean,               // ⚗ raw Responses API items on the event stream — "internal use only (e.g. Codex Cloud)"
 }
 ```
+
+> 📌 The 12 ⚗ fields are where the shipped ChatGPT client and the open-source engine meet
+> ([99 §E.3](99-sources.md), [`agent-ux/03`](../agent-ux/03-openai-codex-chatgpt.md) §1.2.1):
+> `environments`, `dynamicTools`, `selectedCapabilityRoots` and `experimentalRawEvents` are the
+> engine-side half of what the client's durable-host dialect extends. They are on the wire for a
+> client that opts into experimental methods, and absent from the SDK the schema generates.
 
 ### `ThreadStartResponse`
 
