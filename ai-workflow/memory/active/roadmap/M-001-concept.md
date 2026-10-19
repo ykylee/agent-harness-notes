@@ -7,7 +7,7 @@ order: 1
 parallel_allowed: []
 deliverables:
   - ai-workflow/memory/active/PURPOSE.md
-goals: []
+goals: [G1, G2, G3, G4, G5]
 ---
 
 <!-- standard-ai-workflow-kit: v1.10.0 -->

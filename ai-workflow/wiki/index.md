@@ -30,7 +30,7 @@ eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (1
 ### [[concepts/approval-gate]] {#approval-gate}
 Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.
 ACP: one `session/request_permission`. Without an answer the turn stalls. §7.9 adds availability as
-a seventh gate property (Codex Guardian warmup, #49584) and where the gate lives behind the wire. §7.10: Claude Code's `can_use_tool` answer can rewrite the input; fail-open hook layer by default.
+a seventh gate property (Codex Guardian warmup, #49584) and where the gate lives behind the wire. §7.10: Claude Code's `can_use_tool` answer can rewrite the input; fail-open hook layer by default — opt-in `onFailure: "block"` since 2.1.295 (§7.8 addendum); the Desktop 2.42304.2 card is drawn from those fields, six of them untyped (§7.10 rendered).
 
 ### [[concepts/agent-client-protocol]] {#agent-client-protocol}
 Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission option kinds

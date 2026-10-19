@@ -39,4 +39,5 @@
 
 - `sdk.d.ts:1747` `betas` comment still says "`context-1m-2025-08-07` … (Sonnet 4/4.5 only)" while the docs describe 1M as the default — the types lag the docs here.
 - `set_mcp_permission_mode_override` has a `Query` method but is absent from the request union; `get_binary_version`, `set_color`, `seed_read_state` are typed but were not found as bundle literals.
+- The Claude Desktop 2.42304.2 renderer reads six `can_use_tool` fields that neither 0.3.303 nor 0.3.304 (`manifest.json` CLI 2.1.304, checked 2026-10-19) declare: `decision_reason_code`, `decision_reason_hook_event`, `decision_reason_hook_source`, `decision_reason_hook_plugin_id`, `via_host_cli_launcher`, `computer_folder` ([`agent-ux/02`](../agent-ux/02-claude-desktop.md) §3.1). Either the shell's bundled engine is newer than the published types or the fields are desktop-only — watch the next `sdk.d.ts`.
 - The SDK release is the engine's distribution channel (`manifest.json` pins the CLI); a later SDK may ship a different CLI than the one installed locally. Next baseline: CLI 2.1.303 / SDK 0.3.303 / docs 2026-10-19.

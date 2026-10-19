@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/07-harness-engineering.md + rrsi/01-what-it-edits.md + rrsi/02-the-loop.md + rrsi/03-measurement.md + rrsi/99-sources.md + ai-sdlc/01-the-loop.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/primary-source-verification]
 created: 2026-09-22
-updated: 2026-10-06
+updated: 2026-10-19
 ---
 
 # Harness Engineering — the discipline of governing an autonomous runtime
@@ -12,7 +12,7 @@ updated: 2026-10-06
 - Purpose: the operating principles drawn from OpenAI's internal "zero hand-written code" experiment.
 - Scope: the experiment's facts, redefining the engineer's role, legibility, mechanical enforcement, entropy and garbage collection, how to apply it
 - Primary source: [Harness engineering](https://openai.com/index/harness-engineering/), Ryan Lopopolo, 2026-02-11
-- Updated: 2026-10-06 (AI-native SDLC playbook: context file, advisory skill, hook, human gate; plays not run; targets not adopted)
+- Updated: 2026-10-19 (§12 hook row: `onFailure: "block"` since 2.1.295 makes the silent-disable and timeout cases opt-in blocks; conclusion unchanged — the playbook's script does not opt in). Previous: 2026-10-06 (AI-native SDLC playbook: context file, advisory skill, hook, human gate; plays not run; targets not adopted)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -192,7 +192,7 @@ names the same split for Claude Code:
 
 - `CLAUDE.md` is context, read every session, under a page. It does not enforce.
 - A skill is advisory. The page says nothing forces the session to comply.
-- A hook is the deterministic layer. Exit 2 on `PreToolUse` blocks the tool call, and a JSON allow cannot override it (hooks reference, same day). A missing script and a timed-out command hook do not block, so "close to impossible" stays the page's claim.
+- A hook is the deterministic layer. Exit 2 on `PreToolUse` blocks the tool call, and a JSON allow cannot override it (hooks reference, same day). A missing script and a timed-out command hook do not block, so "close to impossible" stays the page's claim. **2026-10-19:** a `command` or `http` hook can now declare `onFailure: "block"` (v2.1.295+), which turns both cases into blocks; the default is unchanged and the playbook's script does not set it ([`ai-sdlc/03`](../../../ai-sdlc/03-the-control-ladder.md), [[concepts/approval-gate]] §7.8).
 - The writer of a change cannot approve it. Branch protection still requires a code owner.
 - Detection of a production breach is a script. The model is invoked only after a band breaks.
 

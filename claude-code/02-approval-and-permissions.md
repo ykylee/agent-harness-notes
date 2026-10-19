@@ -76,6 +76,14 @@ is a no-op with a logged reason ("Ignoring permission update: setMode 'bypassPer
 mode is not available (disableBypassPermissionsMode set, or session not launched in bypassPermissions
 mode)", `chunk-8fgrwnc5.js`) and "never persisted as `defaultMode`".
 
+> 📌 **Rendered (2026-10-19).** The Claude Desktop 2.42304.2 Code tab maps this request one-to-one
+> into its card state ([`agent-ux/02`](../agent-ux/02-claude-desktop.md) §3.1): `'mode'` and `'hook'`
+> get copy of their own, `suppress_always_allow_rule` removes the standing options, and the card's
+> answer never carries `decisionClassification`. The renderer also reads six fields this union does
+> not declare — `decision_reason_code`, `decision_reason_hook_event`, `decision_reason_hook_source`,
+> `decision_reason_hook_plugin_id`, `via_host_cli_launcher`, `computer_folder` — absent from 0.3.303
+> and 0.3.304 alike ([99](99-sources.md) §D).
+
 > 📌 **Against Codex's `ReviewDecision`.** Codex's `accept / acceptForSession / decline / cancel /
 > acceptWithExecpolicyAmendment` and Claude Code's `allow + updatedPermissions[addRules,
 > destination: 'session' | 'localSettings' | …]` are the same idea — an approval carries the policy

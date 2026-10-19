@@ -3,7 +3,8 @@
 > **Drift pass 2026-10-19.** The Linux build 2.42304.2 (vs 2.9939.2 here) was re-read with REA in
 > [`harness-artifacts/02`](../harness-artifacts/02-desktop-shells.md): fuses, windows, preloads,
 > the UI composition from chunk names and message catalogues, and what moved in three weeks. This
-> document is left as the 2026-09-26 reading.
+> document is left as the 2026-09-26 reading, except the §3.1 addendum "What the Code-tab card is
+> drawn from" (2.42304.2 renderer ↔ `can_use_tool` fields, 2026-10-19).
 
 > Product: Anthropic **Claude Desktop 2.9939.2**, including the Chat, Cowork and Code tabs and the agent surfaces they host (Claude Code sessions, Cowork tasks, computer use, Dispatch, Quick Entry).
 > Obtained from the public Squirrel update feed on 2026-09-26: `https://downloads.claude.ai/releases/win32/x64/RELEASES` → `AnthropicClaude-2.9939.2-full.nupkg` (sha1 `c4d5e0fe…6b62`, 255,805,374 B). The macOS universal `RELEASES.json` names the same version (pub_date 2026-09-24). The `claude.ai/api/desktop/…/redirect` installer links return 403 to scripted clients.
@@ -124,6 +125,23 @@ Also present: 10 hue ramps × 35 steps, chart palettes (categorical 8, sequentia
 - **Trusted consent window.** Connector connect/disconnect, the standing Chat grant and 3P bootstrap settings go to a separate React-free native window. The header comment of `app.asar/.vite/renderer/local_exec_consent/localExecConsent.html` reads: "Deliberately dependency-free (no windowBase / React): the consent surface must not run any stack the web-origin renderer could influence. Content arrives via query; the page renders it with textContent only. Color values are the resolved CDS tokens" ✅. A test (`surface-sync.test.ts`) pins those copied values to CDS.
 - **Computer-use tiers.** 📣 `View only` (browsers, trading platforms), `Click only` (terminals, IDEs) and `Full control`, fixed by app category. Buttons are `Allow for this session` / `Deny`, and approvals expire after 30 min in Dispatch sessions (`https://code.claude.com/docs/en/desktop.md`).
 - **Mode-independent cards.** 📣 "Before archiving any session, Claude asks you first. You see the approval card in every permission mode, including Auto and Bypass permissions." ✅ `Claude is in plan mode, so only you can approve this.`
+
+**What the Code-tab card is drawn from** (Linux 2.42304.2, `resources/ion-dist`, read 2026-10-19; the wire side is [`claude-code/02`](../claude-code/02-approval-and-permissions.md) §2) ✅ strings and wiring, ⚠️ unseen rendering:
+
+| `can_use_tool` field (`sdk.d.ts` 0.3.303) | Card state (`ion-dist/assets/v1/shared-26-BTkCzGJl.js`, snake→camel) | What it drives |
+|---|---|---|
+| `tool_name`, `tool_use_id`, `input` | `toolName`, `toolUseId`, `input` (`inputUnasserted` when the input fails the shape check) | the verb of `Allow Claude to <b>{action}</b>?`; the noun comes from a tool→kind table (`Bash`/`PowerShell` → command, `Edit`/`Write`/`NotebookEdit` → edit, else tool) in `ce6aaa9ba-6HXo882R.js` |
+| `permission_suggestions` | `suggestions` | the standing options (`Always allow`, `Don’t ask again for this tool`): **dropped** when `suppress_always_allow_rule` or `via_host_cli_launcher` is true (`be()` in `ce6aaa9ba`) |
+| `decision_reason`, `decision_reason_type` | `decisionReason`, `decisionReasonType` | why the card exists. `'mode'` → `Claude is in plan mode, so only you can approve this.` (i18n `31WIaU93U6`); `'hook'` → `Hook <b>{hook}</b>{label} requires confirmation for this command` (`/Q9mXRZ3HN`, `2+yeUrc2V3`), the hook named from `decision_reason_hook_source` / `_plugin_id` (`plugin` · `synced_plugin` · `skill` · `settings` · `unknown_hook`) |
+| `blocked_path` | `blockedPath` | `Allow Claude to change files in “{directory}”?` (`UzaI/12mvX`) — 추정 the `workingDir` card |
+| `matched_ask_rule { source, tool_name, rule_content }` | `matchedAskRule` | which ask rule forced the prompt (through the SDK bridge `c30db9bec-DjF3pT_h.js`) |
+| `mcp_server { name, source }` | `mcpServer` | `Allow Claude to <b>use</b> <meta>{app}</meta>?` |
+| `classifier_approvable`, `default_to_no`, `requires_user_interaction` | `classifierApprovable`, `defaultToNo`, `requiresUserInteraction` | `requires_user_interaction` forces the card path where auto-approval would otherwise apply (`ce6aaa9ba`); `default_to_no` is also reported with `surface: "thread_card"` (`c96d752d0-lrmpAk66.js`) |
+| `title`, `description` | `title`, `description` | the headline and the consent line |
+
+- **The answer.** `shared-2-BoUuApp2.js` builds `{ behavior: "allow", updatedInput?, updatedPermissions? }` — `updatedPermissions` only on the "always" choice and never for tools in an exclusion list (`hN`) — or `{ behavior: "deny", message }`; `shared-104-A_oIUFQK.js` writes `destination: "session"` for the session-scoped choice. `decisionClassification` (`user_temporary` / `user_permanent`) has **0** hits in the renderer: the card does not send it ✅.
+- **Ahead of the types.** The renderer reads six request fields that `sdk.d.ts` 0.3.303 **and 0.3.304** do not declare: `decision_reason_code`, `decision_reason_hook_event`, `decision_reason_hook_source`, `decision_reason_hook_plugin_id`, `via_host_cli_launcher`, `computer_folder` (`c5da7eb42-C19nHyJe.js` taps `processControlRequest` for the first two). Which engine build emits them is not readable here ⚠️. The renderer's own set of reason types (`mode subcommandResults permissionPromptTool asyncAgent sandboxOverride workingDir safetyCheck other`, `Py` in `c5da7eb42`) omits `rule`, `hook` and `classifier` — the three that carry a field of their own (`matched_ask_rule`, the hook triple, `classifier_approvable`) 추정.
+- The organisation-scoped label `Allow for your organization` has no counterpart in `PermissionUpdate.destination` (`userSettings | projectSettings | localSettings | session | cliArg`); it belongs to the connector/admin surfaces, not to this card.
 
 > 📌 This is the approval-as-primitive shape of [SYNTHESIS §2.1](../SYNTHESIS.md): one card type, reused on every surface, with scope as data. Compare the Codex item/approval protocol in [docs/02](../docs/02-app-server-protocol.md) and the gate properties in [strands/07](../strands/07-security.md). What Claude Desktop adds is **physical separation of the trust-critical prompts** into a window that the web origin cannot script. The wiki's [approval-gate](../ai-workflow/wiki/concepts/approval-gate.md) concept has no such rendering-isolation property yet.
 

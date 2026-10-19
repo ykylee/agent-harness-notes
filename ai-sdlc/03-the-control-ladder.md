@@ -25,9 +25,18 @@ The approval-gate concept in this repository already requires the gate to fail c
 what is being approved, and to be something the writer cannot satisfy alone. The playbook is a
 Claude Code instance of that requirement. It is not a new property of the gate.
 
+One thing the ladder has no word for (**2026-10-19**, from [`claude-code/02`](../claude-code/02-approval-and-permissions.md) §2): when the engine
+asks a host for a decision (`control_request { subtype: "can_use_tool" }`), it says *why* in an enum,
+`decision_reason_type` — `rule | mode | subcommandResults | permissionPromptTool | hook | asyncAgent |
+sandboxOverride | workingDir | safetyCheck | classifier | other` (`sdk.d.ts:4891`, SDK 0.3.303). A host
+can auto-deny `safetyCheck` or route `hook` to a named reviewer without parsing prose. The playbook's
+ladder stops at a hook's exit 2; a fifth rung's policy — the one the writer cannot pass — would be
+written against that field, in a host, not in a hook.
+
 ## Exit 2, checked
 
-Hooks reference, <https://code.claude.com/docs/en/hooks>, read 2026-10-06.
+Hooks reference, <https://code.claude.com/docs/en/hooks>, read 2026-10-06; re-read as `hooks.md` on
+2026-10-19 for the drift notes marked **2026-10-19** below.
 
 The playbook's production-gate script exits 2 to block and exits 0 otherwise, and its comment says
 exit 2 blocks the action and the stderr message goes to Claude. Against the reference:
@@ -35,9 +44,9 @@ exit 2 blocks the action and the stderr message goes to Claude. Against the refe
 - **Exit 2 is a blocking error.** On `PreToolUse` it blocks the tool call. JSON cannot override that block: a `permissionDecision` of `"allow"` on stdout still loses to exit 2. ✅ for the playbook's comment.
 - **Exit 0 with no decision is not an approval.** The reference: staying silent does not approve the call. The normal permission flow continues. ✅, and stronger than the playbook's script needs to be.
 - **Exit 1 does not block.** For most events the only exit code that blocks by itself is 2. A conventional failure code proceeds, and the transcript shows a non-blocking hook error. The playbook's script uses 2, so this does not break the example. It does mean a hook written to the usual Unix habit is not a gate.
-- **A hook that never starts is not a gate.** A missing or non-executable script exits like 127 and is a non-blocking error. The reference says a mistyped path leaves the gate silently disabled. The playbook does not say this.
-- **A timed-out command, HTTP, or MCP-tool `PreToolUse` hook does not block.** The call continues through the normal permission flow. An Agent SDK callback hook that times out does block. The playbook does not distinguish these.
-- **`PermissionRequest` does not honor exit 2.** Deny has to be the decision object. The playbook's example is `PreToolUse`, so the example still matches. A gate hung on the wrong event would not.
+- **A hook that never starts is not a gate.** A missing or non-executable script exits like 127 and is a non-blocking error. The reference says a mistyped path leaves the gate silently disabled. The playbook does not say this. **2026-10-19:** v2.1.295 added `onFailure` on `command` and `http` hooks (`"continue"`, the default, or `"block"`). With `"block"`, a hook that cannot start blocks the action — the reference's own test leaves `check-command.js` missing and the error reads `failed; blocking because onFailure is "block"`. The 2.1.303 bundle carries that log string ([`claude-code/02`](../claude-code/02-approval-and-permissions.md) §4 ✅). With the field unset, this row still holds. On Windows without Git Bash the reference notes the opposite surprise: a failing shell-form `PreToolUse` or `PermissionRequest` hook with `onFailure` unset can block instead.
+- **A timed-out command, HTTP, or MCP-tool `PreToolUse` hook does not block.** The call continues through the normal permission flow. An Agent SDK callback hook that times out does block. The playbook does not distinguish these. **2026-10-19:** `onFailure: "block"` turns a `command` or `http` timeout into a block (the message then says `timed out` instead of `failed`). The reference gives `mcp_tool` hooks no `onFailure` field, so their timeout still proceeds.
+- **`PermissionRequest` does not honor exit 2.** Deny has to be the decision object. The playbook's example is `PreToolUse`, so the example still matches. A gate hung on the wrong event would not. **2026-10-19:** the one exception is `onFailure: "block"` — a `PermissionRequest` hook that fails or times out with it set *denies* the request, without a decision object.
 - **Decisions, when several hooks disagree:** `deny` > `defer` > `ask` > `allow`. Exit 2 is routed as deny. ✅ as the reference, not stated on the playbook.
 - **`PreToolUse` does not fire for an `@` file mention.** The contents are inserted while the prompt is built. A `Read` deny rule is what blocks that path. The playbook's "secrets stay out of context" deny list is the mechanism that covers it; a `PreToolUse` hook on `Read` does not.
 - **A hook `allow` does not approve `rm` / `rmdir` of a critical path.** Permission-modes page. The playbook's script does not claim otherwise.
@@ -46,7 +55,9 @@ exit 2 blocks the action and the stderr message goes to Claude. Against the refe
 
 The page's sentence that a hook makes a violation "close to impossible" is the page's claim. The
 reference's silent-disable and timeout rows are the reason that sentence stays 📣. A hook is
-deterministic only on the path where it runs and exits 2.
+deterministic only on the path where it runs and exits 2 — or, since 2.1.295, on a `command` or `http`
+hook that declares `onFailure: "block"`, where not running is also a block. The default did not
+change, so the playbook's script as printed is still fail-open on those two rows.
 
 The playbook's script matches on the substrings `deploy` and `production` inside
 `tool_input.command`. The reference's own example matches a command prefix and returns

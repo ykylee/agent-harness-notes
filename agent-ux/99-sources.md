@@ -24,6 +24,7 @@
 | Product | Build | Source (2026-09-26) | Integrity |
 |---|---|---|---|
 | Claude desktop | 2.9939.2 | `downloads.claude.ai/releases/win32/x64/RELEASES` → `AnthropicClaude-2.9939.2-full.nupkg` | sha1 `c4d5e0fe…6b62`, 255,805,374 B |
+| Claude desktop (Linux, 2026-10-19) | 2.42304.2 | apt pool `claude-desktop_2.42304.2_amd64.deb` ([`harness-artifacts/99`](../harness-artifacts/99-sources.md)); only `app.asar` (49,232,410 B, 496 files) and `resources/ion-dist` (4,224 files) were read, for [02](02-claude-desktop.md) §3.1 | sha256 `38a7d58b…`, 183,213,384 B |
 | ChatGPT/Codex desktop | 26.924.22138 (`codexBuildNumber` 11645) | `persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb`; Windows MSIX by ZIP range reads | sha256 `ce3bb1aa…b7014e7` |
 | Legacy ChatGPT (macOS native) | 1.2026.183 | `persistent.oaistatic.com/sidekick/public/ChatGPT.dmg` | sha256 `49b33cad…4a251d3b8d1` |
 | Cursor | 3.22.7 (VS Code 1.128.0) | `downloads.cursor.com/production/37076c6c…/cursor_3.22.7_amd64.deb` | sha256 `923fd2d2…37800ab` |
@@ -116,6 +117,7 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
 | Whether Orca's `1`/`ESC` keystrokes match every vendor TUI's current menu order | not run |
 | Mobile companions (Orca, Superset, Paseo) as design surfaces | out of this pass |
 | Cursor's reported Auto-review figures (~4% blocked) | vendor-reported 📣 |
+| Which engine build emits the six `can_use_tool` fields the 2.42304.2 renderer reads but `sdk.d.ts` 0.3.303/0.3.304 do not type ([02](02-claude-desktop.md) §3.1) | not run; the shell downloads its own CLI copy |
 
 ## GUI pass, 2026-09-27
 

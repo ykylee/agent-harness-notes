@@ -6,11 +6,12 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-19 밤 세션 종료 (REA 산출물 독해 → 드리프트 패스 → REPORT/웹 아티팩트 → Claude Code 엔진 계약. TASK-001~009 전부 done, 실행 0건)
+- Updated: 2026-10-19 밤 2차 세션 (워크플로우 경고 3건 해소 → TASK-010 claude-code 후속 교차 반영: onFailure·decision_reason_type → ai-sdlc/03, Desktop 카드 ↔ can_use_tool 필드 → agent-ux/02. 실행 0건)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
+- **2026-10-19 밤 2차 — `claude-code/` 후속 교차 반영 (TASK-2026-10-19-main-010).** hooks.md 재독으로 `onFailure: "block"`(2.1.295+, `command`/`http` 만, 기본 `continue`, `PermissionRequest` 는 deny) 를 `ai-sdlc/03` "Exit 2, checked" 4곳 + `decision_reason_type` 단락에 반영. Desktop 2.42304.2 deb 재다운로드(sha 일치) → `ion-dist` 렌더러가 `can_use_tool` 을 카드 상태로 필드별 매핑하는 코드 확인 ✅ (`agent-ux/02` §3.1 표). **타입에 없는 요청 필드 6종**(`decision_reason_code`, `decision_reason_hook_{event,source,plugin_id}`, `via_host_cli_launcher`, `computer_folder`) — SDK 0.3.303·**0.3.304** 모두 미선언 ⚠️. wiki `approval-gate` §7.8·§7.10, `harness-engineering` §12, `primary-source-verification` 재ingest. 워크플로우 경고 3건 해소(CLAUDE.md kit 1.21.0 다이어트+마커, handoff 라벨 불릿, M-001 goals)
 - **2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**
   - **포장 형태**: Claude Code CLI 2.1.303 과 opencode 1.17.12 는 **Bun 단일 실행파일**(`.bun` ELF 섹션, 52B 모듈 레코드, 트레일러 `---- Bun! ----`). Claude Code 만 2,431/2,433 모듈에 **JSC 바이트코드** 동봉 + SKILL/README `.md.zst` 141개. Codex 0.159.3 은 287MB static-pie stripped — REA 256MiB 한도로 거부, `strings` 수준 대조만. gemini-cli 0.42.0 은 14.7MB 청크 3개 때문에 REA 분석 미완(⚠️)
   - **"stripped 바이너리에서 문자열 부재는 부재의 증거가 아니다"**: `model_catalog_in_context` 0건이 예. 와이어 리터럴(`responses_lite` 18, `thread/goal/set` 4, `approval_policy` 44)은 확인됨
@@ -35,6 +36,7 @@
 
 ## Work Status
 
+- TASK-2026-10-19-main-010 claude-code/ 후속 교차 반영: done. `ai-sdlc/03`·`99`, `agent-ux/02` §3.1 카드↔`can_use_tool` 표·`99`, `claude-code/02` §2 Rendered·`99` §D, wiki 3면+index. untyped 6필드 ⚠️, SDK 0.3.304/CLI 2.1.304 출현(미독). **실행 0건**
 - TASK-2026-10-19-main-009 Claude Code 를 엔진으로 읽기: done. `claude-code/` README·01(와이어)·02(승인/권한)·03(세션/컨텍스트/클라이언트)·99. SDK 0.3.303 `sdk.d.ts` 가 생성 계약: control subtype 40(클라→엔진 36, 엔진→클라 5+런타임 8), SDKMessage 39, options 69, 훅 33, 모드 6. 구조 차이 3: Thread/Turn/Item 없음(평탄), 요청 유니언이 방향 미구분, initialize 는 설정 주입. 승인 답이 입력까지 재작성(`updatedInput`), 게이트는 엔진 안 fail-closed·훅 층 fail-open 기본(`onFailure:"block"` 2.1.295). 번들은 타입의 2~4배 subtype(브리지·TUI–워커). SYNTHESIS §2.9 Claude 행 와이어 수준으로, wiki approval-gate §7.10·thread-turn-item §8.6·wire-protocol-boundary 재ingest
 - TASK-2026-10-19-main-008 저장소 자기 서술 정합성: done. PROJECT_PROFILE(조사 9 폴더·개념 19·드리프트 기준선·REA 호스트 매트릭스·참조 체크아웃 6), README 서두(6 조사+3 노트, 108/67), wiki index 서두. 기계 판독 한글 라벨은 유지
 - TASK-2026-10-19-main-007 REPORT 웹 아티팩트(영/한) 갱신: done. 영문 v3 `claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo`, 한국어 v2 `claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh` — 같은 디자인 토큰 유지, 후속 조사 5 대조표·검증 기록 12행·권고 13·방법 6·근거 자료 14링크. HTML 원본은 세션 스크래치에만(저장소 미보관)
@@ -44,19 +46,18 @@
 - TASK-2026-10-19-main-001 REA 로 설치 하네스 4종+데스크탑 2종 산출물 대조: done. `harness-artifacts/` README·01·02·03·99. **실행 0건**, REA 그래프 3/6 부분(⚠️ 명시)
 - TASK-2026-10-06-main-001 AI-native SDLC playbook 조사: done. `ai-sdlc/`. 산출물 사슬과 통제 5단. exit 2는 PreToolUse를 막고, 스크립트 부재와 타임아웃은 막지 않는다. **미실행**
 - TASK-2026-10-01-main-001 RRSI 하네스 자기개선 조사: done. `rrsi/` @ `be50316e1d`. 가중치 고정, incumbent는 `evolve/<domain>` 커밋. 검색 제약 5개. 점수 표는 자기보고. **미실행**
-- TASK-2026-09-30-main-014 Gas City 오케스트레이션 조사: done. `gas-city/` @ `3ef7fadd42`. 역할 enum 없음, 번들 Gastown 팩은 있음. formula v2 기본 on. ACP `session/request_permission` 미응답. **미실행**
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-013·012·011·010·009·008·007·006·005 (redacted_thinking, REPORT 18종, ACP 엔진측, Strands TS, Strands 드리프트, Aside IPC, Dia 바이너리, codex origin, onboardingSkill), 09-30 저녁 드리프트 3축+Gas Town(`6a2bb44`), 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 09-30-014 (Gas City), 09-30-013·012·011·010·009·008·007·006·005 (redacted_thinking, REPORT 18종, ACP 엔진측, Strands TS, Strands 드리프트, Aside IPC, Dia 바이너리, codex origin, onboardingSkill), 09-30 저녁 드리프트 3축+Gas Town(`6a2bb44`), 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
+- 현재 `in_progress` 작업:
 -
-
 ## 현재 `blocked` 작업
 
+- 현재 `blocked` 작업:
 - TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개
-
 ## Key Changes
 
 - **Anthropic redacted_thinking KeyError (TASK-013)** — Python `_format_request_message_content` 가 redacted-only 블록에서 `KeyError: 'reasoningText'`. stream `redacted_thinking` start 는 `data` 폐기. TS 는 stream·replay 모두 처리. 라이브 키 없이 메서드 컴파일 실행. `strands/02` §5.2, 위키 `retained-reasoning` §5.5
@@ -88,14 +89,14 @@
 ## Next Actions
 
 **2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
-- **사용자 결정 2026-10-19 밤**: (1) `harness-artifacts/03` §8 채택 후보 실측은 **my_harness MVP(TASK-005 스택 결정 이후)** 에서 Read/Grep/Bash 에 넣어 재고 결과만 §8 에 편입 — 지금은 보류. (2) my_harness 의 `engine-centric-derivation.md` 는 **커밋 완료(미푸시)**. (3) `CLAUDE.md` kit 1.20.1 갱신은 `ensure-entrypoints --diet` **보고만**, 적용은 다음 결정. (4) 다음 조사 = **Claude Code 자체를 엔진으로 읽기**(분리 모듈 + Agent SDK 타입 + 공식 문서; Codex `docs/02` 수준의 계약 문서). TASK-2026-10-19-main-009
+- **사용자 결정 2026-10-19 밤**: (1) `harness-artifacts/03` §8 채택 후보 실측은 **my_harness MVP(TASK-005 스택 결정 이후)** 에서 Read/Grep/Bash 에 넣어 재고 결과만 §8 에 편입 — 지금은 보류. (2) my_harness 의 `engine-centric-derivation.md` 는 **커밋 완료(미푸시)**. (3) ~~`CLAUDE.md` kit 갱신~~ — 2026-10-19 밤 2차에 `ensure-entrypoints --diet --apply` + 마커 v1.21.0 적용 완료(프로젝트 고유 절·wiki index 포인터 유지). (4) 다음 조사 = **Claude Code 자체를 엔진으로 읽기**(분리 모듈 + Agent SDK 타입 + 공식 문서; Codex `docs/02` 수준의 계약 문서). TASK-2026-10-19-main-009
 - [x] ~~`agent-ux/08` §2 ChatGPT 행 갱신~~ — 확인 결과 **이미 일치**(9월 읽기에 `Approve for me`·`Custom`·`Managed` 있음). `harness-artifacts/02` §3.3 의 "새 라벨" 서술을 정정(설명문·크레딧 넛지만 추가). 재ingest 불필요
 - [x] ~~Claude Code CLI 번들의 REA 그래프~~ — 상위 150 청크 `--source-path` 로 완료(`ev_c2ff746e…`, 11,355 노드, 리터럴 URL 0). 확장자 없는 `cli` 는 inventory 에 없어 거부됨. `harness-artifacts/01` §1.2
 - [x] ~~gemini-cli 0.42.0 분할 분석~~ — 14.7MB 청크 3개 제외 69 소스 완료(`ev_fb798187…`, 3,269 노드). 리터럴 엔드포인트는 로컬 LiteRT/Gemma `localhost:${port}/.../generateContent` 뿐(⚠️ 미추적). 핵심 7VV 청크는 그래프 밖. `harness-artifacts/01` §2
 - [x] ~~ChatGPT 동봉 `resources/codex` 버전 식별~~ — **0.163.0**(substring ×31; `rust-v0.163.0` 2026-10-15). `model_catalog_in_context` 리터럴 8건 → 0.159.3 의 0건은 `git merge-base --is-ancestor` 로 "태그에 미포함"으로 확정. `harness-artifacts/01` §3.3·§3.4
 - [x] ~~엔진 중심 파생 요약을 my_harness 로 이관~~ — `my_harness/docs/references/engine-centric-derivation.md`(2026-10-19, my_harness `aff26b8` 로 커밋, **미푸시**). 레퍼런스 4종+반례 1, 결정 항목 7개, 원문 링크는 GitHub `main` 기준이라 **이 저장소 푸시 이후에만 유효**
 - [ ] `harness-artifacts/03` 의 채택 후보 12개 — **my_harness MVP 에서 실측하기로 결정(10-19)**, 그 전까지 보류. 결과만 §8 에 편입
-- [ ] `claude-code/` 후속: `onFailure:"block"`·`decision_reason_type` 을 `ai-sdlc/03` §7.8 서술에 반영; `agent-ux/02` §3 의 데스크톱 승인 카드가 `can_use_tool` 의 어느 필드를 그리는지 교차; 다음 SDK/CLI 드리프트 기준 0.3.303 / 2.1.303
+- [x] ~~`claude-code/` 후속: `onFailure:"block"`·`decision_reason_type` → `ai-sdlc/03`; `agent-ux/02` §3 카드 ↔ `can_use_tool` 필드 교차~~ — TASK-010 완료(2026-10-19 밤 2차). 남은 것: untyped 6필드를 내는 CLI 빌드 확인, **다음 드리프트 기준 SDK 0.3.304 / CLI 2.1.304** (0.3.303/2.1.303 에서 하루 만에 올라감)
 - [ ] ChatGPT 셸이 엔진을 `app-server` 로 구동하는 세부(최소 버전 0.141.0, WSL/SSH/durable 호스트)를 `harness-artifacts/02` §3.1 에 기록함 — `agent-ux/03` §1.2 와 교차 확인은 다음 드리프트 패스에서
 - [x] ~~Ghidra 로 `model_catalog_in_context` 유무 판정~~ — 불필요해짐. 태그 조상 검사가 답을 냈다(0.159.3 미포함, 0.163.0 포함)
 - [x] ~~Bun `.bun` 레코드 필드명 확정~~ — `StandaloneModuleGraph.zig`@1.3.14 와 `.rs`@1.4.3 로 대조. 레코드 = StringPointer×6 + u8×4 (처음 추정의 'u32×5 꼬리'는 오류, 정정). Flags 비트 해독: Claude Code 0x1bff = 바이트코드·소스 해시·prelinked graph·startup count. **`Bun v1.4.4` 는 공개 태그 없음(⚠️)**. `harness-artifacts/01` §1.1

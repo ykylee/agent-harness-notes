@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-10-19 (night: REPORT §Method carries the two 2026-10-19 notes; a first-party doc page refuted by first-party source (`gas-city/99` §C) joins the examples; two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
+- Updated: 2026-10-19 (late: `agent-ux/99` §2 gains the Linux 2.42304.2 build row and §7 one open item — the renderer reads six `can_use_tool` fields the published SDK types do not declare; a case of the shipped artifact running ahead of the generated contract, graded ⚠️ until a type ships; night: REPORT §Method carries the two 2026-10-19 notes; a first-party doc page refuted by first-party source (`gas-city/99` §C) joins the examples; two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -348,6 +348,12 @@ rec. 11 (wrappers leave wrapped-agent approval on), 18 wiki concepts, and the AC
 rule in § Method. Korean edition in lockstep. Windows internals and the Agents API server-side
 model list, previously left open in that Method paragraph, are marked settled. The visual layer of
 `agent-ux/` remains ⚠️.
+
+**Desktop renderer vs SDK types 2026-10-19** (TASK-2026-10-19-main-010). The Claude Desktop
+2.42304.2 renderer maps `can_use_tool` into its card state field by field (`agent-ux/02` §3.1) — and
+reads six fields that `sdk.d.ts` 0.3.303 and 0.3.304 do not declare. The method point: a generated
+type file is the *published* contract, and a shipped client can be ahead of it; the gap is recorded
+as ⚠️ with both artifacts' versions, not resolved by preferring either.
 
 **Strands Anthropic `redacted_thinking` 2026-09-30** (TASK-013). Python
 `_format_request_message_content` raises `KeyError: 'reasoningText'` on a redacted-only block;

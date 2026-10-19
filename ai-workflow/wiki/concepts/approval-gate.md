@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md + docs/99-sources.md + harness-artifacts/02-desktop-shells.md + claude-code/02-approval-and-permissions.md
+last_ingested_from: docs/02-app-server-protocol.md + docs/06-choosing.md + docs/05-agents-api.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/03-tools-and-approval.md + strands/07-security.md + strands/06-multi-agent-and-exposure.md + agent-ux/08-primitives-rendered.md + agent-ux/07-paseo-conductor.md + agent-ux/10-acp.md + gas-city/03-roles-and-lifecycle.md + gas-city/99-sources.md + ai-sdlc/03-the-control-ladder.md + ai-sdlc/99-sources.md + docs/99-sources.md + harness-artifacts/02-desktop-shells.md + claude-code/02-approval-and-permissions.md + agent-ux/02-claude-desktop.md
 related_pages: [concepts/thread-turn-item, concepts/harness, concepts/os-sandbox-policy, concepts/execution-environment-topology, concepts/credential-shielding, concepts/agent-client-protocol]
 created: 2026-09-22
 updated: 2026-10-19
@@ -11,7 +11,7 @@ updated: 2026-10-19
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-19 (`claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-19 (late: §7.8 `onFailure: "block"` addendum from the hooks reference re-read, and §7.10 "rendered" — the Desktop 2.42304.2 card drawn from `can_use_tool` fields (`agent-ux/02` §3.1); `claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -253,6 +253,16 @@ not yet the fail-closed property in §7.5. Managed settings can stop an engineer
 off (`allowManagedHooksOnly`; `disableAllHooks` below the managed tier does not reach managed
 hooks). That key was seen. The rest of the playbook's settings example was not checked key by key.
 
+**Addendum 2026-10-19** (hooks reference re-read; [`ai-sdlc/03`](../../../ai-sdlc/03-the-control-ladder.md)
+"Exit 2, checked", [`claude-code/02`](../../../claude-code/02-approval-and-permissions.md) §4): since
+v2.1.295 a `command` or `http` hook can declare `onFailure: "block"`. With it, the third row flips —
+a hook that cannot start or times out **blocks** the action, and on `PermissionRequest` **denies** the
+request without a decision object. The default is still `"continue"`, `mcp_tool` hooks have no such
+field, and the 2.1.303 bundle carries the log string `blocking because onFailure is "block"`. So the
+fail-closed property is now *opt-in per hook*, not absent — the playbook's script as printed does not
+opt in. What a host sees when the engine escalates instead of a hook is the `decision_reason_type`
+enum of §7.10; a policy written against it lives in the host, not in a hook.
+
 ## §7.9 Observation — availability is a separate axis from correctness  {#s7-9-availability}
 
 Codex #49584 (2026-09-30, `docs/99` §E.5): Guardian's skill warmup (`core/src/session/session.rs`)
@@ -291,6 +301,18 @@ check denies "rather than running an unverified command"), **fail-open by defaul
 (missing script, timeout, non-0/2 exit) until `onFailure: "block"` (2.1.295); hook precedence
 `deny > defer > ask > allow` is a literal rank table in the binary; a hard deny survives
 `bypassPermissions`; the only hole named is a mod's `tool.check` outside managed deployments.
+
+**Rendered (2026-10-19).** The Claude Desktop 2.42304.2 Code tab maps the request one-to-one into
+its card state ([`agent-ux/02`](../../../agent-ux/02-claude-desktop.md) §3.1, read from
+`resources/ion-dist`): `tool_name`/`input` become the bold verb of `Allow Claude to <b>{action}</b>?`,
+`permission_suggestions` become the standing options and are dropped when `suppress_always_allow_rule`
+is set, `decision_reason_type: 'mode'` renders "Claude is in plan mode, so only you can approve this"
+and `'hook'` renders "Hook **{hook}** requires confirmation" with the hook's source (plugin, skill,
+settings). The answer is `allow` + `updatedInput?` + `updatedPermissions?` (only for "always") or
+`deny` + `message`; the card never sends `decisionClassification`. The renderer also reads six
+request fields the 0.3.303 **and 0.3.304** types do not declare (`decision_reason_code`, the
+`decision_reason_hook_*` triple, `via_host_cli_launcher`, `computer_folder`) — the shell runs ahead of
+the published contract ⚠️.
 
 ## §8 Read next  {#s8-next}
 

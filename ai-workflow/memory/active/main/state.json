@@ -27,15 +27,16 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**",
-    "current_axis": "**2026-10-19 — `harness-artifacts/` 신설: REA 6.7.0 을 계기로 설치된 하네스 산출물 6종을 실행 없이 읽었다 (TASK-2026-10-19-main-001).**",
-    "current_focus": "TASK-2026-09-27-main-002",
+    "current_baseline": "**2026-10-19 밤 2차 — `claude-code/` 후속 교차 반영 (TASK-2026-10-19-main-010).** hooks.md 재독으로 `onFailure: \"block\"`(2.1.295+, `command`/`http` 만, 기본 `continue`, `PermissionRequest` 는 deny) 를 `ai-sdlc/03` \"Exit 2, checked\" 4곳 + `decision_reason_type` 단락에 반영. Desktop 2.42304.2 deb 재다운로드(sha 일치) → `ion-dist` 렌더러가 `can_use_tool` 을 카드 상태로 필드별 매핑하는 코드 확인 ✅ (`agent-ux/02` §3.1 표). **타입에 없는 요청 필드 6종**(`decision_reason_code`, `decision_reason_hook_{event,source,plugin_id}`, `via_host_cli_launcher`, `computer_folder`) — SDK 0.3.303·**0.3.304** 모두 미선언 ⚠️. wiki `approval-gate` §7.8·§7.10, `harness-engineering` §12, `primary-source-verification` 재ingest. 워크플로우 경고 3건 해소(CLAUDE.md kit 1.21.0 다이어트+마커, handoff 라벨 불릿, M-001 goals)",
+    "current_axis": "**2026-10-19 밤 2차 — `claude-code/` 후속 교차 반영 (TASK-2026-10-19-main-010).** hooks.md 재독으로 `onFailure: \"block\"`(2.1.295+, `command`/`http` 만, 기본 `continue`, `PermissionRequest` 는 deny) 를 `ai-sdlc/03` \"Exit 2, checked\" 4곳 + `decision_reason_type` 단락에 반영. Desktop 2.42304.2 deb 재다운로드(sha 일치) → `ion-dist` 렌더러가 `can_use_tool` 을 카드 상태로 필드별 매핑하는 코드 확인 ✅ (`agent-ux/02` §3.1 표). **타입에 없는 요청 필드 6종**(`decision_reason_code`, `decision_reason_hook_{event,source,plugin_id}`, `via_host_cli_launcher`, `computer_folder`) — SDK 0.3.303·**0.3.304** 모두 미선언 ⚠️. wiki `approval-gate` §7.8·§7.10, `harness-engineering` §12, `primary-source-verification` 재ingest. 워크플로우 경고 3건 해소(CLAUDE.md kit 1.21.0 다이어트+마커, handoff 라벨 불릿, M-001 goals)",
+    "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
-      "TASK-2026-09-27-main-002"
+      "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개"
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
       "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
@@ -44,15 +45,14 @@
       "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
       "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
       "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
-      "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
-      "TASK-2026-10-06-main-001 — AI-native SDLC playbook 조사"
+      "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
-    "task_count": 9,
+    "task_count": 10,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -64,7 +64,8 @@
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
-      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리"
+      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
+      "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에"
     ]
   },
   "next_documents": [
