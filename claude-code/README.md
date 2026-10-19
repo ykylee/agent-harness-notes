@@ -17,6 +17,14 @@
 > Anthropic's commercial terms; the split modules are not committed and are cited by chunk name with
 > short strings only. The types and the docs are quoted freely.
 
+> **Drift 2026-10-19 (late) — SDK 0.3.304 / CLI 2.1.304.** Both shipped within a day of the baseline.
+> No control subtype, message type, option or tool schema changed; the typed delta is context-usage
+> row ids, start-up marks and timeouts, no-deadline dialogs, and browser SSE suspend/resume. The
+> approval wire's string counts are identical; 2.1.304 adds a mod's `decider: "person"`. Two of this
+> folder's own sentences were refuted by the re-read (three "missing" subtypes were spelled
+> `A("…")`; the "untyped" `can_use_tool` fields come from the engine, not the desktop shell).
+> Record: [`99`](99-sources.md) §D–§E. Current baseline: **0.3.304 / 2.1.304 / docs 2026-10-19 late**.
+
 ## ⚠️ Read status
 
 **Static only.** The `.d.ts` files are the contract; the docs are the vendor's description; the

@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: which wire protocol Codex core presumes, and what that presumption forces on a custom harness.
 - Scope: the current state of `WireApi`, three ways out, the in-repo proxy precedent, and the two request shapes
 - Primary sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly), `codex-rs/core/src/client.rs`
-- Updated: 2026-10-19 (`claude-code/01`: a second generated contract and what its binary runs beyond it — note before Read next). Previous: 2026-09-30 (Agents catalog re-read: 11 entries)
+- Updated: 2026-10-19 (latest: `claude-code/01` drift to 0.3.304/2.1.304 — the generated contract gained no subtype; the note's "typed but not found in the bundle" trio was refuted, they are spelled `A("…")` in the engine's zod, from which the types are generated; `claude-code/01`: a second generated contract and what its binary runs beyond it — note before Read next). Previous: 2026-09-30 (Agents catalog re-read: 11 entries)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -140,7 +140,7 @@ AZURE_TOOL_CALL_PROVIDERS  = new Set([`openai`, `openai-codex`, `opencode`, `azu
 JSONL over stdio (or WebSocket/SSE in a browser, or a bridge to Anthropic's server for Remote
 Control), with one control-request union that does not encode direction; `initialize` injects
 hooks, MCP servers, agents and skills and returns `claude_code_version`. Its generated contract
-(`sdk.d.ts`, 40 control subtypes, 39 messages) is to the 2.1.303 binary what Codex's generated
+(`sdk.d.ts`, 40 control subtypes, 39 messages; unchanged in 0.3.304 against the 2.1.304 binary) is to the 2.1.303 binary what Codex's generated
 schema is to its engine: a filtered view — the binary runs roughly 160 subtypes, the Remote Control
 bridge and the TUI–worker split almost entirely outside the types
 ([`claude-code/01`](../../../claude-code/01-wire-protocol.md) §7).

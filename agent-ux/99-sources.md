@@ -74,6 +74,7 @@ downloading it (OpenAI); a web-UI zip **carved out of a Go binary** (Antigravity
 | U11 | Paseo | "Title case is wrong" (`docs/design.md`) | fallback string "Permission Required" | [07](07-paseo-conductor.md) §6 · minor |
 | U12 | Paseo | bypass modes tagged `colorTier: "dangerous"` | nothing colours them | [07](07-paseo-conductor.md) §6 · minor |
 | U13 | Conductor | "295 cities" (docs) | changelog: Adelaide is the 296th | [07](07-paseo-conductor.md) §6 · trivial |
+| U14 | Claude (this study) | §3.1's first reading: the renderer "runs ahead of the published contract" (2026-10-19) | the engine's request builder sends the same fields in 2.1.303 and 2.1.304; only the types lag; `via_host_cli_launcher` is the host's | [02](02-claude-desktop.md) §3.1 · self-correction, same day |
 
 Inconsistencies inside vendor documentation, not refuted by an artifact: Windsurf's docs name Cascade's
 modes as "Code/Chat" on one page and "Code/Plan/Ask" on another; Devin's blog ended legacy Cascade on
@@ -117,7 +118,7 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
 | Whether Orca's `1`/`ESC` keystrokes match every vendor TUI's current menu order | not run |
 | Mobile companions (Orca, Superset, Paseo) as design surfaces | out of this pass |
 | Cursor's reported Auto-review figures (~4% blocked) | vendor-reported 📣 |
-| Which engine build emits the six `can_use_tool` fields the 2.42304.2 renderer reads but `sdk.d.ts` 0.3.303/0.3.304 do not type ([02](02-claude-desktop.md) §3.1) | not run; the shell downloads its own CLI copy |
+| ~~Which engine build emits the six `can_use_tool` fields the 2.42304.2 renderer reads but `sdk.d.ts` 0.3.303/0.3.304 do not type~~ — resolved 2026-10-19 late: five come from the 2.1.303/2.1.304 engine itself, `via_host_cli_launcher` from the desktop host (U14) | split binaries, not run |
 
 ## GUI pass, 2026-09-27
 

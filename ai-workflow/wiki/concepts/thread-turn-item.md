@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-10-19 (`claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-10-19 (latest: `claude-code/01·03` drift 0.3.304/2.1.304 — no change to the flat wire; `keep_alive` gains an out-of-schema `startup_mark`, dialogs may have no deadline, context-usage rows get stable ids; §8.6 unchanged; `claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 

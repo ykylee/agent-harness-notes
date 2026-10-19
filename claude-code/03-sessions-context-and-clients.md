@@ -88,6 +88,14 @@ minutes idle → summarise just before the cache expires (`docs:settings-referen
 the bundle's constants `i1o=200000, c1o=0.95, p1o=60000` and strings "Compacted while idle, before
 the prompt cache expired" / "Compacted after an hour idle, using a summary" (`chunk-4jsg44k7.js`).
 
+**0.3.304 (2026-10-19 late)**: the `get_context_usage` answer's rows gain a stable `id` enum of 13
+values (`system_prompt … messages, autocompact_buffer, compact_buffer, free_space` — "match a
+particular row on this", "treat an unknown value as absent"), a per-server `mcpInstructions[]`, and
+`pluginId` / `path` on agents and skills, the last three "present only where the CLI answers on its
+own stdio and no server stores or forwards the reply" — i.e. absent on cloud, self-hosted runner and
+Remote Control connections. The producer is in the 2.1.304 bundle (`chunk-rncrmfyt.js`, the three
+buffer ids 0 → 2/4/2 hits). The compaction thresholds above did not change ([99](99-sources.md) §E).
+
 **What survives compaction**: the system prompt and output style; root `CLAUDE.md`, unscoped rules
 and auto memory (re-injected from disk); a fresh git snapshot; the plan; the five most recently
 modified files re-read (paths only above 5,000 tokens); invoked skill bodies (5,000 per skill,

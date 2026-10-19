@@ -40,6 +40,13 @@ then allow. The first match … rule specificity doesn't change the order" (`#ma
 matches the documented order ✅. One documented exception to the rule layer: a mod's `tool.check`
 answers *after* rules and hooks and, outside managed/Team/Enterprise deployments, can approve past a
 deny rule (`docs:permissions#precedence-among-rules-hooks-and-mods`) — recorded as the hole it is.
+**2026-10-19 (late):** the page now says deny rules hold over the mod on managed/Team/Enterprise
+"by default, and your organization can change that"; and **2.1.304** adds the opposite lever —
+a mod may answer `{decision: "ask", decider: "person"}`, after which "only the permission dialog
+or a host's callback can approve the ask, and it is refused with the mod's reason where nobody can
+be asked" (changelog; the binary's `decider==="person"` branch sets `personOnly`, `hooksMayRefuse`,
+`suppressAlwaysAllowRule`, 0 → 2 hits, [99](99-sources.md) §E). A mod can widen the gate outside
+managed deployments and can now narrow it to a human anywhere.
 
 ## 2. The wire shape of an approval
 
@@ -79,10 +86,14 @@ mode)", `chunk-8fgrwnc5.js`) and "never persisted as `defaultMode`".
 > 📌 **Rendered (2026-10-19).** The Claude Desktop 2.42304.2 Code tab maps this request one-to-one
 > into its card state ([`agent-ux/02`](../agent-ux/02-claude-desktop.md) §3.1): `'mode'` and `'hook'`
 > get copy of their own, `suppress_always_allow_rule` removes the standing options, and the card's
-> answer never carries `decisionClassification`. The renderer also reads six fields this union does
-> not declare — `decision_reason_code`, `decision_reason_hook_event`, `decision_reason_hook_source`,
-> `decision_reason_hook_plugin_id`, `via_host_cli_launcher`, `computer_folder` — absent from 0.3.303
-> and 0.3.304 alike ([99](99-sources.md) §D).
+> answer never carries `decisionClassification`. The renderer also reads fields this union does
+> not declare — and **the engine sends them**: the request builder in `chunk-88j6ans0.js` (2.1.303
+> and 2.1.304 alike) adds `decision_reason_code`, `decision_reason_rule_source`, the hook triple
+> `decision_reason_hook_event / _source / _plugin_id`, `server_policy_ask_only`, `tool_kind:
+> "browser"`, `server_prompt`, `provenance_prompt_line`, `plugin` and `computer_folder`, none of them
+> in `sdk.d.ts` 0.3.303 or 0.3.304. Only `via_host_cli_launcher` is the desktop host's own (0 hits in
+> both binaries). The types lag the engine here, as they do for `set_mcp_permission_mode_override`
+> ([99](99-sources.md) §D, corrected 2026-10-19 late).
 
 > 📌 **Against Codex's `ReviewDecision`.** Codex's `accept / acceptForSession / decline / cancel /
 > acceptWithExecpolicyAmendment` and Claude Code's `allow + updatedPermissions[addRules,

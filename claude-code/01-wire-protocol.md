@@ -79,7 +79,10 @@ The `Query` handle (`sdk.d.ts:2892`) wraps control requests in **30 methods**: `
 `readFile`, `reloadPlugins / Skills / OutputStyles`, `accountInfo`, `rewindFiles`, `seedReadState`,
 `reconnectMcpServer`, `toggleMcpServer`, `readMcpResource`, `setMcpServers`, `streamInput`,
 `stopTask`, `backgroundTasks`, `close`. `startup()` → `WarmQuery` (`sdk.d.ts:9718`) pre-spawns a
-process (`result.warm_spare_claimed`).
+process (`result.warm_spare_claimed`). **0.3.304**: `startup()` and `prewarm()` take
+`initializeTimeoutMs` (default 60,000 ms; when unset, time a `SessionStart` or `Setup` hook spends is
+not counted, for at most 10 minutes), and with `CLAUDE_CODE_SDK_READS_STARTUP_MARKS` the CLI reports
+35 named start-up checkpoints as `keep_alive` lines before `initialize` answers ([99](99-sources.md) §E).
 
 ### 2.4 `initialize` is configuration injection, not capability negotiation
 
@@ -102,7 +105,10 @@ matchers with `callback_ids`), `sdkMcpServers` / `sdkMcpServerConfigs` / `sdkMcp
 cancelled?: string[]}` (`sdk.d.ts:4686-4705`). `control_cancel_request {request_id}` goes either
 way and has no reply ("Either side may send it for a request it originated… There is no reply to
 the cancel itself", comment above `sdk.d.ts:3958`). `{type: 'keep_alive'}` is engine→client with
-no fields (`sdk.d.ts:5375`).
+no fields (`sdk.d.ts:5375`) — **0.3.304** adds one use outside the schema: a `startup_mark` field
+naming a start-up checkpoint, written only when the SDK set `CLAUDE_CODE_SDK_READS_STARTUP_MARKS`.
+The same release lets the CLI send a `request_user_dialog` with **no deadline**, withdrawn with
+`control_cancel_request` ([99](99-sources.md) §E).
 
 ## 3. Message primitives — `SDKMessage`
 
@@ -229,6 +235,7 @@ look like it and are untyped (추정).
 | `Query` methods | 30 | `:2892` |
 | tool input schemas in `sdk-tools.d.ts` | 44 (44 outputs, 90 exports) | `ToolInputSchemas` |
 | `BUILTIN_TOOL_NAMES` | 54 | `:216` |
+| bundle `.js` modules | 2,435 (2.1.303) → 2,463 (2.1.304); none of the counts above changed in 0.3.304 | `scripts/bun_split.py`, [99](99-sources.md) §E |
 | `HOOK_EVENTS` | 33 | `:975` |
 | `PermissionMode` | 6 | `:2529` |
 | `subtype:"…"` literals in the bundle | ~160 (~185 counting `subtype ===` comparisons, 추정) | `chunk-*.js` grep |
@@ -259,8 +266,12 @@ look like it and are untyped (추정).
   `code_change_published`, `agents_killed`, `api_error`, `read_divider`, `rewind_stand_in`,
   `channel_enable`, `ultrareview_launch`, `tool_host_result`.
 
-**In the types, not found as a bundle literal**: `get_binary_version`, `set_color`,
-`seed_read_state` (추정: folded differently by the minifier). The engine-originated subtypes
+~~**In the types, not found as a bundle literal**: `get_binary_version`, `set_color`,
+`seed_read_state`~~ — **refuted 2026-10-19 (late)**: the engine spells its subtypes as zod literals
+`A("get_binary_version")`, `A("set_color")`, `A("seed_read_state")` (`chunk-4qs43hr1.js`, whose
+`.describe()` strings are the `sdk.d.ts` doc comments verbatim — the types are generated from these
+schemas) and lists all three in a per-subtype boolean table (`ZC`, `chunk-8w3jrzn0.js`). The first
+search matched `subtype:"<name>"` only ([99](99-sources.md) §D). The engine-originated subtypes
 confirmed at direct `type: "control_request"` construction sites are `can_use_tool`, `initialize`,
 `interrupt`, `mcp_message`, `request_user_dialog`; the rest go through a `sendRequest(...)` helper.
 

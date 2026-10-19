@@ -11,7 +11,7 @@ updated: 2026-10-19
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-19 (late: §7.8 `onFailure: "block"` addendum from the hooks reference re-read, and §7.10 "rendered" — the Desktop 2.42304.2 card drawn from `can_use_tool` fields (`agent-ux/02` §3.1); `claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-19 (latest: §7.10 drift 0.3.304/2.1.304 — approval strings unchanged, `decider: "person"`, and the "shell ahead of engine" sentence corrected to "types lag the engine"; late: §7.8 `onFailure: "block"` addendum from the hooks reference re-read, and §7.10 "rendered" — the Desktop 2.42304.2 card drawn from `can_use_tool` fields (`agent-ux/02` §3.1); `claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -309,10 +309,19 @@ its card state ([`agent-ux/02`](../../../agent-ux/02-claude-desktop.md) §3.1, r
 is set, `decision_reason_type: 'mode'` renders "Claude is in plan mode, so only you can approve this"
 and `'hook'` renders "Hook **{hook}** requires confirmation" with the hook's source (plugin, skill,
 settings). The answer is `allow` + `updatedInput?` + `updatedPermissions?` (only for "always") or
-`deny` + `message`; the card never sends `decisionClassification`. The renderer also reads six
-request fields the 0.3.303 **and 0.3.304** types do not declare (`decision_reason_code`, the
-`decision_reason_hook_*` triple, `via_host_cli_launcher`, `computer_folder`) — the shell runs ahead of
-the published contract ⚠️.
+`deny` + `message`; the card never sends `decisionClassification`. The renderer also reads request
+fields the 0.3.303 **and 0.3.304** types do not declare (`decision_reason_code`, the
+`decision_reason_hook_*` triple, `computer_folder`) — and the engine sends them in 2.1.303 and 2.1.304
+alike, with `decision_reason_rule_source`, `server_policy_ask_only`, `tool_kind`, `server_prompt`,
+`provenance_prompt_line` besides; only `via_host_cli_launcher` is the desktop host's own. **The types
+lag the engine; the shell is in step** (corrected 2026-10-19 late, [`claude-code/99`](../../../claude-code/99-sources.md) §D–§E).
+
+**Drift 0.3.304 / 2.1.304 (2026-10-19 late).** The approval wire's string counts are identical
+between the two binaries; no control subtype or option changed in the types. One gate-relevant
+addition: a mod's `tool.check` may answer `decider: "person"`, after which only the dialog or the
+host callback can approve and the ask is refused where nobody can be asked (`decider==="person"`
+0 → 2 hits) — the lever opposite to the mod hole, a mod narrowing the gate to a human. The
+permissions page now says the managed/Team/Enterprise deny-over-mod default is organisation-changeable.
 
 ## §8 Read next  {#s8-next}
 

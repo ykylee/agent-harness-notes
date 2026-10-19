@@ -111,7 +111,8 @@ default-mode check into CI.
     `docs/99` §E.6), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
     Gas City `3ef7fadd42`, ACP spec `9b26a3ea`. Desktop builds read: Claude Desktop 2.42304.2 and
     ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
-    Code 2.1.303, Codex 0.159.3 / 0.163.0, opencode 1.17.12, Gemini CLI 0.42.0.
+    Code 2.1.303 → drift-checked to **2.1.304 / Agent SDK 0.3.304** the same evening (`claude-code/99` §E),
+    Codex 0.159.3 / 0.163.0, opencode 1.17.12, Gemini CLI 0.42.0.
   - **The artifact method's host matrix matters.** REA 6.7.0 on this Linux host has no Hopper, Ghidra,
     IDA or pwntools; native and Apple analyses are ⚠️ until run on a host that has them
     (`harness-artifacts/README.md`).
