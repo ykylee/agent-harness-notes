@@ -16,7 +16,7 @@ updated: 2026-10-20
 - Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
   `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
   **Not run** — no binary executed, so every mechanism here is source-read, never observed
-- Updated: 2026-10-20 (§8 the mechanics were executed once — `gas-town/05` runtime observation: merge slot unreachable, `gt done` self-block, `stale-hooks` scope, four disagreeing stores). Previous: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
+- Updated: 2026-10-20 (`strands/99` §6.3 + `gas-city/99` §C pointer only — Strands `bd0b6a94` → `3bd98e618` (gate grep 0), Beads `4f9174e6b` → `d0d9aa214` (claim/SECURITY/serve untouched); nothing on this page changes). Previous: 2026-10-20 (§8 the mechanics were executed once — `gas-town/05` runtime observation: merge slot unreachable, `gt done` self-block, `stale-hooks` scope, four disagreeing stores). Previous: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 

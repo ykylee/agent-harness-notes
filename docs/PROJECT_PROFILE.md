@@ -38,8 +38,8 @@
   `~/repos/harness-refs/` were removed on the user's request; pinned commits stay recorded in each
   `99-sources.md`: `codex` (drift baseline `014489466`; loop files read at `1a35bc4cc`), `gascity`
   (`3ef7fadd42`), `gastown` (`649b832b`), `rrsi` (`be50316e1d`), `strands-harness-sdk` (local
-  `a9a62d4e`; drift baseline `bd0b6a94`), `agent-client-protocol` (study pin `9b26a3ea`, drift baseline `ff7ef5169`), `beads`
-  (`4f9174e6b`; gt pins `v1.0.5`). Re-clone (`--filter=blob:none`) at those commits when a drift pass
+  `a9a62d4e`; drift baseline `3bd98e618`), `agent-client-protocol` (study pin `9b26a3ea`, drift baseline `ff7ef5169`), `beads`
+  (read at `4f9174e6b`, drift baseline `d0d9aa214`; gt pins `v1.0.5`). Re-clone (`--filter=blob:none`) at those commits when a drift pass
   needs source
 - 환경 기록 위치: `ai-workflow/memory/active/repository_assessment.md`
 - 운영 문서 위치: `ai-workflow/memory/active/`
@@ -114,7 +114,7 @@ default-mode check into CI.
     study reflects builds downloaded on 2026-09-26 (two products were renamed or merged that year). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.
   - **Current drift baselines (2026-10-20):** Codex `014489466` (generated schema 108 / 10 / 87 unchanged
-    since `b1fd48c48`; `docs/99` §E.9), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
+    since `b1fd48c48`; `docs/99` §E.9), Strands `3bd98e618` (`strands/99` §6.3), Beads `d0d9aa214` (`gas-city/99` §C),
     Gas City `3ef7fadd42`, ACP spec **`ff7ef5169`** (`agent-ux/10` §1.1; stable v1 moved once in `schema-v1.25.0`, permission RPC unchanged). Desktop builds read: Claude Desktop 2.42304.2 and
     ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
     Code 2.1.303 → drift-checked to **2.1.304 / Agent SDK 0.3.304** the same evening (`claude-code/99` §E),

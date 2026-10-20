@@ -375,4 +375,4 @@ Findings reflect the state of `openai/codex` on 2026-09-15, with the App Server 
 at HEAD `bcd6d9ab6b` on 2026-09-30 (107 / 10 / 86). External corroboration added 2026-09-23. The
 Strands case added 2026-09-26 (`harness-sdk` @ `15da9dc`). The client study added 2026-09-26;
 ACP engine-side 2026-09-30 (spec `9b26a3ea`). Artifact pass and drift re-checks 2026-10-19: Codex
-`b1fd48c48` (108 / 10 / 87), Strands `bd0b6a94`, Beads `4f9174e6b`; Codex re-checked 2026-10-20 at `79a19cbb3` and `014489466` (unchanged). Wiki concepts: 19.
+`b1fd48c48` (108 / 10 / 87), Strands `bd0b6a94`, Beads `4f9174e6b`; Codex re-checked 2026-10-20 at `79a19cbb3` and `014489466`, Strands at `3bd98e618`, Beads at `d0d9aa214` (all unchanged). Wiki concepts: 19.

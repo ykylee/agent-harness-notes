@@ -3,7 +3,7 @@
 > Applies this repository's [method of knowing](../ai-workflow/wiki/concepts/primary-source-verification.md)
 > unchanged: **committed artifacts over prose**, no secondary source settled before cross-checking,
 > inference labelled as inference, refutations kept rather than deleted. Researched 2026-09-26.
-> Drift re-check: 2026-09-30 against HEAD `a9a62d4e` — see [§6](#6-drift-re-check-2026-09-30); 2026-10-19 against `bd0b6a94` — [§6.2](#62-drift-re-check-2026-10-19--a9a62d4e--bd0b6a94): gate core byte-identical, harness context path moved, no refutation.
+> Drift re-check: 2026-09-30 against HEAD `a9a62d4e` — see [§6](#6-drift-re-check-2026-09-30); 2026-10-19 against `bd0b6a94` — [§6.2](#62-drift-re-check-2026-10-19--a9a62d4e--bd0b6a94): gate core byte-identical, harness context path moved, no refutation; 2026-10-20 against `3bd98e618` — [§6.3](#63-drift-re-check-2026-10-20--bd0b6a94--3bd98e618): 3 commits, gate grep 0, no refutation.
 
 ## 1. Grade vocabulary
 
@@ -243,7 +243,7 @@ a temporary clone.
 `typescript/v1.20.0` → **`v1.21.0`** (10-14), `harness-python/v0.2.0` (10-07) → **`v0.3.1`** (10-15),
 `harness-typescript/v0.2.0` → `v0.3.0`, `harness-cli/v0.2.0` → `v0.2.1`. (`v1.39–1.41` are May 2026
 tags under the old naming and are not in range.) The durable checkout stays at `a9a62d4e`; everything
-below was read with `git show origin/main:<path>`. **No new refutation.** Next baseline: **`bd0b6a94`**.
+below was read with `git show origin/main:<path>`. **No new refutation.** Next baseline: **`bd0b6a94`** → superseded by §6.3 (`3bd98e618`).
 
 - **The §6 grep returns 63 hits; 6 touch approval code, 57 are `harness-*` paths, docs and tests.**
   The six: the HITL classifier (py `vended_interventions/hitl/classifier.py:111`, ts
@@ -291,3 +291,27 @@ below was read with `git show origin/main:<path>`. **No new refutation.** Next b
   of the SDK's new vended subagent; `file_tools.py` now accepts Windows absolute paths too (R6's "any
   absolute path" widened, #4978); `subagent.py` reports `cancelled | content_filtered | refusal` as
   `status: "error"` (#5165).
+
+### 6.3 Drift re-check 2026-10-20 — `bd0b6a94` → `3bd98e618`
+
+3 commits (all 2026-10-19), 19 files, +1,185 / −111; no tag in range. No clone — GitHub compare API
+for the commit and file lists, then the one substantive PR read on GitHub. **The §6 grep over the
+19 file names returns nothing** (`approval|permission|consent|cedar|sandbox|intervention|harness`),
+so P1–P6, the Cedar fail-open reading, the `harness-*` numbers of §6.2 and `create_harness()`'s
+option list all stand without re-reading. **No new refutation.** Next baseline: **`3bd98e618`**.
+
+- **The one code change is a model-provider retry, in the SDK, not the harness** (#5171, py `models/
+  {anthropic,bedrock}.py` + new `_thinking_binding.py`, ts `models/{anthropic,bedrock}.ts` + `thinking-binding.ts`,
+  and `_context_manager/methods/summarize.py` / `summarize.ts`). The PR states the trigger:
+  preserved-thinking Claude models *"bind each thinking block to the content before it"*; on accounts
+  that enforce this (*"the default for accounts created on or after 2026-08-31"*) any edit to earlier
+  history fails the next request with a **non-retryable 400** (*"The block is bound to a different
+  conversation"*), and the context manager's summarize and drop are exactly such edits. The fix catches
+  that error once and retries with a flag that **drops the thinking blocks** from the replayed history.
+  Relevant to this repository's retained-reasoning axis ([`SYNTHESIS`](../SYNTHESIS.md) §2.1,
+  [`wiki/retained-reasoning`](../ai-workflow/wiki/concepts/retained-reasoning.md)): a provider now
+  verifies that replayed reasoning is *bound to its original context*, and a harness that rewrites
+  history must choose between keeping the rewrite and keeping the reasoning. Source ✅ (PR diff and
+  text); the account-date rule is the PR's claim about the provider, not verified here ⚠️.
+- **The other two:** a docs page on agent-foundation migration paths (#5152) and a `site/` dependency
+  bump (#5229). Nothing under `harness-py`, `harness-ts`, `strands-cli`.
