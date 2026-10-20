@@ -33,11 +33,11 @@
 - Source and verification records: every `99-sources.md`; drift ledgers in `docs/99` §E and
   `strands/99` §6
 - Concept re-index: `ai-workflow/wiki/` (19 concepts)
-- Reference checkouts (outside this repo): `~/repos/harness-refs/{codex,beads}` — pinned commits
-  are recorded in each `99-sources.md`. The `gascity` (`3ef7fadd42`), `gastown` (`649b832b`), `rrsi`
-  (`be50316e1d`), `strands-harness-sdk` (local `a9a62d4e`; drift baseline `bd0b6a94`) and
-  `agent-client-protocol` (spec HEAD `9b26a3ea`) clones were removed on 2026-10-20; re-clone at those
-  commits if a drift pass needs them
+- Reference checkouts (outside this repo): `~/repos/harness-refs/codex` only — pinned commits are
+  recorded in each `99-sources.md`. The `gascity` (`3ef7fadd42`), `gastown` (`649b832b`), `rrsi`
+  (`be50316e1d`), `strands-harness-sdk` (local `a9a62d4e`; drift baseline `bd0b6a94`),
+  `agent-client-protocol` (spec HEAD `9b26a3ea`) and `beads` (`4f9174e6b`; gt pins `v1.0.5`) clones
+  were removed on 2026-10-20; re-clone at those commits if a drift pass needs them
 - 환경 기록 위치: `ai-workflow/memory/active/repository_assessment.md`
 - 운영 문서 위치: `ai-workflow/memory/active/`
 - 백로그 위치: `ai-workflow/memory/active/<branch>/backlog/`
