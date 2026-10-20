@@ -662,7 +662,8 @@ baseline numbers reproduce exactly). **No refutation.**
   metadata, not proof of device ownership"), `RuntimeRole { Orchestrator | Executor |
   OrchestratorAndExecutor }`, and **Ed25519** per-request assertions (`ed25519-dalek`; "registration
   retries keep the key and sign fresh assertions"). Not wired to the app server in this range; a
-  runtime-identity leg for the orchestration axis (`gas-city/`, `SYNTHESIS` §2.4) to watch.
+  runtime-identity leg for the orchestration axis (`gas-city/`, `SYNTHESIS` §2.4) to watch —
+  checked the next morning in §E.8: still no consumer, and the *older* `agent-identity` leg is live.
 - **Startup and auth plumbing.** `codex app-server --print-startup-config` (#55300,
   `StartupConfigArgs`, `CloudStartupConfig { bootstrap, config }`: "Load local policy before auth,
   then fetch the account's cloud configuration" — one-shot, refuses a subcommand); enterprise-managed
@@ -679,3 +680,71 @@ baseline numbers reproduce exactly). **No refutation.**
   `thread-store`, `cloud-tasks`, `.github`. Live traffic ⚠️.
 
 **Next drift baseline: `79a19cbb3`.**
+
+### E.8 Follow-up, 2026-10-20 — is `runtime-agent-instance` wired? No; the identity leg that *is* wired was unrecorded
+
+Checked at `origin/main` `1a35bc4cc` (5 commits past the §E.7 baseline `79a19cbb3`, none touching
+identity; the drift baseline stays `79a19cbb3`). Method: reverse-dependency grep over every
+`Cargo.toml`/`BUILD.bazel`/`.rs`, then the crate's four files and the crate it imports from.
+
+- **`runtime-agent-instance` has no consumer.** It is a workspace member (`codex-rs/Cargo.toml:105`)
+  that nothing depends on: `codex-runtime-agent-instance` appears in no other manifest, and its
+  exports (`RuntimeRegistration`, `RuntimeRegistrationClient`, `RuntimeAgentInstance::assertion`)
+  and its strings (`openai-agent-assertion+jws`, `runtime_agent_instance_id`) occur in no other crate.
+  What it would do when wired: `POST https://auth.openai.com/agent/register` (https only, or http on
+  loopback; no userinfo/query/fragment; `Idempotency-Key` = a per-initialization UUID; body ≤ 64 KiB,
+  30 s) with `{actor_auth: oauth|personal_access_token|platform_api_key{credential}, agent_host_auth:
+  installation_id{uuid}, public_key: "ssh-ed25519 …", metadata{harness?, harness_version?, role:
+  orchestrator|executor|orchestrator_and_executor}}` → `{runtime_agent_instance_id, agent_host_id,
+  actor: chatgpt{user_id, account_id} | platform{user_id, organization_id, project_id?}}`; then a
+  fresh **JWS per request attempt** `1.<b64url({"alg":"EdDSA","typ":"openai-agent-assertion+jws"})>.
+  <b64url({"version":1,"runtime_agent_instance":id,"iat":…,"id":uuid})>.<sig>` (≤ 8,192 B). The signing
+  key is generated from `OsRng`, held in memory only ("Neither this key nor the resulting runtime is
+  persisted"). 14 typed rejection codes (`token_expired`, `runtime_instance_revoked`,
+  `runtime_actor_conflict`, `runtime_host_conflict`, `runtime_rate_limited`, …). Errors deliberately
+  drop server messages ("can contain secrets"). Grade: ✅ source; **not reachable from any binary
+  path** ⚠️.
+- **What is wired is older and was missing from this record: `agent-identity`** (crate #18871 and
+  `AuthMode::AgentIdentity` #18785, both 2026-04-21; flag `use_agent_identity` #17385, 2026-04-11,
+  still UnderDevelopment/off at head). Three pieces:
+  1. *Registration* — `POST {auth.openai.com/api/accounts}/v1/agent/register` with the ChatGPT bearer
+     token, body `{abom: {agent_version, agent_harness_id, running_location}, agent_public_key:
+     "ssh-ed25519 …", capabilities: ["responsesapi"], ttl: null}` → `agent_runtime_id`; the Ed25519 key
+     is derived (`codex-agent-identity-ed25519-v1`, 64-byte seed) and **persisted** in `auth.json`
+     (`AgentIdentityAuthRecord { agent_runtime_id, agent_private_key (PKCS#8), account_id, … }`), or
+     arrives whole as a JWT (`iss https://chatgpt.com/codex-backend/agent-identity`, `aud
+     codex-app-server`, claims incl. `agent_private_key`) verified against a JWKS.
+  2. *Task registration* — `POST …/v1/agent/{agent_runtime_id}/task/register` signed with that key,
+     answering a `task_id` (optionally `encrypted_task_id`, decrypted with the Curve25519 form of the
+     same key).
+  3. *Per-request header* — `Authorization: AgentAssertion <b64url({agent_runtime_id, signature,
+     task_id, timestamp})>` where `signature = Ed25519(agent_runtime_id:task_id:timestamp)`, plus
+     `ChatGPT-Account-ID` and `X-OpenAI-Fedramp` (`model-provider/src/auth.rs`
+     `AgentIdentityAuthProvider`). It **replaces the bearer token** on Responses API calls.
+  When: `ModelClient` is built with `AgentIdentityAuthPolicy::ChatGptAuth` only if
+  `features.use_agent_identity` is on (`core/src/session/session.rs`), otherwise `JwtOnly` — so today
+  a ChatGPT login is upgraded to an agent identity **only** under the flag, while an account whose
+  `auth.json` already says `auth_mode: agentIdentity` (JWT or record) uses it unconditionally. If the
+  bootstrap is unavailable the session **falls back to bearer auth once** and stays there
+  (`agent_identity_session_fallback.engage()`, "agent identity bootstrap unavailable; using ChatGPT
+  bearer auth for this session"). Guardian v2's async scorer and the memories writer make the same
+  choice. Production/staging environments are enumerated (`chatgpt.com`, `chatgpt-staging.com`); any
+  other ChatGPT base URL is refused ("Agent Identity only supports production and staging ChatGPT
+  environments"). Grade ✅ source; live backend ⚠️.
+- **A third, separate thing: attestation** (`x-oai-attestation`, app-server `attestation/generate`
+  server→client request, #20619 2026-05-08, already in [02 §5](02-app-server-protocol.md)). It is a
+  *host* signal: the app server asks the connected client to produce the header (100 ms budget), and
+  the client does so only when it declared `requestAttestation` in `initialize`; the model client
+  attaches it only for ChatGPT auth (`supports_attestation`). It says "a known client is driving
+  this thread"; agent identity says "this *runtime* (and this *task*) is calling the model".
+- **Reading.** Three identity layers now coexist in the engine: client attestation (wired, opt-in
+  by capability), agent identity v1 (wired behind `use_agent_identity`, persisted key, task-scoped
+  assertion in `Authorization`), and the runtime-agent-instance scheme (unwired; ephemeral key,
+  role-tagged, JWS assertion, composite actor+host registration). The new scheme's `role` field and
+  `agent_host_id` are the first wire-level vocabulary for *which runtime in an orchestration is
+  speaking* — the leg `SYNTHESIS` §2.4 lacked. Watch for its first consumer: the likely sites are
+  `model-provider/src/auth.rs` (a third `AuthProvider`) and `login/src/auth/manager.rs`.
+- `AuthMode` at head has **eight** values: `apiKey`, `chatgpt`, `chatgptAuthTokens`, `headers`,
+  `agentIdentity`, `personalAccessToken`, `bedrockApiKey`, `bedrockAccessKeys`
+  (`app-server-protocol/src/protocol/common.rs`); [02](02-app-server-protocol.md) never listed them —
+  a gap, recorded here rather than patched into a 2026-09-30 reading.
