@@ -11,15 +11,15 @@ updated: 2026-10-20
 
 - Purpose: the wire between a code editor (client) and a coding agent (typically a subprocess), as distinct from Codex App Server and from model `WireApi`.
 - Scope: stable `protocolVersion` 1 methods, the permission RPC, session model; Codex and Strands CLI contrasted
-- Primary sources: [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md); spec repo `agentclientprotocol/agent-client-protocol` @ `c81fae79` (re-check 2026-09-30 evening; stable schema unchanged)
-- Updated: 2026-10-20 (`docs/02` header: Codex re-count at `79a19cbb3` — 108 / 10 / 87 unchanged, one experimental `thread/sample`; nothing on this page changes). Previous: 2026-10-19 (evening: `docs/02` §4/§9 supplement; ACP facts unchanged; date bump: `docs/02`/`docs/99` drift 2026-10-19; ACP facts this page draws on are unchanged (Strands ACP path diff 0, `strands/99` §6.2)). Previous: 2026-09-30 (evening re-check to `c81fae79`: stable schema byte-identical; 3 unstable entries added — subagents RFD, request-scoped MCP-over-ACP, v2 available-commands)
+- Primary sources: [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md); spec repo `agentclientprotocol/agent-client-protocol` @ `ff7ef5169` (drift pass 2026-10-20; stable schema moved once, `schema-v1.25.0`)
+- Updated: 2026-10-20 (ACP drift pass `9b26a3ea` → `ff7ef5169`: §2 artifact versions, §3 three gated `session/update` variants + strict parsing, §4 permission re-check; earlier the same day: `docs/02` header: Codex re-count at `79a19cbb3` — 108 / 10 / 87 unchanged, one experimental `thread/sample`; nothing on this page changes). Previous: 2026-10-19 (evening: `docs/02` §4/§9 supplement; ACP facts unchanged; date bump: `docs/02`/`docs/99` drift 2026-10-19; ACP facts this page draws on are unchanged (Strands ACP path diff 0, `strands/99` §6.2)). Previous: 2026-09-30 (evening re-check to `c81fae79`: stable schema byte-identical; 3 unstable entries added — subagents RFD, request-scoped MCP-over-ACP, v2 available-commands)
 
 ## §1 TL;DR  {#s1-tldr}
 
 | # | Item | Value |
 |---|---|---|
 | 1 | Wire version | integer `protocolVersion` at `initialize`. **Stable is `1`.** `2` is an unstable draft |
-| 2 | Artifact versions | crate `1.9.1`, `schema-v1.24.0`, SDK `1.3.0`–`1.5.1` — **not** wire versions |
+| 2 | Artifact versions | crate `1.12.0`, `schema-v1.26.0`, npm SDK `2.0.0` (Strands pin `1.3.0`) — **not** wire versions; SDK 2.0 keeps v1 default |
 | 3 | Transport | JSON-RPC 2.0, newline-delimited stdio |
 | 4 | Approval | **one** agent→client method: `session/request_permission` |
 | 5 | Option kinds | `allow_once` · `allow_always` · `reject_once` · `reject_always` |
@@ -48,8 +48,18 @@ Optional: `fs/read_text_file`, `fs/write_text_file`, `terminal/*`, `elicitation/
 The TypeScript SDK's camelCase accessor `requestPermission` sends the hyphenated wire string
 `session/request_permission`.
 
-Unstable extras (`session/fork`, `providers/*`, `nes/*`, `document/*`, `mcp/message`) live in
-`schema.unstable.json`, not in the stable v1 schema.
+Unstable extras (`session/fork`, `providers/*`, `mcp/message`, subagents, system prompt) live in
+`schema.unstable.json`, not in the stable v1 schema. `nes/*` and `document/*` were removed from it
+on 2026-10-16 (#2266).
+
+**Drift pass 2026-10-20 → `ff7ef5169`** (160 commits past `9b26a3ea`, [`agent-ux/10`](../../../agent-ux/10-acp.md)
+§1.1): the stable v1 schema **moved once**, in `schema-v1.25.0` (2026-10-09). `$defs` 170 → 178,
+methods 25 → 25, `session/update` gains three **capability-gated** variants — `notice`
+(`clientCapabilities.session.notices`), `compaction_update` and `compaction_summary_chunk`
+(`…session.compaction`); an agent MUST NOT send them to a v1 client that did not advertise the
+capability. Six request definitions lost their lenient-parse annotations (#2333): malformed
+`terminal/create` args, `fs/read_text_file` line/limit, `mcpServers` entries now fail with `-32602`
+instead of silently doing something else. **All eight permission definitions are byte-identical.**
 
 **Re-checked 2026-09-30 evening → `c81fae79`** (7 commits past `9b26a3ea`): `schema/v1/schema.json`
 is **byte-identical**, so every line above still holds — including `§4 Permission`, whose one
@@ -86,7 +96,8 @@ while the checkout was being created: documentation only, no schema change. **Ne
 The agent MAY request permission before a tool call. Params: `sessionId`, `toolCall`, `options[]`
 (`optionId`, `name`, `kind`). Outcome: `selected` + `optionId`, or `cancelled`. On
 `session/cancel` the client MUST answer every outstanding permission request with `cancelled`.
-`kind` is a UI hint; the agent defines what "remember" means.
+`kind` is a UI hint; the agent defines what "remember" means. Re-checked 2026-10-20 at
+`ff7ef5169`: request, response, option, kind and outcome definitions byte-identical to the pin.
 
 This is the protocol enum Devin Desktop already rendered ([`agent-ux/08`](../../../agent-ux/08-primitives-rendered.md)
 §1.2). Contrast Codex: ten typed server→client requests and a `ReviewDecision` family that can

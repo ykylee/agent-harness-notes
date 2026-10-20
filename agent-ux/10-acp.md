@@ -8,7 +8,9 @@
 >
 > Read 2026-09-30 from the spec repo and generated schema, then contrasted with Codex App Server
 > ([`docs/02`](../docs/02-app-server-protocol.md) §7) and the Strands CLI implementation at
-> `a9a62d4e`. **No live ACP client was started.**
+> `a9a62d4e`. **No live ACP client was started.** Drift pass 2026-10-20 → `ff7ef5169` (§1.1): the
+> stable v1 wire moved once (`schema-v1.25.0`, notices + compaction + strict parsing); the
+> permission RPC did not.
 >
 > Grade: method names, session model and permission option kinds ✅ from schema and spec prose.
 > Runtime behaviour of any client or of Strands' ungated harness path ⚠️.
@@ -24,26 +26,46 @@ Official spec: [`agentclientprotocol/agent-client-protocol`](https://github.com/
 (same content as `zed-industries/agent-client-protocol`). Site: <https://agentclientprotocol.com>.
 Official libraries: TypeScript, Python, Rust, Kotlin, Java.
 
-Upstream: [`agentclientprotocol/agent-client-protocol`](https://github.com/agentclientprotocol/agent-client-protocol).
-**Durable checkout `~/repos/harness-refs/agent-client-protocol` recreated 2026-09-30 evening** —
-an earlier revision of this file named that path as the place the study was read, but it did not
-exist on the machine. HEAD is now **`7d794e0e2d`** (2026-09-30 15:55 +0200, `docs: mention ACP TCK`
-#2263), one documentation-only commit past the re-check below.
+Upstream: [`agentclientprotocol/agent-client-protocol`](https://github.com/agentclientprotocol/agent-client-protocol)
+(the `zed-industries/…` URL now redirects there). Checkout `~/repos/harness-refs/agent-client-protocol`
+was recreated 2026-10-20 (`--filter=blob:none`) for the drift pass below; the 2026-09-30 clone had
+been removed with the other reference checkouts.
 
 Study pin: **`9b26a3eaa8d3644c2a899f56171bd25f7a5a884f`** (2026-09-30, `docs: update registry agents (#2258)`).
-Re-checked 2026-09-30 evening against **`c81fae79a66b62e6a4c26b20d3ecf0e48b32583d`** — **7 commits**,
-33 files, +6791 / −359. **`schema/v1/schema.json` is byte-identical** (the stable wire did not
-move); everything substantive landed in `schema/v2/schema.json`, `*/schema.unstable.json`, and the
-draft docs. Schema releases moved `schema-v1.23.0` → **`schema-v1.24.0`** and
-`2.0.0-alpha.5` → **`2.0.0-alpha.6`**. **Next baseline: `7d794e0e`.**
+Re-checked 2026-09-30 evening against `c81fae79` — 7 commits, `schema/v1/schema.json` byte-identical,
+everything substantive in v2 / unstable files (`schema-v1.23.0` → `v1.24.0`, `2.0.0-alpha.5` → `alpha.6`).
+
+### 1.1 Drift pass 2026-10-20 — `9b26a3ea` → `ff7ef5169` (160 commits)
+
+HEAD **`ff7ef5169fd74e7f8921dc24413110a65753168e`** (2026-10-20 04:53 UTC, `docs: update registry
+agents (#2443)`). Two generated files per wire version were diffed structurally (`$defs` keys,
+`x-method` set, per-definition JSON equality), not by line count. **The stable v1 wire moved once**,
+in `schema-v1.25.0` (2026-10-09, PRs #2333 / #2334 / #2336); `v1.26.0` (10-16) is unstable-only.
+
+| Surface | `9b26a3ea` | `ff7ef5169` | What changed |
+|---|---|---|---|
+| `schema/v1/schema.json` `$defs` | 170 | **178** | +8, −0: `Notice` · `NoticeSeverity` · `NoticeCapabilities` · `CompactionCapabilities` · `CompactionId` · `CompactionStatus` · `CompactionUpdate` · `CompactionSummaryChunk` |
+| v1 `x-method` set | 25 | 25 | **unchanged** — no method added or removed (`$/cancel_request` and `session/update` counted) |
+| `SessionUpdate` variants | 11 | **14** | + `notice` · `compaction_update` · `compaction_summary_chunk`, each sendable only when the client advertised `clientCapabilities.session.notices` / `.compaction` (`{}` = full contract; omitted or `null` = unsupported) |
+| Permission definitions (8: `RequestPermissionRequest/Response`, `PermissionOption`, `PermissionOptionKind`, `RequestPermissionOutcome`, `StopReason`, `ToolCallStatus`, `ToolKind`) | — | — | **byte-identical** — §5 holds as written |
+| Lenient-parse annotations (`x-deserialize-default-on-error`, `x-deserialize-skip-invalid-items`) | present on 6 defs | **removed** (#2333) | `terminal/create` `args`/`env`/`cwd`/`outputByteLimit`, `fs/read_text_file` `line`/`limit`, `session/{new,load,resume}` `mcpServers`/`additionalDirectories`, terminal auth-method `args`/`env` → malformed values now fail with `-32602` (or drop the auth method) instead of silently running something else — e.g. `args: ["serve","--port",3000]` used to run `serve --port` |
+| `schema/v1/schema.unstable.json` | 265 defs / 40 methods | 225 / **30** | **NES and `document/*` removed** (#2266: 10 methods, 40 defs); added subagents (#1992), client system prompt (#2361), `SessionCancelCapabilities` |
+| `schema/v2/schema.json` (draft) | 175 / 16 | 181 / 16 | +notice/compaction defs, `StopReason` → `ErrorStopReason`; permission request/option/kind defs identical, `RequestPermissionOutcome` **description only** (cancel answers scoped to the session, never twice) |
+| Artifact versions | crate `1.9.1`, `schema-v1.24.0`, `2.0.0-alpha.6` | crate **`1.12.0`**, **`schema-v1.26.0`**, **`2.0.0-alpha.9`** | still all wire `1`; `LATEST = V1` without `unstable_protocol_v2` (`version.rs:39`) |
+| npm `@agentclientprotocol/sdk` | 1.5.1 | **2.0.0** (2026-10-19) | breaking for *library* users (connection classes removed, unstable features behind `/unstable` entrypoints) — its CHANGELOG states *"SDK 2.0 does not switch the default protocol from ACP v1"* |
+
+Reading: the v1 contract gained two capability-gated notification families and lost its tolerance
+for malformed values on fields the receiver acts on. Nothing about approval changed. **Next
+baseline: `ff7ef5169`.** The 09-30 lesson repeats with the sign flipped — this time the CHANGELOG
+entries are tagged `*(schema)*`, and the stable file did change; the tag is the first thing to read.
 
 ## 2. Versioning — three numbers, one wire
 
 | Number | What it is | This read |
 |---|---|---|
 | **`protocolVersion`** | integer exchanged at `initialize`; **the wire version** | **`1` is stable.** `0` is pre-release. `2` exists only behind `unstable_protocol_v2` |
-| Schema / crate release | artifact version for generators (`schema-v1.24.0` as of 2026-09-30 evening; crate `agent-client-protocol-schema` **1.9.1**, repo tag `v1.9.1`) | many schema releases describe the **same** wire version `1` |
-| Language SDK | `@agentclientprotocol/sdk` **1.3.0** (Strands CLI pin, 2026-07-21) … latest npm **1.5.1** (2026-09-28) | `PROTOCOL_VERSION = 1` at the 1.3.0 pin (`typescript-sdk` `src/schema/index.ts:320`) |
+| Schema / crate release | artifact version for generators (`schema-v1.24.0` as of 2026-09-30 evening → **`schema-v1.26.0`** 2026-10-20; crate `agent-client-protocol-schema` **1.9.1** → **1.12.0**) | many schema releases describe the **same** wire version `1` |
+| Language SDK | `@agentclientprotocol/sdk` **1.3.0** (Strands CLI pin, 2026-07-21) … latest npm **2.0.0** (2026-10-19; 1.5.1 at the 09-30 read) | `PROTOCOL_VERSION = 1` at the 1.3.0 pin (`typescript-sdk` `src/schema/index.ts:320`); 2.0.0 keeps v1 as the default protocol (§1.1) |
 
 The spec README states this as a rule: **do not infer wire compatibility from crate or schema
 release numbers.** Negotiate `protocolVersion`; then use capabilities for optional methods
@@ -73,7 +95,7 @@ client MUST answer every pending `session/request_permission` with `outcome: "ca
 
 ## 4. Methods (stable v1 schema)
 
-Generated JSON Schema `schema/v1/schema.json` (`$defs` count 170). Method names below are the
+Generated JSON Schema `schema/v1/schema.json` (`$defs` count 170 at the pin, **178** at `ff7ef5169` — §1.1). Method names below are the
 `x-method` values on request/response types. Rust constants in
 `agent-client-protocol-schema/src/v1/{agent,client,protocol_level}.rs` match.
 
@@ -108,7 +130,15 @@ Generated JSON Schema `schema/v1/schema.json` (`$defs` count 170). Method names 
 
 `session/update` variants in the stable schema: `user_message_chunk` · `agent_message_chunk` ·
 `agent_thought_chunk` · `tool_call` · `tool_call_update` · `plan` · `available_commands_update` ·
-`current_mode_update` · `config_option_update` · `session_info_update` · `usage_update`.
+`current_mode_update` · `config_option_update` · `session_info_update` · `usage_update`, and since
+`schema-v1.25.0` (2026-10-09) three **capability-gated** ones — `notice` (`severity` `info` ·
+`warning` · `error` · open `other`, required non-empty `title`; *"live events rather than session
+history"*, the agent *"must not rely on a notice being received, displayed, or seen"*),
+`compaction_update` (`compactionId` + `status` `in_progress` · `completed` · `failed` · `cancelled` ·
+`other`; an upsert whose first notification fixes the timeline position) and
+`compaction_summary_chunk` (append-only content for that compaction). Agents MUST NOT send them to a
+v1 client that did not advertise `clientCapabilities.session.notices` / `.compaction`
+(`docs/protocol/v1/initialization.mdx`, +32 lines). v2 needs no capability for either.
 
 ### 4.3 Unstable extras (not in `schema/v1/schema.json`)
 
@@ -119,7 +149,11 @@ Generated JSON Schema `schema/v1/schema.json` (`$defs` count 170). Method names 
 `document/didOpen|didChange|didClose|didSave|didFocus` · `session/fork`.
 
 These are **not** part of wire version 1's stable surface. An SDK pin that lacks them is still
-v1-compatible.
+v1-compatible. **2026-10-20:** the `nes/*` and `document/*` families (10 methods, 40 defs) were
+**removed** from the unstable schema (#2266, `schema-v1.26.0`); the TypeScript SDK first isolated
+NES behind an experimental entrypoint (1.9.0) and then 2.0.0 dropped it. Added instead:
+subagent types (#1992), a client **system prompt** schema (`SystemPrompt`, `SystemPromptMode`,
+`SessionSystemPrompt*Capabilities`, #2361) and `SessionCancelCapabilities`. All still `*(unstable)*`.
 
 **Added 2026-09-30 (`schema-v1.24.0`, re-check to `c81fae79`)** — three entries, **all marked
 `*(unstable)*` in the project's own CHANGELOG**, which is why the stable schema file did not change:
@@ -168,6 +202,10 @@ The agent **MAY** call `session/request_permission` before executing a tool
 
 The client study already recorded these four strings on Devin Desktop
 ([08](08-primitives-rendered.md) §1.2). They are the protocol enum, not a Devin invention.
+
+**Re-checked 2026-10-20 at `ff7ef5169`:** across 160 commits and one stable schema release the
+eight permission-related definitions are byte-identical to the pin (§1.1). Rust line numbers in
+this section are from the pin and were not re-derived.
 
 Response `RequestPermissionOutcome`: `cancelled`, or `selected` plus `optionId`. Clients MAY
 auto-allow or auto-reject from user settings. `kind` is a **UI hint** — the agent decides what
@@ -250,12 +288,12 @@ does not confuse artifact churn with a wire bump.
 
 | v1 | v2 draft |
 |---|---|
-| `session/prompt` response ends the turn (`stopReason`) | response only acknowledges; completion is a `state_update` notification |
+| `session/prompt` response ends the turn (`stopReason`) | response only acknowledges; completion is a `state_update` notification. `StopReason` left the v2 draft at `2.0.0-alpha.9`; failures carry an `ErrorStopReason` (*"details of a failure that ended active work"*) |
 | `authenticate` / `logout` | `auth/login` / `auth/logout` |
 | `session/load` | **removed** — use `session/resume` with `replayFrom: { type: "start" }` |
 | `session/set_mode` | **removed** — config options |
 | `fs/*`, `terminal/*` | **removed** — client-provided MCP for client-side tools |
-| `session/request_permission` | **same name**; params restructured |
+| `session/request_permission` | **same name**; params restructured — required `sessionId` · `title` · `options`, optional `description` · `subject`; `PermissionOptionKind` adds the open `other` string (`_`-prefixed values reserved for implementations). Unchanged `alpha.6` → `alpha.9` except cancel wording |
 | `protocolVersion: 1` | send `2`; a v1-only peer answers `1` |
 
 Stable v1 remains the wire to implement against today.
@@ -278,5 +316,6 @@ Stable v1 remains the wire to implement against today.
 - How Devin Local / Paseo / Superset map ACP option kinds onto their cards — strings match the
   enum ([08](08-primitives-rendered.md)); the RPC was not traced in those binaries this pass.
 - Source-agent `'deny'` vs spec `cancelled` / `reject_*`.
-- Unstable extras (`session/fork`, NES, MCP-over-ACP, providers) — unread beyond method names.
+- Unstable extras (`session/fork`, MCP-over-ACP, providers, subagents, system prompt) — unread beyond method names. NES is gone from the schema (2026-10-20), so it is no longer a question.
+- Strands CLI pin `@agentclientprotocol/sdk` 1.3.0 vs npm 2.0.0 — whether `strands --acp-server` has moved off the removed connection classes was not re-read this pass.
 - Streamable HTTP transport — draft, unread.

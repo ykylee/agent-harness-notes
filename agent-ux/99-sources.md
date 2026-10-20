@@ -107,6 +107,13 @@ July 1, yet it ships in the September build (usability ⚠️); Claude's docs sa
   permission method `session/request_permission`, option kinds `allow_once` · `allow_always` ·
   `reject_once` · `reject_always`. Strands harness ACP path still has no permission RPC; live
   client ⚠️.
+  - **Drift pass 2026-10-20 → `ff7ef5169`** (160 commits; re-clone `--filter=blob:none`, structural
+    `$defs` / `x-method` diff, [10](10-acp.md) §1.1). Stable v1: `$defs` 170 → 178 (+8 notice /
+    compaction, −0), methods 25 → 25, `SessionUpdate` 11 → 14 (capability-gated), lenient-parse
+    annotations removed from 6 defs (#2333) — all in `schema-v1.25.0` (2026-10-09). **Permission
+    definitions 8/8 byte-identical.** Unstable: NES + `document/*` removed (10 methods). Artifacts:
+    crate 1.12.0, `schema-v1.26.0`, `2.0.0-alpha.9`, npm SDK **2.0.0** (v1 still default). Repo now
+    under the `agentclientprotocol` org. No live client ⚠️ unchanged. Next baseline `ff7ef5169`.
 
 ## 7. What was not verified
 
