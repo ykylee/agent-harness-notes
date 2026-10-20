@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md + harness-artifacts/01-single-file-executables.md + harness-artifacts/02-desktop-shells.md
+last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md + harness-artifacts/01-single-file-executables.md + harness-artifacts/02-desktop-shells.md + harness-artifacts/04-update-channels.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
 updated: 2026-10-19
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-10-19 (§6.6 served catalogs and the organisation as chooser). Previous: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
+- Updated: 2026-10-20 (§6.7 the update channel is served data too, and the release manifest and the model catalog share one signing key — from `harness-artifacts/04`). Previous: 2026-10-19 (§6.6 served catalogs and the organisation as chooser). Previous: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -138,6 +138,21 @@ bundled by ChatGPT desktop, not in npm 0.159.3); Claude Desktop 2.42304.2 fetche
 local LiteRT-served Gemma endpoint. §5's three choosers (configuration, user, product) gain a fourth —
 the organisation — that filters whatever the served catalog offers. The axis becomes *catalog source ×
 chooser × policy filter*; only the first is shared wire data (`SYNTHESIS` §2.3).
+
+## §6.7 Observation — the update channel is served data, signed with the catalog's key  {#s6-7-update-channel}
+
+[`harness-artifacts/04`](../../../harness-artifacts/04-update-channels.md) (2026-10-19/20) read how the
+references update themselves. The same pattern as §6.6 appears one layer down: *which engine version a
+client runs* is data the vendor serves — Claude Code's channel pointer files (`/latest`, `/stable`),
+Claude Desktop's `channelUuid` (three UUIDs answered three versions: 2.42304.2 / 2.42585.0 / 2.31226.1)
+and a GrowthBook flag `{target, check_interval_ticks, spread_hours}` that tells the desktop app which
+CLI to install, with a per-install hashed delay. The release manifest is signed with an RSA-4096 key
+compiled into the CLI (`claude-code-manifest-v1\0`, reproduced locally), and the served model catalog
+of §6.6 names the **same key id** (`claude-code-release-signing-key`, weekly `expires_at`). Organisation
+ceilings exist on both axes: `requiredMaximumVersion` / `dangerousMaxVersion` for versions, `deniedModels`
+for models; the vendor's own levers are `maxVersion` + forced downgrade and the channel map. Codex keeps
+the opposite shape: the CLI never replaces itself and defers to the package manager; opencode auto-applies
+patch releases through a pipe-to-shell installer with no checksum — the chooser is the vendor's tag.
 
 ## §7 Checklist for a multi-provider harness  {#s7-checklist}
 

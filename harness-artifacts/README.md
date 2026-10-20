@@ -47,6 +47,7 @@
 | 01 | [Single-file executables](01-single-file-executables.md) | Claude Code CLI 2.1.303 and opencode 1.17.12 as **Bun** executables (module table, bytecode, embedded skills); Codex 0.159.3 as a 287 MB **Rust static-pie** (what `strings` confirms of the source-read contract, and what it cannot); Gemini CLI 0.42.0 as a plain **JS bundle** |
 | 02 | [Desktop shells](02-desktop-shells.md) | Claude Desktop **2.42304.2** (Linux deb, published the morning of the read) and ChatGPT/Codex **26.1013.40934** (Linux deb): Electron fuses, windows, preloads, context bridges, IPC, utility processes, and the **UI composition** recovered from chunk names and message catalogues; drift from 2.9939.2 / 26.924.22138; the unchanged legacy native ChatGPT 1.2026.183 |
 | 03 | [Tool-use patterns](03-tool-use-patterns.md) | How each reference defines, invokes and post-processes tools, read across Claude Code, Codex, Gemini CLI, opencode, Strands and REA itself — the mechanisms that decide tokens per tool call |
+| 04 | [Update channels](04-update-channels.md) | How each reference updates **itself** — version pointer, manifest, artifact; who signs what; channels and staggered rollout; install/replace state machines; policy ceilings. Claude Code's manifest signature verified locally against the key embedded in the binary; Desktop Squirrel feed read across three channels; OpenAI Sparkle appcast, Codex R2 host, opencode's pipe-to-shell upgrade, Gemini's npm path, Cursor/Devin update APIs (2026-10-19/20, Korean) |
 | 99 | [Sources](99-sources.md) | Artifacts (URL, size, SHA-256, last-modified), REA evidence IDs, grades |
 
 ## Artifacts read
@@ -88,6 +89,17 @@
    no literal left, so the zero on its own proved nothing; tag ancestry did: the flag commit is not
    in `rust-v0.159.3` and is in `rust-v0.163.0`, and the 0.163.0 build that ChatGPT desktop bundles
    carries the literal 8 times ([01 §3](01-single-file-executables.md)).
+
+4. **Self-update is where the trust root is easiest to compare** (added 2026-10-20, [04](04-update-channels.md)).
+   Claude Code verifies a release *manifest* with an RSA-4096 key compiled into the binary (domain
+   prefix `claude-code-manifest-v1\0`, sidecar `manifest.json.raw-sig.json`, enforced from 2.1.207 —
+   reproduced locally), and the desktop app updates its embedded CLI under a remote flag with a
+   floor, a high-water mark and a per-install hashed spread. Sparkle signs the *artifact* (Ed25519);
+   Codex publishes sha256 digests and sigstore attestations but delegates its own update to the
+   package manager; opencode's curl path pipes `opencode.ai/install` into a shell with no checksum
+   and auto-applies patch releases by default; Gemini and the npm paths trust the registry. The
+   Desktop Squirrel feed answered three channels with three versions (stable 2.42304.2, latest
+   2.42585.0, staggered 2.31226.1) and honoured `maxVersion` server-side.
 
 ## Method notes worth keeping
 

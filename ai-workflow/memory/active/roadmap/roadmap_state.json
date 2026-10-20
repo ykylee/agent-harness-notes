@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "workflow_kit.common.state.roadmap.generate_roadmap_state",
-  "generated_at": "2026-10-19",
+  "generated_at": "2026-10-20",
   "milestones": [
     {
       "id": "M-001",
@@ -309,6 +309,13 @@
       "wbs_ref": "exempt",
       "exempt_reason": "연구 저장소 — 조사 작업은 kit 로드맵 WBS 밖",
       "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-011.md"
+    },
+    {
+      "task_id": "TASK-2026-10-19-main-012",
+      "task_status": "done",
+      "wbs_ref": "exempt",
+      "exempt_reason": "연구 저장소 — 조사 작업은 kit 로드맵 WBS 밖",
+      "source_path": "ai-workflow/memory/active/main/backlog/tasks/TASK-2026-10-19-main-012.md"
     }
   ],
   "issues": []

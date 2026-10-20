@@ -74,7 +74,7 @@ artifact, install ≠ enable ≠ share.
 ### [[concepts/provider-as-data]] {#provider-as-data}
 Providers as data, not code branches. Command-backed token minting, and the deny-list on
 project-local configuration. §6.6: the catalog itself is served (`model_catalog_url`, Claude's
-`model-catalog/v1/catalog.json`) and a managed policy filters it — a fourth chooser.
+`model-catalog/v1/catalog.json`) and a managed policy filters it — a fourth chooser. §6.7 (2026-10-20): the update channel is served data too — channel pointers, `channelUuid`, a rollout flag — and the release manifest shares the catalog's signing key (`harness-artifacts/04`).
 
 ### [[concepts/perception-model]] {#perception-model}
 How an agent sees a screen. Four representations, **symmetry between perception and action**, the

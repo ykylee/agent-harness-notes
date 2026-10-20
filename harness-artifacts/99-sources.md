@@ -28,6 +28,17 @@
 | `chatgpt_amd64.deb` | 26.1013.40934 | 502,087,434 | `3ca59e7f9a6641b9…` | `https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb` (`last-modified` 2026-10-16 22:32 UTC) |
 | `resources/codex` (inside) | 0.163.0 (`strings` substring ×31; tag `rust-v0.163.0` 2026-10-15) | 296,885,960 | `70ea33b7094a4c20…` | — |
 | `ChatGPT.dmg` | 1.2026.183 | 78,575,566 | `49b33cadd2ec659b…` (same as 2026-09-26) | `https://persistent.oaistatic.com/sidekick/public/ChatGPT.dmg` |
+| Claude Code CLI ELF | 2.1.304 | 288,730,480 | `ea0f135784631619…` (= `manifest.json` linux-x64) | `~/.local/share/claude/versions/2.1.304`, split 2026-10-19 night (2,710 modules) |
+| `manifest.json` / `manifest.json.raw-sig.json` / `manifest.json.sig` / `manifest.zst.json` | 2.1.304 | 2,101 / 833 / 833 / — | sidecar `publicKeySha256` `89a24e2e18d2f8fa…` | `downloads.claude.ai/claude-code-releases/2.1.304/` — signature verified locally with the binary's embedded PEM ([04](04-update-channels.md) §1.2) |
+| `claude.ai/install.sh` · `opencode.ai/install` · `releases.openai.com/codex/install.sh` | — | 9,704 / 15,443 / 34,564 | — | read, not run |
+| Desktop update API (`releases.claude.com/api/desktop/…`), `RELEASES`, `RELEASES.json`, apt `InRelease`/`Packages`, `key.asc` | 2.42304.2 (stable) · 2.42585.0 (latest) · 2.31226.1 (staggered) | — | apt key fp `31DDDE24…1A7ECACE` "Anthropic Claude Code Release Signing" | GET 2026-10-19 night; `claude.ai` host returns a Cloudflare challenge to curl |
+| OpenAI `appcast?installation_id&arch&app_version`, `windows-release.json`, `windows-store-update.json` | 26.1013.40934 / 26.1013.4894.0 | 25,351 (arm64 appcast) | Ed25519 `edSignature` per enclosure | `updates.oaistatic.com`, `persistent.oaistatic.com` |
+| `ChatGPT.dmg` `Info.plist` | 1.2026.183 | — | `SUPublicEDKey IktUdD7h…`, Sparkle 2.8.1 | re-downloaded, sha256 unchanged `49b33cad…` |
+| Codex R2 `channels/latest`, `releases/0.163.0/release.json` | rust-v0.163.0 | 97,344 | 318 assets with `sha256:` digests, 28 `.sigstore` | `releases.openai.com/codex/` |
+| `openai/codex` source | `origin/main` `79a19cbb3` (fetched 2026-10-19 night; drift baseline stays `b1fd48c48`) | — | — | `codex-rs/tui/src/{updates,update_action,updates_cache,npm_registry}.rs`, `install-context/src/lib.rs`, `scripts/install/install.sh`, `.github/scripts/publish_r2_release.py` |
+| opencode Bun bundle (split) | 1.17.12 | 1,200 modules, 1,066 js | — | `opencode-linux-x64/bin/opencode`, [04](04-update-channels.md) §5 |
+| Gemini CLI update sources | `main` 2026-10-19 | 3,677 / 6,701 / 8,474 | — | `raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/cli/src/…` |
+| Cursor / Devin update APIs | 3.25.9 / 3.10.67 | — | Devin `sha256hash`; Cursor none | `api2.cursor.sh`, `windsurf-stable.codeium.com` |
 | Release feeds read | — | — | — | `downloads.claude.ai/releases/win32/x64/RELEASES` → `AnthropicClaude-2.42304.2-full.nupkg` (262,853,497 B, not downloaded); `downloads.claude.ai/releases/darwin/universal/RELEASES.json` → 2.42304.2 pub_date 2026-10-19T00:30:35Z; `code.claude.com/docs/en/desktop-linux.md` |
 
 ## C. REA evidence (session scratch, not committed)
@@ -68,3 +79,10 @@
 | Legacy native app UI type inventory | ✅ `strings` | which types render on macOS ⚠️ |
 | Cowork VM toolchain on Linux | ✅ files + strings | runtime ⚠️ |
 | Tool-use mechanisms in [03](03-tool-use-patterns.md) | per-row | source line references for Codex/Strands/REA; module names for Claude Code/opencode/Gemini |
+| Claude Code manifest signature scheme ([04](04-update-channels.md) §1.2) | ✅ **reproduced**: RSASSA-PKCS1-v1_5-SHA512 over `"claude-code-manifest-v1\0" ‖ manifest bytes`, key sha256 `89a24e2e…`, sidecars from 2.1.207 | key custody and the relation to the PGP key ⚠️ |
+| Desktop channel UUIDs → versions, server-side `maxVersion` ([04](04-update-channels.md) §2.1) | ✅ GET on `releases.claude.com` | `claude.ai` host ⚠️ (bot challenge) |
+| Desktop embedded-CLI auto-update: flag `762798616`, floor/high-water mark, hashed spread, same signing key ([04](04-update-channels.md) §2.4) | ✅ strings | live flag values ⚠️ |
+| OpenAI appcast shape, required params, 10 items × 4–5 deltas ([04](04-update-channels.md) §3) | ✅ GET | Electron consumer, Ed25519 verification ⚠️ |
+| Codex: 20 h cache, per-method sources, no self-replacement; R2 layout ([04](04-update-channels.md) §4) | ✅ source + GET | sigstore not consumed by CLI/installer (추정) |
+| opencode: patch auto-upgrade by default, pipe-to-shell with no checksum ([04](04-update-channels.md) §5) | ✅ bundle + script | asset hash files beyond 6 names ⚠️ |
+| Gemini CLI: npm `latest-version`, channel-stability guard, sandbox block ([04](04-update-channels.md) §6) | ✅ source | — |

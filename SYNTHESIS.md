@@ -321,6 +321,15 @@ Four observations follow, each with a cost the artifacts showed:
 > and both Electron shells carry 300–500 MB of engine binaries and sidecars. One engine, many clients
 > means the client package is the engine's distribution channel, and the parts kept outside the engine
 > are a design decision, not an omission.
+>
+> 📌 **The engine is updated like a dependency (2026-10-20, [`harness-artifacts/04`](harness-artifacts/04-update-channels.md)).**
+> Claude Desktop pins a CLI manifest (2.1.299) and raises it under a remote flag
+> (`{target, check_interval_ticks, spread_hours}`) with a floor, a high-water mark and a per-install hashed
+> delay; the Agent SDK pins the same manifest in npm. Both verify the manifest with the key that is
+> compiled into the CLI itself (`claude-code-manifest-v1\0`, RSA-4096, reproduced locally). So "one engine,
+> many clients" has an OTA leg: the client ships the engine, but the engine's *next* version is chosen by a
+> flag, not by the client release. Codex keeps the opposite shape — the CLI never replaces itself and
+> defers to npm/brew/the installer, while the desktop shell carries its own `codex` and updates by Sparkle.
 
 ## 3. Surface-specific axes — what the browser study produced
 

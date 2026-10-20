@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-10-19",
+  "generated_at": "2026-10-20",
   "purpose_digest": "record the **actual contract** of agent harnesses by reading **generated schemas, source",
   "purpose_digest_rev": "2026-09-26",
   "source_of_truth": {
@@ -10,7 +10,7 @@
     "daily_backlog_dir": "ai-workflow/memory/active/main/backlog",
     "tasks_dir": "ai-workflow/memory/active/main/backlog/tasks",
     "sessions_dir": "ai-workflow/memory/active/main/sessions",
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
     "repository_assessment_path": null
   },
   "project": {
@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-19 밤 3차 — 드리프트 패스 SDK 0.3.304 / CLI 2.1.304 (TASK-2026-10-19-main-011).** 타입 diff +51줄 전수 분류: 제어 subtype·옵션·도구 스키마 변화 **0**; 추가는 컨텍스트 사용량 행 `id` 13종·`mcpInstructions`·`pluginId/path`, `startup()/prewarm()` `initializeTimeoutMs`, no-deadline 다이얼로그(`control_cancel_request` 로 철회), `keep_alive` `startup_mark`(체크포인트 35종), browser `suspendSseStream/resumeSseStream`. 바이너리 2.1.304(2,463 js, 224 파일 바이트 동일) 승인 문자열 전부 동일; `decider===\"person\"` 0→2(모드 `tool.check` 가 사람 전용으로 좁힘). **자체 반박 2건**: (1) '번들에 없는 subtype 3종'은 `A(\"…\")` 철자로 존재 — 생산자 철자로 검색할 것; (2) 'untyped 6필드'는 엔진 2.1.303/304 가 직접 보냄(5/6; 외 5필드 더), `via_host_cli_launcher` 만 데스크톱 호스트. 새 기준선 **0.3.304 / 2.1.304 / docs 2026-10-19 late** (`claude-code/99` §E)",
-    "current_axis": "**2026-10-19 밤 3차 — 드리프트 패스 SDK 0.3.304 / CLI 2.1.304 (TASK-2026-10-19-main-011).** 타입 diff +51줄 전수 분류: 제어 subtype·옵션·도구 스키마 변화 **0**; 추가는 컨텍스트 사용량 행 `id` 13종·`mcpInstructions`·`pluginId/path`, `startup()/prewarm()` `initializeTimeoutMs`, no-deadline 다이얼로그(`control_cancel_request` 로 철회), `keep_alive` `startup_mark`(체크포인트 35종), browser `suspendSseStream/resumeSseStream`. 바이너리 2.1.304(2,463 js, 224 파일 바이트 동일) 승인 문자열 전부 동일; `decider===\"person\"` 0→2(모드 `tool.check` 가 사람 전용으로 좁힘). **자체 반박 2건**: (1) '번들에 없는 subtype 3종'은 `A(\"…\")` 철자로 존재 — 생산자 철자로 검색할 것; (2) 'untyped 6필드'는 엔진 2.1.303/304 가 직접 보냄(5/6; 외 5필드 더), `via_host_cli_launcher` 만 데스크톱 호스트. 새 기준선 **0.3.304 / 2.1.304 / docs 2026-10-19 late** (`claude-code/99` §E)",
+    "current_baseline": "**2026-10-20 새벽 — OTA 역공학 `harness-artifacts/04` (TASK-2026-10-19-main-012).** 레퍼런스 10여 종의 자기 갱신 경로를 번들·소스·공개 피드로 복원. **Claude Code**: GCS 호스트 `downloads.claude.ai/claude-code-releases`(`/latest`·`/stable` 평문, `rc` 404), `manifest.json`+사이드카 `manifest.json.raw-sig.json`(RSA-4096 PKCS1v1.5-SHA512, 접두사 `claude-code-manifest-v1\\0`, 키 내장 sha256 `89a24e2e…`, 2.1.207+) **로컬 검증 성공**; PGP `manifest.json.sig`/apt/GitHub `SHASUMS256.txt.sig` 는 \"Anthropic Claude Code Release Signing\" rsa4096(지문 `31DD…CACE`); 설치 상태기계(versions 디렉터리·심링크 rename·`.update.lock` 5분·버전락 7일·보존 2개·`.last-update-result.json`), 정책(`DISABLE_UPDATES`, `requiredMax/MinVersion`, 원격 `maxVersion`+강제 다운그레이드, 채널 latest/stable/rc=\"slow\"). **Desktop**: `/api/desktop/<os>/<arch>/squirrel/update?device_id&version&os_version[&maxVersion][&channelUuid]`, `claude.ai` 는 Cloudflare 챌린지·`releases.claude.com` 은 열림, 채널 UUID 3개 → **3버전**(2.42304.2/2.42585.0/2.31226.1), `maxVersion` 서버측 적용, 틱 1h·4틱, Linux 는 apt(55 버전 풀). **내장 CLI(CCD)**: 핀 2.1.299, 플래그 `762798616{target,check_interval_ticks,spread_hours}`, floor=max(고수위,핀), `sha256(installId\\ncandidate) mod spread` 분산, 같은 서명 키(모델 카탈로그도 같은 key_id). **OpenAI**: Sparkle appcast 필수 파라미터 3종, arm64/x64, 10항목×델타 4–5, Ed25519; Windows msix json·Store 표; **Codex**: 20h 캐시 `version.json`, 방식별 소스(brew cask/GitHub+npm dist-tags), 자기교체 없음, R2 `channels/latest`(318 자산, `sha256:` digest, 28 `.sigstore`), 설치기 digest 검증+GitHub 폴백. **opencode**: 패치 자동 업그레이드 기본, curl 경로는 `opencode.ai/install` 무검증 파이프, `OPENCODE_DISABLE_AUTOUPDATE`. **Gemini**: npm `latest-version`, 채널 하향 금지, 샌드박스 차단. Cursor zsync 델타 3.25.9, Devin sha256hash 3.10.67. 실행 0건",
+    "current_axis": "**2026-10-20 새벽 — OTA 역공학 `harness-artifacts/04` (TASK-2026-10-19-main-012).** 레퍼런스 10여 종의 자기 갱신 경로를 번들·소스·공개 피드로 복원. **Claude Code**: GCS 호스트 `downloads.claude.ai/claude-code-releases`(`/latest`·`/stable` 평문, `rc` 404), `manifest.json`+사이드카 `manifest.json.raw-sig.json`(RSA-4096 PKCS1v1.5-SHA512, 접두사 `claude-code-manifest-v1\\0`, 키 내장 sha256 `89a24e2e…`, 2.1.207+) **로컬 검증 성공**; PGP `manifest.json.sig`/apt/GitHub `SHASUMS256.txt.sig` 는 \"Anthropic Claude Code Release Signing\" rsa4096(지문 `31DD…CACE`); 설치 상태기계(versions 디렉터리·심링크 rename·`.update.lock` 5분·버전락 7일·보존 2개·`.last-update-result.json`), 정책(`DISABLE_UPDATES`, `requiredMax/MinVersion`, 원격 `maxVersion`+강제 다운그레이드, 채널 latest/stable/rc=\"slow\"). **Desktop**: `/api/desktop/<os>/<arch>/squirrel/update?device_id&version&os_version[&maxVersion][&channelUuid]`, `claude.ai` 는 Cloudflare 챌린지·`releases.claude.com` 은 열림, 채널 UUID 3개 → **3버전**(2.42304.2/2.42585.0/2.31226.1), `maxVersion` 서버측 적용, 틱 1h·4틱, Linux 는 apt(55 버전 풀). **내장 CLI(CCD)**: 핀 2.1.299, 플래그 `762798616{target,check_interval_ticks,spread_hours}`, floor=max(고수위,핀), `sha256(installId\\ncandidate) mod spread` 분산, 같은 서명 키(모델 카탈로그도 같은 key_id). **OpenAI**: Sparkle appcast 필수 파라미터 3종, arm64/x64, 10항목×델타 4–5, Ed25519; Windows msix json·Store 표; **Codex**: 20h 캐시 `version.json`, 방식별 소스(brew cask/GitHub+npm dist-tags), 자기교체 없음, R2 `channels/latest`(318 자산, `sha256:` digest, 28 `.sigstore`), 설치기 digest 검증+GitHub 폴백. **opencode**: 패치 자동 업그레이드 기본, curl 경로는 `opencode.ai/install` 무검증 파이프, `OPENCODE_DISABLE_AUTOUPDATE`. **Gemini**: npm `latest-version`, 채널 하향 금지, 샌드박스 차단. Cursor zsync 델타 3.25.9, Devin sha256hash 3.10.67. 실행 0건",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)",
       "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
       "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
@@ -44,35 +45,24 @@
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
       "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
       "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
-      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
-      "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석"
+      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
-    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-19.md",
-    "task_count": 11,
+    "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
+    "task_count": 1,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-10-19-main-001 — REA 로 설치 하네스 4종 산출물 대조 — 선적된 바이너리가 말하는 계약",
-      "TASK-2026-10-19-main-002 — harness-artifacts 후속 — 08 모드 행, 동봉 codex 버전, Bun 레코드 확정, REA 분할 재분석",
-      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생",
-      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
-      "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
-      "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
-      "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
-      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
-      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
-      "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
-      "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)"
+      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)"
     ]
   },
   "next_documents": [
     "docs/PROJECT_PROFILE.md",
     "ai-workflow/memory/active/main/session_handoff.md",
-    "ai-workflow/memory/active/main/backlog/2026-10-19.md",
+    "ai-workflow/memory/active/main/backlog/2026-10-20.md",
     "ai-workflow/memory/active/PURPOSE.md",
     "ai-workflow/memory/active/main/state.json",
     "ai-workflow/memory/active/main/backlog"

@@ -1,0 +1,249 @@
+# 04. 업데이트 채널 — 레퍼런스 하네스들의 OTA 경로와 업데이트 서버 구성
+
+> **무엇인가.** 이 저장소가 읽어 온 레퍼런스 도구들이 **자기 자신을 어떻게 갱신하는지**를 복원한 기록이다. 버전 포인터·매니페스트·산출물의 세 층, 무결성(해시·서명·키), 채널과 단계적 배포, 설치 위치와 원자적 교체, 조직 정책 키를 도구별로 적고, 마지막에 공통 패턴과 보안 관찰을 모았다. 2026-10-19 밤, TASK-2026-10-19-main-012.
+>
+> **방법.** (1) 로컬 산출물의 정적 독해 — Claude Code CLI 2.1.304 와 opencode 1.17.12 의 Bun 번들을 `scripts/bun_split.py` 로 분리해 문자열·코드를 읽었고, Claude Desktop 2.42304.2 deb 의 `app.asar` 와 `ion-dist`, 레거시 ChatGPT 1.2026.183 DMG 의 `Info.plist`, Codex 의 Rust 소스(`openai/codex` `origin/main` `79a19cbb3`, 설치본은 0.159.3)와 Gemini CLI 의 TypeScript 소스(GitHub `main`)를 읽었다. (2) 공개 피드의 **GET 응답** — 버전 포인터, 매니페스트, 서명 사이드카, Squirrel/Sparkle 피드, apt 인덱스, npm dist-tags, GitHub Releases API. (3) **로컬 암호 검증** — Claude Code 매니페스트 서명을 바이너리에 내장된 공개키로 Python `cryptography` 로 검증했다. REA 6.7.0 은 이번 패스에서 그래프를 새로 만들지 않았다(앞선 패스의 `inspect-electron-fuses`·`analyze-javascript-application` 결과를 전제로, 업데이트 경로는 분리 번들의 직접 독해가 더 빨랐다). **어떤 업데이트도 트리거하지 않았고, 어떤 바이너리도 실행하지 않았다.** 호스트에 남아 있던 `~/.claude/.last-update-result.json` 은 이 세션 전에 일어난 갱신의 기록이다.
+>
+> **등급.** ✅ 산출물·소스·피드 응답에서 직접 읽음 · 📣 벤더 문서/변경 로그의 진술 · ⚠️ 정적으로 판정 불가 또는 이번 패스에서 미독 · 추정 은 본문에 표시.
+>
+> 앞선 기록과의 관계: 산출물 포장은 [01](01-single-file-executables.md), 데스크톱 셸은 [02](02-desktop-shells.md), 엔진 계약은 [`claude-code/`](../claude-code/README.md), 다운로드 URL 들의 첫 기록은 [`agent-ux/99`](../agent-ux/99-sources.md) §2 와 [`browser-agents/12`](../browser-agents/12-dia-binary.md).
+
+## 0. 한눈에
+
+| 도구 | 버전 확인 | 피드/매니페스트 형식 | 무결성 | 채널 | 적용 방식 | 정책 키 | 등급 |
+|---|---|---|---|---|---|---|---|
+| **Claude Code CLI** (native) | `GET downloads.claude.ai/claude-code-releases/<channel>` → 버전 문자열 평문 | `/<v>/manifest.json`(플랫폼별 sha256·size·binary) + `manifest.zst.json`(zstd 번들) + 사이드카 `manifest.json.raw-sig.json` | **RSA-4096 PKCS#1 v1.5 SHA-512**, 도메인 접두사 `claude-code-manifest-v1\0`, 공개키 바이너리 내장(2.1.207+ 의무). GitHub 미러에는 PGP `SHASUMS256.txt.sig` | `latest` · `stable` · `rc`(UI 표기 "slow"; 포인터 파일은 404) | `~/.local/share/claude/versions/<v>` 에 쓰고 `~/.local/bin/claude` 심링크를 tmp→rename 으로 교체; 보존 2개+보호 | `DISABLE_AUTOUPDATER`/`DISABLE_UPDATES`, `autoUpdatesChannel`, `minimumVersion`, 정책 `requiredMinimumVersion`/`requiredMaximumVersion`, 원격 `maxVersion`+강제 다운그레이드 | ✅ (서명 로컬 검증) |
+| **Claude Code** (npm/brew) | `npm view @anthropic-ai/claude-code@<channel> version` (HOME 에서), `formulae.brew.sh/api/cask/claude-code[@latest].json` | npm 레지스트리 / Homebrew cask API | 레지스트리 신뢰 | npm dist-tags `latest`=`stable`=`next`=2.1.304 | `npm install -g` / brew | 위와 동일 | ✅ 문자열 |
+| **Claude Desktop** (mac/win) | `GET {claude.ai\|releases.claude.com}/api/desktop/<platform>/<arch>/squirrel/update?device_id&version&os_version[&maxVersion][&channelUuid]` | Squirrel JSON(mac: `currentRelease`, `releases[].updateTo{url,sha256,size,pub_date}`), Windows: `RELEASES` 한 줄(SHA1 + nupkg) | mac zip sha256(피드) · Windows SHA1(Squirrel) · 패키지 코드서명 ⚠️ | `stable`(uuid 없음) · `latest`(uuid 77a14fc4…) · `staggered`(uuid 51760d71…); 관찰값 2.42304.2 / **2.42585.0** / **2.31226.1** | Squirrel(ShipIt) `quitAndInstall`, 스테이징 종류 `zip`/`delta`/`delta_fell_back` | `autoUpdate.disabled`, `dangerousMaxVersion`(서버·클라이언트 양쪽), `releaseChannel`, `viaUpdatesHost`, GrowthBook `check_interval_ticks` | ✅ 피드 응답 |
+| **Claude Desktop** (Linux) | apt: `downloads.claude.ai/claude-desktop/apt/stable` (`InRelease` SHA512, `Valid-Until` 7일) + `GET /api/desktop/linux/<arch>/deb/latest` | Debian 인덱스 / `{version,url}` JSON | apt 저장소 PGP(아래 키) + `Packages` SHA256 | 하나(`stable`) | 앱 내 업데이터 **꺼짐** — "updates via apt" | `CLAUDE_DESKTOP_ADD_REPO` | ✅ |
+| **Desktop 내장 Claude Code** (CCD) | 고정 매니페스트 2.1.299 + GrowthBook 플래그 `762798616` `{check_interval_ticks, target, spread_hours}` | `/<v>/manifest.zst.json` + `.raw-sig.json` | CLI 와 **같은 서명 키**(sha256 `89a24e2e…`), 바닥 버전 = max(고수위, 핀) | 플래그가 `target` 지정 | 설치별 결정적 지연(`sha256(installId\ncandidate) mod spread`) | `autoUpdate.disabled`, 로컬 바이너리 override | ✅ 문자열 |
+| **ChatGPT / Codex Desktop** (mac) | Sparkle `updates.oaistatic.com/codex/app/appcast?installation_id&arch(arm64\|x64)&app_version` — 세 파라미터 **필수** | Sparkle RSS 10 항목, 항목당 전체 zip + 델타 4–5개 | **Ed25519**(`sparkle:edSignature`), 앱 `SUPublicEDKey` | 채널 태그 없음; `installation_id` 3종으로 상단 항목 불변 | Sparkle(레거시 2.8.1) / Electron 측 소비 ⚠️ | — | ✅ 피드 |
+| **ChatGPT Desktop** (win/linux) | `persistent.oaistatic.com/codex-app-prod/windows-release.json`, `windows-store-update.json`, `linux/deb/latest/` | `{schemaVersion:1, packageVersion, packages[{architecture, downloadUrl .msix}]}`; Store 제품 `9PLM9XGG6VKS` | MSIX 서명 ⚠️ | — | MSIX / Store / deb | — | ✅ 피드 |
+| **Codex CLI** | 시작 시, 20시간 캐시 `$CODEX_HOME/version.json`; 방식별 소스 — brew: cask API, npm 계열: GitHub latest + npm 레지스트리 dist-tags 확인, standalone: GitHub latest | GitHub Releases API; 설치기는 Cloudflare R2 `releases.openai.com/codex/{channels/latest, releases/<v>/release.json}` (`{tag_name, assets[{name, digest "sha256:…", browser_download_url}]}`) | 설치기: digest 검증 + GitHub 폴백; 릴리스에 `.sigstore` 증명 동봉(CLI 는 미검증) | `channels/latest`·`prerelease`; npm dist-tags 다수 | **자기 교체 없음** — 설치 방식별 명령 제안(npm/bun/pnpm/vp/brew/설치기 재실행); 데몬은 `app-server daemon update` | `check_for_update_on_startup`, `CODEX_MANAGED_BY_*`, `CODEX_INSTALLER_USE_RELEASES_OPENAI_COM` | ✅ 소스+피드 |
+| **opencode** | TUI 워커 시작 시: 방식별 — brew formula API, npm `/opencode-ai/latest`, choco OData, scoop 버킷, GitHub `anomalyco/opencode` latest | GitHub Releases / npm | **없음** — curl 경로는 `opencode.ai/install` 을 받아 `bash` 에 파이프(`VERSION` 환경변수), 스크립트는 자산 존재만 확인 | npm `latest`; 데스크톱은 Tauri `latest.json` + electron-builder `latest*.yml` | 패치 버전은 **자동 업그레이드**, 그 외 알림 | `autoupdate: true\|false\|"notify"`, `OPENCODE_DISABLE_AUTOUPDATE`, `OPENCODE_ALWAYS_NOTIFY_UPDATE` | ✅ 번들 |
+| **Gemini CLI** | `latest-version` 로 npm 조회(stable + nightly, 2초 타임아웃) | npm dist-tags(`latest` 0.64.0, `preview`, `nightly`) | 레지스트리 신뢰; GitHub 자산은 `-unsigned.zip` | 채널 안정도 사다리(덜 안정한 채널로는 금지) | `npm install -g @google/gemini-cli@<v>` 스폰, 샌드박스에선 금지 | `general.enableAutoUpdateNotification`, `general.enableAutoUpdate`, `DEV` | ✅ 소스 |
+| **Cursor** | `api2.cursor.sh/updates/api/update/<platform>/cursor/<ver>/<commit>/<channel>` | `{version, url, productVersion, timestamp}` | 응답에 해시 없음; Linux 는 `.AppImage.zsync`(zsync 델타) | `stable` | VS Code 계열 업데이터 | — | ✅ 피드 |
+| **Devin Desktop** (Windsurf) | `windsurf-stable.codeium.com/api/update/<platform>/stable/latest` | VS Code 업데이트 API + `sha256hash`, `supportsFastUpdate`, commit 키 URL | sha256 | `stable` | VS Code 업데이터 | — | ✅ 피드 |
+| Antigravity · Conductor · Orca · Superset · Paseo | 이번 패스 미독 | — | — | — | Antigravity GCS 버킷, Conductor Tauri updater, Orca `electron-updater`(publish 미설정) | — | ⚠️ |
+
+> 📌 **한 줄.** 자기 갱신의 신뢰 뿌리가 **어디에 있는지**가 도구마다 다르다. Claude Code 는 바이너리에 박힌 키로 매니페스트를 검증하고, Sparkle 은 앱에 박힌 키로 산출물을 검증하며, Codex 는 digest 와 sigstore 를 **발행**하지만 CLI 자신은 패키지 관리자에 위임하고, opencode 의 curl 경로와 Gemini 의 npm 경로는 전송 채널(HTTPS 와 레지스트리)을 그대로 믿는다.
+
+## 1. Claude Code CLI — 네이티브 설치기
+
+### 1.1 호스트와 경로 ✅
+
+릴리스 호스트는 `https://downloads.claude.ai/claude-code-releases` 다. 응답 헤더(`server: UploadServer`, `x-goog-generation`, `x-goog-hash: crc32c/md5`, `x-goog-storage-class`)가 **Google Cloud Storage 버킷의 정적 서빙**임을 말하고, 번들의 텔레메트리 이름(`update_check_gcs_retry`, `update_check_gcs_failed`)도 그렇게 부른다. 설치 스크립트 `https://claude.ai/install.sh`(9,704 B)와 바이너리의 `chunk-f0r0jt2x.js` 가 같은 경로 규칙을 쓴다:
+
+| 경로 | 내용 | 관찰 |
+|---|---|---|
+| `/<channel>` | 버전 문자열 평문 | `latest` → `2.1.304`, `stable` → `2.1.304`, `rc` → GCS `NoSuchKey`(404) |
+| `/<v>/manifest.json` | `{version, manifestSignatureEnforcement, commit, buildDate, platforms{<os-arch>{binary, checksum(sha256), size}}, sdkCompat{testedWrapperVersions[], harnessSchema}}` | 2.1.304: 2,101 B, 플랫폼 8종, `manifestSignatureEnforcement: "flag"`, `sdkCompat` 30 항목(0.3.271–0.3.303) |
+| `/<v>/manifest.zst.json` | 같은 구조, `binary: "claude.zst"`, 압축 크기 + `bundle{checksum,size}` | 2.1.304 linux-x64: 101,910,048 B(비압축 288,730,480 B) |
+| `/<v>/manifest.json.raw-sig.json` | 서명 사이드카 `{schema:1, algorithm:"RSASSA-PKCS1-v1_5-SHA512", signature(base64 512 B), publicKeySha256}` | 2.1.207 부터 존재(2.1.206 은 404). `manifest.zst.json.raw-sig.json` 도 존재 |
+| `/<v>/manifest.json.sig` | **OpenPGP** 분리 서명(833 B) | 키 ID `BAA929FF1A7ECACE`, 2026-10-19 생성 |
+| `/<v>/<os-arch>/claude[.zst]` | 바이너리 | `last-modified` 2026-10-19 19:38:57 GMT(매니페스트 `buildDate` 18:30:38Z 의 68분 뒤) |
+| `/plugins/claude-plugins-official` | 공식 마켓플레이스(`marketplaces/claude-plugins-official/`), 하루 캐시(86,400,000 ms) | 번들 `chunk-rncrmfyt.js` |
+
+세 번째 유통 경로가 **GitHub Releases** 다(`anthropics/claude-code` `v2.1.304`, 2026-10-19T21:34:39Z): 플랫폼별 `claude-<os-arch>.tar.gz/.zip` 8개 + `SHASUMS256.txt` + `SHASUMS256.txt.sig`. 이 `.sig` 역시 같은 PGP 키가 만든다. 네 번째가 npm: `@anthropic-ai/claude-code` 의 dist-tags 가 `latest`·`stable`·`next` 모두 2.1.304 이고, 네이티브 바이너리는 `@anthropic-ai/claude-cli-native-<platform>` 패키지의 `cli` 파일로도 온다(번들 `tengu_native_install_package_*`, "Could not find platform-specific native package"). Agent SDK 패키지는 `manifest.json` 과 `manifest.zst.json` 을 그대로 동봉해 CLI 를 핀한다([`claude-code/01`](../claude-code/01-wire-protocol.md) §6).
+
+Homebrew 는 별도 축이다: cask `claude-code`(stable)와 `claude-code@latest` 가 같은 GCS 경로를 가리키고(`formulae.brew.sh/api/cask/claude-code.json` → `…/2.1.304/darwin-arm64/claude`, `autobump: true`), 바이너리는 Homebrew 설치를 감지하면 **그 cask 의 버전**을 추적한다 — 번들의 스킬 지시문이 "stable-cask 사용자를 빠른 채널에 대고 뒤처졌다고 읽지 말 것"이라고 적는다(`chunk-tf2pwx04.js`).
+
+### 1.2 서명 체인 — 로컬로 검증했다 ✅
+
+`chunk-f0r0jt2x.js` 는 PEM 공개키를 **문자열로 내장**한다(`Be()`, RSA 4096 비트, SPKI DER 550 B, sha256 `89a24e2e18d2f8fa4627a0a47cf76c3682aef237b60d2cd115d6f5202e2e9896`). 검증 함수 `We({manifestBytes, sidecar, expectedVersion, publicKeyPem})` 의 상수는 `Ue = "claude-code-manifest-v1\0"`, `Re = "2.1.207"`, `je = "flag"`, `Dt = 1`, `Lt = "RSASSA-PKCS1-v1_5-SHA512"`.
+
+이 세션에서 Python `cryptography` 로 확인한 것:
+
+- 사이드카의 `publicKeySha256` = 내장 키의 SPKI sha256 (`89a24e2e…`) — **일치**.
+- 서명 대상은 **`"claude-code-manifest-v1\0" ‖ manifest.json 바이트 그대로`**. 이 메시지로만 검증이 성공했고, 매니페스트 바이트만, 접두사+sha256, 접두사+버전, 정규화 JSON 은 모두 실패했다. 즉 도메인 분리 접두사가 있고 매니페스트는 바이트 단위로 고정된다.
+- 사이드카는 2.1.207 부터 발행된다(2.1.207/2.1.303/2.1.304 는 200, 2.1.206/2.1.200/2.1.100 은 404) — 바이너리의 `Re = "2.1.207"` 과 일치.
+
+정책은 네 값이다(`rt()`): `require`(기본), `allow-unsigned-legacy`(명시적으로 요청한 버전이 2.1.207 이전일 때만 — 사이드카 404 를 "checksum-only verification" 경고로 허용), `require-enforcing-release`(원격 플래그가 요구하면, 매니페스트의 `manifestSignatureEnforcement` 가 현재 플래그와 맞지 않는 릴리스를 `release_predates_enforcement` 로 거부), `skip`. 실패 사유 enum: `sidecar_missing`, `sidecar_fetch_http_error|timeout|interrupted|connection_error`, `signature_invalid`, `version_mismatch`(사이드카로 검증된 매니페스트의 `version` 이 요청과 다름), `binary_name_mismatch`(플랫폼 항목의 `binary` 가 기대 파일명과 다름), `release_predates_enforcement`. 오류 메시지는 한 문장으로 끝난다: "Release verification failed for Claude Code ${v} (${reason}). The update was not installed." 텔레메트리 `tengu_binary_manifest_signature_failed{reason, http_status, enforced, platform, latency_ms}` 는 `enforced` 가 거짓이면 실패를 기록만 하고 계속한다 — 매니페스트의 `"flag"` 라는 값이 바로 그 스위치의 이름이다(추정: 서명 **발행**은 끝났고 **강제**는 플래그로 켠다).
+
+보관된 사본도 다시 검증한다: 이미 받아 둔 버전을 활성화할 때 `purpose: "reverify"` 로 매니페스트를 다시 받아 체크섬을 대조하고, 오프라인이면 "offline, activating as requested" 경고와 함께 넘어간다.
+
+PGP 쪽: `manifest.json.sig` 와 GitHub 의 `SHASUMS256.txt.sig` 를 만든 키는 **apt 저장소 키와 같다**. `downloads.claude.ai/claude-desktop/key.asc` 를 `gpg --show-keys` 로 읽으면 `rsa4096 2026-03-30 [SCE]`, 지문 `31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE`, uid **"Anthropic Claude Code Release Signing <security@anthropic.com>"** 이다 — 데스크톱 Linux 문서(`desktop-linux.md`)가 사용자더러 대조하라고 적은 지문과 같다. 그러므로 서명 키는 둘이다: 바이너리에 박힌 RSA-4096(JSON 사이드카, 자동 업데이터가 검증)과 PGP RSA-4096(apt·GitHub·`.sig`, 패키지 관리자와 사람이 검증). 두 키의 관계(같은 HSM 인지, 어느 쪽이 상위인지)는 ⚠️.
+
+### 1.3 설치 상태기계 ✅
+
+호스트에서 본 모습: `~/.local/bin/claude` → `~/.local/share/claude/versions/2.1.304`(심링크), `versions/` 에 `2.1.291`·`2.1.303`·`2.1.304`, `~/.claude/.last-update-result.json` = `{"timestamp":"2026-10-19T21:54:02.168Z","path":"native","outcome":"success","status":"success","version_from":"2.1.303","version_to":"2.1.304","error_code":null}`, `~/.claude.json` 에 `installMethod: "native"`, `autoUpdates: false`, `autoUpdatesProtectedForNative: true`. 번들이 설명하는 규칙과 맞춰 보면:
+
+- **다운로드** `${base}/${v}/${platform}/${binary}` — `manifest.zst.json` 이 있으면 `.zst` 를 받아 `createZstdDecompress` 로 풀고 매니페스트 `size` 만큼 자른 뒤 sha256 을 대조한다(install.sh 도 `head -c "$size"` 로 같은 일을 한다). 실패하면 비압축 바이너리로 재시도. 텔레메트리에 `is_checksum_mismatch`, `compressed`, `attempt` 가 실린다.
+- **원자적 교체** — `versions/<v>` 로 `atomicMoveToInstallPath`(재시도 지연 로그), 런처는 `${launcher}.tmp.${pid}.${Date.now()}` 심링크를 만들어 rename 한다. 런처가 **네이티브 설치기가 만든 심링크도, npm shim 도 아니면 교체를 거부**한다: "Not replacing ${e}: it was not created by the native installer (not a symlink into a claude/versions/ directory) and is not an npm shim … New versions still install under the versions/ directory".
+- **잠금** — 전역 `.update.lock`(`X = 300000` ms 보다 오래된 잠금은 stale), 버전별 잠금 파일(`Ve = 604,800,000` ms = 7일 stale, `lockCurrentVersion`), Windows 는 `windows_running_exe_lock` 실패를 세어(`consecutiveExeLockFailures`) 세션 내에서 감쇠한다. 잠금 정리 텔레메트리 `tengu_native_stale_locks_cleanup`.
+- **보존**(`cleanupOldVersions`) — 보호 집합 = 실행 중인 `process.execPath`, 런처가 가리키는 버전, 잠금이 잡힌 버전(Windows 는 런처와 같은 크기의 파일도). 나머지를 mtime 역순으로 정렬해 **`Ne = 2` 개**만 남기고 지운다. 0 바이트·`.tmp.<pid>.<ts>` 잔재는 1시간(`Vn = 3,600,000`) 뒤 정리, 스테이징 디렉터리도 1시간, Windows 백업 exe 는 14일(1,209,600,000) 또는 30일(`$n = 2,592,000,000`). 호스트의 세 버전(실행 중 2.1.304 + 보존 2개)이 이 규칙 그대로다.
+- **결과 기록** — `.last-update-result.json` 스키마 `{timestamp, path: "npm-global"|"npm-local"|"native", outcome: "success"|"failed", status, version_from, version_to|null, error_code|null}`, `atomicWrite`. `claude doctor` 가 이것을 "last update result" 로 보여 준다.
+- **`claude install`** — install.sh 는 바이너리를 임시 경로에 받아 체크섬을 대조한 뒤 **그 바이너리의 `install` 서브커맨드**에 런처·셸 통합을 맡긴다(`"$binary_path" install ${TARGET}`); 512 MB 메모리 안내와 `stty sane` 복구 로직이 스크립트에 있다. `claude update` 는 `DISABLE_UPDATES` 면 "Updates are disabled by your administrator" 로 종료하고, 채널 버전보다 현재가 새로우면 "Skipping update. To switch back to the channel version, run claude install ${v}" 를 안내한다.
+
+### 1.4 채널과 정책 ✅
+
+- **채널** — 설정 `autoUpdatesChannel` 은 `latest` · `stable` · `rc`; `/config` 의 라벨은 `rc` 를 **"slow"** 라고 부른다. 포인터 파일은 `latest`·`stable` 만 존재했고 `rc` 는 404 — 추정: `rc` 는 아직 비어 있는 채널이거나 다른 경로다. 채널 입력은 enum 으로 검증된다("Auto-update channel doesn't accept …").
+- **끄기** — `DISABLE_AUTOUPDATER=1` 또는 `DISABLE_UPDATES=1`(환경변수 또는 settings 의 `env`). 2.1.304 는 옛 `autoUpdates: false` 선호를 `userSettings.env.DISABLE_AUTOUPDATER` 로 **마이그레이션**하고(`tengu_migrate_autoupdates_to_settings`), 네이티브 설치는 `autoUpdatesProtectedForNative` 로 그 마이그레이션에서 보호한다 — 호스트의 `~/.claude.json` 이 정확히 이 상태다. 호스트 앱(데스크톱 등)이 자식 CLI 의 업데이터를 끄는 환경변수는 `CLAUDE_CODE_AUTOUPDATER_DISABLED_BY_HOST`, Cowork/격리 실행에서는 `DISABLE_AUTOUPDATER:"1"` 을 포함한 환경 묶음을 자식에게 준다(`chunk-zway9q61.js`).
+- **버전 울타리** — 사용자 `minimumVersion`, 관리 정책 `requiredMinimumVersion`/`requiredMaximumVersion`(semver 검증, `update`·`install`·`doctor` 서브커맨드는 예외). 원격 플래그가 주는 `maxVersion` 은 자동 업데이트를 그 버전에 **캡**하고(`"AutoUpdater: maxVersion ${j} is set, capping update from ${X} to ${j}"`), `forceDowngradeEnabled` 가 함께 오면 **강제 다운그레이드**를 시도하며 `tengu_auto_updater_forced_downgrade` 를 보낸다. 즉 벤더는 특정 버전을 회수할 수 있다 — 서명 검증은 그대로 통과해야 한다.
+- **설치 방식** — `installMethod` ∈ `native` · `global`(npm-global) · `local`(npm-local) · `development` · `unknown`; 옛 `autoUpdaterStatus`(migrated/disabled/enabled)에서 변환한다. npm 경로는 HOME 디렉터리에서 `npm view … --registry https://registry.npmjs.org/` 를 실행하라고 번들 자신이 못 박는다 — "a cloned repo's committed `.npmrc`/`bunfig.toml` could otherwise redirect the lookup to an attacker-chosen registry". 패키지 관리자(`package-manager`) 설치는 "Please use your package manager to update" 로 손을 뗀다.
+- **주기** — 자동 확인은 TUI 의 effect 가 세션 상태(`no_permissions` 지속, exe 잠금 감쇠, 개발 빌드)를 보고 호출한다. 고정 간격 상수는 이 번들에서 찾지 못했다 ⚠️(마켓플레이스 캐시 1일, Desktop 은 §2.2).
+
+### 1.5 Codex 와 나란히 📌
+
+Codex 는 자기 교체 코드가 없고(§4), Claude Code 는 **설치기가 곧 업데이터**다. 그 대가로 Claude Code 에는 서명 정책, 잠금, 보존, 결과 기록, 런처 소유권 검사라는 상태기계가 들어 있고, Codex 에는 "어느 명령을 제안할지"만 있다. 한편 Codex 는 릴리스마다 sigstore 증명을 발행하고 Claude Code 는 하지 않는다(GitHub 자산은 PGP 서명 체크섬). 두 설계는 **신뢰의 위치**가 다르다: Claude 는 바이너리 안에, Codex 는 패키지 관리자와 투명성 로그에.
+
+## 2. Claude Desktop
+
+### 2.1 업데이트 API 와 피드 ✅
+
+메인 프로세스(`app.asar/.vite/build/index.chunk-DOx99pQU.js`)가 Electron `autoUpdater.setFeedURL({url, serverType:"json"?})` 에 넘기는 URL 은
+
+```
+${base}/api/desktop/${platform}/${arch}/${squirrel}/update?device_id=<uuid>&version=<app>&os_version=<os>[&maxVersion=<v>][&channelUuid=<uuid>]
+```
+
+`base` 는 `updateApiBase` override → 설정 `autoUpdate.viaUpdatesHost` 면 `https://releases.claude.com` → 기본 `https://claude.ai`. `device_id` 는 사용자 데이터 폴더의 `ant-did` 파일에 보관하는 UUID 다(일반 파일·하드링크 1 검사, 없으면 새로 만듦). Linux 는 `/api/desktop/linux/${arch}/deb/latest` 만 묻고 앱 내 업데이터를 끈다: "[updater] Linux: in-app updater off (updates via apt)", 텔레메트리 `desktop_update_disabled{reason: managed_by_package_manager}`.
+
+GET 결과(2026-10-19 밤, `device_id` 는 0 으로 채운 v4 UUID):
+
+| 요청 | 응답 |
+|---|---|
+| `claude.ai/api/desktop/…` (curl) | Cloudflare **"Just a moment…"** 챌린지(HTML). 앱은 통과하고 curl 은 막힌다 — 봇 챌린지가 피드 앞에 있다 |
+| `releases.claude.com/api/desktop/darwin/universal/squirrel/update?…&version=1.0.0` | `{"currentRelease":"2.42304.2","releases":[{"version":"2.42304.2","updateTo":{"name":"Claude 2.42304.2","version":"2.42304.2","pub_date":"2026-10-19T01:33:55.569585","url":"https://downloads.claude.ai/releases/darwin/universal/2.42304.2/Claude-af65c0e3….zip","notes":"Production Release - No Notes","sha256":"f97ee3e3…","size":390120618}}]}` |
+| 같은 요청, `version=2.42304.2` | 200, 425 B(현재 버전 하나만) |
+| `…&channelUuid=51760d71-67e2-4366-9bf5-4221cda21f61` (staggered) | `currentRelease` **2.31226.1** |
+| `…&channelUuid=77a14fc4-808e-4345-ac3e-090be671bf94` (latest) | `currentRelease` **2.42585.0** |
+| `…&maxVersion=2.9939.2` | `currentRelease` **2.9939.2** — 캡이 **서버에서도** 적용된다 |
+| `…/darwin/arm64/squirrel/update` | 2.42304.2, `…/darwin/arm64/2.42304.2/Claude-af65c0e3….zip`, 다른 sha256 |
+| `…/win32/x64/squirrel/update` | 평문 한 줄 `5F29471885C1041E6D5007281609E24FD1FF1906 https://downloads.claude.ai/releases/win32/x64/AnthropicClaude-2.42304.2-full.nupkg 262853497` (Squirrel.Windows `RELEASES`, **SHA1**) |
+| `…/linux/x64/deb/latest` | `{"version":"2.42304.2","url":"https://downloads.claude.ai/releases/linux/x64/2.42304.2/Claude-af65c0e3….deb"}` |
+| `downloads.claude.ai/releases/darwin/universal/RELEASES.json` | 정적 사본(`pub_date` 2026-10-19T00:30:35Z, `notes` 빈 문자열, sha256 없음) |
+| `…/win32/x64/RELEASES` | 위와 같은 한 줄(BOM 포함) |
+
+채널 UUID 는 번들 상수다: `u6r = {stable: null, latest: "77a14fc4-…", staggered: "51760d71-…"}`. 선택 규칙 `jJ()` 는 설정 `autoUpdate.releaseChannel === "staggered"` → `staggered`, 저장된 선호가 `latest` 이고 기능 플래그 `3424654946` 이 켜져 있으면 `latest`, 아니면 `stable`. 설정 스키마에서 `releaseChannel` 은 `stable | staggered`(기본 `stable`, **fail-closed 값 `staggered`**, 3p 스코프, `visibility: internal-only`), `dangerousMaxVersion` 은 2.110.0 부터 `public-undocumented`, `autoUpdate.disabled` 는 엔터프라이즈 정책이다. 텔레메트리는 채널을 `nest | production | staggered` 로 부른다(`getUpdateChannel, updater.ts`). 세 채널이 **세 버전**을 가리켰다 — staggered 가 가장 오래된 2.31226.1 인 점은 "staggered = 늦게 받는다"는 이름 그대로다.
+
+### 2.2 주기·연기·적용 ✅
+
+상수(`chunk-DOx99pQU.js`): 틱 `E3r = 3,600,000` ms(1시간), 기본 `T3r = 4` 틱마다 확인(GrowthBook `476513332` 의 `check_interval_ticks` 가 1–3 으로 줄일 수 있다), 재시도 `k3r = 60,000`, 호스트 바쁨 관찰창 `j3r = 2,700,000`(45분), 바쁨 상한 `A3r = 7,200,000`(2시간 — "Host busy for %d h; checking for updates anyway"), 실패 설치 재시도 `R3r = 2`("Install of %s has failed to apply %d time(s) at this version"). 상태 레코드: `updaterStagedPayloadKind{version, kind: zip|delta|delta_fell_back, arch: universal|arm64|x64}`, `updaterFailedInstall`, staged-at, running-instance sentinel, update-attempt marker; 재시작 뒤 "Previous update install succeeded (%s -> %s)" / "did not apply (still at %s, attempted %s at %s)" 를 판정하고 ShipIt(Squirrel.Mac) stderr 로그를 찾는다(내용은 "withheld under compliance redaction"). 적용 전에는 SSH 입력 대기·터미널 PTY 종료를 예산 안에서 기다린 뒤 `autoUpdater.quitAndInstall()`; "Update ready with no window open, but Claude is working; installing once idle". 수동 확인은 정책이 막으면 "manual check skipped: enterprise policy".
+
+### 2.3 Linux — apt 저장소 ✅
+
+`deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/claude-desktop-archive-keyring.asc] https://downloads.claude.ai/claude-desktop/apt/stable stable main`. `InRelease` 는 `Hash: SHA512` 로 PGP 서명되고 `Acquire-By-Hash: yes`, `Valid-Until` 은 발행 7일 뒤(2026-10-19 05:40 → 10-26 05:40), `Origin/Label: Anthropic`. `Packages` 는 `claude-desktop` **55개 버전**(1.17180.0 … 2.42304.2)을 SHA256 과 함께 나열한다 — 풀이 역사 전체를 보존한다. deb 자체가 키를 `/usr/share/keyrings/…asc` 에 설치하고 저장소를 등록하며, `/etc/default/claude-desktop` 의 `CLAUDE_DESKTOP_ADD_REPO="false"` 로 끈다(📣 `desktop-linux.md`; 이번엔 deb 의 postinst 를 다시 열지 않았다 ⚠️).
+
+### 2.4 내장 Claude Code 의 OTA — 엔진 자동 업데이트 ✅
+
+Code 탭의 엔진은 데스크톱이 내려받는 CLI 사본이다([02](02-desktop-shells.md) §2, [`claude-code/03`](../claude-code/03-sessions-context-and-clients.md) §4). 번들은 CLI 매니페스트를 **통째로 내장**한다: `version: "2.1.299"`, `baseUrl: "https://downloads.claude.ai/claude-code-releases"`, `sdkWrapperVersion: "0.3.299"`, `sdkCompat.testedWrapperVersions` 0.3.266–0.3.285. 그 위에 `[CCD-autoupdate]` 가 있다:
+
+- GrowthBook 플래그 `762798616` 의 값 `{check_interval_ticks(≥1, 기본 4), target(≤32자 semver), spread_hours(0–168)}` 를 파싱하고, 모르는 필드는 "Ignoring what this build does not understand", 잘못된 필드는 "no update is looked for until they are fixed". 플래그가 **2시간 넘게 새로고침되지 않으면** 보류(`vMr = 7,200,000`).
+- 후보 = `target`; 바닥 = `max(auto-update-state.json 의 highWaterMark, 빌드 핀 2.1.299)`; 게이트 사유 `not_newer`, `invalid_*`, `invalidated_this_run`, `wrapper_not_tested`(매니페스트 `sdkCompat` 에 데스크톱의 wrapper 버전이 없으면 거부), `manifest_malformed`.
+- **단계적 배포는 클라이언트가 계산한다**: 지연 = `sha256("${installId}\n${candidateVersion}")` 의 앞 6바이트 정수 `mod (spread_hours × 3,600,000)`. 같은 설치는 같은 후보에 늘 같은 시각에 받는다.
+- 받는 것은 `${baseUrl}/${v}/manifest.zst.json`(최대 524,288 B) + `.raw-sig.json`(최대 4,096 B); 검증은 CLI 와 **같은 서명 문맥** `dMr = "claude-code-manifest-v1\0"`, `RSASSA-PKCS1-v1_5-SHA512`, 루트 `{id: "claude-code-release-signing-key", pem}` — 그 PEM 의 SPKI sha256 이 `89a24e2e…` 로 CLI 내장 키와 **동일**하다. 사용자가 로컬 바이너리를 override 하면(`hasLocalBinaryOverride`) 건드리지 않는다.
+- 같은 키 ID 가 **모델 카탈로그**에도 쓰인다: 번들에 박힌 카탈로그 스냅샷이 `key_id: "claude-code-release-signing-key"`, `issued_at 2026-10-18T23:58:23Z`, `expires_at 2026-10-25T23:58:23Z`(7일) 이고, 서빙 카탈로그는 `downloads.claude.ai/model-catalog/v1/catalog.json`([`SYNTHESIS`](../SYNTHESIS.md) §2.3). 릴리스 서명 키가 데이터 서명 키이기도 하다.
+
+같은 호스트에서 내려오는 다른 OTA 페이로드: `downloads.claude.ai/claude-ssh-releases`(SSH 헬퍼 바이너리, 번들에 플랫폼별 sha256·size 매니페스트 내장, 버전은 커밋 해시), `downloads.claude.ai/vms/linux/${arch}/${sha}`(Cowork VM 번들, 옆에 `.${name}.origin` 파일로 sha 를 기록해 "origin missing/mismatch" 를 판정), Chrome 확장은 `clients2.google.com/service/update2/crx` 로 간다.
+
+## 3. ChatGPT / Codex Desktop
+
+### 3.1 macOS — Sparkle appcast ✅
+
+`https://updates.oaistatic.com/codex/app/appcast` 는 쿼리 없이 부르면 JSON 오류로 **필수 파라미터**를 알려 준다: `installation_id`, `arch`, `app_version`. `arch=arm64` 또는 `x64` 만 항목을 돌려주고(`x86_64`, `intel`, `amd64`, `universal` 은 0건), 응답은 Sparkle RSS(`<channel><title>Codex</title>`)다:
+
+| 항목(shortVersion) | 빌드 | 날짜 | 전체 zip | 델타 |
+|---|---|---|---|---|
+| 26.1013.40934 | 20770 | 10-16 | 722.8 MB | 5 (20586, 20398, …) |
+| 26.1013.31256 | 20586 | 10-15 | 722.8 MB | 5 |
+| 26.1007.71326 | 20398 | 10-14 | 719.9 MB | 5 |
+| 26.1007.41230 | 20324 | 10-13 | 719.4 MB | 4 |
+| 26.1007.30912 | 20156 | 10-10 | 719.4 MB | 4 |
+| 26.803.81509 … 26.727.51351 | 6415 … 6119 | 08-11 … 07-31 | 511–568 MB | 1–5 |
+
+항목마다 `sparkle:minimumSystemVersion 13.0`, `sparkle:hardwareRequirements arm64`, 전체/델타 enclosure 모두 `sparkle:edSignature`(Ed25519), 델타에는 `sparkle:deltaFromSparkleExecutableSize`·`deltaFromSparkleLocales`. `sparkle:channel`, `criticalUpdate`, `phasedRolloutInterval` 은 없다. `installation_id` 세 값(0…, 1…, f…)과 `app_version` 두 값으로 상단 항목이 바뀌지 않았다 — 장치 단위 타기팅의 **입구**는 있으나 이번 관찰에서 분기는 없었다(⚠️ 표본 3). 빌드 번호가 8월 6,4xx 에서 10월 20,xxx 로 뛴 것은 [02](02-desktop-shells.md) §3 의 "네이티브 → Electron(OWL)" 전환과 맞물린다(추정).
+
+레거시 네이티브 앱(`ChatGPT.dmg` 1.2026.183, 09-26 과 바이트 동일)의 `Info.plist`: `SUPublicEDKey = IktUdD7h3A+E0F0nYHibnVnGZ7ZgdyTHAi4C6tLo/0c=`, `SUEnableAutomaticChecks/SUAllowsAutomaticUpdates/SUAutomaticallyUpdate = true`, `LSMinimumSystemVersion 14.0`, Sparkle 프레임워크 **2.8.1**(빌드 2050). `SUFeedURL` 키는 plist 에 없다 — 피드 URL 은 코드에서 준다(⚠️ 바이너리 미독). 이 앱이 appcast 의 서명을 검증하는지는 Ed25519 공개키가 같은지로 판정할 수 있으나, 722 MB 페이로드를 받지 않아 서명 수학은 돌리지 않았다 ⚠️. Electron 셸이 appcast 를 어떻게 소비하는지(네이티브 모듈인지, 자체 다운로더인지)는 deb 를 다시 열지 않아 ⚠️ — [02](02-desktop-shells.md) §3.1 이 호스트 문자열만 기록했다.
+
+### 3.2 Windows·Linux ✅
+
+`persistent.oaistatic.com/codex-app-prod/windows-release.json` = `{schemaVersion:1, releaseDate:"2026-10-17T05:55:44Z", packageVersion:"26.1013.4894.0", packages:[{architecture:"x64", downloadUrl:".../releases/26.1013.4894.0/ChatGPT-x64.msix"}, {arm64…}]}`; `windows-store-update.json` = `{schemaVersion:1, buildVersion:"26.1013.4894.0", storeProductId:"9PLM9XGG6VKS", packageIdentity:"OpenAI.Codex", releaseVersion:"26.1013.40934"}` — Store 패키지 버전(4자리)과 제품 버전(3자리)을 잇는 표다. Linux 는 `linux/deb/latest/chatgpt_amd64.deb`(Cloudflare, `etag`, 502,087,434 B, 10-16 22:32 GMT) 이고 apt 저장소는 보지 못했다 ⚠️. 세 파일 모두 해시가 없다 — 무결성은 MSIX/코드서명과 TLS 에 있다(⚠️ 서명자 미독).
+
+## 4. Codex CLI — 소스로 읽은 업데이트 확인 ✅
+
+소스는 `openai/codex` `origin/main` `79a19cbb3`(2026-10-19 fetch; 설치본 0.159.3, 최신 릴리스 `rust-v0.163.0`, npm `latest` 0.163.0 2026-10-19T23:09Z 갱신). 핵심은 `codex-rs/tui/src/updates.rs`:
+
+- `get_upgrade_version` 은 `config.check_for_update_on_startup` 이 참이고 소스 빌드가 아닐 때, `$CODEX_HOME/version.json` 의 `last_checked_at` 이 **20시간** 이상 지났으면 백그라운드로 확인한다. 파일은 `{latest_version, last_checked_at, dismissed_version}` 한 줄 JSON; "Skip until next version" 이 `dismissed_version` 을 쓴다.
+- 확인 소스는 설치 방식에 따라 갈린다(`InstallContext`, `codex-rs/install-context/src/lib.rs`): 환경변수 `CODEX_MANAGED_BY_{VITE_PLUS,PNPM,NPM,BUN}` 이 우선, 없으면 `current_exe` 경로와 `CodexPackageLayout` 으로 `Npm | Bun | Pnpm | VitePlus | Brew | Standalone(Unix|Windows) | Other` 를 판정한다. **brew** → `formulae.brew.sh/api/cask/codex.json` 의 `version`; **npm 계열** → GitHub `releases/latest` 의 `tag_name`(`rust-v` 접두사 제거) 을 받은 뒤 `registry.npmjs.org/@openai%2fcodex` 의 `dist-tags` 로 그 버전이 **실제로 공개됐는지**(`ensure_version_ready`) 확인; **standalone/기타** → GitHub 만. HTTP 는 `RouteAwareClientPool::with_chatgpt_cloudflare_cookies(…, ClientRouteClass::Other)` 를 거친다.
+- 적용은 **명령 제안**뿐이다(`update_action.rs`): `npm install -g @openai/codex`, `bun install -g …`, `vp install -g …`, `pnpm add -g …`, `brew upgrade --cask codex`, standalone 은 `curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh`(Windows 는 `irm …/install.ps1 | iex`). 데몬 모드는 `codex app-server daemon update` 또는 `--from-cli --yes`(`DaemonUpdateSource::{PublicStable, ThisCli}`). 디버그 빌드는 업데이트 탐지·실행이 통째로 꺼진다(`#![cfg(not(debug_assertions))]`). TUI 프롬프트의 릴리스 노트 링크는 `github.com/openai/codex/releases/latest`.
+
+릴리스 호스트는 **Cloudflare R2** 다(`.github/scripts/publish_r2_release.py`: 버킷 `releases`, 접두사 `codex`, 객체 `codex/releases/<version>/…` + `release.json`, 채널 별칭 `codex/channels/latest`·`codex/channels/prerelease`, 변경 가능한 `codex/install.sh`; "An older stable release cannot move these aliases or the latest channel back"). 라이브 관찰:
+
+| URL | 응답 |
+|---|---|
+| `releases.openai.com/codex/channels/latest` | 200, 97,344 B JSON `{tag_name: "rust-v0.163.0", assets:[{name, digest:"sha256:…", browser_download_url}] × 318}` |
+| `…/releases/0.163.0/release.json` | 200, 같은 97,344 B |
+| `…/channels/latest/release.json`, `…/prerelease/release.json` | 404 — 채널 객체 자체가 메타데이터다 |
+| `…/codex/install.sh` | 200, 34,564 B `text/x-sh` |
+| `chatgpt.com/codex/install.sh` | 302 → `releases.openai.com/codex/install.sh` |
+| `releases.openai.com/codex` (루트) | 404 |
+
+자산 318개의 꼬리는 `.tar.gz` 113 · `.zip` 29 · `.sigstore` 28 · `.exe` 28 · `.tgz` 9 · `.dmg` 4 — 바이너리마다 **sigstore 증명**(`codex-x86_64-unknown-linux-musl.sigstore`, `-bazel` 변형 포함, `bwrap` 도)이 있다. 설치 스크립트는 `release.json` 의 `digest` 로 `verify_archive_digest` 를 수행하고, 실패하면 GitHub Releases 로 폴백해 같은 digest 를 다시 확인한다(`CODEX_INSTALLER_USE_RELEASES_OPENAI_COM=false` 로 GitHub 강제, `CODEX_RELEASE`, `CODEX_INSTALL_DIR` 기본 `~/.local/bin`). **sigstore 증명은 스크립트도 CLI 도 검증하지 않는다** — 사람이나 CI 가 `cosign`/`gh attestation` 으로 쓰라고 발행된 것이다(추정). `codex-rs/cli/src/main.rs` 의 네트워크 정책 테스트는 `"releases.openai.com" = "deny"` 를 예시 호스트로 쓴다.
+
+## 5. opencode ✅
+
+번들(`src/cli/tui/worker.js`, `chunk-dq002mqv.js`)의 흐름:
+
+1. TUI 워커가 뜰 때 전역 설정을 읽어 `autoupdate === false` 또는 `OPENCODE_DISABLE_AUTOUPDATE` 면 끝. `OPENCODE_ALWAYS_NOTIFY_UPDATE` 면 항상 `UpdateAvailable` 이벤트.
+2. **설치 방식 탐지** `Installation.method`: `process.execPath` 가 `.opencode/bin` 또는 `.local/bin` 아래면 `curl`; 아니면 `npm list -g`, `yarn global list`, `pnpm`, `bun`, `brew list`, `scoop list`, `choco list` 를 차례로 돌려 `opencode-ai`(브루/초코/스쿱은 `opencode`)가 보이는 쪽; 없으면 `unknown`.
+3. **최신 조회** `Installation.latest`: brew → `formulae.brew.sh/api/formula/opencode.json`(탭이면 `brew info --json=v2`), npm/bun/pnpm → `${registry}/opencode-ai/latest`(레지스트리는 cwd 설정을 따른다), choco → `community.chocolatey.org/api/v2/Packages?$filter=…IsLatestVersion`, scoop → `raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/opencode.json`, 그 외 → `api.github.com/repos/anomalyco/opencode/releases/latest` 의 `tag_name`.
+4. **판정**: 같은 버전이면 끝. `getReleaseType(current, latest)` 가 `patch` 가 아니거나 `autoupdate === "notify"` 면 알림만. **패치이고 autoupdate 가 꺼져 있지 않으면 조용히 `Installation.upgrade(method, version)`** 을 실행하고 `Updated` 이벤트를 낸다. 기본값(설정 없음)은 이 자동 경로다.
+5. **적용** `Installation.upgrade`: `curl` → `GET https://opencode.ai/install` 의 본문을 `bash`(없으면 `sh`)의 stdin 으로 넘기고 `VERSION=<v>` 환경변수를 준다; `npm`/`pnpm`/`bun` → `<pm> install -g opencode-ai@<v>`; `brew` → 탭이면 `brew tap anomalyco/tap` + `git pull --ff-only` 후 `brew upgrade`(`HOMEBREW_NO_AUTO_UPDATE=1`); `choco upgrade opencode --version=<v> -y`; `scoop install opencode@<v>`. 끝나면 `process.execPath --version` 으로 확인.
+
+설치 스크립트 `opencode.ai/install`(15,443 B): `INSTALL_DIR=$HOME/.opencode/bin`, 버전이 없으면 `registry.npmjs.org/opencode-ai/latest` 로 정하고 GitHub 자산의 **존재**(`curl -sIL … %{http_code}`)만 확인한 뒤 `github.com/anomalyco/opencode/releases/download/v<v>/<file>` 을 받아 푼다. **체크섬·서명 검증 문장이 없다**(`sha256`, `checksum`, `gpg`, `minisign` 모두 0건) — 레거시 `opencode-ai/opencode` 0.0.55 릴리스에는 `checksums.txt` 가 있었으나 현재 `anomalyco/opencode` v1.19.3 자산 37개는 데스크톱용 `latest.json`(Tauri 업데이터, minisign 형식 "untrusted comment: signature from tauri secret key")과 electron-builder 형식 `latest*.yml`(sha512, blockMap) 를 함께 싣고 CLI 자산엔 해시 파일이 없다(⚠️ 자산 목록 6개만 확인). npm `opencode-ai` 의 dist-tags 는 `latest-0`, 다수의 `snapshot-*` 태그를 포함한다. GitHub 조직은 `sst/opencode` 가 아니라 **`anomalyco/opencode`** 다(`sst/opencode` API 는 비어 있다).
+
+## 6. Gemini CLI ✅
+
+`packages/cli/src/ui/utils/updateCheck.ts`(GitHub `main`, 2026-10-19 읽음): `general.enableAutoUpdateNotification` 이 꺼졌거나 `DEV=true` 면 확인하지 않는다. `latest-version` 패키지로 npm 을 묻되, 현재 버전이 nightly 면 `nightly` 태그와 `latest` 를 함께 묻고 **기준 버전이 같으면 nightly 를 선호**한다(`getBestAvailableUpdate`). `FETCH_TIMEOUT_MS = 2000`.
+
+`handleAutoUpdate.ts`: `general.enableAutoUpdate` 가 켜져 있고, 설치 방식에 `updateCommand` 가 있으며(npx/pnpx 는 "update not applicable", brew 는 안내만, `IS_BINARY=true` standalone 은 "download the latest version from GitHub"), 샌드박스가 아니고, **덜 안정한 채널로 내려가지 않을 때**(`RELEASE_CHANNEL_STABILITY[target] < [current]` 금지) `npm install -g @google/gemini-cli@<v>`(nightly 면 `@nightly`)를 스폰한다. 끝난 뒤 활성 바이너리의 `package.json` 버전이 올랐는지 다시 읽어 "the active binary … was not updated" 를 구분한다. 관찰된 dist-tags: `latest` 0.64.0, `preview` 0.65.0-preview.0, `nightly` 0.66.0-nightly.20261019…; GitHub v0.64.0 의 자산은 `gemini-darwin-*-unsigned.zip` 등 3개 — 서명 없는 압축이 이름으로 드러난다. 무결성은 npm 레지스트리와 TLS 가 전부다.
+
+## 7. IDE·래퍼 클라이언트 — 피드만 ✅/⚠️
+
+- **Cursor**: `api2.cursor.sh/updates/api/update/<platform>/cursor/<version>/<commit>/<channel>` 에 더미 버전·커밋을 주면 200 — `linux-x64` → `{"version":"3.25.9","url":"https://downloads.cursor.com/production/5d4df965…/linux/x64/Cursor-3.25.9-x86_64.AppImage.zsync","productVersion":"3.25.9","timestamp":1792453510682}`(zsync 제어 파일 523,620 B, 2026-10-17 → **zsync 델타**), `darwin-universal`/`darwin-arm64` → `{url: …Cursor-darwin-universal.zip, name: "3.25.9"}`, `win32-x64` → `system-setup/CursorSetup-x64-3.25.9.exe`. 응답에 해시가 없다. 3.22.7(09-26) → 3.25.9.
+- **Devin Desktop(Windsurf)**: `windsurf-stable.codeium.com/api/update/linux-x64/stable/latest` → VS Code 업데이트 API 형태 `{url(codeiumdata.com, 커밋 키), name/productVersion 1.126.0, version/notes = 커밋, hash(sha1), sha256hash, timestamp, supportsFastUpdate: true, windsurfVersion 3.10.67, displayName}`. 3.10.35 → 3.10.67. VS Code 엔진은 1.126.0 그대로.
+- **Antigravity**: 기록만 — GCS `antigravity-public/antigravity-hub/<ver>-<build>/<platform>/Antigravity.tar.gz`, `app.asar` 에 updater 모듈([`agent-ux/05`](../agent-ux/05-antigravity-windsurf.md)). 피드 URL 미독 ⚠️.
+- **Conductor**: Tauri 2.11.1 `updater` 플러그인([`agent-ux/07`](../agent-ux/07-paseo-conductor.md)) — 엔드포인트·공개키 미독 ⚠️. **Orca**: `package.json` 에 `electron-updater`·`electron-builder` 의존성만 있고 `build.publish` 는 없다(1.4.214) — 자동 업데이트 미구성 또는 CI 주입(추정). **Superset·Paseo**: 모노레포, 미독 ⚠️.
+- 브라우저 에이전트 교차: Dia 는 Sparkle(`SUFeedURL …/BoostBrowser-updates.xml`, [`browser-agents/12`](../browser-agents/12-dia-binary.md)), Aside 는 `releases.aside.com/dev-updater/`([`browser-agents/09`](../browser-agents/09-aside-browser-internals.md)), Comet 확장은 `perplexity.ai/rest/browser/update-crx`.
+
+## 8. 공통 패턴
+
+1. **세 층과 서명의 위치.** 모든 경로가 *버전 포인터 → 매니페스트 → 산출물*로 짜인다. 포인터는 평문 파일(Claude Code), Squirrel JSON/`RELEASES`(Desktop), Sparkle RSS(OpenAI mac), `release.json`/`channels/latest`(Codex R2), npm dist-tags(opencode·Gemini·Claude npm), VS Code 업데이트 API(Cursor·Devin). 서명은 **매니페스트**(Claude Code: RSA-4096 사이드카, 키 내장)이거나 **산출물**(Sparkle Ed25519, 키 내장)이거나 **외부 증명**(Codex sigstore, PGP 체크섬)이거나 **없음**(opencode curl, Gemini npm, Cursor). 해시만 있는 경우도 둘로 갈린다 — 매니페스트가 서명되면 해시는 전이적으로 보호되고(Claude), 아니면 해시는 전송 오류 탐지일 뿐이다(Squirrel SHA1, Devin sha256).
+2. **채널은 데이터다.** 채널 이름이 파일명(`/latest`, `/stable`), UUID(`channelUuid`), dist-tag, 원격 플래그(`762798616.target`)로 표현되고, 같은 질의에 다른 답을 주는 것은 서버(Squirrel `channelUuid`, `maxVersion`)이거나 클라이언트(CCD 의 `spread_hours` 해시 지연)다. [`SYNTHESIS`](../SYNTHESIS.md) §2.3 "providers as data" 의 네 번째 선택자(조직)에 **"벤더의 배포 플래그"** 가 더해진다 — 모델 카탈로그와 릴리스 매니페스트가 같은 키로 서명되는 것이 그 증거다.
+3. **천장과 회수.** 조직은 `requiredMaximumVersion`(CLI)·`dangerousMaxVersion`(Desktop, 서버도 존중)으로 위를 막고, 벤더는 `maxVersion`+`forceDowngradeEnabled`(CLI)·채널 UUID(Desktop)로 **되돌릴** 수 있다. 되돌림도 서명 검증을 통과해야 하므로 "옛 버전으로의 다운그레이드 공격"은 서명으로 막히지 않는다 — 막는 것은 `requiredMinimumVersion` 과 `release_predates_enforcement` 뿐이다(추정: 이것이 `manifestSignatureEnforcement` 를 플래그로 둔 이유).
+4. **자기 교체의 네 형태.** (a) 버전 디렉터리 + 런처 심링크 교체 + 보존/잠금(Claude Code 네이티브), (b) 설치 스크립트 재실행(Codex standalone, opencode curl), (c) 패키지 관리자 위임(npm/brew/apt/winget/Store — Codex 전부, Claude npm, Gemini, Desktop Linux), (d) 프레임워크 업데이터(Squirrel/ShipIt, Sparkle, electron-updater, Tauri, VS Code). (a)만이 **실패 기록·소유권 검사·보존 규칙**을 갖고, (b)는 파이프 투 셸의 신뢰를 그대로 물려받는다.
+5. **엔진은 의존성처럼 갱신된다.** 데스크톱이 CLI 매니페스트를 핀하고(2.1.299), 플래그로 `target` 을 올리며, 바닥·고수위·분산 지연으로 롤아웃한다. SDK 패키지가 `manifest.json` 으로 CLI 를 핀하는 것([`claude-code/01`](../claude-code/01-wire-protocol.md) §6)과 같은 구조다 — §2.9 "one engine, many clients" 에 OTA 다리가 생긴다: **클라이언트 패키지는 엔진의 배포 채널이고, 엔진의 다음 버전은 클라이언트가 아니라 플래그가 정한다.**
+6. **델타.** Sparkle 델타(항목당 4–5개, 13–100 MB), zsync(Cursor), Squirrel 스테이징 `delta|delta_fell_back`(Desktop), zstd 번들(Claude Code 101 MB vs 288 MB). Devin 은 `supportsFastUpdate`.
+7. **빠른 레포에서 "latest" 는 모호하다.** Claude Code 는 `latest == stable`(둘 다 2.1.304), Desktop 은 `latest` 2.42585.0 > `stable` 2.42304.2 > `staggered` 2.31226.1, Gemini 는 `latest` < `preview` < `nightly`, Codex npm 은 플랫폼별 `release-*` 태그가 수십 개. 같은 단어가 도구마다 다른 자리를 가리킨다.
+
+## 9. 보안 관찰
+
+- **Claude Code 네이티브 경로의 설계는 완결적이다** ✅: 키가 바이너리에 있고 사이드카가 키 해시를 실어 키 교체를 드러내며, 도메인 접두사로 서명 재사용을 막고, 매니페스트는 `version` 필드를 요청 버전과 대조해 **다른 버전의 서명된 매니페스트를 끼워 넣는 공격**을 막는다(`version_mismatch`). `binary_name_mismatch` 는 플랫폼 항목 바꿔치기를 막는다. 남는 구멍은 `release_predates_enforcement` 가 플래그 의존이라는 점과, 오프라인일 때 보관본 재검증을 건너뛴다는 점(경고만)이다.
+- **같은 벤더 안의 비대칭**: 네이티브 설치기는 서명을 검증하지만 install.sh 자체는 체크섬만 보고(스크립트가 받은 매니페스트를 신뢰), GitHub 자산은 PGP 로 사람이 검증한다. `claude.ai` 의 데스크톱 피드는 Cloudflare 봇 챌린지 뒤에 있어 **스크립트로는 읽을 수 없고**, 같은 API 가 `releases.claude.com` 에서는 열려 있다. Windows `RELEASES` 는 포맷상 SHA1 이다.
+- **OpenAI**: appcast 가 `installation_id` 를 요구하므로 장치별 응답 분기의 입구가 있다(관찰상 분기 없음). Codex 는 digest 를 발행하고 설치기가 검증하지만, **CLI 의 자기 갱신은 패키지 관리자에 위임**하므로 npm/brew 경로의 신뢰는 레지스트리다; sigstore 증명은 발행되나 소비자는 CLI 밖이다.
+- **opencode**: 기본 설정에서 **패치 버전은 조용히 자동 업그레이드**되고, curl 설치는 `opencode.ai/install` 본문을 **검증 없이 셸에 파이프**한다. 설치 스크립트는 자산 존재만 확인한다. 끄는 길은 `autoupdate: false`/`"notify"` 또는 `OPENCODE_DISABLE_AUTOUPDATE`. 레지스트리를 cwd 설정에서 읽는 점(`p.registry(process.cwd())`)은 Claude Code 가 명시적으로 피한 바로 그 경로다.
+- **Gemini CLI**: 자동 업데이트가 켜지면 npm 을 스폰한다 — 레지스트리 신뢰. 샌드박스와 채널 하향 금지는 있다.
+- **Cursor/Devin**: 업데이트 API 응답에 서명이 없다(Devin 은 sha256 포함). 다운로드 URL 이 커밋 해시로 고정되는 점은 재현성에 유리하다.
+
+## 10. 미검증·한계 ⚠️
+
+| 항목 | 이유 |
+|---|---|
+| 어떤 업데이트 경로의 **런타임** 동작(실제 확인 주기, 잠금 경합, 롤백) | 실행하지 않았다. 호스트의 `.last-update-result.json` 한 건만 관찰 |
+| Claude Code 자동 확인의 고정 간격 | 번들에서 상수를 찾지 못했다(effect 가 상태를 보고 호출) |
+| `rc` 채널의 실체, 두 서명 키(RSA 사이드카 / PGP)의 관계 | 포인터 404; 키 관리 정보 없음 |
+| Claude Desktop 의 Windows/mac 패키지 코드서명, ShipIt 의 검증 | 패키지 미다운로드 |
+| Electron ChatGPT 가 appcast 를 소비하는 방식, Linux apt 유무 | deb 를 다시 열지 않았다 |
+| Sparkle Ed25519 서명 검증 | 722 MB 페이로드 미다운로드; 레거시 앱 키와 현재 앱 키의 동일성 미확인 |
+| Codex `.sigstore` 증명 검증 | `cosign` 미실행; 설치기·CLI 모두 소비하지 않는다 |
+| opencode 데스크톱 Tauri 공개키, CLI 자산 해시 파일 유무 전수 | 자산 37개 중 6개 이름만 읽음 |
+| Antigravity·Conductor·Superset·Paseo 의 업데이트 엔드포인트 | 산출물 없음/모노레포 미탐색 |
+| 피드의 지역·UA 의존성 | 한 호스트, 한 UA(Sparkle 피드는 두 UA) |
+
+## 11. 출처 요약
+
+- 로컬 산출물: `~/.local/share/claude/versions/2.1.304`(sha256 `ea0f1357…` = 매니페스트 linux-x64), 분리 모듈 `chunk-f0r0jt2x.js`(매니페스트·서명·설치), `chunk-yxbdpafp.js`(채널·GCS·정책 문자열), `chunk-q0m7hekb.js`(AutoUpdater effect), `chunk-0hxqzzbz.js`(`claude update`), `chunk-rhnwftfs.js`(`/config`), `chunk-4e7gzyk8.js`(마이그레이션), `chunk-tf2pwx04.js`(스킬 지시문); Claude Desktop 2.42304.2 `app.asar/.vite/build/index.chunk-DOx99pQU.js`·`index.pre.js`; opencode 1.17.12 분리 모듈 `src/cli/tui/worker.js`·`chunk-dq002mqv.js`·`chunk-q8yd3c12.js`·`chunk-g5fbberp.js`; `@openai/codex` 0.159.3 `bin/codex.js`; `ChatGPT.dmg` 1.2026.183 (sha256 `49b33cad…`) `Info.plist`; `~/repos/harness-refs/codex` `origin/main` `79a19cbb3`.
+- 공개 GET(2026-10-19 밤, UTC+9): §1.1·§2.1·§3·§4 의 표에 적은 URL 전부, `claude.ai/install.sh`, `code.claude.com/docs/en/desktop-linux.md`, `downloads.claude.ai/claude-desktop/key.asc`, `formulae.brew.sh/api/cask/claude-code.json`, `api.github.com/repos/{anthropics/claude-code,openai/codex,anomalyco/opencode,google-gemini/gemini-cli}/releases/latest`, npm `dist-tags`(5 패키지), `raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/cli/src/{ui/utils/updateCheck.ts,utils/installationInfo.ts,utils/handleAutoUpdate.ts}`, `opencode.ai/install`.
+- 로컬 검증: Python `cryptography` 로 `manifest-2.1.304.json` + `manifest.json.raw-sig.json` 을 내장 PEM 으로 검증(§1.2); `gpg --list-packets`/`--show-keys` 로 PGP 서명·키 식별.
+- 스크래치 산출물(미커밋): `scratchpad/feeds-untrusted/`(피드 응답 원본), `scratchpad/cli-untrusted/out-2.1.304/`, `scratchpad/opencode-untrusted/out/`, `scratchpad/deb-untrusted/`.

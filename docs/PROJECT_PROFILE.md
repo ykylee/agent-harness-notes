@@ -6,7 +6,7 @@
 - Scope: project overview, document layout, standard commands, validation points, policy exceptions
 - Audience: developers, operators, AI agents, anyone onboarding
 - Status: draft
-- Updated: 2026-10-19 (nine study folders, 19 concepts, drift baselines; was 2026-09-23)
+- Updated: 2026-10-20 (`harness-artifacts/04` update channels added; nine study folders, 19 concepts, drift baselines; was 2026-10-19)
 - Related: [PURPOSE](../ai-workflow/memory/active/PURPOSE.md), [SYNTHESIS](../SYNTHESIS.md)
 
 ## 1. Project overview
@@ -27,7 +27,7 @@
 - Claude Code as an engine: `claude-code/` (3 documents + `99-sources.md`)
 - Browser-agent study: `browser-agents/` (13 documents) · Strands: `strands/` (8) · clients and ACP:
   `agent-ux/` (11) · orchestration: `gas-town/` (5), `gas-city/` (5) · notes: `rrsi/` (4),
-  `ai-sdlc/` (4), `harness-artifacts/` (4) — each folder has a `README.md` and a `99-sources.md`
+  `ai-sdlc/` (4), `harness-artifacts/` (5) — each folder has a `README.md` and a `99-sources.md`
 - Cross-study synthesis: `SYNTHESIS.md`
 - Reports: `REPORT.md` (English), `REPORT.ko.md` (Korean); web versions linked from `README.md`
 - Source and verification records: every `99-sources.md`; drift ledgers in `docs/99` §E and
