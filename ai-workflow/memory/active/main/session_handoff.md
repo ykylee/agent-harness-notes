@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-20 (Gas Town **런타임 검증** `gas-town/05` 신설 — 모델 없는 스크립트 에이전트로 두 사이클 완주, 소스-런타임 불일치 3건. 앞서 같은 날 `harness-artifacts/04`·`05` 2차 패스. 다음 드리프트 기준: Codex `1a35bc4cc`(루프 파일)·0.163.0 / Claude Code SDK 0.3.304·CLI 2.1.304 / ChatGPT 26.1013.40934 / Gemini CLI `76e4d7c04` / Strands `bd0b6a94`)
+- Updated: 2026-10-20 (세션 말미 정리: **참조 체크아웃 전부 삭제**(`~/repos/harness-refs/` 없음 — 핀 커밋은 `docs/PROJECT_PROFILE.md` §환경과 각 `99-sources.md`, 드리프트 패스 전 `--filter=blob:none` 재클론 필요), `/tmp` 스크래치·`~/.cache/gt-lab`·`gt-build-tmp` 삭제. 같은 날 Gas Town **런타임 검증** `gas-town/05` 신설 — 모델 없는 스크립트 에이전트로 두 사이클 완주, 소스-런타임 불일치 3건. 앞서 같은 날 `harness-artifacts/04`·`05` 2차 패스. 다음 드리프트 기준: Codex `1a35bc4cc`(루프 파일)·0.163.0 / Claude Code SDK 0.3.304·CLI 2.1.304 / ChatGPT 26.1013.40934 / Gemini CLI `76e4d7c04` / Strands `bd0b6a94`)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -99,6 +99,9 @@
 - **하류 구현 착수 (이 저장소 외부, 기록만)** — `SYNTHESIS.md` 의 표면 무관 축(대칭 네임스페이스·정책 우선순위·승인·비밀 핸들)을 `ykylee/heddle` 에서 코드로 옮겼다. 설계 주장 5건이 실측에 반박당했다. 드러난 버그 중 **세 건은 같은 결함의 반복**이었다 — 요소 식별자가 구별 축(스냅샷 세대 · 프레임 · 프로세스 생애)을 담지 못해 옛 참조가 조용히 다른 요소로 해석됐다. **이 결과는 `SYNTHESIS.md` §6 으로 편입됐다.**
 
 ## Next Actions
+
+**2026-10-20 세션 말미 (정리)**
+- [ ] 다음 드리프트 패스 전 재클론: `openai/codex`(기준 `79a19cbb3`, 루프 파일 `1a35bc4cc`), `strands-agents` 하네스(`bd0b6a94`), `gastownhall/{gastown,gascity,beads}`, `agent-client-protocol`(`9b26a3ea`) — 로컬 클론·분리 번들·추출물이 모두 지워졌다. 번들 재분리는 `scripts/bun_split.py`, 산출물 해시·URL 은 `harness-artifacts/99` §B
 
 **2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
 - [x] ~~`harness-artifacts/05` 후속: opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini 대화형 TUI 큐·에이전트 프레임워크, Claude Code 자동 압축 임계 상수, Codex 루프 탐지 부재의 보상 메커니즘~~ — TASK-2026-10-20-main-005 로 해소. 남은 ⚠️(05 §7): Claude Code 원격 플래그 `tengu_amber_*` 값·`clientDataAutoCompactWindow` 채움 시점, opencode 번들↔태그 리비전 대조, Gemini 원격/A2A 실행기·`fast-ack-helper` 모델 매핑, Codex 서버측 반복 억제
