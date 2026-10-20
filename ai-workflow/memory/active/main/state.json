@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-20 (2차) — `harness-artifacts/05` §7 미검증 해소 (TASK-2026-10-20-main-005).** Claude Code 자동 압축 임계식 = 유효 창(창 − min(maxOutput, 20k)) − 13k, 차단 −3k, 경고 −20k(1M → 967k = 문서 수치), 급속 재충전 차단기 = 압축 뒤 3턴 안 재충전 3연속, 실패 차단기 3(`chunk-rncrmfyt.js`); opencode **소스 v1.17.12**: 스텝 상한 문구 `MAX_STEPS_PROMPT`(도구 목록은 그대로 전송), 서버 조종 = 메시지 저장 후 `Runner.ensureRunning` 이 **도는 fiber 에 합류**해 다음 스텝의 `lastUser` 가 됨 — 1차의 \"바쁘면 `RunnerBusy` 거절\" 은 **정정**(`assertNotBusy` 는 편집·shell 경로); Gemini `main 76e4d7c04`: TUI 는 클라이언트 큐(`useMessageQueue`, 유휴 시 합쳐 1회) + 실험 `modelSteering` 힌트(`InjectionService` → 도구 응답 앞 `User steering update:`), `LocalAgentExecutor` 30턴/10분/`complete_task` 필수/유예 턴 60 s, `_recoverFromLoop` = 시스템 문장 1줄; Codex `1a35bc4cc` grep 0 → **루프 탐지 없음**, 상한은 토큰 창(\"압축이 수렴한다\" 주석 가정). 05 §1.6·§4.3·§4.4 신설, SYNTHESIS §2.10 (2)(4), wiki `thread-turn-item` §8.7",
-    "current_axis": "**2026-10-20 (2차) — `harness-artifacts/05` §7 미검증 해소 (TASK-2026-10-20-main-005).** Claude Code 자동 압축 임계식 = 유효 창(창 − min(maxOutput, 20k)) − 13k, 차단 −3k, 경고 −20k(1M → 967k = 문서 수치), 급속 재충전 차단기 = 압축 뒤 3턴 안 재충전 3연속, 실패 차단기 3(`chunk-rncrmfyt.js`); opencode **소스 v1.17.12**: 스텝 상한 문구 `MAX_STEPS_PROMPT`(도구 목록은 그대로 전송), 서버 조종 = 메시지 저장 후 `Runner.ensureRunning` 이 **도는 fiber 에 합류**해 다음 스텝의 `lastUser` 가 됨 — 1차의 \"바쁘면 `RunnerBusy` 거절\" 은 **정정**(`assertNotBusy` 는 편집·shell 경로); Gemini `main 76e4d7c04`: TUI 는 클라이언트 큐(`useMessageQueue`, 유휴 시 합쳐 1회) + 실험 `modelSteering` 힌트(`InjectionService` → 도구 응답 앞 `User steering update:`), `LocalAgentExecutor` 30턴/10분/`complete_task` 필수/유예 턴 60 s, `_recoverFromLoop` = 시스템 문장 1줄; Codex `1a35bc4cc` grep 0 → **루프 탐지 없음**, 상한은 토큰 창(\"압축이 수렴한다\" 주석 가정). 05 §1.6·§4.3·§4.4 신설, SYNTHESIS §2.10 (2)(4), wiki `thread-turn-item` §8.7",
+    "current_baseline": "**2026-10-20 (3차) — `harness-artifacts/04` §10 미검증 해소 (TASK-2026-10-20-main-006).** ChatGPT deb 의 Electron 업데이터: mac 은 `sparkle.node` 애드온(production appcast 쿼리 `installation_id/arch/app_version/beta/os-version/plan_type`, 15분), Windows 는 `windows-updater.node` + MSIX sha256·identity 대조, Linux 는 `linux-package-metadata.json` 15분 폴링만; **ChatGPT Linux apt 저장소** `persistent.oaistatic.com/codex-app-prod/linux/deb`(postinst 내장 키 \"Codex Linux Repository\" `3BFA…60E4`, InRelease **Good signature** 로컬 검증, 풀 1버전, `latest` deb = 풀 deb sha256 동일); Claude Desktop postinst(마커·unattended-upgrades `Origins-Pattern site=downloads.claude.ai`·`kms-gpg-signer` 단서); **Codex `.sigstore` 로컬 검증**(cosign 레거시 번들: ECDSA·Fulcio 체인·Rekor SET 유효, 서명자 `rust-release.yml@refs/tags/rust-v0.163.0`, 소비자 없음은 그대로); opencode 자산 37/37(CLI 12 해시 0), 데스크톱은 **electron-builder**(`allowDowngrade: true`, Windows `verifyUpdateCodeSignature: false`, 10분), Tauri 형식 `latest.json` 은 CI 가 minisign 서명; Superset 4h·mac/Linux·GitHub 피드, Paseo `rolloutHours` 클라이언트 단계 배포·`allowDowngrade: false`; Claude Code 확인 **30분**(`rr=1800000`); `rc`·`next`·`slow` 404, UA 무관. 남은 ⚠️: Sparkle 키 동일성(mac zip), Desktop 패키지 서명, Antigravity·Conductor 산출물. 업데이트 트리거·실행 0건",
+    "current_axis": "**2026-10-20 (3차) — `harness-artifacts/04` §10 미검증 해소 (TASK-2026-10-20-main-006).** ChatGPT deb 의 Electron 업데이터: mac 은 `sparkle.node` 애드온(production appcast 쿼리 `installation_id/arch/app_version/beta/os-version/plan_type`, 15분), Windows 는 `windows-updater.node` + MSIX sha256·identity 대조, Linux 는 `linux-package-metadata.json` 15분 폴링만; **ChatGPT Linux apt 저장소** `persistent.oaistatic.com/codex-app-prod/linux/deb`(postinst 내장 키 \"Codex Linux Repository\" `3BFA…60E4`, InRelease **Good signature** 로컬 검증, 풀 1버전, `latest` deb = 풀 deb sha256 동일); Claude Desktop postinst(마커·unattended-upgrades `Origins-Pattern site=downloads.claude.ai`·`kms-gpg-signer` 단서); **Codex `.sigstore` 로컬 검증**(cosign 레거시 번들: ECDSA·Fulcio 체인·Rekor SET 유효, 서명자 `rust-release.yml@refs/tags/rust-v0.163.0`, 소비자 없음은 그대로); opencode 자산 37/37(CLI 12 해시 0), 데스크톱은 **electron-builder**(`allowDowngrade: true`, Windows `verifyUpdateCodeSignature: false`, 10분), Tauri 형식 `latest.json` 은 CI 가 minisign 서명; Superset 4h·mac/Linux·GitHub 피드, Paseo `rolloutHours` 클라이언트 단계 배포·`allowDowngrade: false`; Claude Code 확인 **30분**(`rr=1800000`); `rc`·`next`·`slow` 404, UA 무관. 남은 ⚠️: Sparkle 키 동일성(mac zip), Desktop 패키지 서명, Antigravity·Conductor 산출물. 업데이트 트리거·실행 0건",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
       "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
       "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
       "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
@@ -44,15 +45,14 @@
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)",
       "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
-      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
-      "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로"
+      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 6,
+    "task_count": 7,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -61,7 +61,8 @@
       "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)",
       "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
       "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
-      "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘"
+      "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
+      "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성"
     ]
   },
   "next_documents": [

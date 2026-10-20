@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/15-model-providers.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/09-aside-browser-internals.md + strands/05-providers-and-telemetry.md + strands/02-agent-loop.md + harness-artifacts/01-single-file-executables.md + harness-artifacts/02-desktop-shells.md + harness-artifacts/04-update-channels.md
 related_pages: [concepts/wire-protocol-boundary, concepts/retained-reasoning, concepts/capability-distribution, concepts/control-plane-execution-plane]
 created: 2026-09-22
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Provider as Data — model providers as data, not code branches
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: how `ModelProviderInfo` expresses a provider as data, and which parts of that design a custom harness should copy outright.
 - Scope: why the built-in list is short, the full field set, command-backed auth, the config deny-list, in-flight threads
 - Primary source: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly)
-- Updated: 2026-10-20 (§6.7 the update channel is served data too, and the release manifest and the model catalog share one signing key — from `harness-artifacts/04`). Previous: 2026-10-19 (§6.6 served catalogs and the organisation as chooser). Previous: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
+- Updated: 2026-10-20 (§6.7 second pass — ChatGPT apt leg, appcast selectors, Codex sigstore verified, Paseo rollout; from `harness-artifacts/04` 2nd pass). Previous: 2026-10-20 (§6.7 the update channel is served data too, and the release manifest and the model catalog share one signing key — from `harness-artifacts/04`). Previous: 2026-10-19 (§6.6 served catalogs and the organisation as chooser). Previous: 2026-09-30 (Strands native Anthropic Python/TS split on `redacted_thinking`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -153,6 +153,13 @@ ceilings exist on both axes: `requiredMaximumVersion` / `dangerousMaxVersion` fo
 for models; the vendor's own levers are `maxVersion` + forced downgrade and the channel map. Codex keeps
 the opposite shape: the CLI never replaces itself and defers to the package manager; opencode auto-applies
 patch releases through a pipe-to-shell installer with no checksum — the chooser is the vendor's tag.
+The second pass (2026-10-20) added the other vendor's Linux leg: ChatGPT's deb registers an apt
+repository (`persistent.oaistatic.com/codex-app-prod/linux/deb`, key "Codex Linux Repository") whose
+`InRelease` verified locally, and the Electron shell only polls a metadata file for a newer package; its
+macOS appcast is chosen by `installation_id`, `plan_type` and `beta` — a wider selector than Claude's
+`channelUuid`. Codex's sigstore bundle verified end to end (signer `rust-release.yml@refs/tags/rust-v0.163.0`),
+yet no installer or CLI consumes it. Paseo's `rolloutHours`/`releaseDate` manifest fields are the same
+client-side hashed rollout as Claude's `spread_hours`.
 
 ## §7 Checklist for a multi-provider harness  {#s7-checklist}
 

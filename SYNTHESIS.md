@@ -329,7 +329,10 @@ Four observations follow, each with a cost the artifacts showed:
 > compiled into the CLI itself (`claude-code-manifest-v1\0`, RSA-4096, reproduced locally). So "one engine,
 > many clients" has an OTA leg: the client ships the engine, but the engine's *next* version is chosen by a
 > flag, not by the client release. Codex keeps the opposite shape — the CLI never replaces itself and
-> defers to npm/brew/the installer, while the desktop shell carries its own `codex` and updates by Sparkle.
+> defers to npm/brew/the installer, while the desktop shell carries its own `codex` and updates by Sparkle
+> (a native addon; on Linux both vendors' shells hand the job to **apt** and only watch for a newer package).
+> Codex's sigstore attestation was reproduced end to end — signer identity `rust-release.yml@refs/tags/rust-v0.163.0`
+> in the transparency log — and nothing in the product consumes it; the strongest proof is the least used.
 
 ### 2.10 The loop itself — what decides "continue"
 
