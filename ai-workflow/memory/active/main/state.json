@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-20 (6차) — Gas City 드리프트 재검토 `3ef7fadd42`→`6aa6be55d` (TASK-2026-10-20-main-011).** 838 커밋·3,622 파일을 재클론 후 인용 경로 34개 분류 + 주장 4 클러스터(보조 에이전트 4)로 재독. **반박 1(기준 시점 오류)**: city-write 그랜트 \"minter 없음·클라이언트는 CSRF 만\" — `cmd/gc-write-mint` 참조 서명기 + `clientgrant` `grant_command` 가 핀에 존재, 대시보드만 그랜트 없음(§F.1; `02` §6.1·`04` A5·wiki control-plane §5.6 정정). **상류 반전 1**: ACP 프로바이더가 2026-10-11 `ee24a477c`(#6598)부터 `session/request_permission` 을 보류→API/CLI 결정 중계(`allow_once`…`reject_always`, interrupt·turn end 시 `cancelled`), 타임아웃 테스트 삭제·왕복 테스트 5종, gc 자체 auto-approve 없음 → \"게이트 미응답\"에서 \"릴레이, 결정은 아님\"으로(§F.2; `03` §6 superseded, `04` Part B/C·카드, wiki approval-gate §7.7·MAO). 나머지 유지·강화(three-outcome liveness + `ServerDeathConfirmer`·v2 5분류, zero roles, 컨트롤 프로세스, 스코프별 DB + 클라이언트측 펜스 주석). 신규 기록 §F.3: opjournal·eventfact 새 원장 쓰기 경로 + `eventfact/doc.go` D-TRUST(\"actor … what the box asserts\") 자기 진술, `internal/connect` 세션별 HMAC 베어러(전송 주체), 세션 행 펜스(일반 API 422, #7783), reconciler v2 opt-in(기본 legacy, engdoc 낡음), 실행 백스톱(승인 대기 좌석 56회 드레인 사고), bd ≥1.3.0 바닥·수동 스키마 마이그레이션(`gas-town/05` 교차). 실행 0건. 다음 기준 `6aa6be55d`, 클론 유지",
-    "current_axis": "**2026-10-20 (6차) — Gas City 드리프트 재검토 `3ef7fadd42`→`6aa6be55d` (TASK-2026-10-20-main-011).** 838 커밋·3,622 파일을 재클론 후 인용 경로 34개 분류 + 주장 4 클러스터(보조 에이전트 4)로 재독. **반박 1(기준 시점 오류)**: city-write 그랜트 \"minter 없음·클라이언트는 CSRF 만\" — `cmd/gc-write-mint` 참조 서명기 + `clientgrant` `grant_command` 가 핀에 존재, 대시보드만 그랜트 없음(§F.1; `02` §6.1·`04` A5·wiki control-plane §5.6 정정). **상류 반전 1**: ACP 프로바이더가 2026-10-11 `ee24a477c`(#6598)부터 `session/request_permission` 을 보류→API/CLI 결정 중계(`allow_once`…`reject_always`, interrupt·turn end 시 `cancelled`), 타임아웃 테스트 삭제·왕복 테스트 5종, gc 자체 auto-approve 없음 → \"게이트 미응답\"에서 \"릴레이, 결정은 아님\"으로(§F.2; `03` §6 superseded, `04` Part B/C·카드, wiki approval-gate §7.7·MAO). 나머지 유지·강화(three-outcome liveness + `ServerDeathConfirmer`·v2 5분류, zero roles, 컨트롤 프로세스, 스코프별 DB + 클라이언트측 펜스 주석). 신규 기록 §F.3: opjournal·eventfact 새 원장 쓰기 경로 + `eventfact/doc.go` D-TRUST(\"actor … what the box asserts\") 자기 진술, `internal/connect` 세션별 HMAC 베어러(전송 주체), 세션 행 펜스(일반 API 422, #7783), reconciler v2 opt-in(기본 legacy, engdoc 낡음), 실행 백스톱(승인 대기 좌석 56회 드레인 사고), bd ≥1.3.0 바닥·수동 스키마 마이그레이션(`gas-town/05` 교차). 실행 0건. 다음 기준 `6aa6be55d`, 클론 유지",
+    "current_baseline": "**2026-10-20 (8차) — agent-ux GUI 를 소스 레벨로 (TASK-2026-10-20-main-013).** 실행 호스트가 없어 앱 대신 설치 번들의 렌더러를 읽었다: Claude Desktop 2.42304.2 deb(`ion-dist`, REA `ev_9169cddc…`), ChatGPT 26.1013.40934 deb(`webview`, `ev_783d2550…`), Antigravity 2.17.0 Linux tar.gz(새 sha `6a9b0ff6…`, `language_server` 안의 웹 UI zip 을 오프셋 150,747,311 에서 절단; 셸 asar `ev_2eee329b…`, **`main.js` 9.5 MB 는 REA 힙 소진 2회 → 바이트 창 검색으로만**). 보조 에이전트 3 + 반박은 직접 재확인. **노트 오류 ❌ 4**: Claude 기본 모드 폴백은 Manual 이 아니라 `acceptEdits`(Auto 는 `ccd/ccr_auto_default_mode`·내부 코호트에서만 default-first); ChatGPT `Allow for this chat` 은 네이티브 전용이 아니라 슈퍼앱 브라우저 사용 카드; ChatGPT 승인 대기 칩은 주황이 아니라 **초록**; Antigravity 승인 대기 점은 테마 primary(파랑, 미독 점과 동일) → \"amber = needs you\" 는 선언된 어휘·LED 에만 성립(wiki design-language §1·§5 정정). **⚠️→✅**: Claude 카드 배치는 플래그(`claudeai_cc_epitaxy_session_presets_main`) 전환 dock/inline, 큐는 엔진으로 즉시 `priority now|next|later`(5초 내 자동 steer, 클라이언트 보류 없음), WorkingMark = `--cds-clay #d97757` WebP 스프라이트; ChatGPT 결정 매핑(`Allow once→accept`, prefix→execpolicy amendment, `Always allow`→network amendment), Enter/Esc, squircle `@supports` 게이트, `followUpQueueMode`→`thread/queue/add`/`turn/steer`, `Work in`=실행 위치; Antigravity Documents/Artifacts 는 aux 패널 섹션, 사운드 트리거·기본 off·피아노 없음, 승인 inline(Alt+Enter), 터미널 기본 `PROCEED_IN_SANDBOX`, 큐 기본. 남은 ⚠️: 무게·밀도·애니메이션 체감, Antigravity NUX 문구(서버). 번들·evidence 는 `~/.cache/agent-ux-gui-src`(2.5 GB, 삭제는 사용자 판단)",
+    "current_axis": "**2026-10-20 (8차) — agent-ux GUI 를 소스 레벨로 (TASK-2026-10-20-main-013).** 실행 호스트가 없어 앱 대신 설치 번들의 렌더러를 읽었다: Claude Desktop 2.42304.2 deb(`ion-dist`, REA `ev_9169cddc…`), ChatGPT 26.1013.40934 deb(`webview`, `ev_783d2550…`), Antigravity 2.17.0 Linux tar.gz(새 sha `6a9b0ff6…`, `language_server` 안의 웹 UI zip 을 오프셋 150,747,311 에서 절단; 셸 asar `ev_2eee329b…`, **`main.js` 9.5 MB 는 REA 힙 소진 2회 → 바이트 창 검색으로만**). 보조 에이전트 3 + 반박은 직접 재확인. **노트 오류 ❌ 4**: Claude 기본 모드 폴백은 Manual 이 아니라 `acceptEdits`(Auto 는 `ccd/ccr_auto_default_mode`·내부 코호트에서만 default-first); ChatGPT `Allow for this chat` 은 네이티브 전용이 아니라 슈퍼앱 브라우저 사용 카드; ChatGPT 승인 대기 칩은 주황이 아니라 **초록**; Antigravity 승인 대기 점은 테마 primary(파랑, 미독 점과 동일) → \"amber = needs you\" 는 선언된 어휘·LED 에만 성립(wiki design-language §1·§5 정정). **⚠️→✅**: Claude 카드 배치는 플래그(`claudeai_cc_epitaxy_session_presets_main`) 전환 dock/inline, 큐는 엔진으로 즉시 `priority now|next|later`(5초 내 자동 steer, 클라이언트 보류 없음), WorkingMark = `--cds-clay #d97757` WebP 스프라이트; ChatGPT 결정 매핑(`Allow once→accept`, prefix→execpolicy amendment, `Always allow`→network amendment), Enter/Esc, squircle `@supports` 게이트, `followUpQueueMode`→`thread/queue/add`/`turn/steer`, `Work in`=실행 위치; Antigravity Documents/Artifacts 는 aux 패널 섹션, 사운드 트리거·기본 off·피아노 없음, 승인 inline(Alt+Enter), 터미널 기본 `PROCEED_IN_SANDBOX`, 큐 기본. 남은 ⚠️: 무게·밀도·애니메이션 체감, Antigravity NUX 문구(서버). 번들·evidence 는 `~/.cache/agent-ux-gui-src`(2.5 GB, 삭제는 사용자 판단)",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 설치된 5종 시각 주장 확인. 수동 패스는 끝났고 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. **2026-10-20 사용자가 앱별 스크래치 프로젝트 지정 완료** → 남은 차단은 **실행 호스트**: 이 세션은 Linux `plex`(디스플레이·원격 기기 도구 없음). MacBook 의 Claude Code 세션에서 TASK-002 Plan(앱 5종 × 읽기/쓰기/거절, `orca computer` 캡처, 조종 입도, 기록 규칙) 순서대로 실행하면 된다",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-013 — agent-ux GUI 를 소스 레벨로 — Claude Desktop·ChatGPT Linux 번들의 렌더러를 REA 로 읽어 ⚠️ 시각 주장(승인 카드 배치·상태 어휘·조종 입도·amber)을 코드로 판정",
       "TASK-2026-10-20-main-012 — Strands CLI 의 ACP SDK 핀 확인 — @agentclientprotocol/sdk 1.3.0 유지, 2.0.0 에서 제거된 연결 클래스 미사용",
       "TASK-2026-10-20-main-011 — Gas City 드리프트 재검토 — 3ef7fadd42 → origin/main (838 커밋), gas-city/ 5편 주장별 재검증",
       "TASK-2026-10-20-main-010 — Strands·Beads 드리프트 기준 전진 — bd0b6a94→3bd98e618 (3 커밋, 게이트 grep 0), 4f9174e6b→d0d9aa214 (9 커밋, claim/SECURITY/serve 미변경)",
@@ -44,15 +45,14 @@
       "TASK-2026-10-20-main-007 — Gas Town 런타임 검증 — 소규모 town 에서 sling→done→mq→post-merge→convoy 와 stalled→force-kill→stranded→redispatch 를 스크립트 에이전트로 관찰 (gas-town/05)",
       "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
       "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
-      "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
-      "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해"
+      "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 14,
+    "task_count": 15,
     "in_progress_items": [],
     "blocked_items": [
       "TASK-2026-09-27-main-002 — agent-ux GUI 패스 — 설치된 5종 시각 주장 확인"
@@ -70,7 +70,8 @@
       "TASK-2026-10-20-main-009 — Codex 드리프트 재확인 79a19cbb3 → 014489466 (10 커밋, 클론 없이 precomputed export 대조) — docs/99 §E.9, 기준 전진",
       "TASK-2026-10-20-main-010 — Strands·Beads 드리프트 기준 전진 — bd0b6a94→3bd98e618 (3 커밋, 게이트 grep 0), 4f9174e6b→d0d9aa214 (9 커밋, claim/SECURITY/serve 미변경)",
       "TASK-2026-10-20-main-011 — Gas City 드리프트 재검토 — 3ef7fadd42 → origin/main (838 커밋), gas-city/ 5편 주장별 재검증",
-      "TASK-2026-10-20-main-012 — Strands CLI 의 ACP SDK 핀 확인 — @agentclientprotocol/sdk 1.3.0 유지, 2.0.0 에서 제거된 연결 클래스 미사용"
+      "TASK-2026-10-20-main-012 — Strands CLI 의 ACP SDK 핀 확인 — @agentclientprotocol/sdk 1.3.0 유지, 2.0.0 에서 제거된 연결 클래스 미사용",
+      "TASK-2026-10-20-main-013 — agent-ux GUI 를 소스 레벨로 — Claude Desktop·ChatGPT Linux 번들의 렌더러를 REA 로 읽어 ⚠️ 시각 주장(승인 카드 배치·상태 어휘·조종 입도·amber)을 코드로 판정"
     ]
   },
   "next_documents": [

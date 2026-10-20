@@ -12,7 +12,7 @@ updated: 2026-09-30
 - Purpose: the shared design language of agent clients, and where their theories of supervision part.
 - Scope: structure, visual system, vocabulary, behaviours; the three client families
 - Primary source: ten shipped clients (installers unpacked, source at pinned commits), 2026-09-26 — [`agent-ux/`](../../../agent-ux/README.md)
-- Updated: 2026-09-30 (date bump: `agent-ux/08` ACP enum citation; design-language facts unchanged)
+- Updated: 2026-10-20 (§1 row 7 + §5: source-level GUI pass — the in-app needs-you marker is green (ChatGPT), untokened (Claude) or theme-primary blue (Antigravity); amber holds only for declared vocabularies). Previous: 2026-09-30 (date bump: `agent-ux/08` ACP enum citation; design-language facts unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -24,7 +24,7 @@ updated: 2026-09-30
 | 4 | Theming | **VS Code theme keys as the token API** (OpenAI, Cursor, Antigravity 1.x, Devin) |
 | 5 | Words | "Allow ⟨agent⟩ to ⟨verb⟩?" · once/session/always · Queue/Steer · Needs you · Ready for review |
 | 6 | Autonomy | a dial with a **machine reviewer** in the middle |
-| 7 | Attention | **amber/orange = needs you** in declared status vocabularies; working is blue (unambiguous) or yellow (needs a second channel). *Narrowed 2026-09-27 (GUI pass): in-app, orange also marks a risky state (ChatGPT `Full access`) and Claude's working mark is clay — the hue is not reserved* |
+| 7 | Attention | **amber/orange = needs you** in declared status vocabularies; working is blue (unambiguous) or yellow (needs a second channel). *Narrowed 2026-09-27 (GUI pass): in-app, orange also marks a risky state (ChatGPT `Full access`) and Claude's working mark is clay — the hue is not reserved.* **Narrowed again from code 2026-10-20** ([`agent-ux/99` source-level GUI pass](../../../agent-ux/99-sources.md#source-level-gui-pass-2026-10-20)): the convention holds for **LED legends and declared vocabularies**, not for the rendered chips — ChatGPT's `Awaiting approval` / `Needs input` chip is **green** (`text-chart-green`), Claude Desktop has no attention token (`needs_attention` shares `failed`'s orange in scheduled tasks; the sidebar shows a count), and Antigravity's pending-approval dot is the **theme primary** (blue), the same dot as *unread* |
 | 8 | Divergence | the **theory of supervision** — steps, deliverables, or a board — not the style |
 
 > ⚠️ Read from the parts list: tokens, fonts, icons and strings were extracted; **nothing was seen
@@ -60,7 +60,7 @@ is the portable layer** — a new client that adopts it inherits users' expectat
 - [ ] Neutral chrome; colour for state; git/PR state in the token system
 - [ ] Map tokens onto VS Code theme keys if you will live in an editor
 - [ ] Approval request as **data** any channel can render; never bind bare Enter to approve
-- [ ] Sandbox state in the mode label; amber/orange for "needs you" in status indicators — and if you also use it for risk or working, keep those out of the status channel
+- [ ] Sandbox state in the mode label; amber/orange for "needs you" in status indicators — and if you also use it for risk or working, keep those out of the status channel. *(Code read 2026-10-20: none of ChatGPT, Claude Desktop or Antigravity actually paints the pending-approval marker amber in-app; treat this as a recommendation, not an observed convention.)*
 - [ ] Density as a user lens; name completion for the next step
 - [ ] Protect trust surfaces from theming
 - [ ] Write down your theory of supervision — the layout follows from it

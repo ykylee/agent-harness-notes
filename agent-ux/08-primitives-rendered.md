@@ -72,8 +72,9 @@
 
 | Product | Modes (verbatim) | The machine-reviewer rung | Default |
 |---|---|---|---|
-| Claude desktop | Manual · Accept edits · Plan · **Auto** · Bypass permissions | Auto: "checks each tool call for risky actions and prompt injection" | Manual (Auto flag-gated ⚠️) |
+| Claude desktop | Manual · Accept edits · Plan · **Auto** · Bypass permissions · Don't ask | Auto: "checks each tool call for risky actions and prompt injection" | ~~Manual (Auto flag-gated ⚠️)~~ ❌ from code 2026-10-20: **Auto** when `ccd_auto_default_mode` / `ccr_auto_default_mode` or an internal cohort applies, otherwise **Accept edits** (`acceptEdits` fallback); Auto availability is a host check, not a flag ([`02`](02-claude-desktop.md) §6) |
 | ChatGPT/Codex | Ask for approval · **Approve for me** · Full access · Custom (config.toml) · Managed | "A carefully prompted reviewer agent" | — |
+| Antigravity 2.17.0 (code, 2026-10-20) | Request Review · **Default** · Vetted · Auto · Turbo; terminal policy Request Review · Proceed in Sandbox · Auto · Always Proceed | Vetted: "A Gemini-powered security agent decides if commands should be auto-approved" | Default (sandbox + **Proceed in Sandbox**) |
 | Cursor | Ask Every Time (hidden) · Allowlist (with Sandbox) · **Auto-review** (with Sandbox) · Run Everything (Unsandboxed) | LLM classifier; blocks go back to the agent first | — |
 | Antigravity 2.0 | Default · Request Review · Turbo (+ Autonomous mode banner) | — | Default: auto inside sandbox, ask outside |
 | Devin Desktop | (Cascade) Disabled · Allowlist Only · Auto · **Turbo** | — | — |
@@ -161,10 +162,12 @@ Center (default screen), Orca's dashboard (Needs You / Working / Done / Idle), S
 | Product | Working | **Needs you** | Done | Error |
 |---|---|---|---|---|
 | ChatGPT/Codex (Micro LEDs) | blue | **amber** | green | red |
+| ChatGPT/Codex (sidebar chip, from code 2026-10-20) | — | **green** `text-chart-green` (`Awaiting approval` / `Needs input`) | — | — |
 | Paseo | blue | **amber** ("because it wants something from you") | — | — |
 | Orca | yellow spinner | **orange** — "Orange, not amber: it has to stay separable from working-yellow" | emerald | red |
 | Superset | amber, static | **yellow, pulsing** — only human-needed states pulse | green "Ready for review" | red, pulsing |
 | Devin Desktop | pulsing icon | **amber dot** + ring | — | — |
+| Antigravity 2.17.0 (code, 2026-10-20) | — | **theme primary** (blue `#007acc` by default), same dot as *unread*, icon differs; orange only on the `need input` pill border | — | — |
 
 > 📌 **Amber/orange means "needs you" in every product that declares a colour.** The disagreement is over
 > *working*: blue (OpenAI, Paseo) keeps amber unambiguous; yellow (Orca, Superset) forces a second
@@ -189,9 +192,10 @@ Center (default screen), Orca's dashboard (Needs You / Working / Done / Idle), S
 
 | Product | Vocabulary | Default |
 |---|---|---|
-| ChatGPT/Codex | Send / **Queue / Steer** / Stop — "Steer — Submit without interrupting the model" | setting |
+| ChatGPT/Codex | Send / **Queue / Steer** / Stop — queue → `thread/queue/add`, steer → `turn/steer`, Stop → `turn/interrupt` (code, 2026-10-20) | setting `followUpQueueMode` |
+| Antigravity 2.17.0 (code, 2026-10-20) | **Queue** ("Queue until after the current turn.") / Send Immediately ("Interrupt the agent and send immediately.") — Enter = chosen strategy, Alt+Enter = the other; no steer | queue (`WHEN_IDLE`) |
 | Cursor | Queue / **Steer** — "applied at the next tool call" | setting |
-| Claude desktop | **Queue** — "Claude will read this after the current turn" | queue (⚠️ docs say "after the current action") |
+| Claude desktop | **Queue** (`priority: next`) / **Send now** = steer (`now`, auto within 5 s of turn start) / **Queue for later** (`later`) — sent to the engine immediately, never held client-side | queue = `next` (code, 2026-10-20; ~~⚠️ docs say "after the current action"~~ — that is the engine's lane, no client granularity) |
 | Devin Desktop | "Guide Devin while it works, or press {shortcut} to queue" — **per message by modifier** | steer |
 | Paseo | Interrupt / **Steer** / Queue; a pending permission is **denied** by the message | steer |
 | Conductor | Queue / **Steer** | steer |

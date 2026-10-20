@@ -28,7 +28,7 @@
 | ChatGPT/Codex desktop | 26.924.22138 (`codexBuildNumber` 11645) | `persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb`; Windows MSIX by ZIP range reads | sha256 `ce3bb1aa…b7014e7` |
 | Legacy ChatGPT (macOS native) | 1.2026.183 | `persistent.oaistatic.com/sidekick/public/ChatGPT.dmg` | sha256 `49b33cad…4a251d3b8d1` |
 | Cursor | 3.22.7 (VS Code 1.128.0) | `downloads.cursor.com/production/37076c6c…/cursor_3.22.7_amd64.deb` | sha256 `923fd2d2…37800ab` |
-| Antigravity | 1.23.2 · IDE 2.5.5 · 2.17.0 | `edgedl.me.gvt1.com/…/antigravity/stable/…`; `storage.googleapis.com/antigravity-public/antigravity-hub/2.17.0-…` | commits `15487b30`, `ecfbad74` |
+| Antigravity | 1.23.2 · IDE 2.5.5 · 2.17.0 | `edgedl.me.gvt1.com/…/antigravity/stable/…`; `storage.googleapis.com/antigravity-public/antigravity-hub/2.17.0-…` | commits `15487b30`, `ecfbad74`; 2.17.0 tarball re-fetched 2026-10-20: 179,494,137 B, sha256 `6a9b0ff60f7bd0d1…`, web UI zip at byte 150,747,311 of `resources/bin/language_server` (3,768,098 B, 304 entries) |
 | Windsurf → Devin Desktop | 3.10.35 (VS Code 1.126.0) | `windsurf-stable.codeium.com/api/update/linux-x64/stable/latest` → `Devin-linux-x64-3.10.35.tar.gz` | sha256 `fd50eb54…6ec6`, commit `dfa4a2d6` |
 | Orca | 1.4.197 | `stablyai/orca` @ `da6d483` (MIT) | commit |
 | Superset | desktop 1.30.2 | `superset-sh/superset` @ `2370f60` (Elastic License 2.0 — source-available, not open source) | commit |
@@ -146,4 +146,22 @@ own threads and pages; they are not kept in this repository, and only UI structu
 
 Next: a live run per app in a scratch project the user sets up once, to see approval cards and `blocked`/`waiting`.
 Not installed here, still fully ⚠️: Cursor, Devin, Superset, Paseo, Conductor.
+
+## Source-level GUI pass, 2026-10-20
+
+The live run above is blocked on a display host, so the same questions were put to the **shipped renderer code** on
+this Linux host: the two Linux debs re-fetched and hash-matched against [`harness-artifacts/99`](../harness-artifacts/99-sources.md)
+§B (Claude Desktop 2.42304.2 `38a7d58b…`, ChatGPT 26.1013.40934 `3ca59e7f…`), plus the Antigravity 2.17.0 Linux tarball
+(`6a9b0ff6…`, web UI carved from `language_server`). REA `analyze-javascript-application` evidence per bundle is in
+`harness-artifacts/99` §C; the readings themselves were window searches over the minified chunks (byte offsets are the
+citation unit) — `grep` here is ugrep and silently fails on these lines, so a Python window script was used throughout.
+What code can settle it settles; weight, density and animation *feel* stay ⚠️. Nothing was executed.
+
+| Doc | Settled from code (✅ / ❌) | Still ⚠️ |
+|---|---|---|
+| [02](02-claude-desktop.md) §4 · §6 · §8 | **Placement** is flag-switched, not viewport: dock between the queued/parked bands and the composer by default; `claudeai_cc_epitaxy_session_presets_main` portals the same one-head-card cluster into a transcript-tail slot (`presentation: card`), with `Also waiting` collapsed rows only there. **Queue/steer**: submits go to the engine at once with `priority: now \| next \| later`; `next` auto-escalates to `now` within 5 s of turn start; no client-side "after the current action" hold. ❌ **Default mode** fallback is `acceptEdits`, not Manual; Auto is default-first only under `ccd_auto_default_mode` / `ccr_auto_default_mode` or an internal cohort, and its availability is a host check. **WorkingMark** = clay `#d97757` (`--cds-clay`; the sampled `#cc7c5e` was a rendered value) with a WebP sprite-sheet animation; brand `Spark` is a separate SVG. `Summary` is a generic string; `Review code` is docs drift. **Attention**: no dedicated token — `needs_attention` shares `failed`'s orange in scheduled tasks; the sidebar shows a count | plan/tasks pane appearance, card weight |
+| [03](03-openai-codex-chatgpt.md) §3.1 · §3.7 · §3.8 · §8 | **Decision mapping** read from the mappers: `Allow once → accept`, `Allow this conversation → acceptForSession`, prefix/`Allow similar commands → acceptWithExecpolicyAmendment`, `Always allow → applyNetworkPolicyAmendment` (network only), `Allow all edits → acceptForSession`, `Deny → decline`; hotkeys Enter/Esc, no digits; one request per thread; MCP card separate. ❌ `Allow for this chat` is in the superapp's browser-use website-access card, not native-only; `Always allow host` / `Always approve` / `Tell Codex what to do` have 0 hits. ❌ The `Awaiting approval` / `Needs input` chip is **green** (`text-chart-green`); orange (`--color-text-warning`) is Full access / Elevated Risk. **Squircles** are `@supports (corner-shape:superellipse(1.5))`-gated, browser host forced round. **Queue/steer**: `followUpQueueMode` → `thread/queue/add` vs `turn/steer`; `turn/interrupt` is Stop only; `composer.steer`/`composer.queue` have no default keybinding. `Work in` = run-location picker; context meter behind `showContextWindowUsage` | card weight, density, icon usage; the invert-shortcut key (runtime-computed) |
+| [05](05-antigravity-windsurf.md) §1.2 · §4.8 · §7 · §9 | `Documents` / `Artifacts` are aux-pane sections, not sidebar entries (09-27 ⚠️ → ✅). Sounds: action-required on `WAITING` steps, done on top-level idle, **default off**; piano notes absent from 2.17.0. `Planning` / `Fast` never render as a selector; `/plan` is server-supplied. Approval inline (`Accept`/`Reject`, `Allow in Conversation`/`Allow Once`/`Deny`, `Always Allow` for browser hosts), Alt+Enter / Alt+Shift+Backspace; presets `Request Review · Default · Vetted · Auto · Turbo`, terminal default `PROCEED_IN_SANDBOX`, Plan Review Policy default `Always Ask`. Queue by default (`WHEN_IDLE`), `Send Immediately` interrupts. Attention dot = theme primary (blue), shared with unread — no amber. `Open IDE` → `antigravity-ide://` via allow-listed `shell:open-external`. REA could not graph the 9.5 MB `main.js` (two heap exhaustions) — bytes read directly | mode tints, megaplan/Kanban geometry, review-pane look; NUX card text (server-side) |
+| [08](08-primitives-rendered.md) | Mode-default row for Claude corrected (Accept edits); Claude queue row rewritten as `next / now / later`; ChatGPT queue row wired; a ChatGPT sidebar-chip row (green) added beside the LED legend (amber) | — |
+
 

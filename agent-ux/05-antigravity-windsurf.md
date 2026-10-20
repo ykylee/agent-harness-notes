@@ -54,7 +54,7 @@ Component stacks ✅:
 > **GUI pass 2026-09-27 (macOS, same build, `orca computer` screenshots; passive — no agent was run), Antigravity 2.17.0.** ✅ The standalone app opens on an agent home: sidebar `New Conversation`,
 > `Conversation History`, `Scheduled Tasks`, then `Projects` with conversations nested under each; a centred composer
 > (`Ask anything, @ to mention, / for actions`, model + effort, execution target `Local`). `Documents` and `Artifacts`
-> were **not** sidebar entries on that screen ⚠️ (they may live in the side pane). An **`Open IDE`** button hands off to the
+> were **not** sidebar entries on that screen ~~⚠️ (they may live in the side pane)~~ → ✅ from code 2026-10-20: they are collapsible **sections of the per-conversation aux (side) pane** — `rV{title:"Documents"}` (`main.js @5221160`, office/PDF/Docs artifacts; tooltip "Everything else the agent creates is under Artifacts") and `rV{title:"Artifacts"}` (`@4289087`), registered in the overview-pane section registry (`subagents`, `backgroundTasks`, `artifacts`, `modifiedFiles`, `uploads`; `@6395223`); the sidebar component (`@6449300`) lists only `New Conversation`, `Conversation History` (`/history`, Mod+Y), flag-gated `Scheduled Tasks` (Mod+U) and plugins/customizations, then projects. No `/documents` or `/artifacts` route. An **`Open IDE`** button hands off to the
 > separately installed Antigravity IDE — "there is no IDE" means the IDE left *this* window, not the product. An
 > onboarding card read `Planning mode has moved to /plan`, confirming the 2.17 change in §4. Unread conversations carry a
 > **blue** dot.
@@ -258,7 +258,7 @@ docs) 📣. It matches the scope ladder in [SYNTHESIS §2.1](../SYNTHESIS.md) an
 - **Antigravity** ✅: sound files `antigravityActionRequired.mp3` and `antigravityCascadeDone.mp3`; setting
   `Play a sound when the agent finishes generating a response.`; the 4s `unread-ping` animation. In 1.x,
   `out/vs/workbench/contrib/antigravitySounds/media/` ships **89 piano notes (A0–C8)** with the command
-  `antigravity.playNote` and a setting `enableTabSounds`. What triggers the notes is ⚠️. Remote Control adds browser
+  `antigravity.playNote` and a setting `enableTabSounds`. What triggers the notes is ~~⚠️~~ settled from code 2026-10-20 ([99 § Source-level GUI pass](99-sources.md#source-level-gui-pass-2026-10-20)): `antigravityActionRequired.mp3` plays when a step enters `WAITING` on `runCommand` / `executeBrowserJavascript` / `openBrowserUrl` / `askQuestion` or any other requested interaction (`main.js @2067300`, `ICa`, OS-notification titles `Requesting your permission in Terminal:` …), `antigravityCascadeDone.mp3` when a **top-level** cascade leaves `notFullyIdle` (`GCa`); the setting `Enable Sounds for Agent` (`enableSoundsForSpecialEvents`) defaults **false** (`@9400440`), notifications default true. The **89 piano notes do not exist in 2.17.0**: `playNote` has 0 hits in the web UI, the shell and the 150 MB `language_server`; `enableTabSounds` survives only as a settings key and a proto field with no UI. Absence is "not in these files". Remote Control adds browser
   push 📣.
 - **Windsurf** ✅: an **amber dot** on the session icon when the session is waiting on the user, with a ring that
   animates "to draw the eye without moving the underlying logo" (`.ws-session-activity-badge`). The icon pulses at
@@ -317,7 +317,7 @@ credits.`).
   Agent conversation, you can choose between two primary execution modes … **Planning Mode** … **Fast Mode**". The
   2.17.0 settings handler in `main.js` reads `case Oi.PLANNING_MODE:throw Error("Planning mode is no longer supported")`,
   and changelog 2.17.0 replaces the mode with `/plan` and the Plan Review Policy. The strings `Planning` and `Fast`
-  still ship, so where (or whether) they render is ⚠️. Graded moderate.
+  still ship, ~~so where (or whether) they render is ⚠️~~ → from code 2026-10-20: they do **not** render as a mode selector. `PlanningMode` is read as `ON` and never consumed by a React element; the only rendered `Planning` is a settings heading above the Review Policy dropdown (`main.js @5904796`), the only `Fast` is Tab-autocomplete speed. `/plan` is a **server-supplied** SYSTEM slash command (`SlashCommandInfo` from the language server; the client hard-codes only `/browser`), and the `Planning mode has moved to /plan` onboarding card text is not in the bundle (NUXes come from the server, ⚠️). The Plan Review Policy that replaced it: `Always Ask` / `Always Proceed` (+ `Inherit Global` per project), backing `ARTIFACT_REVIEW_MODE` default `ALWAYS`. Graded moderate → settled.
 - 📣 **Windsurf docs disagree with themselves.** `cascade.md`: "Cascade comes in two primary modes: **Code** and
   **Chat**". `modes.md`: "Code / Plan / Ask".
 - ⚠️ **Cascade sunset date.** The 2026-06-02 post says legacy Cascade remains usable "through July 1st", but the
@@ -348,8 +348,8 @@ credits.`).
 - Is Antigravity 2.0's "Jetski Web" a rewrite of the 1.x Agent Manager or the same code with a new theming adapter?
   Lexical, the `cascadeId` model and the NUX enum carried over; Tailwind v3 → v4 and Headless UI → Base UI changed.
 - When Devin Local fully replaces Cascade, does the Cortex protocol leave Windsurf (now Devin Desktop) entirely?
-- What do Antigravity's 89 piano notes and `enableTabSounds` actually play on? ⚠️
+- ~~What do Antigravity's 89 piano notes and `enableTabSounds` actually play on? ⚠️~~ — not in 2.17.0 (§4.8, 2026-10-20).
 - Are `vs/sessions` and bundled `@github/copilot-sdk` / `@anthropic-ai/sandbox-runtime` upstream VS Code 1.126 or
   Cognition additions? ⚠️
 - Everything visual (the rendered mode tints, the megaplan snake, the Kanban geometry, the artifact review pane) is
-  unseen ⚠️.
+  unseen ⚠️. **Settled from code 2026-10-20** instead: approval is inline in the step card (`Accept` / `Reject` for terminal and browser-URL/JS prompts, `Allow in Conversation` + `Allow Once` / `Deny` for file access — scopes enum `ONCE · CONVERSATION · WORKSPACE · GLOBAL · PROJECT` but only the first two offered — `Always Allow` / `Allow Once` / `Deny` for browser hosts), plus a floating `N need input` pill and subagent `Blocked, needs input` rows; no modal; hotkeys **Alt+Enter** accept / **Alt+Shift+Backspace** reject. Permission presets `Request Review · Default · Vetted · Auto · Turbo` (unspecified → `default` = sandbox + `Proceed in Sandbox`); terminal policy `Request Review · Proceed in Sandbox · Auto · Always Proceed`, default **`PROCEED_IN_SANDBOX`** (`@9443355`); allow-list auto-executes, the deny-list setter now throws. **Queue vs steer:** submit-while-running **queues by default** (`QUEUED_MESSAGE_DELIVERY_STRATEGY` = `WHEN_IDLE`, "Queue until after the current turn."; `NEXT_INVOCATION` = "Interrupt the agent and send immediately."), Enter = primary strategy, Alt+Enter = the other; no steer vocabulary in the UI. **Attention:** unread dot and pending-approval dot are both `bg-primary` (`--primary: #007acc` in the default themes → blue; other themes recolour it), differing by icon, not hue (`status-unread-dot` `@4400264`, `attention-dot` `@2171005`); warm accents only on the `need input` pill (`border-l-orange-500`) and subagent rows (`bg-yellow-500/5`). `Open IDE` builds `antigravity-ide://file<path>` and routes it through the shell's allow-listed `shell:open-external` (`ipcHandlers.js`).

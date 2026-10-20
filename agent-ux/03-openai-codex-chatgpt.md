@@ -187,19 +187,29 @@ An inline **request card** in the thread (`pending-request-item-panel`), with th
 | permissions (`item/permissions/requestApproval`) | `Permission request: {reason}` | `Ask permission` |
 | MCP tool | 167 per-tool prompts, e.g. `Allow Google Calendar to decline an event?` | — |
 
-**Scope ladder** and the App Server decision each option most plausibly maps to (⚠️ mapping inferred; the decision names are from `docs/02`):
+**Scope ladder** and the App Server decision each option sends. ~~⚠️ mapping inferred~~ → **✅ read from code 2026-10-20**
+(Linux deb 26.1013.40934, `webview/assets/pending-request-item-panel-87037fba4f9a.js` decision mappers `Qr` (exec) / `$r` (patch)
+at `@84470`, sent through `replyWithCommandExecutionApprovalDecision` / `replyWithFileChangeApprovalDecision` `@77300-78500`;
+labels in `app-initial-a68277f60b93.js @14105157-14109900`; [99 § Source-level GUI pass](99-sources.md#source-level-gui-pass-2026-10-20)):
 
-| Button | Scope | ≈ `ReviewDecision` |
+| Button | Scope | `ReviewDecision` sent |
 |---|---|---|
-| `Allow once` | this call | `accept` |
-| `Allow this conversation` | the thread | `acceptForSession` |
-| `Allow commands that start with {command} for this conversation` / `Allow similar commands` | a command prefix | amendment-carrying variant |
-| `Always allow` | persistent | amendment-carrying variant |
+| `Allow once` (primary; default `approveLabel`) | this call | `accept` |
+| `Allow this conversation` (split-button item) | the thread | `acceptForSession` |
+| `Allow commands that start with {command} for this conversation` / `Allow similar commands` | a command prefix | `{acceptWithExecpolicyAmendment: {execpolicy_amendment}}` |
+| `Always allow` (leading outline button, rendered only when the request proposes a **network** amendment) | persistent network rule | `{applyNetworkPolicyAmendment: {network_policy_amendment}}` |
 | `Allow all edits` — `Allow this and future file edits in this conversation without asking again` | all file edits, this thread | `acceptForSession` |
 | `Deny` | — | `decline` |
 
+Hotkeys: `approval.approve` = **Enter**, `approval.decline` = **Escape** (command table `app-initial @5311479`; Enter is
+ignored while focus is in a dialog, menu, button or text field). **No digit keys** — digits belong to `switchToMode1…`.
+The panel renders **one** pending request per thread (`PendingRequestItemPanel` switches on `pendingRequest.type`:
+`userInput`, `optionPicker`, `setupCodexStep`, `approval`, `mcpServerElicitation`, `permissionRequest`, `implementPlan`),
+not a cross-thread list. MCP tool approvals use a separate card (`mcp-request-card-*.js`: `session` / `always` persist,
+`Elevated Risk` header in `text-warning`).
+
 - A `Reason` row appears, and long commands get `Expand` / `Collapse`. The command palette has `Approve request` / `Decline request`.
-- **Native (B) differs.** Its strings `Allow for this chat`, `Always allow host` and `Always approve` add a **host** scope. Declining takes free text: `Tell Codex what to do`. ✅ string table, ⚠️ platform.
+- **Native (B) differs.** Its strings `Always allow host` and `Always approve` add a **host** scope, and declining takes free text: `Tell Codex what to do`. ✅ string table, ⚠️ platform. ~~`Allow for this chat` is native-only~~ ❌ corrected 2026-10-20: that string **is** in the superapp — in the ChatGPT **browser-use website-access** card (`chatgpt.browser_use.website_access_approval.button.allow_for_this_chat`, `chatgpt-conversation-turn-content-*.js @139547`, siblings `Allow low-risk tools`, `allow_once` / `allow_low_risk`), not in the Codex card. The other two strings have **0 hits** in the Linux bundle.
 
 > 📌 The superapp shows no `cancel` (abort the turn) on the card; Stop lives on the composer. The native Remote client pairs
 > *decline* with *feedback*, which is the channel-renderable direction of
@@ -281,12 +291,18 @@ The native voice client says `Running a command`, `Changing files`, `Using an ap
 
 > 📌 A single status vocabulary, with *amber = needs a human*, drives the sidebar, the hardware LEDs and the Pets. Attention is
 > designed to live **outside the window**.
+>
+> ❌ **Narrowed from code 2026-10-20.** The *words* are shared; the *colour* is not. The sidebar chip for `Awaiting approval` /
+> `Needs input` (`codex.localTaskRow.awaitingApproval`, `app-initial @10169244`) renders through `dTc` with
+> `bg-chart-green/20 text-chart-green` (`@9946819`) — **green**, with blue for the generic tone and `bg-chart-blue` for unread.
+> The orange family (`--color-text-warning` = `--orange-700` light / `--orange-500` dark, `app-shared css @161301`) is used for
+> `Full access`, MCP `Elevated Risk` and hand-off "needs attention" text. Amber = needs-you holds for the **LED legend** only.
 
 ### 3.8 Steering and queueing
 
 - The submit button morphs between `Send · Queue · Steer · Stop · Resume`.
 - Queued follow-ups form a list with `Steer — Submit without interrupting the model`, `Edit message`, `Open in side chat`, and `Queue paused because you interrupted`.
-- Setting: `Follow-up behavior: Queue | Steer`. These map to `turn/steer` and `turn/interrupt` ✅.
+- Setting: `Follow-up behavior: Queue | Steer`. ~~These map to `turn/steer` and `turn/interrupt`~~ → read from code 2026-10-20: `followUpQueueMode` reads as `queue` or `send-now` (`app-initial @3166317`); the router (`@2786973`) picks `queue` → `thread/queue/add` (edits via `thread/queue/update`), `send-now` with a running turn → **`turn/steer`**, no running turn → `turn/start`. `turn/interrupt` is the **Stop** path only (`sendInterruptRequest`, `@2874793`). `Steer — Submit without interrupting the model` is the tooltip of the send-now action on an already-queued message. Commands `composer.steer` / `composer.queue` ship with **no default keybinding**; the invert shortcut label is computed at runtime (⚠️ key not readable from code). The server-side item type is `steeringUserMessage`.
 
 ### 3.9 Errors
 
@@ -344,8 +360,9 @@ and `{actor}`-parameterised prompts. **The same primitive gets a different perso
 
 ## 8. Open questions
 
-- ⚠️ **Everything visual**: approval card weight, density in practice, icon usage, whether squircles are active in the shipped Chromium 154.
-- ⚠️ Mapping of `Always allow` and the prefix rule onto App Server amendment decisions. This needs a live run with protocol tracing.
+- ⚠️ **Everything visual**: approval card weight, density in practice, icon usage. ~~whether squircles are active~~ → settled from code 2026-10-20: squircles are **`@supports (corner-shape:superellipse(1.5))`-gated** (`app-shared-*.css @1299300` sets `--codex-corner-shape:superellipse(1.5)` and a 1.25 radius scale; the browser host forces `round`; buttons use `data-squircle`, the Electron composer `superellipse(1.1)`); no mask/clip-path fallback. Active iff the shipped Chromium honours `corner-shape` — a runtime fact the CSS itself gates on.
+- ~~⚠️ Mapping of `Always allow` and the prefix rule onto App Server amendment decisions~~ → settled from code (§3.1): prefix → `acceptWithExecpolicyAmendment`, `Always allow` → `applyNetworkPolicyAmendment`.
+- ✅ 2026-10-20 also from code: `Work in` is the **run-location** picker (`Work locally` / `New local worktree` / `New remote worktree` / `Remote · {host}` / cloud), not a sandbox cwd; a context meter (`Context window: {usage}% used ({remaining}% left)`, `{usedTokens}k / {contextWindow}k tokens used`) sits behind `showContextWindowUsage`; the permission dropdown's internal values `auto` / `granular` / `read-only` all display as `Ask for approval`, `Managed` is a disabled trigger (`Managed by enterprise policy`), and a hidden `server-default` kind exists.
 - ⚠️ What the durable (Aeon) engine is, and its behaviour — not provisioned for the account used, so unobserved (§1.2.1).
 - ⚠️ How much of the component layer is Radix and how much is in-house.
 - ⚠️ Native (B) colour tokens need `assetutil`/`acextract` on macOS. Which `codex_remote_*` strings render on macOS versus only on iOS.

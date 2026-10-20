@@ -19,6 +19,9 @@
 | Artifact | Version | Bytes | SHA-256 | Origin |
 |---|---|---|---|---|
 | Claude Code CLI ELF | 2.1.303 | 285,809,912 | `375988f457756524…` | `~/.local/share/claude/versions/2.1.303` |
+| `claude-desktop_2.42304.2_amd64.deb` (re-fetch 2026-10-20) | 2.42304.2 | 183,213,384 | `38a7d58b58a976c8…` (= row above) | same apt pool; extracted to `~/.cache/agent-ux-gui-src/claude-desktop`, `ion-dist` root sha256 `b8d67132…` (3,620 files) |
+| `chatgpt_amd64.deb` (re-fetch 2026-10-20) | 26.1013.40934 | 502,087,434 | `3ca59e7f9a6641b9…` (= row above) | same URL; `app.asar` 578,643,106 B extracted (`webview/assets` 16,354 files, root sha256 `37bd40fc…`) |
+| `Antigravity.tar.gz` (Linux x64, standalone agent app) | 2.17.0 | 179,494,137 | `6a9b0ff60f7bd0d1…` | `storage.googleapis.com/antigravity-public/antigravity-hub/2.17.0-5217732355031040/linux-x64/`; `resources/app.asar` 4,621,906 B; web UI zip embedded in `resources/bin/language_server` (180,375,760 B, sha256 `016673a9…`) at offset 150,747,311 (3,768,098 B, 304 entries, `main.js` 9,528,635 B) |
 | opencode ELF | 1.17.12 | 167,577,728 | `f52fea2ee6a6a856…` | npm `opencode-linux-x64` |
 | Codex `codex` | 0.159.3 | 287,086,056 | `8bf204b36a2f6dd0…` | npm `@openai/codex-linux-x64` |
 | Codex `codex-code-mode-host` | 0.159.3 | 74,072,976 | `fe64bd08c7844ca1…` | same |
@@ -59,6 +62,10 @@
 | `analyze-javascript-application` opencode split dir | `ev_9ad22e97…` | ✅ complete, 2 chunks static-only |
 | `analyze-javascript-application` claude split dir | none | ⚠️ `resource_constraint` at 526/2,439 |
 | `analyze-javascript-application` claude split dir, `--source-path` ×150 largest chunks | `ev_c2ff746e…` | ✅ complete for the selection; 2,289 files out of scope, several chunks static-only |
+| `analyze-javascript-application` Claude Desktop `ion-dist` (directory), `--source-path` ×15 GUI chunks (2026-10-20, `agent-ux/99` source-level GUI pass) | `ev_9169cddc…` | ✅ complete for the selection: 9,137 nodes / 15,903 edges, 3,605 files out of scope (28 limitations) |
+| `analyze-javascript-application` ChatGPT `app.asar` extracted, `--source-path` ×7 `webview/assets` chunks (2026-10-20) | `ev_783d2550…` | ✅ complete for the selection: 33,865 nodes / 40,151 edges, 16,347 files out of scope (13 limitations) |
+| `analyze-javascript-application` Antigravity 2.17.0 `app.asar` extracted (whole, 2026-10-20) | `ev_2eee329b…` | ✅ complete: 688 JS parsed, 3,168 nodes / 4,455 edges (1,100 limitations, Electron relationships inert-syntax only) |
+| `analyze-javascript-application` Antigravity 2.17.0 web UI zip, `--source-path main.js` | `ev_0c260c4d…` (1 GiB heap) and `ev_00b01802…` (`--max-heap-mb 6144`, `--max-semantic-nodes-per-file 60000`, 900 s) — **both** `resource_constraint`: the worker heap exhausted on the single 9,528,635-byte bundle, **0 JS parsed** each time. The zero is a non-delivery, not a result; inventory identity (root sha256 `52e60614…`, 9 files) is the only sealed fact. The reading in `agent-ux/05` was done by window search over the bytes | ⚠️ REA graph absent |
 | `analyze-javascript-application` gemini bundle | `ev_b5494fd5…` (partial, first run) | ⚠️ timeout 300 s at 14/102; 1,800 s re-run stopped by hand at 16/102 |
 | `analyze-javascript-application` gemini bundle, `--source-path` ×69 (without the three 14.7 MB chunks) | `ev_fb798187…` | ✅ complete for the selection; 33 files out of scope, 2 chunks static-only |
 | `analyze-javascript-application` Claude Desktop `app.asar` (extracted) | `ev_49ecce1c…` | ✅ complete, 8 sources static-only |
