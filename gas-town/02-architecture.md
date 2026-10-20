@@ -183,6 +183,13 @@ The scheduler's `flock` and this bead-based slot are a useful contrast: **use a 
 "do not do this twice on this machine", and a ledger item for "this resource is owned, and the
 ownership is part of the system's story."**
 
+> **Runtime note (2026-10-20, [05](05-runtime-observation.md) §3).** At `649b832b` the slot code is
+> **unreachable**: `MergeSlotAcquire/Release` are called only from `internal/refinery/engineer.go`,
+> and the engineer's merge path (`ProcessMRInfo`, `doMerge`) has no non-test caller. In the lab no
+> `gt:merge-slot` bead was ever created; `gt refinery claim` only sets the MR's assignee, and the
+> merge itself is the Refinery agent's git work. The contrast drawn above is between a design and a
+> `flock` that both exist in the tree — but only the `flock` runs.
+
 ## Read next
 
 - [`03-roles-and-lifecycle.md`](03-roles-and-lifecycle.md) — the supervision tree, the mail

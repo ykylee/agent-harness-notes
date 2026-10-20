@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-20 (3차) — `harness-artifacts/04` §10 미검증 해소 (TASK-2026-10-20-main-006).** ChatGPT deb 의 Electron 업데이터: mac 은 `sparkle.node` 애드온(production appcast 쿼리 `installation_id/arch/app_version/beta/os-version/plan_type`, 15분), Windows 는 `windows-updater.node` + MSIX sha256·identity 대조, Linux 는 `linux-package-metadata.json` 15분 폴링만; **ChatGPT Linux apt 저장소** `persistent.oaistatic.com/codex-app-prod/linux/deb`(postinst 내장 키 \"Codex Linux Repository\" `3BFA…60E4`, InRelease **Good signature** 로컬 검증, 풀 1버전, `latest` deb = 풀 deb sha256 동일); Claude Desktop postinst(마커·unattended-upgrades `Origins-Pattern site=downloads.claude.ai`·`kms-gpg-signer` 단서); **Codex `.sigstore` 로컬 검증**(cosign 레거시 번들: ECDSA·Fulcio 체인·Rekor SET 유효, 서명자 `rust-release.yml@refs/tags/rust-v0.163.0`, 소비자 없음은 그대로); opencode 자산 37/37(CLI 12 해시 0), 데스크톱은 **electron-builder**(`allowDowngrade: true`, Windows `verifyUpdateCodeSignature: false`, 10분), Tauri 형식 `latest.json` 은 CI 가 minisign 서명; Superset 4h·mac/Linux·GitHub 피드, Paseo `rolloutHours` 클라이언트 단계 배포·`allowDowngrade: false`; Claude Code 확인 **30분**(`rr=1800000`); `rc`·`next`·`slow` 404, UA 무관. 남은 ⚠️: Sparkle 키 동일성(mac zip), Desktop 패키지 서명, Antigravity·Conductor 산출물. 업데이트 트리거·실행 0건",
-    "current_axis": "**2026-10-20 (3차) — `harness-artifacts/04` §10 미검증 해소 (TASK-2026-10-20-main-006).** ChatGPT deb 의 Electron 업데이터: mac 은 `sparkle.node` 애드온(production appcast 쿼리 `installation_id/arch/app_version/beta/os-version/plan_type`, 15분), Windows 는 `windows-updater.node` + MSIX sha256·identity 대조, Linux 는 `linux-package-metadata.json` 15분 폴링만; **ChatGPT Linux apt 저장소** `persistent.oaistatic.com/codex-app-prod/linux/deb`(postinst 내장 키 \"Codex Linux Repository\" `3BFA…60E4`, InRelease **Good signature** 로컬 검증, 풀 1버전, `latest` deb = 풀 deb sha256 동일); Claude Desktop postinst(마커·unattended-upgrades `Origins-Pattern site=downloads.claude.ai`·`kms-gpg-signer` 단서); **Codex `.sigstore` 로컬 검증**(cosign 레거시 번들: ECDSA·Fulcio 체인·Rekor SET 유효, 서명자 `rust-release.yml@refs/tags/rust-v0.163.0`, 소비자 없음은 그대로); opencode 자산 37/37(CLI 12 해시 0), 데스크톱은 **electron-builder**(`allowDowngrade: true`, Windows `verifyUpdateCodeSignature: false`, 10분), Tauri 형식 `latest.json` 은 CI 가 minisign 서명; Superset 4h·mac/Linux·GitHub 피드, Paseo `rolloutHours` 클라이언트 단계 배포·`allowDowngrade: false`; Claude Code 확인 **30분**(`rr=1800000`); `rc`·`next`·`slow` 404, UA 무관. 남은 ⚠️: Sparkle 키 동일성(mac zip), Desktop 패키지 서명, Antigravity·Conductor 산출물. 업데이트 트리거·실행 0건",
+    "current_baseline": "**2026-10-20 (4차) — Gas Town 런타임 검증 `gas-town/05` (TASK-2026-10-20-main-007).** `gt` 1.2.1(`649b832b`) 소스 빌드(ICU 헤더 로컬 추출) + **vendored `bd` 1.0.5**(최신 1.3.0 은 스키마 v49→v72 skew 로 거부) + Dolt 2.4.0, 로컬 bare repo 리그, Tier-1 preset 셸 에이전트(모델 0). 관찰: sling→`gt done`(**오버레이 파일 자가 차단** 재현: add -A 후 unstage → nothing to commit → 'would be lost')→MR 비드→`refinery claim`→수동 ff 머지→`post-merge`(거짓 'open PR exists', fail-closed)→`convoy check`→mayor 메일; 스톨 폴캣: `health-check` 2회 미응답(빠른 응답은 baseline 전), `force-kill` 뒤 **4 스토어 불일치**(tmux stalled / 비드 spawning / 하트비트 working / 라벨 없음), `stale-hooks` 는 town DB 만 봐서 0건, 롤백→stranded→`feed-stranded`(Dog 포뮬러, title 오류)→`redispatch` 성공. **머지 슬롯 비드 코드는 호출처 없음**(dead). 실험 환경 `~/.cache/gt-lab`(정지, 미삭제)",
+    "current_axis": "**2026-10-20 (4차) — Gas Town 런타임 검증 `gas-town/05` (TASK-2026-10-20-main-007).** `gt` 1.2.1(`649b832b`) 소스 빌드(ICU 헤더 로컬 추출) + **vendored `bd` 1.0.5**(최신 1.3.0 은 스키마 v49→v72 skew 로 거부) + Dolt 2.4.0, 로컬 bare repo 리그, Tier-1 preset 셸 에이전트(모델 0). 관찰: sling→`gt done`(**오버레이 파일 자가 차단** 재현: add -A 후 unstage → nothing to commit → 'would be lost')→MR 비드→`refinery claim`→수동 ff 머지→`post-merge`(거짓 'open PR exists', fail-closed)→`convoy check`→mayor 메일; 스톨 폴캣: `health-check` 2회 미응답(빠른 응답은 baseline 전), `force-kill` 뒤 **4 스토어 불일치**(tmux stalled / 비드 spawning / 하트비트 working / 라벨 없음), `stale-hooks` 는 town DB 만 봐서 0건, 롤백→stranded→`feed-stranded`(Dog 포뮬러, title 오류)→`redispatch` 성공. **머지 슬롯 비드 코드는 호출처 없음**(dead). 실험 환경 `~/.cache/gt-lab`(정지, 미삭제)",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-007 — Gas Town 런타임 검증 — 소규모 town 에서 sling→done→mq→post-merge→convoy 와 stalled→force-kill→stranded→redispatch 를 스크립트 에이전트로 관찰 (gas-town/05)",
       "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
       "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
       "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
@@ -44,15 +45,14 @@
       "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)",
-      "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
-      "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리"
+      "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 7,
+    "task_count": 8,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -62,7 +62,8 @@
       "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
       "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
       "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
-      "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성"
+      "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
+      "TASK-2026-10-20-main-007 — Gas Town 런타임 검증 — 소규모 town 에서 sling→done→mq→post-merge→convoy 와 stalled→force-kill→stranded→redispatch 를 스크립트 에이전트로 관찰 (gas-town/05)"
     ]
   },
   "next_documents": [

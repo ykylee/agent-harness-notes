@@ -17,9 +17,11 @@
 
 ## ⚠️ Read status
 
-**Nothing in this study was executed.** No `gt`/`bd` binary was run, no town was created, no Dolt
-server started. Every mechanism is **source-read** (`internal/`) or **read from first-party design
-docs** — never observed at runtime. Capability and cost claims from the project or its community are
+**Until 2026-10-20 nothing in this study was executed.** Files 01–04 are **source-read** (`internal/`) or
+**read from first-party design docs**. On 2026-10-20 a throwaway town was built from the same
+revision and driven through two sling → done → merge → convoy cycles with a **scripted agent and no
+model** ([05](05-runtime-observation.md)): the orchestration *mechanics* are now observed; the
+agents' behaviour (Witness, Refinery, Dogs, Mayor) still is not. Capability and cost claims from the project or its community are
 marked 📣 and are not adopted as findings. See [`99-sources.md`](99-sources.md).
 
 ## Files
@@ -30,6 +32,7 @@ marked 📣 and are not adopted as findings. See [`99-sources.md`](99-sources.md
 | 02 | [Architecture](02-architecture.md) | The Beads/Dolt substrate and its two-level split; directory composition; the four-layer config with its `Blocked` value; how a worker is actually spawned (`WorktreeAddFromRef` vs `…ExistingForce`); **control/execution plane split**; the capacity-controlled scheduler; supervision thresholds; **the merge slot as a ledger item** |
 | 03 | [Roles & lifecycle](03-roles-and-lifecycle.md) | The supervision tree and the watchdog-of-the-watchdog; the polecat state machine (Working/Idle/Done/**Stalled**/**Zombie**) and retired completion; the three heartbeat stores and the two-channel rule; the mail protocol that binds roles into a workflow; convoy/swarm/mountain and the **hysteresis** argument |
 | 04 | [Orchestration techniques](04-orchestration-techniques.md) | **The point of the study.** Eleven reusable techniques (A1–A11) with caveats; where they meet this repository's Codex/Strands/ACP findings (Part B); what Gas Town does that this repository's evidence does **not** support (Part C); a one-screen card |
+| 05 | [Runtime observation](05-runtime-observation.md) | One town, two polecats, no model (2026-10-20): the happy path as it ran; `gt done` blocked by its own overlay files; the merge slot is dead code; four stores disagree about one killed worker; `stale-hooks` scans the wrong database; stranded → feed (agent formula, failed) → `redispatch` (mechanical, worked) |
 | 99 | [Sources](99-sources.md) | Verification status per claim, what is recorded-but-not-adopted, and what was not verified |
 
 ## If you only have two minutes

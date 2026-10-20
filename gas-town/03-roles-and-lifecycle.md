@@ -78,6 +78,14 @@ itself fail will, given enough fleet size, lie — and the recovery it triggers 
 can be more damaging than the fault it was watching for. The design answer is not a better
 heartbeat; it is **two independent channels and a documented tolerance for disagreement.**
 
+> **Runtime note (2026-10-20, [05](05-runtime-observation.md) §4).** Observed on one deliberately
+> stalled worker after `gt deacon force-kill`: tmux said *stalled*, the agent bead still said
+> `spawning` (the kill's bead update is best-effort and its error is discarded), the session heartbeat
+> file said `working`, and the `heartbeat:<epoch>` label had never been written (only `await-signal`
+> writes it). The rule above is the observed condition of a single worker, not a precaution. The
+> deacon's `health-check` detected neither a prompt printed within milliseconds nor an operator
+> `send-keys` as a response; only a bead write counts reliably.
+
 ## 4. The mail protocol — roles bound into a workflow
 
 `docs/design/mail-protocol.md`. Inter-agent messages are `type=message` beads routed by `gt mail`.

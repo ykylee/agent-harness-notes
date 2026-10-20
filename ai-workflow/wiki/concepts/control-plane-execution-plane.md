@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/05-agents-api.md + docs/09-agents-api-environments.md + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + browser-agents/06-architecture-axes.md + gas-town/02-architecture.md + gas-town/04-orchestration-techniques.md + gas-city/02-architecture.md + gas-city/04-orchestration-techniques.md
 related_pages: [concepts/execution-environment-topology, concepts/harness, concepts/os-sandbox-policy, concepts/provider-as-data, concepts/multi-agent-orchestration]
 created: 2026-09-22
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Control Plane / Execution Plane — separating the harness from compute
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-10-19 (night: prefix isolation = database naming, `beads-topology.md` claim refuted; REPORT §Shipped artifacts mirrors §5.6; standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
+- Updated: 2026-10-20 (§5.6 observed note from `gas-town/05`: `BD_ACTOR` export is the whole forgery). Previous: 2026-10-19 (night: prefix isolation = database naming, `beads-topology.md` claim refuted; REPORT §Shipped artifacts mirrors §5.6; standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -133,6 +133,12 @@ night: Gas City's own read store picks one database **per scope** from `metadata
 (`internal/beads/doltlite_read_store.go:125-142`) — it is database separation, and the "query-layer
 filter" sentence in Gas City's `beads-topology.md` is a first-party doc claim contradicted by
 first-party source on both sides (`gas-city/99` §C).
+
+
+> **Observed 2026-10-20** ([`gas-town/05`](../../../gas-town/05-runtime-observation.md) §8): in a
+> throwaway town the operator shell wrote ledger state as `lab/refinery` and `lab/witness` by
+> exporting `BD_ACTOR`; `gt refinery claim`, `gt mq post-merge` and a hand-made fast-forward merge
+> all went through as those identities. The forgeable-ledger property is a one-line shell fact.
 
 ## §6 Read next  {#s6-next}
 

@@ -1,10 +1,10 @@
 ---
 type: concept
 status: active
-last_ingested_from: gas-town/01-vocabulary.md + gas-town/02-architecture.md + gas-town/03-roles-and-lifecycle.md + gas-town/04-orchestration-techniques.md + gas-town/99-sources.md + gas-city/01-vocabulary.md + gas-city/02-architecture.md + gas-city/03-roles-and-lifecycle.md + gas-city/04-orchestration-techniques.md + gas-city/99-sources.md
+last_ingested_from: gas-town/01-vocabulary.md + gas-town/02-architecture.md + gas-town/03-roles-and-lifecycle.md + gas-town/04-orchestration-techniques.md + gas-town/05-runtime-observation.md + gas-town/99-sources.md + gas-city/01-vocabulary.md + gas-city/02-architecture.md + gas-city/03-roles-and-lifecycle.md + gas-city/04-orchestration-techniques.md + gas-city/99-sources.md
 related_pages: [concepts/control-plane-execution-plane, concepts/approval-gate, concepts/harness, concepts/agent-client-protocol, concepts/stateless-conversation-wire, concepts/primary-source-verification]
 created: 2026-09-30
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Multi-Agent Orchestration — driving many harness instances at once
@@ -16,7 +16,7 @@ updated: 2026-10-19
 - Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
   `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
   **Not run** — no binary executed, so every mechanism here is source-read, never observed
-- Updated: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
+- Updated: 2026-10-20 (§8 the mechanics were executed once — `gas-town/05` runtime observation: merge slot unreachable, `gt done` self-block, `stale-hooks` scope, four disagreeing stores). Previous: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -137,8 +137,15 @@ Recorded because a graded concept page has to carry its own negative findings.
 - **Its scale and cost figures are self-reported.** "20–30 agents", "$100/hour" and "Kubernetes for
   agents" are the project's and its community's claims, not measurements. No number from this page
   should be cited as a benchmark.
-- **Nothing here was executed.** Mechanisms are source-read. Design-vs-implementation drift is
-  always possible, and this repository's own record says so repeatedly.
+- **The agents were never executed; the mechanics were, once.** Files 01–04 are source-read. On
+  2026-10-20 [`gas-town/05`](../../../gas-town/05-runtime-observation.md) drove a throwaway town with a
+  scripted, model-free agent through two sling → done → merge → convoy cycles and a stall →
+  force-kill → stranded → re-dispatch loop. Three design-vs-implementation drifts surfaced: the
+  merge-slot bead (§4 above) is **unreachable from any command** at `649b832b`; `gt done` refuses
+  itself on the overlay files it scaffolds unless the rig ignores them; and the deacon's
+  `stale-hooks` reads the town database while hooked task beads live in the rig's. Four state
+  stores disagreed about one killed worker — §6's rule, observed. Model-driven roles (Witness,
+  Refinery, Dogs, Mayor) remain unobserved.
 
 ## §9 Read next  {#s9-next}
 

@@ -181,6 +181,9 @@ the default, "no isolation"), `DockerSandbox`, `SshSandbox` — and every harnes
 orchestration study sharpened this axis: a worker that can write its own result ledger can forge
 its own work, so the line is *(credential-bearing control | untrusted execution)*, recorded in the
 wiki at [`control-plane-execution-plane` §5.6](ai-workflow/wiki/concepts/control-plane-execution-plane.md).
+On 2026-10-20 that was done by hand: in a throwaway Gas Town the operator shell wrote the ledger as
+`lab/refinery` and `lab/witness` simply by exporting `BD_ACTOR`
+([`gas-town/05`](gas-town/05-runtime-observation.md) §8).
 The desktop drift pass found both vendors *relying* on that line: Claude Desktop is the device-side
 bridge for cloud Cowork sessions and carries `sandbox.credentials.{sigv4,awsPairs,allowPlaintextInject}`
 policy keys; ChatGPT desktop drives a local engine and a durable cloud host from one shell
