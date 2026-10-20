@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-20 새벽 — OTA 역공학 `harness-artifacts/04` (TASK-2026-10-19-main-012).** 레퍼런스 10여 종의 자기 갱신 경로를 번들·소스·공개 피드로 복원. **Claude Code**: GCS 호스트 `downloads.claude.ai/claude-code-releases`(`/latest`·`/stable` 평문, `rc` 404), `manifest.json`+사이드카 `manifest.json.raw-sig.json`(RSA-4096 PKCS1v1.5-SHA512, 접두사 `claude-code-manifest-v1\\0`, 키 내장 sha256 `89a24e2e…`, 2.1.207+) **로컬 검증 성공**; PGP `manifest.json.sig`/apt/GitHub `SHASUMS256.txt.sig` 는 \"Anthropic Claude Code Release Signing\" rsa4096(지문 `31DD…CACE`); 설치 상태기계(versions 디렉터리·심링크 rename·`.update.lock` 5분·버전락 7일·보존 2개·`.last-update-result.json`), 정책(`DISABLE_UPDATES`, `requiredMax/MinVersion`, 원격 `maxVersion`+강제 다운그레이드, 채널 latest/stable/rc=\"slow\"). **Desktop**: `/api/desktop/<os>/<arch>/squirrel/update?device_id&version&os_version[&maxVersion][&channelUuid]`, `claude.ai` 는 Cloudflare 챌린지·`releases.claude.com` 은 열림, 채널 UUID 3개 → **3버전**(2.42304.2/2.42585.0/2.31226.1), `maxVersion` 서버측 적용, 틱 1h·4틱, Linux 는 apt(55 버전 풀). **내장 CLI(CCD)**: 핀 2.1.299, 플래그 `762798616{target,check_interval_ticks,spread_hours}`, floor=max(고수위,핀), `sha256(installId\\ncandidate) mod spread` 분산, 같은 서명 키(모델 카탈로그도 같은 key_id). **OpenAI**: Sparkle appcast 필수 파라미터 3종, arm64/x64, 10항목×델타 4–5, Ed25519; Windows msix json·Store 표; **Codex**: 20h 캐시 `version.json`, 방식별 소스(brew cask/GitHub+npm dist-tags), 자기교체 없음, R2 `channels/latest`(318 자산, `sha256:` digest, 28 `.sigstore`), 설치기 digest 검증+GitHub 폴백. **opencode**: 패치 자동 업그레이드 기본, curl 경로는 `opencode.ai/install` 무검증 파이프, `OPENCODE_DISABLE_AUTOUPDATE`. **Gemini**: npm `latest-version`, 채널 하향 금지, 샌드박스 차단. Cursor zsync 델타 3.25.9, Devin sha256hash 3.10.67. 실행 0건",
-    "current_axis": "**2026-10-20 새벽 — OTA 역공학 `harness-artifacts/04` (TASK-2026-10-19-main-012).** 레퍼런스 10여 종의 자기 갱신 경로를 번들·소스·공개 피드로 복원. **Claude Code**: GCS 호스트 `downloads.claude.ai/claude-code-releases`(`/latest`·`/stable` 평문, `rc` 404), `manifest.json`+사이드카 `manifest.json.raw-sig.json`(RSA-4096 PKCS1v1.5-SHA512, 접두사 `claude-code-manifest-v1\\0`, 키 내장 sha256 `89a24e2e…`, 2.1.207+) **로컬 검증 성공**; PGP `manifest.json.sig`/apt/GitHub `SHASUMS256.txt.sig` 는 \"Anthropic Claude Code Release Signing\" rsa4096(지문 `31DD…CACE`); 설치 상태기계(versions 디렉터리·심링크 rename·`.update.lock` 5분·버전락 7일·보존 2개·`.last-update-result.json`), 정책(`DISABLE_UPDATES`, `requiredMax/MinVersion`, 원격 `maxVersion`+강제 다운그레이드, 채널 latest/stable/rc=\"slow\"). **Desktop**: `/api/desktop/<os>/<arch>/squirrel/update?device_id&version&os_version[&maxVersion][&channelUuid]`, `claude.ai` 는 Cloudflare 챌린지·`releases.claude.com` 은 열림, 채널 UUID 3개 → **3버전**(2.42304.2/2.42585.0/2.31226.1), `maxVersion` 서버측 적용, 틱 1h·4틱, Linux 는 apt(55 버전 풀). **내장 CLI(CCD)**: 핀 2.1.299, 플래그 `762798616{target,check_interval_ticks,spread_hours}`, floor=max(고수위,핀), `sha256(installId\\ncandidate) mod spread` 분산, 같은 서명 키(모델 카탈로그도 같은 key_id). **OpenAI**: Sparkle appcast 필수 파라미터 3종, arm64/x64, 10항목×델타 4–5, Ed25519; Windows msix json·Store 표; **Codex**: 20h 캐시 `version.json`, 방식별 소스(brew cask/GitHub+npm dist-tags), 자기교체 없음, R2 `channels/latest`(318 자산, `sha256:` digest, 28 `.sigstore`), 설치기 digest 검증+GitHub 폴백. **opencode**: 패치 자동 업그레이드 기본, curl 경로는 `opencode.ai/install` 무검증 파이프, `OPENCODE_DISABLE_AUTOUPDATE`. **Gemini**: npm `latest-version`, 채널 하향 금지, 샌드박스 차단. Cursor zsync 델타 3.25.9, Devin sha256hash 3.10.67. 실행 0건",
+    "current_baseline": "**2026-10-20 — Codex 드리프트 패스 `b1fd48c48`→`79a19cbb3` (TASK-2026-10-20-main-001).** 46 커밋·태그 없음. 생성 스키마 **108/10/87 불변**, 소스 +1 실험 `thread/sample`; 승인 타입 10종 md5 동일; durable 방언 0건(4번째). features `incremental_tools` Stable/on·`transcript_v2` Removed·`subagent_thread_environments` 신설(내 `key:` 집계 180→181, §E.6 의 192 와 집계 방식 다름 — Δ 만 비교). Guardian 인터럽트 롤백, `bwrap` 교체 가능 심링크 거부, `mxc-sdk` 이관, 카탈로그 `approved_prefixes` 프롬프트 템플릿(결정 경로 불변), 신규 `runtime-agent-instance`(auth.openai.com/agent/register, Ed25519 assertions), `--print-startup-config`, EMA MCP auth. **반박 0건.** 새 기준선 **`79a19cbb3`** (`docs/99` §E.7)",
+    "current_axis": "**2026-10-20 — Codex 드리프트 패스 `b1fd48c48`→`79a19cbb3` (TASK-2026-10-20-main-001).** 46 커밋·태그 없음. 생성 스키마 **108/10/87 불변**, 소스 +1 실험 `thread/sample`; 승인 타입 10종 md5 동일; durable 방언 0건(4번째). features `incremental_tools` Stable/on·`transcript_v2` Removed·`subagent_thread_environments` 신설(내 `key:` 집계 180→181, §E.6 의 192 와 집계 방식 다름 — Δ 만 비교). Guardian 인터럽트 롤백, `bwrap` 교체 가능 심링크 거부, `mxc-sdk` 이관, 카탈로그 `approved_prefixes` 프롬프트 템플릿(결정 경로 불변), 신규 `runtime-agent-instance`(auth.openai.com/agent/register, Ed25519 assertions), `--print-startup-config`, EMA MCP auth. **반박 0건.** 새 기준선 **`79a19cbb3`** (`docs/99` §E.7)",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)",
       "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
@@ -44,19 +45,19 @@
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
       "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
-      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)",
-      "TASK-2026-10-19-main-003 — SYNTHESIS §2 편입 — 서빙 카탈로그, credential plane, 게이트 가용성, 엔진–클라이언트 파생"
+      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 1,
+    "task_count": 2,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
-      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)"
+      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
+      "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)"
     ]
   },
   "next_documents": [

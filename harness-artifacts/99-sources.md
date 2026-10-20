@@ -35,7 +35,7 @@
 | OpenAI `appcast?installation_id&arch&app_version`, `windows-release.json`, `windows-store-update.json` | 26.1013.40934 / 26.1013.4894.0 | 25,351 (arm64 appcast) | Ed25519 `edSignature` per enclosure | `updates.oaistatic.com`, `persistent.oaistatic.com` |
 | `ChatGPT.dmg` `Info.plist` | 1.2026.183 | — | `SUPublicEDKey IktUdD7h…`, Sparkle 2.8.1 | re-downloaded, sha256 unchanged `49b33cad…` |
 | Codex R2 `channels/latest`, `releases/0.163.0/release.json` | rust-v0.163.0 | 97,344 | 318 assets with `sha256:` digests, 28 `.sigstore` | `releases.openai.com/codex/` |
-| `openai/codex` source | `origin/main` `79a19cbb3` (fetched 2026-10-19 night; drift baseline stays `b1fd48c48`) | — | — | `codex-rs/tui/src/{updates,update_action,updates_cache,npm_registry}.rs`, `install-context/src/lib.rs`, `scripts/install/install.sh`, `.github/scripts/publish_r2_release.py` |
+| `openai/codex` source | `origin/main` `79a19cbb3` (fetched 2026-10-19 night; became the drift baseline in `docs/99` §E.7 on 2026-10-20) | — | — | `codex-rs/tui/src/{updates,update_action,updates_cache,npm_registry}.rs`, `install-context/src/lib.rs`, `scripts/install/install.sh`, `.github/scripts/publish_r2_release.py` |
 | opencode Bun bundle (split) | 1.17.12 | 1,200 modules, 1,066 js | — | `opencode-linux-x64/bin/opencode`, [04](04-update-channels.md) §5 |
 | Gemini CLI update sources | `main` 2026-10-19 | 3,677 / 6,701 / 8,474 | — | `raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/cli/src/…` |
 | Cursor / Devin update APIs | 3.25.9 / 3.10.67 | — | Devin `sha256hash`; Cursor none | `api2.cursor.sh`, `windsurf-stable.codeium.com` |

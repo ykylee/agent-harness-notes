@@ -107,8 +107,8 @@ default-mode check into CI.
     2026-09-22/23; the Strands study reflects `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25); the agent-client UX
     study reflects builds downloaded on 2026-09-26 (two products were renamed or merged that year). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.
-  - **Current drift baselines (2026-10-19):** Codex `b1fd48c48` (generated schema 108 / 10 / 87;
-    `docs/99` §E.6), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
+  - **Current drift baselines (2026-10-20):** Codex `79a19cbb3` (generated schema 108 / 10 / 87 unchanged
+    from `b1fd48c48`; `docs/99` §E.7), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
     Gas City `3ef7fadd42`, ACP spec `9b26a3ea`. Desktop builds read: Claude Desktop 2.42304.2 and
     ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
     Code 2.1.303 → drift-checked to **2.1.304 / Agent SDK 0.3.304** the same evening (`claude-code/99` §E),

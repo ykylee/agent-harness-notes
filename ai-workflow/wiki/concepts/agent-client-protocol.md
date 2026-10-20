@@ -4,7 +4,7 @@ status: active
 last_ingested_from: agent-ux/10-acp.md + strands/06-multi-agent-and-exposure.md + docs/02-app-server-protocol.md
 related_pages: [concepts/approval-gate, concepts/wire-protocol-boundary, concepts/agent-client-design-language, concepts/harness]
 created: 2026-09-30
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Agent Client Protocol — editor-to-agent JSON-RPC
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: the wire between a code editor (client) and a coding agent (typically a subprocess), as distinct from Codex App Server and from model `WireApi`.
 - Scope: stable `protocolVersion` 1 methods, the permission RPC, session model; Codex and Strands CLI contrasted
 - Primary sources: [`agent-ux/10-acp.md`](../../../agent-ux/10-acp.md); spec repo `agentclientprotocol/agent-client-protocol` @ `c81fae79` (re-check 2026-09-30 evening; stable schema unchanged)
-- Updated: 2026-10-19 (evening: `docs/02` §4/§9 supplement; ACP facts unchanged; date bump: `docs/02`/`docs/99` drift 2026-10-19; ACP facts this page draws on are unchanged (Strands ACP path diff 0, `strands/99` §6.2)). Previous: 2026-09-30 (evening re-check to `c81fae79`: stable schema byte-identical; 3 unstable entries added — subagents RFD, request-scoped MCP-over-ACP, v2 available-commands)
+- Updated: 2026-10-20 (`docs/02` header: Codex re-count at `79a19cbb3` — 108 / 10 / 87 unchanged, one experimental `thread/sample`; nothing on this page changes). Previous: 2026-10-19 (evening: `docs/02` §4/§9 supplement; ACP facts unchanged; date bump: `docs/02`/`docs/99` drift 2026-10-19; ACP facts this page draws on are unchanged (Strands ACP path diff 0, `strands/99` §6.2)). Previous: 2026-09-30 (evening re-check to `c81fae79`: stable schema byte-identical; 3 unstable entries added — subagents RFD, request-scoped MCP-over-ACP, v2 available-commands)
 
 ## §1 TL;DR  {#s1-tldr}
 

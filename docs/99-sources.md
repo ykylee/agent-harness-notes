@@ -600,4 +600,81 @@ The first seven commits of the range are §E.5's. Counts re-done with §E.2's me
   measure; everything else in the 719 commits is ⚠️ unread.
 - **Verification status.** Source, generated schemas and SDK read statically ✅; live traffic ⚠️.
 
-**Next drift baseline: `b1fd48c48`.**
+**Next drift baseline: `b1fd48c48`** → superseded by §E.7 (`79a19cbb3`).
+
+### E.7 Drift re-check, 2026-10-20 — `b1fd48c48` → `79a19cbb3`
+
+46 commits in ten hours (2026-10-19 13:27 → 23:01 UTC), 375 files, +19,418 / −2,937; **no tag** in the
+range (last is `rust-v0.163.0`, 10-15). Same scoped method as §E.6, counts re-derived with a fresh
+parser on both revisions (the macro tables `client_request_definitions!` etc. in `common.rs`; the
+baseline numbers reproduce exactly). **No refutation.**
+
+| Count | `b1fd48c48` | `79a19cbb3` | Δ |
+|---|---|---|---|
+| Client requests in `common.rs` (stable + experimental) | 175 (108 + 67) | **176** (108 + 68) | +1 experimental |
+| Generated `ClientRequest.ts` / `ServerRequest.ts` / `ServerNotification.ts` | 108 / 10 / 87 | 108 / 10 / 87 | 0 |
+| Notifications in `common.rs` | 86 (62 + 24) | 86 | 0 |
+| `features/src/lib.rs` keys (`key:` occurrences) | 180 | **181** | +1 |
+
+- **Protocol: one experimental request, nothing else.** `thread/sample` (#55339,
+  `ThreadSampleParams { thread_id, expected_turn_id, prompt, effort?, turn_trigger? }`) — a side
+  sample against a thread without a turn; excluded from the generated schema by §E.2's rule. Every
+  approval type is **byte-identical**: `CommandExecutionRequestApprovalParams`,
+  `FileChangeRequestApprovalParams`, `ToolRequestUserInputParams`, `ReviewDecision`, `SandboxOverride`,
+  `McpApprovalCancellationReason`, `ThreadStartParams` (27), `TurnStartParams`, the `ServerRequest`
+  table and `CodexErrorInfo` (md5 of each block equal at both revisions). The generated JSON changed
+  only where `PlanType` gained `sci` / `sci_plus` ("Academic Researchers", counted as workspace
+  accounts, #55387) and the `ModelInfo` catalog gained `approved_prefixes` (below).
+- **The durable-host dialect is still absent**: `turn/addUserMessage`, `thread/prewarm`,
+  `thread/startAeon`, `environmentConfigId`, `deferredEnvironment`, `item/tool/requestOptionPicker` —
+  0 commits by `git log -S`, 0 files at head. §E.3 stands for a fourth check.
+- **Approval, as prompt data.** #55366 lets a served model catalog entry carry a template
+  `approved_prefixes: Option<String>` (`protocol/src/openai_models.rs`, "Supports
+  `{{ approved_prefixes }}`. Missing or null uses the bundled text; an empty string suppresses the
+  approved-prefix section") rendered by `prompts/src/permissions_instructions.rs` from the execpolicy
+  `prefix_rule(... decision="allow")` set. The *decision* path is untouched; what moved is how the
+  model is **told** which prefixes are pre-approved — the catalog (§2.3 of `SYNTHESIS`, "providers
+  as data") now also shapes the permission prose.
+- **Guardian (`ext/guardian-reviewer`, 3 commits).** Interrupted reviews **roll back** admitted
+  context (`SessionDisposition::Rollback`, "Interrupted turns roll back admitted context; completed
+  inference errors can retain it", #55395); native agent messages deduplicated in the review context
+  (#55391); retry metrics and turn attribution (#55347). `core/src/guardian/{decision,review}.rs`
+  changed by 17 lines; the `RequireEscalated` reading of §E.6 is unchanged.
+- **Sandbox.** `sandboxing/src/bwrap.rs` (+93): the pre-sandbox executable lookup now **rejects
+  replaceable symlinks** — a path whose parent is writable by the caller (`symlink_metadata`, owner
+  `uid == euid` checks, policy matched "through parent aliases without resolving the child symlink")
+  no longer resolves to a read-only system target (#55384; test
+  `skips_writable_bwrap_symlink_to_read_only_target`). Windows `mxc-sandbox` migrated to `mxc-sdk`
+  (#55378, policy.rs −49/+… net −20 lines); `docs/14` §3's `mxc` mode and `prefer_mxc` gate are not
+  renamed. `execpolicy`: 0 commits.
+- **Features.** `incremental_tools` **UnderDevelopment/off → Stable/on** (#55368, "Enable incremental
+  tools by default for Responses Lite" — the request-shape branch of `docs/16` §2 gains incremental
+  tool delivery as the default; what "incremental" means on the wire was not read ⚠️);
+  `transcript_v2` Deprecated → **Removed** (#55388); new `subagent_thread_environments`
+  (UnderDevelopment, off; subagents inherit the configured thread environment, #55327/#55375/#55331).
+  My `key:` tally is 180 → 181 where §E.6 reported 192 — a different count, not a removal of 12 keys
+  (`features/src/lib.rs` has no deletions in the range); the comparable figure is the Δ.
+- **New crate `runtime-agent-instance`** (#55398, #55402): "Ephemeral OpenAI runtimes: composite
+  registration and per-request assertions" — one-call registration at
+  `https://auth.openai.com/agent/register` with `AuthenticatedActorAuthorization { Oauth |
+  PersonalAccessToken | PlatformApiKey }`, `AgentHostAuthorization::InstallationId` ("tracking
+  metadata, not proof of device ownership"), `RuntimeRole { Orchestrator | Executor |
+  OrchestratorAndExecutor }`, and **Ed25519** per-request assertions (`ed25519-dalek`; "registration
+  retries keep the key and sign fresh assertions"). Not wired to the app server in this range; a
+  runtime-identity leg for the orchestration axis (`gas-city/`, `SYNTHESIS` §2.4) to watch.
+- **Startup and auth plumbing.** `codex app-server --print-startup-config` (#55300,
+  `StartupConfigArgs`, `CloudStartupConfig { bootstrap, config }`: "Load local policy before auth,
+  then fetch the account's cloud configuration" — one-shot, refuses a subcommand); enterprise-managed
+  authorization (EMA) for MCP connections (`McpServerAuth::EmaAuth`, extension id
+  `ENTERPRISE_MANAGED_AUTHORIZATION_EXTENSION_ID`, gated by `xaa_enabled`, #55334) and EMA authority
+  re-checked at HTTP boundaries (#55288); OAuth provenance and login identity recorded on account
+  tokens (#55397); Responses API proxy gains GitHub Actions OIDC and renewable federated auth
+  (#55296–#55320). Exec-server: environment disconnect notifications deferred until recovery fails
+  (#55401).
+- **Unchanged and re-checked:** `models.json` 11 slugs (`gpt-5.5` the only non-lite); tool spec
+  files (`spec_plan.rs`) untouched; no `const` numeric limit added or removed under `core/src`,
+  `models-manager`, `code-mode`; `thread/rollback` survives only in the README notice.
+- **Not read:** `tui/` (TUI backend sessions #55381/#55304, title spinners), `file-search`,
+  `thread-store`, `cloud-tasks`, `.github`. Live traffic ⚠️.
+
+**Next drift baseline: `79a19cbb3`.**

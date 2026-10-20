@@ -25,7 +25,7 @@ plays were not run.
 
 ### [[concepts/thread-turn-item]] {#thread-turn-item}
 The three conversation primitives. Item lifecycle, thread unloading (60 seconds) and capacity
-eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (108/10/87, turn lineage, read state, open `codexErrorInfo`). §8.6: Claude Code's flat `session_id` + `uuid` alternative, JSONL transcripts, no unload timer.
+eviction, the sticky semantics of turn overrides. §8.5: three weeks of drift (108/10/87, turn lineage, read state, open `codexErrorInfo`); 2026-10-20 re-check `79a19cbb3`: unchanged, + experimental `thread/sample`. §8.6: Claude Code's flat `session_id` + `uuid` alternative, JSONL transcripts, no unload timer.
 
 ### [[concepts/approval-gate]] {#approval-gate}
 Approval as a protocol primitive rather than a UI convenience. Codex: ten server→client requests.

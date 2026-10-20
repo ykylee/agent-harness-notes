@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/99-sources.md + REPORT.md + browser-agents/99-sources.md (§4.5 incl. the Brave paraphrase) + browser-agents/11-dia-and-neon.md + browser-agents/12-dia-binary.md + strands/99-sources.md + strands/01-overview.md + agent-ux/10-acp.md + agent-ux/99-sources.md
 related_pages: [concepts/harness, concepts/retained-reasoning, concepts/os-sandbox-policy, concepts/thread-turn-item, concepts/credential-shielding]
 created: 2026-09-22
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Primary-Source Verification — this repository's method of knowing
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: fix as rules how this repository grades claims and verifies them. New research follows this.
 - Scope: the grade vocabulary, the method, preserving refutations, what was actually overturned, reproduction
 - Primary sources: `docs/99-sources.md`, `REPORT.md`, `browser-agents/99-sources.md`
-- Updated: 2026-10-19 (latest: two same-day self-corrections from the 0.3.304/2.1.304 drift pass — search the producer's spelling, answer a "which build" ⚠️ before publishing it; late: `agent-ux/99` §2 gains the Linux 2.42304.2 build row and §7 one open item — the renderer reads six `can_use_tool` fields the published SDK types do not declare; a case of the shipped artifact running ahead of the generated contract, graded ⚠️ until a type ships; night: REPORT §Method carries the two 2026-10-19 notes; a first-party doc page refuted by first-party source (`gas-city/99` §C) joins the examples; two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
+- Updated: 2026-10-20 (`docs/99` §E.7 / REPORT: Codex re-checked at `79a19cbb3` (46 commits, no tag) — counts unchanged, no refutation; the baseline numbers reproduced with a fresh parser, which is the check that matters). Previous: 2026-10-19 (latest: two same-day self-corrections from the 0.3.304/2.1.304 drift pass — search the producer's spelling, answer a "which build" ⚠️ before publishing it; late: `agent-ux/99` §2 gains the Linux 2.42304.2 build row and §7 one open item — the renderer reads six `can_use_tool` fields the published SDK types do not declare; a case of the shipped artifact running ahead of the generated contract, graded ⚠️ until a type ships; night: REPORT §Method carries the two 2026-10-19 notes; a first-party doc page refuted by first-party source (`gas-city/99` §C) joins the examples; two method notes from 2026-10-19: tag ancestry beats string counts; count scripts diverge by one unless recorded). Previous: 2026-09-30 (Strands native Anthropic redacted_thinking: Python KeyError probed; TASK-013)
 
 ## §1 TL;DR  {#s1-tldr}
 

@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/14-windows-sandbox.md + docs/02-app-server-protocol.md + browser-agents/10-aside-enforcement-and-native.md + browser-agents/12-dia-binary.md
 related_pages: [concepts/approval-gate, concepts/control-plane-execution-plane, concepts/execution-environment-topology, concepts/primary-source-verification, concepts/credential-shielding, concepts/indirect-prompt-injection]
 created: 2026-09-22
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # OS Sandbox Policy — defence inside the execution plane
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: protocol-level sandbox modes and their OS-level implementations (especially native Windows), plus the design principles a custom harness can carry over.
 - Scope: the four policy values, per-OS mechanisms, the two Windows modes, the two network switches, the authority model
 - Primary sources: generated schemas, `learn.chatgpt.com/docs/windows/windows-sandbox.md`, the `codex-rs/windows-sandbox-rs` source tree
-- Updated: 2026-10-19 (evening: `docs/02` §9 supplement — `sandbox` vs ⚗ `permissions` profile id listed; sandbox facts unchanged; drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc availability probe — note under the last section). Previous: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
+- Updated: 2026-10-20 (`docs/02`/`99` §E.7: Codex `bwrap.rs` pre-sandbox executable lookup rejects replaceable symlinks (writable parent, owner check; #55384); Windows `mxc-sandbox` moved onto `mxc-sdk` (#55378); `execpolicy` 0 commits). Previous: 2026-10-19 (evening: `docs/02` §9 supplement — `sandbox` vs ⚗ `permissions` profile id listed; sandbox facts unchanged; drift 2026-10-19: integrity checks observe-only, proxy DNS gating, mxc availability probe — note under the last section). Previous: 2026-09-30 (Aside Computer Use spawn + JSON-lines IPC; Dia Seatbelt)
 
 ## §1 TL;DR  {#s1-tldr}
 
