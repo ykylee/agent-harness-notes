@@ -48,6 +48,7 @@
 | 02 | [Desktop shells](02-desktop-shells.md) | Claude Desktop **2.42304.2** (Linux deb, published the morning of the read) and ChatGPT/Codex **26.1013.40934** (Linux deb): Electron fuses, windows, preloads, context bridges, IPC, utility processes, and the **UI composition** recovered from chunk names and message catalogues; drift from 2.9939.2 / 26.924.22138; the unchanged legacy native ChatGPT 1.2026.183 |
 | 03 | [Tool-use patterns](03-tool-use-patterns.md) | How each reference defines, invokes and post-processes tools, read across Claude Code, Codex, Gemini CLI, opencode, Strands and REA itself — the mechanisms that decide tokens per tool call |
 | 04 | [Update channels](04-update-channels.md) | How each reference updates **itself** — version pointer, manifest, artifact; who signs what; channels and staggered rollout; install/replace state machines; policy ceilings. Claude Code's manifest signature verified locally against the key embedded in the binary; Desktop Squirrel feed read across three channels; OpenAI Sparkle appcast, Codex R2 host, opencode's pipe-to-shell upgrade, Gemini's npm path, Cursor/Devin update APIs (2026-10-19/20, Korean) |
+| 05 | [Agent loop](05-agent-loop.md) | How each reference runs **one turn**: units, the sampling cycle, what decides "continue" (Codex `needs_follow_up` with no step cap; Claude Code `stop_reason` + hooks + `maxTurns`, 26 terminal reasons; opencode `compact\|stop\|continue` + per-agent `steps`; Gemini `MAX_TURNS 100` + an LLM next-speaker check; Strands `turns`), steering queues, where compaction and approval enter the loop, loop detection, sub-agent inheritance (2026-10-20, Korean) |
 | 99 | [Sources](99-sources.md) | Artifacts (URL, size, SHA-256, last-modified), REA evidence IDs, grades |
 
 ## Artifacts read
@@ -100,6 +101,15 @@
    and auto-applies patch releases by default; Gemini and the npm paths trust the registry. The
    Desktop Squirrel feed answered three channels with three versions (stable 2.42304.2, latest
    2.42585.0, staggered 2.31226.1) and honoured `maxVersion` server-side.
+
+5. **"Continue?" is computed differently in every engine** (added 2026-10-20, [05](05-agent-loop.md)).
+   Codex asks only whether the output called a tool or a steer arrived (no step cap; the Stop hook
+   can force another round); Claude Code reads `stop_reason`, the hooks and `maxTurns` and folds 26
+   internal terminal reasons into five `result` subtypes (stop-hook override cap 8); opencode returns
+   `compact | stop | continue` per step and treats three identical tool calls as a permission question;
+   Gemini bounds recursion at 100 and, when no tool is pending, asks the model who speaks next and
+   sends "Please continue." itself. Compaction is a loop branch in Codex/Claude/opencode and a
+   pre-send step in Gemini; approval sits outside sampling and inside tool execution in all five.
 
 ## Method notes worth keeping
 

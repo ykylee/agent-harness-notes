@@ -331,6 +331,28 @@ Four observations follow, each with a cost the artifacts showed:
 > flag, not by the client release. Codex keeps the opposite shape — the CLI never replaces itself and
 > defers to npm/brew/the installer, while the desktop shell carries its own `codex` and updates by Sparkle.
 
+### 2.10 The loop itself — what decides "continue"
+
+*(2026-10-20, [`harness-artifacts/05`](harness-artifacts/05-agent-loop.md).)* Every engine's atom is one
+sampling cycle plus the tool calls it produced, but the **continue signal** is computed differently,
+and that difference is a design axis a builder has to choose on:
+
+| Engine | Continue when… | Hard cap | Who can override the end |
+|---|---|---|---|
+| Codex | the output called a tool **or** a steer arrived (`needs_follow_up`) | none | Stop hook (with a prompt), Guardian budget compaction |
+| Claude Code | `stop_reason`/tool results say so, hooks allow it | `maxTurns` (API round-trips), `maxBudgetUsd` | Stop/SubagentStop hooks, capped at 8 consecutive blocks; an MCP tool may end the turn |
+| opencode | the step returned `continue` | per-agent `steps` (∞) | permission `doom_loop` after 3 identical calls |
+| Gemini CLI | tool calls pending, else an LLM says the model speaks next | `MAX_TURNS` 100, `maxSessionTurns` | loop detector (5 identical calls / 10 repeats / LLM) |
+| Strands | `stop_reason == tool_use` | `turns`, token limits | hooks (`retry`, cancel) |
+
+Three consequences. (1) "Turn" means a user unit only in Codex; elsewhere it is one model call, so a
+`maxTurns`-style number is not portable. (2) Steering is an engine feature or it is not: Codex takes an
+*intent* (`StartOrSteer` / `Steer{expected_turn_id}`) and absorbs it between samplings, Claude Code keeps a
+uuid-stamped **queue with priorities** and returns an interrupt *receipt* of what will still run; the others
+refuse or ignore mid-turn input. (3) Compaction and approval have fixed seats: compaction is a branch of the
+loop (Codex, Claude Code, opencode) or a pre-send step that may refuse to send (Gemini); approval always sits
+**inside tool execution and outside sampling** — §2.1's primitive, located.
+
 ## 3. Surface-specific axes — what the browser study produced
 
 The Codex study has no counterpart to these, **because a shell harness does not have the problem.**

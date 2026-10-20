@@ -1,7 +1,7 @@
 ---
 type: concept
 status: active
-last_ingested_from: docs/02-app-server-protocol.md + claude-code/01-wire-protocol.md + claude-code/03-sessions-context-and-clients.md
+last_ingested_from: docs/02-app-server-protocol.md + claude-code/01-wire-protocol.md + claude-code/03-sessions-context-and-clients.md + harness-artifacts/05-agent-loop.md
 related_pages: [concepts/harness, concepts/approval-gate, concepts/stateless-conversation-wire]
 created: 2026-09-22
 updated: 2026-10-20
@@ -12,7 +12,7 @@ updated: 2026-10-20
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-10-20 (`docs/99` §E.8: `runtime-agent-instance` unwired; the live identity leg is `AuthMode::AgentIdentity` + attestation — §8.5 addendum corrected). Previous: 2026-10-20 (Codex drift `b1fd48c48`→`79a19cbb3`: counts unchanged, + experimental `thread/sample`, Thread/Turn types byte-identical — §8.5 addendum; 2026-10-19: `claude-code/01·03` drift 0.3.304/2.1.304 — no change to the flat wire; `keep_alive` gains an out-of-schema `startup_mark`, dialogs may have no deadline, context-usage rows get stable ids; §8.6 unchanged; `claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-10-20 (§8.7: four meanings of "turn" and the continue signal across five engines, from `harness-artifacts/05`). Previous: 2026-10-20 (`docs/99` §E.8: `runtime-agent-instance` unwired; the live identity leg is `AuthMode::AgentIdentity` + attestation — §8.5 addendum corrected). Previous: 2026-10-20 (Codex drift `b1fd48c48`→`79a19cbb3`: counts unchanged, + experimental `thread/sample`, Thread/Turn types byte-identical — §8.5 addendum; 2026-10-19: `claude-code/01·03` drift 0.3.304/2.1.304 — no change to the flat wire; `keep_alive` gains an out-of-schema `startup_mark`, dialogs may have no deadline, context-usage rows get stable ids; §8.6 unchanged; `claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -148,6 +148,18 @@ wire: a `runtime-agent-instance` crate registering ephemeral runtimes with Ed255
 checked 2026-10-20 (`docs/99` §E.8): no crate depends on it yet; the identity that *is* wired is
 `AuthMode::AgentIdentity` (persisted Ed25519 key, task-scoped `Authorization: AgentAssertion …`,
 behind `use_agent_identity`), distinct from the client-side `x-oai-attestation`.
+
+## §8.7 Observation — four meanings of "turn", and what decides "continue"  {#s8-7-loop}
+
+[`harness-artifacts/05`](../../../harness-artifacts/05-agent-loop.md) (2026-10-20) read the loop code
+of five engines. Only the App Server's turn is a *user* unit; Claude Code (`maxTurns`, `num_turns`),
+opencode (steps), Gemini (`Turn`, `MAX_TURNS 100`) and Strands (`turns`) all mean one model call. The
+continue signal differs accordingly: Codex `needs_follow_up` = "a tool was called ∨ a steer arrived"
+with no step cap and a Stop hook that can add rounds; Claude Code folds 26 internal terminal reasons into
+five `result` subtypes and caps stop-hook blocking at 8; opencode's step returns `compact | stop |
+continue`; Gemini asks an LLM who speaks next and sends "Please continue." itself. Steering is an
+Item-level fact in Codex (`TurnInputMode::Steer{expected_turn_id}`, pending input absorbed between
+samplings, a separate next-turn queue) and a priority queue with interrupt receipts in Claude Code.
 
 ## §8.6 Observation — the flat alternative: `session_id` + `uuid` + `parent_tool_use_id`  {#s8-6-claude-code}
 

@@ -27,8 +27,8 @@
     "runtime_checks": null
   },
   "session": {
-    "current_baseline": "**2026-10-20 — `runtime-agent-instance` 배선 조사 (TASK-2026-10-20-main-003).** `origin/main` `1a35bc4cc` 기준 역의존 0·소비처 0 → **미배선**(와이어: `POST auth.openai.com/agent/register` 복합 등록 + 요청별 JWS `openai-agent-assertion+jws`, 메모리 전용 Ed25519 키, 역할 orchestrator/executor, 거부 코드 14). 대신 **기록에 없던 live 경로 발견**: `agent-identity`(2026-04, `AuthMode::AgentIdentity`, `/v1/agent/register`→`agent_runtime_id`+영구 키, `/v1/agent/{id}/task/register`→`task_id`, `Authorization: AgentAssertion …` 가 bearer 를 대체; `use_agent_identity` 플래그 off → ChatGPT 로그인 승격은 플래그 뒤, 부트스트랩 실패 시 세션 단위 bearer 폴백) 와 클라이언트 `x-oai-attestation`(#20619). 세 정체성 층을 `docs/99` §E.8 에 정리. `AuthMode` 8값은 `docs/02` 에 없음(갭 기록). 기준선 `79a19cbb3` 유지",
-    "current_axis": "**2026-10-20 — `runtime-agent-instance` 배선 조사 (TASK-2026-10-20-main-003).** `origin/main` `1a35bc4cc` 기준 역의존 0·소비처 0 → **미배선**(와이어: `POST auth.openai.com/agent/register` 복합 등록 + 요청별 JWS `openai-agent-assertion+jws`, 메모리 전용 Ed25519 키, 역할 orchestrator/executor, 거부 코드 14). 대신 **기록에 없던 live 경로 발견**: `agent-identity`(2026-04, `AuthMode::AgentIdentity`, `/v1/agent/register`→`agent_runtime_id`+영구 키, `/v1/agent/{id}/task/register`→`task_id`, `Authorization: AgentAssertion …` 가 bearer 를 대체; `use_agent_identity` 플래그 off → ChatGPT 로그인 승격은 플래그 뒤, 부트스트랩 실패 시 세션 단위 bearer 폴백) 와 클라이언트 `x-oai-attestation`(#20619). 세 정체성 층을 `docs/99` §E.8 에 정리. `AuthMode` 8값은 `docs/02` 에 없음(갭 기록). 기준선 `79a19cbb3` 유지",
+    "current_baseline": "**2026-10-20 — 에이전트 대화 루프 비교 `harness-artifacts/05` (TASK-2026-10-20-main-004).** 다섯 엔진의 \"계속\" 신호: Codex `needs_follow_up`(도구 호출 ∨ 조종 입력, **스텝 상한 없음**, Stop 훅이 라운드 추가, `TurnInputMode` 4종으로 steer/queue 분리, 재시도 5/4·백오프 200ms×2ⁿ); Claude Code 재귀 제너레이터 `chunk-gzc5bc6y.js`(종료 사유 26 → `result.subtype` 5, `maxTurns`=API 왕복, Stop 훅 차단 상한 8, 비동기 메시지 큐 `priority now|next|later` + 인터럽트 영수증 `still_queued`, `compact_boundary`·과열 차단기); opencode 스텝 결과 `compact|stop|continue`(에이전트별 `steps` ∞, doom_loop 3회 → 권한 질문, 압축을 대화 메시지로, `session.status retry{attempt,next}`); Gemini `MAX_TURNS 100` 재귀 + 도구 없으면 LLM 에게 다음 화자 질문 → \"Please continue.\", 3겹 루프 탐지(5/10/LLM 30턴 후), 전송 전 압축·오버플로 가드; Strands 기존 노트 요약. `SYNTHESIS` §2.10 신설, wiki `thread-turn-item` §8.7",
+    "current_axis": "**2026-10-20 — 에이전트 대화 루프 비교 `harness-artifacts/05` (TASK-2026-10-20-main-004).** 다섯 엔진의 \"계속\" 신호: Codex `needs_follow_up`(도구 호출 ∨ 조종 입력, **스텝 상한 없음**, Stop 훅이 라운드 추가, `TurnInputMode` 4종으로 steer/queue 분리, 재시도 5/4·백오프 200ms×2ⁿ); Claude Code 재귀 제너레이터 `chunk-gzc5bc6y.js`(종료 사유 26 → `result.subtype` 5, `maxTurns`=API 왕복, Stop 훅 차단 상한 8, 비동기 메시지 큐 `priority now|next|later` + 인터럽트 영수증 `still_queued`, `compact_boundary`·과열 차단기); opencode 스텝 결과 `compact|stop|continue`(에이전트별 `steps` ∞, doom_loop 3회 → 권한 질문, 압축을 대화 메시지로, `session.status retry{attempt,next}`); Gemini `MAX_TURNS 100` 재귀 + 도구 없으면 LLM 에게 다음 화자 질문 → \"Please continue.\", 3겹 루프 탐지(5/10/LLM 30턴 후), 전송 전 압축·오버플로 가드; Strands 기존 노트 요약. `SYNTHESIS` §2.10 신설, wiki `thread-turn-item` §8.7",
     "current_focus": "TASK-2026-09-27-main-002 agent-ux GUI 패스 — 수동 패스는 끝났고, 승인 카드·에이전트 상태(blocked/waiting)는 에이전트 실행이 필요하다. 각 앱이 사용자 프로젝트를 가리키고 스크래치 폴더 지정은 파일 대화상자라 `orca computer` 로 못 연다 → 사용자가 앱별 스크래치 프로젝트를 한 번 지정하면 재개",
     "in_progress_items": [],
     "blocked_items": [
@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)",
       "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
       "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)",
       "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
@@ -44,22 +45,22 @@
       "TASK-2026-10-19-main-010 — claude-code/ 후속 교차 반영 — onFailure:block·decision_reason_type 을 ai-sdlc/03 에, Desktop 승인 카드↔can_use_tool 필드 대응을 agent-ux/02 에",
       "TASK-2026-10-19-main-009 — Claude Code 를 엔진으로 읽기 — 분리 모듈·Agent SDK 타입·공식 문서로 계약(와이어·승인·세션·훅) 정리",
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
-      "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
-      "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정"
+      "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 4,
+    "task_count": 5,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
       "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)",
-      "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해"
+      "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
+      "TASK-2026-10-20-main-004 — 레퍼런스 하네스들의 에이전트 대화 루프 구성 — Codex·Claude Code·opencode·Gemini CLI·Strands 비교 (harness-artifacts/05)"
     ]
   },
   "next_documents": [

@@ -12,7 +12,7 @@ updated: 2026-10-20
 - Purpose: what representation an agent reads a web page (or a screen) through, and what failure mode each choice produces.
 - Scope: four approaches, symmetry between perception and action, the cost ladder, recovery
 - Character: **a surface-specific axis.** A shell-based harness (Codex) does not have this problem
-- Updated: 2026-10-20 (`SYNTHESIS` §2.9 gained an OTA paragraph from `harness-artifacts/04`; nothing on this page changes). Previous: 2026-10-19 (night: `SYNTHESIS` §2.9 Claude row restated at wire level (`claude-code/`); facts this page draws on unchanged; date bump: `SYNTHESIS.md` §2 additions; perception facts this page draws on are unchanged). Previous: 2026-09-30 (date bump: `SYNTHESIS.md` concept count 17→18; perception facts this page draws on are unchanged)
+- Updated: 2026-10-20 (`SYNTHESIS` §2.10 / `harness-artifacts/05` agent-loop comparison added; nothing on this page changes). Previous: 2026-10-20 (`SYNTHESIS` §2.9 gained an OTA paragraph from `harness-artifacts/04`; nothing on this page changes). Previous: 2026-10-19 (night: `SYNTHESIS` §2.9 Claude row restated at wire level (`claude-code/`); facts this page draws on unchanged; date bump: `SYNTHESIS.md` §2 additions; perception facts this page draws on are unchanged). Previous: 2026-09-30 (date bump: `SYNTHESIS.md` concept count 17→18; perception facts this page draws on are unchanged)
 
 ## §1 TL;DR  {#s1-tldr}
 

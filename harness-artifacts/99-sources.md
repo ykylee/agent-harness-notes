@@ -39,6 +39,8 @@
 | opencode Bun bundle (split) | 1.17.12 | 1,200 modules, 1,066 js | — | `opencode-linux-x64/bin/opencode`, [04](04-update-channels.md) §5 |
 | Gemini CLI update sources | `main` 2026-10-19 | 3,677 / 6,701 / 8,474 | — | `raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/cli/src/…` |
 | Cursor / Devin update APIs | 3.25.9 / 3.10.67 | — | Devin `sha256hash`; Cursor none | `api2.cursor.sh`, `windsurf-stable.codeium.com` |
+| Gemini CLI core sources (`main`, 2026-10-20) | — | `client.ts` 42,391 · `turn.ts` 15,722 · `geminiChat.ts` 71,902 · `loopDetectionService.ts` 26,752 · `nextSpeakerChecker.ts` 5,317 · `scheduler.ts` 31,881 · `nonInteractiveCli.ts` 22,365 | — | `raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/…`, for [05](05-agent-loop.md) §4 |
+| Codex loop sources | `origin/main` `79a19cbb3` (= `1a35bc4cc` for these files) | — | — | `core/src/session/{turn,turn_input,input_queue}.rs`, `ext/queue`, `agent/control/spawn.rs`, `protocol/src/{protocol,turn_input}.rs`, [05](05-agent-loop.md) §1 |
 | Release feeds read | — | — | — | `downloads.claude.ai/releases/win32/x64/RELEASES` → `AnthropicClaude-2.42304.2-full.nupkg` (262,853,497 B, not downloaded); `downloads.claude.ai/releases/darwin/universal/RELEASES.json` → 2.42304.2 pub_date 2026-10-19T00:30:35Z; `code.claude.com/docs/en/desktop-linux.md` |
 
 ## C. REA evidence (session scratch, not committed)
@@ -86,3 +88,7 @@
 | Codex: 20 h cache, per-method sources, no self-replacement; R2 layout ([04](04-update-channels.md) §4) | ✅ source + GET | sigstore not consumed by CLI/installer (추정) |
 | opencode: patch auto-upgrade by default, pipe-to-shell with no checksum ([04](04-update-channels.md) §5) | ✅ bundle + script | asset hash files beyond 6 names ⚠️ |
 | Gemini CLI: npm `latest-version`, channel-stability guard, sandbox block ([04](04-update-channels.md) §6) | ✅ source | — |
+| Codex turn loop: `needs_follow_up`, no step cap, steer vs queue, Stop-hook continuation, mid/post-turn compaction ([05](05-agent-loop.md) §1) | ✅ source | runtime ⚠️ |
+| Claude Code query loop: 26 terminal reasons, `maxTurns`, stop-hook cap 8, async message queue with interrupt receipt ([05](05-agent-loop.md) §2) | ✅ bundle strings + `sdk.d.ts` | thresholds ⚠️ |
+| opencode step loop: `compact\|stop\|continue`, doom-loop window 3, per-agent `steps`, busy guard ([05](05-agent-loop.md) §3) | ✅ bundle | server-side steer ⚠️ |
+| Gemini loop: `MAX_TURNS 100`, next-speaker LLM check, three-layer loop detection, pre-send compression ([05](05-agent-loop.md) §4) | ✅ source | interactive TUI ⚠️ |

@@ -6,11 +6,12 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-20 (`runtime-agent-instance` 미배선 판정 + agent-identity v1 기록. 다음 드리프트 기준: Codex `79a19cbb3` / Claude Code SDK 0.3.304·CLI 2.1.304 / Strands `bd0b6a94`)
+- Updated: 2026-10-20 (에이전트 루프 비교 `harness-artifacts/05` 완료. 다음 드리프트 기준: Codex `79a19cbb3` / Claude Code SDK 0.3.304·CLI 2.1.304 / Strands `bd0b6a94`)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
 
+- **2026-10-20 — 에이전트 대화 루프 비교 `harness-artifacts/05` (TASK-2026-10-20-main-004).** 다섯 엔진의 "계속" 신호: Codex `needs_follow_up`(도구 호출 ∨ 조종 입력, **스텝 상한 없음**, Stop 훅이 라운드 추가, `TurnInputMode` 4종으로 steer/queue 분리, 재시도 5/4·백오프 200ms×2ⁿ); Claude Code 재귀 제너레이터 `chunk-gzc5bc6y.js`(종료 사유 26 → `result.subtype` 5, `maxTurns`=API 왕복, Stop 훅 차단 상한 8, 비동기 메시지 큐 `priority now|next|later` + 인터럽트 영수증 `still_queued`, `compact_boundary`·과열 차단기); opencode 스텝 결과 `compact|stop|continue`(에이전트별 `steps` ∞, doom_loop 3회 → 권한 질문, 압축을 대화 메시지로, `session.status retry{attempt,next}`); Gemini `MAX_TURNS 100` 재귀 + 도구 없으면 LLM 에게 다음 화자 질문 → "Please continue.", 3겹 루프 탐지(5/10/LLM 30턴 후), 전송 전 압축·오버플로 가드; Strands 기존 노트 요약. `SYNTHESIS` §2.10 신설, wiki `thread-turn-item` §8.7
 - **2026-10-20 — `runtime-agent-instance` 배선 조사 (TASK-2026-10-20-main-003).** `origin/main` `1a35bc4cc` 기준 역의존 0·소비처 0 → **미배선**(와이어: `POST auth.openai.com/agent/register` 복합 등록 + 요청별 JWS `openai-agent-assertion+jws`, 메모리 전용 Ed25519 키, 역할 orchestrator/executor, 거부 코드 14). 대신 **기록에 없던 live 경로 발견**: `agent-identity`(2026-04, `AuthMode::AgentIdentity`, `/v1/agent/register`→`agent_runtime_id`+영구 키, `/v1/agent/{id}/task/register`→`task_id`, `Authorization: AgentAssertion …` 가 bearer 를 대체; `use_agent_identity` 플래그 off → ChatGPT 로그인 승격은 플래그 뒤, 부트스트랩 실패 시 세션 단위 bearer 폴백) 와 클라이언트 `x-oai-attestation`(#20619). 세 정체성 층을 `docs/99` §E.8 에 정리. `AuthMode` 8값은 `docs/02` 에 없음(갭 기록). 기준선 `79a19cbb3` 유지
 - **2026-10-20 — `incremental_tools` 독해 (TASK-2026-10-20-main-002).** Responses Lite 의 **세 번째 요청 형태**: `use_responses_lite && features.incremental_tools`(lite 슬러그 11종 전부 기본 on, #55368 은 기본값 전환만·플래그 #50464 10-02·메커니즘 #50540 10-03)이면 `build_prompt` 가 `tools`·`base_instructions` 를 비워 §10.2 의 요청별 접두 `additional_tools`+지시문 항목이 사라지고, 월드스테이트 섹션 `top_level_tools`/`model` 이 **히스토리 항목**으로 영구 기록: 첫 스텝 전체 카탈로그 → 이후 변경 멤버만 + 고정 힌트 메시지(`tools.incremental_update`) → 제거는 산문 알림(`tools.removed_definition`). 창 단위로 고정(`has_tool_declarations`), 압축·Guardian·prewarm 도 동일 판정. 알림 문구는 카탈로그 `IncrementalToolMessages`(≤512B) 로 교체 가능. 어댑터 결과: 도구 목록은 요청 필드가 아니라 **히스토리 fold**, 제거는 content kind 로 식별. `docs/16` §10.3, wiki `wire-protocol-boundary` §7.5
 - **2026-10-20 — Codex 드리프트 패스 `b1fd48c48`→`79a19cbb3` (TASK-2026-10-20-main-001).** 46 커밋·태그 없음. 생성 스키마 **108/10/87 불변**, 소스 +1 실험 `thread/sample`; 승인 타입 10종 md5 동일; durable 방언 0건(4번째). features `incremental_tools` Stable/on·`transcript_v2` Removed·`subagent_thread_environments` 신설(내 `key:` 집계 180→181, §E.6 의 192 와 집계 방식 다름 — Δ 만 비교). Guardian 인터럽트 롤백, `bwrap` 교체 가능 심링크 거부, `mxc-sdk` 이관, 카탈로그 `approved_prefixes` 프롬프트 템플릿(결정 경로 불변), 신규 `runtime-agent-instance`(auth.openai.com/agent/register, Ed25519 assertions), `--print-startup-config`, EMA MCP auth. **반박 0건.** 새 기준선 **`79a19cbb3`** (`docs/99` §E.7)
@@ -41,6 +42,7 @@
 
 ## Work Status
 
+- TASK-2026-10-20-main-004 에이전트 루프 비교 `harness-artifacts/05`: done. 한눈에 표·엔진 5절·교차 독해 7; `SYNTHESIS` §2.10. **실행 0건**
 - TASK-2026-10-20-main-003 `runtime-agent-instance` 배선 조사: done. 미배선 ✅, agent-identity v1·attestation 과의 삼층 구조를 `docs/99` §E.8 에 기록. **실행 0건**
 - TASK-2026-10-20-main-002 `incremental_tools` 독해: done. `docs/16` §10.3 신설, `docs/99` §E.7 ⚠️ 해소, wiki 5면. **실행 0건**
 - TASK-2026-10-20-main-001 Codex 드리프트 패스 `b1fd48c48`→`79a19cbb3`: done. 수치 불변·+1 실험 메서드·반박 0, `docs/99` §E.7, wiki 6면. **실행 0건**
@@ -50,10 +52,9 @@
 - TASK-2026-10-19-main-009 Claude Code 를 엔진으로 읽기: done. `claude-code/` README·01(와이어)·02(승인/권한)·03(세션/컨텍스트/클라이언트)·99. SDK 0.3.303 `sdk.d.ts` 가 생성 계약: control subtype 40(클라→엔진 36, 엔진→클라 5+런타임 8), SDKMessage 39, options 69, 훅 33, 모드 6. 구조 차이 3: Thread/Turn/Item 없음(평탄), 요청 유니언이 방향 미구분, initialize 는 설정 주입. 승인 답이 입력까지 재작성(`updatedInput`), 게이트는 엔진 안 fail-closed·훅 층 fail-open 기본(`onFailure:"block"` 2.1.295). 번들은 타입의 2~4배 subtype(브리지·TUI–워커). SYNTHESIS §2.9 Claude 행 와이어 수준으로, wiki approval-gate §7.10·thread-turn-item §8.6·wire-protocol-boundary 재ingest
 - TASK-2026-10-19-main-008 저장소 자기 서술 정합성: done. PROJECT_PROFILE(조사 9 폴더·개념 19·드리프트 기준선·REA 호스트 매트릭스·참조 체크아웃 6), README 서두(6 조사+3 노트, 108/67), wiki index 서두. 기계 판독 한글 라벨은 유지
 - TASK-2026-10-19-main-007 REPORT 웹 아티팩트(영/한) 갱신: done. 영문 v3 `claude.ai/artifact/6J9zrjCvZQcfDXcKvgUsxo`, 한국어 v2 `claude.ai/artifact/NC1DXYvqdUp1J1sSeKH9bh` — 같은 디자인 토큰 유지, 후속 조사 5 대조표·검증 기록 12행·권고 13·방법 6·근거 자료 14링크. HTML 원본은 세션 스크래치에만(저장소 미보관)
-- TASK-2026-10-19-main-006 REPORT(영/한) 갱신 + Gas City prefix 필터 위치 확정: done. REPORT 에 "선적된 산출물" 절, 권고 12·13, 방법 노트 3, 읽기 순서; prefix 격리는 DB 명명(`doltlite_read_store.go:125-142`), `beads-topology.md` 의 쿼리층 필터 문장은 1차 문서 vs 1차 소스 모순으로 기록
 
 
-> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 10-19-main-005, 10-19-main-004, 10-19-001 (REA 산출물 대조), 10-06-001 (AI-native SDLC), 10-01-001 (RRSI), 09-30-014 (Gas City), 09-30-013·012·011·010·009·008·007·006·005 (redacted_thinking, REPORT 18종, ACP 엔진측, Strands TS, Strands 드리프트, Aside IPC, Dia 바이너리, codex origin, onboardingSkill), 09-30 저녁 드리프트 3축+Gas Town(`6a2bb44`), 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
+> 상한(10) 이전의 완료 항목은 `backlog/tasks/` 에 있다 — 10-19-main-006, 10-19-main-005, 10-19-main-004, 10-19-001 (REA 산출물 대조), 10-06-001 (AI-native SDLC), 10-01-001 (RRSI), 09-30-014 (Gas City), 09-30-013·012·011·010·009·008·007·006·005 (redacted_thinking, REPORT 18종, ACP 엔진측, Strands TS, Strands 드리프트, Aside IPC, Dia 바이너리, codex origin, onboardingSkill), 09-30 저녁 드리프트 3축+Gas Town(`6a2bb44`), 09-22-004 (Windows 샌드박스 승격), 09-30-004 (CLAUDE.md kit), 09-30-003 (다른 저장소 overlay), 09-30-002 (형제 스킬 overlay), 09-30-001 (session-start overlay), 09-27-001 (ChatGPT webview/durable), 015·014·013·012·011·010·009·008 (위협 모델, 공급자 정정, 모델 측정, 주입 방어, SYNTHESIS §6, REPORT, 파서 라벨, 브랜치 병합), 001·005·006 (워크플로우 도입, 위키 계층, 재색인 강제), browser-agents-001~007 (조사 착수, CLI 바이너리 추출, Aside 바이너리·집행 분석, Dia·Neon 심화, 두 조사 융합, 영어 통일). `blocked`: TASK-2026-09-27-main-002 (GUI 패스 — 스크래치 프로젝트 지정 필요).
 
 ## 현재 `in_progress` 작업
 
@@ -94,6 +95,7 @@
 ## Next Actions
 
 **2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
+- [ ] `harness-artifacts/05` 후속: opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini 대화형 TUI 큐·에이전트 프레임워크, Claude Code 자동 압축 임계 상수, Codex 루프 탐지 부재의 보상 메커니즘 — §7 ⚠️
 - [ ] `harness-artifacts/04` 후속: Electron ChatGPT 의 appcast 소비 방식(deb 재개봉), Sparkle Ed25519 키 동일성(레거시 vs 현재), Antigravity/Conductor/Superset/Paseo 업데이트 엔드포인트, RSA 사이드카 키와 PGP 키의 관계, `rc` 채널 실체 — 모두 ⚠️ 로 §10 에 적어 둠
 - **사용자 결정 2026-10-19 밤**: (1) `harness-artifacts/03` §8 채택 후보 실측은 **my_harness MVP(TASK-005 스택 결정 이후)** 에서 Read/Grep/Bash 에 넣어 재고 결과만 §8 에 편입 — 지금은 보류. (2) my_harness 의 `engine-centric-derivation.md` 는 **커밋 완료(미푸시)**. (3) ~~`CLAUDE.md` kit 갱신~~ — 2026-10-19 밤 2차에 `ensure-entrypoints --diet --apply` + 마커 v1.21.0 적용 완료(프로젝트 고유 절·wiki index 포인터 유지). (4) 다음 조사 = **Claude Code 자체를 엔진으로 읽기**(분리 모듈 + Agent SDK 타입 + 공식 문서; Codex `docs/02` 수준의 계약 문서). TASK-2026-10-19-main-009
 - [x] ~~`agent-ux/08` §2 ChatGPT 행 갱신~~ — 확인 결과 **이미 일치**(9월 읽기에 `Approve for me`·`Custom`·`Managed` 있음). `harness-artifacts/02` §3.3 의 "새 라벨" 서술을 정정(설명문·크레딧 넛지만 추가). 재ingest 불필요
