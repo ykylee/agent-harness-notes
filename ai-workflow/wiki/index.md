@@ -38,7 +38,7 @@ Editor ↔ coding-agent JSON-RPC. Stable `protocolVersion` is `1`. Permission op
 
 ### [[concepts/wire-protocol-boundary]] {#wire-protocol-boundary}
 `WireApi` has one variant — Responses. The boundary deciding whether the core is reusable, and
-`responses_lite` as a second request shape. 2026-10-19: Claude Code's `sdk.d.ts` as a second filtered contract.
+`responses_lite` as a second request shape. 2026-10-19: Claude Code's `sdk.d.ts` as a second filtered contract. §7.5 (2026-10-20): under `incremental_tools` the lite tool list is a fold over history, not a request field.
 
 ### [[concepts/stateless-conversation-wire]] {#stateless-conversation-wire}
 `store: false` plus no `previous_response_id` exempts you from session stores, id registries and

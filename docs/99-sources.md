@@ -649,7 +649,8 @@ baseline numbers reproduce exactly). **No refutation.**
   renamed. `execpolicy`: 0 commits.
 - **Features.** `incremental_tools` **UnderDevelopment/off → Stable/on** (#55368, "Enable incremental
   tools by default for Responses Lite" — the request-shape branch of `docs/16` §2 gains incremental
-  tool delivery as the default; what "incremental" means on the wire was not read ⚠️);
+  tool delivery as the default — read the same day: the lite tool list and base instructions leave the
+  per-request prefix and become diffed **history items**, [16 §10.3](16-responses-chat-adapter.md#103-incremental_tools-the-lite-tool-list-moves-out-of-the-request-and-into-history-2026-10-20-); #55368 flipped only the default);
   `transcript_v2` Deprecated → **Removed** (#55388); new `subagent_thread_environments`
   (UnderDevelopment, off; subagents inherit the configured thread environment, #55327/#55375/#55331).
   My `key:` tally is 180 → 181 where §E.6 reported 192 — a different count, not a removal of 12 keys

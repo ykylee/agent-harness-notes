@@ -566,6 +566,97 @@ arrive from the provider's own remote model list — and, added 2026-09-26 (#465
 model you support, each with `use_responses_lite` set deliberately. Do not rely on prefix-match
 luck, and do not rely on the fallback — its metadata is wrong for most non-OpenAI models.
 
+### 10.3 `incremental_tools`: the lite tool list moves out of the request and into history *(2026-10-20)* ✅
+
+Read at `openai/codex` `origin/main` `79a19cbb3` after `docs/99` §E.7 flagged the default flip
+(#55368, 2026-10-19: `incremental_tools` UnderDevelopment/off → **Stable/on**; the commit changes
+four lines of `features/src/lib.rs` and tests — the mechanism was already there: the flag arrived
+with #50464 on 2026-10-02 and the diffing section `top_level_tools.rs` with #50540 "Send incremental
+tool catalog updates in Responses Lite" on 2026-10-03, i.e. after the 2026-09-30 reading of §10.2). It
+is a third request shape, and for an adapter it is the most consequential of the three.
+
+**Gate.** `StepContext::incremental_tools_enabled()` = `model_info.use_responses_lite &&
+features.enabled(IncrementalTools)` (`core/src/session/step_context.rs`). The decision is made **per
+context window**: `Session::current_window_uses_incremental_tools` returns the flag only while
+history is empty; once anything is recorded it answers "does history contain an `additional_tools`
+item" (`history.has_tool_declarations()`), so a window that started incremental stays incremental
+and a legacy window stays legacy. Compaction uses the same `tools_in_history` test on the snapshot
+it is about to summarise (`compact_remote_v2_attempt.rs`).
+
+**What changes in the request.** `build_prompt(…, incremental_tools: true)` (`session/turn.rs`)
+hands the client an empty `tools` list and empty `base_instructions`. `client.rs` therefore builds
+**none of §10.2's prefix items** — no per-request `AdditionalTools` with the `at-<uuid-v5>` id, no
+base-instructions message. Top-level `instructions` and `tools` are empty as before. The tool
+catalog and the base instructions are now **history items**, written by two world-state sections
+(`core/src/context/world_state/`) whose snapshots are persisted in the rollout under stable section
+ids (`top_level_tools`, `model`):
+
+| Transition (`top_level_tools`) | What is appended to history | Role / kind |
+|---|---|---|
+| first step of a window | one `{"type":"additional_tools","role":"developer","tools":[…]}` carrying the full lite catalog: the `functions` namespace (every `ToolSpec::Function`/`Freeform` folded in by `create_tools_json_for_responses_lite`) plus built-ins such as `{"type":"tool_search","execution":"client"}` and `{"type":"web_search"}` | developer item |
+| a member added or its schema changed | a developer message `"This is an incremental tools update. Previously declared tools remain available for direct calls unless explicitly marked unavailable. If a tool is redefined here, its latest definition replaces the earlier one."` (content kind `tools.incremental_update`, only when a namespace is in the batch), then an `additional_tools` item whose namespace lists **only the changed members** | message + item |
+| a built-in added or changed | the built-in alone in an `additional_tools` item | item |
+| a member or built-in removed | developer message `"The following tools are no longer available. Do not call them:"` + `- functions.removed` (kind `tools.removed_definition`) | message |
+| a whole namespace removed | `"The following namespaces are no longer available. Do not call tools in them unless those tools are declared in a later update:"` + `- functions`; the members are **not** listed separately | message |
+| only a namespace description changed | `"Updated instructions for the {name} namespace:\n…"` or `"The {name} namespace no longer has additional instructions."` — text, because "namespace declarations require a member" | message |
+| nothing changed | nothing | — |
+
+Diffing is by hash: `WorldStateHash::from_json` per namespace header, per `namespace.member` and per
+built-in `type` (`BTreeMap<String, WorldStateHash>`, persisted; "the empty map too: it is a known
+empty catalog, not missing state"). The snapshot fixtures in
+`core/src/context/world_state/snapshots/…top_level_tools…transitions.snap` show every row above
+verbatim. Metrics `TOOL_INCREMENTAL_UPDATES_METRIC{action: added|removed|schema_changed, tool}` and a
+description-byte histogram are emitted per delta. The `model` section does the same for base
+instructions: `ModelInstructionsState::for_incremental_tools` records the instructions as a
+`BaseInstructionsFragment` in history and keeps its hash in the snapshot, so a model switch or an
+instruction change is a history delta, not a prefix rebuild.
+
+**Who else honours the window's choice.** The Guardian review request (`guardian/input_budget.rs`),
+the startup prewarm (`session/startup_prewarm.rs`) and `codex debug prompt` (`prompt_debug.rs`) all
+call `build_prompt` with `current_window_uses_incremental_tools`, so a Guardian request against an
+incremental window also carries no prefix. Sub-agent spawn strips `tools.incremental_update` hints
+(and base-instruction fragments) from the inherited developer messages unless
+`preserve_context_baselines` (`agent/control/spawn.rs`). Lite requests additionally attach
+`responses_metadata.tool_namespaces_info` when `tool_registry.turn_metadata_includes_tool_info`
+(`session/session.rs`). `parallel_tool_calls` is still forced `false` in lite (§2).
+
+**The catalog can reword the notices.** `ModelInfo.model_messages.tools.incremental_tools:
+IncrementalToolMessages { tool_update_hint, removed_tools_header, removed_namespaces_header,
+namespace_instructions_prefix, namespace_instructions_cleared }` — each optional, ≤512 bytes, an
+empty string suppresses the static text (`protocol/src/openai_models/incremental_tools.rs`,
+resolved in `prompts/src/model_messages/incremental_tools.rs`). `models.json` sets none of them; a
+served catalog could. This is the same lever §E.7 recorded for `approved_prefixes`: the provider
+entry is data that shapes the prose the model is shown.
+
+**Consequences for the adapter (this document's subject).**
+
+1. **The tool list is no longer in the request prefix.** Under §10.2 an adapter could read the
+   first `additional_tools` item of `input` and treat it as the tool list. Under incremental tools
+   the list is the **fold** of every `additional_tools` item in `input`, in order, with "latest
+   definition replaces the earlier one" semantics — and removals arrive as **developer prose**
+   (`tools.removed_definition`), not as a structured item. An adapter that translates to a flat Chat
+   `tools` array must either parse those notices (the headers are catalog-configurable, so match on
+   the content kind in `internal_chat_message_metadata_passthrough.content_item_kinds`, which lite
+   keeps — `clear_content_item_metadata` runs only for non-lite) or re-derive the catalog from its
+   own thread state. Doing neither means removed tools stay callable on the Chat side.
+2. **Base instructions are history too.** The `BaseInstructionsFragment` lives wherever the window
+   started; the request's top-level `instructions` is empty in both lite shapes. An adapter that
+   maps `instructions` → Chat `system` gets nothing in either case; under 10.2 it could take the
+   prefix message, under 10.3 it must find the fragment in history (kind
+   `BaseInstructionsFragment::KIND`).
+3. **Ids differ.** The legacy prefix had deterministic `at-…`/`msg-…` ids rebuilt per request;
+   persisted items get ids when recorded (`assign_missing_response_item_ids` covers
+   `additional_tools`) and then keep them.
+4. **The switch is per model and per window.** `use_responses_lite` is still the catalog flag of
+   §10.2 (11 slugs, `gpt-5.5` the only non-lite, unchanged at `79a19cbb3`); `[features]
+   incremental_tools = false` in `config.toml` returns *new* windows to §10.2's shape, existing
+   windows keep whatever they started with. Resumed threads recorded before the flip therefore
+   stay legacy; new ones are incremental.
+
+Grades: ✅ source and snapshot fixtures (static); the wire as the server sees it and the model's
+behaviour on the prose notices 📣/⚠️ — nothing was run. The §2 field table and §10.2 stay correct
+for a window with `incremental_tools` off.
+
 ## 11. Net effect on the verdict
 
 Nothing overturns §0, but the balance shifts:

@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)",
       "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
       "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)",
@@ -44,20 +45,20 @@
       "TASK-2026-10-19-main-008 — 저장소 자기 서술 정합성 — PROJECT_PROFILE·README·wiki index 를 조사 9 폴더·개념 19 기준으로",
       "TASK-2026-10-19-main-007 — REPORT 웹 아티팩트 영/한 갱신 — 9월 초판을 2026-10-19 REPORT 와 동기화",
       "TASK-2026-10-19-main-006 — REPORT 영/한 갱신 — 선적된 산출물 절·권고 12-13·방법 노트, Gas City prefix 필터 위치 확정",
-      "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정",
-      "TASK-2026-10-19-main-004 — 드리프트 패스 2026-10-19 — Codex d42056091→b1fd48c48 (719 커밋, 0.160–0.163), Strands a9a62d4e→bd0b6a94 (176 커밋)"
+      "TASK-2026-10-19-main-005 — docs/02 보완 + Beads standalone 독해 — Item 표·ThreadStartParams 27필드, 원장 속성 확인과 prefix 필터 정정"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 2,
+    "task_count": 3,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
       "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
-      "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)"
+      "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
+      "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)"
     ]
   },
   "next_documents": [

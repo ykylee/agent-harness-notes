@@ -4,7 +4,7 @@ status: active
 last_ingested_from: docs/15-model-providers.md + docs/16-responses-chat-adapter.md + browser-agents/09-aside-browser-internals.md + claude-code/01-wire-protocol.md
 related_pages: [concepts/provider-as-data, concepts/stateless-conversation-wire, concepts/retained-reasoning, concepts/harness, concepts/agent-client-protocol]
 created: 2026-09-22
-updated: 2026-10-19
+updated: 2026-10-20
 ---
 
 # Wire Protocol Boundary — what decides whether the core is reusable
@@ -12,7 +12,7 @@ updated: 2026-10-19
 - Purpose: which wire protocol Codex core presumes, and what that presumption forces on a custom harness.
 - Scope: the current state of `WireApi`, three ways out, the in-repo proxy precedent, and the two request shapes
 - Primary sources: `codex-rs/model-provider-info/src/lib.rs` (710 lines, read directly), `codex-rs/core/src/client.rs`
-- Updated: 2026-10-19 (latest: `claude-code/01` drift to 0.3.304/2.1.304 — the generated contract gained no subtype; the note's "typed but not found in the bundle" trio was refuted, they are spelled `A("…")` in the engine's zod, from which the types are generated; `claude-code/01`: a second generated contract and what its binary runs beyond it — note before Read next). Previous: 2026-09-30 (Agents catalog re-read: 11 entries)
+- Updated: 2026-10-20 (`docs/16` §10.3: under `incremental_tools` — default on for every lite model since #55368 — the Responses Lite tool list and base instructions are no longer a per-request prefix but diffed history items, with removals as developer prose; a third request shape behind the boundary). Previous: 2026-10-19 (latest: `claude-code/01` drift to 0.3.304/2.1.304 — the generated contract gained no subtype; the note's "typed but not found in the bundle" trio was refuted, they are spelled `A("…")` in the engine's zod, from which the types are generated; `claude-code/01`: a second generated contract and what its binary runs beyond it — note before Read next). Previous: 2026-09-30 (Agents catalog re-read: 11 entries)
 
 ## §1 TL;DR  {#s1-tldr}
 
