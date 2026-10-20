@@ -160,6 +160,13 @@ five `result` subtypes and caps stop-hook blocking at 8; opencode's step returns
 continue`; Gemini asks an LLM who speaks next and sends "Please continue." itself. Steering is an
 Item-level fact in Codex (`TurnInputMode::Steer{expected_turn_id}`, pending input absorbed between
 samplings, a separate next-turn queue) and a priority queue with interrupt receipts in Claude Code.
+The same-day second pass (TASK-2026-10-20-main-005) closed four gaps: opencode has **no server queue** —
+a prompt during a run is stored and joins the running fiber, becoming the next step's `lastUser`
+(the first pass's "busy → refused" was wrong; `assertNotBusy` guards edits and shells, not prompts);
+Gemini's TUI queues on the client and, behind `experimental.modelSteering`, injects hints before the
+next tool results; Claude Code compacts at *effective window − 13k* (effective = window − min(maxOutput,
+20k); 1M → 967k) with a rapid-refill breaker of 3 refills within 3 turns each; and Codex has **no loop
+detector** — its only bound is the context window, on the comment's assumption that compaction converges.
 
 ## §8.6 Observation — the flat alternative: `session_id` + `uuid` + `parent_tool_use_id`  {#s8-6-claude-code}
 

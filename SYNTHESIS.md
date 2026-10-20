@@ -348,10 +348,16 @@ and that difference is a design axis a builder has to choose on:
 Three consequences. (1) "Turn" means a user unit only in Codex; elsewhere it is one model call, so a
 `maxTurns`-style number is not portable. (2) Steering is an engine feature or it is not: Codex takes an
 *intent* (`StartOrSteer` / `Steer{expected_turn_id}`) and absorbs it between samplings, Claude Code keeps a
-uuid-stamped **queue with priorities** and returns an interrupt *receipt* of what will still run; the others
-refuse or ignore mid-turn input. (3) Compaction and approval have fixed seats: compaction is a branch of the
+uuid-stamped **queue with priorities** and returns an interrupt *receipt* of what will still run; opencode
+stores the message and lets the running loop pick it up as the next step's user turn (no refusal, no abort —
+the queue, if any, lives in the client); Gemini's TUI queues on the client and, only behind the experimental
+`modelSteering` flag, injects it as a *hint* in front of the next tool results; Strands has none. (3) Compaction and approval have fixed seats: compaction is a branch of the
 loop (Codex, Claude Code, opencode) or a pre-send step that may refuse to send (Gemini); approval always sits
-**inside tool execution and outside sampling** — §2.1's primitive, located.
+**inside tool execution and outside sampling** — §2.1's primitive, located. (4) Loop *detection* is optional:
+Gemini has three layers plus a 30-turn / 10-minute / grace-turn executor for sub-agents, opencode turns three
+identical calls into a permission question, Claude Code has per-failure-shape recovery rounds and breakers
+(rapid refill 3×3, compaction failure 3), and Codex has **none** — its only in-engine bound is the context
+window, on the code comment's assumption that compaction converges (`harness-artifacts/05` §1.6).
 
 ## 3. Surface-specific axes — what the browser study produced
 
