@@ -2,6 +2,9 @@
 
 > Read from `gastownhall/gascity` @ `3ef7fadd42`. Where an architecture note and the code
 > disagree, the code is the grade and the note is the drift.
+>
+> Re-checked 2026-10-20 at `6aa6be55d` (838 commits, [99 §F](99-sources.md#f-drift-re-check-2026-10-20--3ef7fadd42--6aa6be55d)):
+> §2, §4, §5 and §7 hold; §6.1 carries a correction that was wrong at the pin; §6 gains two doors.
 
 ## 1. What a city is on disk
 
@@ -43,6 +46,13 @@ Two facts are both true, and the older glossary collapses them.
   > topology page's "one shared store with prefix scoping" is a documentation claim contradicted by
   > both substrate and embedder source. Recorded in [99 §C](99-sources.md); A4 in
   > [04](04-orchestration-techniques.md) is corrected the same way.
+>
+> Re-checked 2026-10-20 at `6aa6be55d`: the per-scope resolution is unchanged (now
+> `doltlite_read_store.go:126-143`). Addendum: Gas City does keep **client-side** prefix fences —
+> cache event ownership (`caching_store.go:741-754 ownsBeadID`, `HasPrefix(id, prefix+"-")`), a
+> pinned-id namespace check (`pinned_id_fence.go:42-53`) and `ProxiedPrefixAgreement` — all present
+> at the pin, none a SQL predicate, none server-side, none a grant. The topology page is still
+> byte-unchanged and still wrong.
 - `gc.endpoint_origin` is `managed_city` at the city and `inherited_city` at a default rig. Rigs
   do not run Dolt. `gc bd --rig <name>` is "cd and run `bd`", not a federation join.
 
@@ -64,7 +74,10 @@ So the durable-state claim is narrower than "one database for everything":
 > seam that is allowed to be more than one store**, with explicit cross-store refs when a graph
 > and its work do not share a backend.
 
-`bd` remains the production beads backend (Dolt underneath). `GC_BEADS=file` or
+`bd` remains the production beads backend (Dolt underneath) — consumed both as the Go module
+`github.com/steveyegge/beads` in-process and as the operator-installed `bd` subprocess; since Gas
+City 1.5 the floor is `bd` ≥ 1.3.0 and the Beads schema migration is a manual operator step
+([99 §F.3](99-sources.md#f3-new-in-the-range-that-this-studys-axes-care-about)). `GC_BEADS=file` or
 `[beads] provider = "file"` is the file store, which the formula architecture note limits to
 tests and tutorials for full formula execution. Exec providers exist for beads, mail, and events:
 a user script, trusted as operator code (`docs/reference/trust-boundaries.md`).
@@ -126,6 +139,13 @@ reserved-but-unemitted events are ✅ gaps, not documentation lag I failed to ch
 Desired-vs-running is the Kubernetes-shaped part, and it is narrow: child spec in, reconcile
 out, restart with backoff. It is not a claim that the rest of the system is Kubernetes.
 
+> **2026-10-20.** The tick above is the *legacy* reconciler and still the default. A keyed
+> per-session reconciler with a city-wide allocator ("v2") landed behind
+> `[daemon] session_reconciler = "v2"`, latched at boot and refused for cities that use
+> `max_session_age`, `depends_on`, stall timeouts or chat auto-suspend; under v2 the tick keeps only
+> its maintenance phases. Its design page `engdocs/architecture/reconciler-v2.md` was stale within a
+> week of being written. [99 §F.3](99-sources.md#f3-new-in-the-range-that-this-studys-axes-care-about).
+
 ## 5. Session providers
 
 `runtime.Provider` (`internal/runtime/runtime.go`) is the seam: `Start`, `Stop`, `Interrupt`,
@@ -139,7 +159,8 @@ README, not a measured requirement from this study.
 
 ACP is a **session transport** here (`agent.session = "acp"`), speaking JSON-RPC over stdio. It
 is the same protocol this repository studies in [`agent-ux/10`](../agent-ux/10-acp.md). What Gas
-City does with the permission method is in [`03`](03-roles-and-lifecycle.md) §5, not here.
+City does with the permission method is in [`03`](03-roles-and-lifecycle.md) §6, not here — and
+it changed on 2026-10-11: the provider now relays the request instead of leaving it unanswered.
 
 ## 6. Trust is split by input class, not by folder
 
@@ -164,9 +185,17 @@ single-use `jti`, and a digest of method + path + query + body. When a verifying
 configured, a missing or bad `X-GC-City-Write` header fails closed. With no key, the middleware
 is not installed.
 
-The package ships no minter. The bundled API client and dashboard send only a CSRF header, so
-turning the gate on **rejects those first-party clients**. That is an intentional split: the
-writer of city config is not the process that serves the dashboard.
+The package ships no minter. ~~The bundled API client and dashboard send only a CSRF header, so
+turning the gate on rejects those first-party clients.~~
+
+> ❌ **Corrected 2026-10-20 — wrong at the pin** ([99 §F.1](99-sources.md#f1-refutation--the-grant-minter-and-the-client-grant-path-existed-at-the-pin)).
+> The *package* mints nothing, but the repository did at `3ef7fadd42`: `cmd/gc-write-mint` is the
+> reference re-validating signer ("the signing key never enters gc"), and `internal/clientgrant`
+> runs a context's `grant_command` once per mutation, passing the request binding in `GC_GRANT_INFO`;
+> the Go API client attaches the grant automatically when a context configures it
+> (`internal/api/client.go:305-309`, `cmd/gc/remote_client.go:103-121`). Only the **dashboard**
+> sends no grant. The split that is real: signing is out-of-tree by contract, the supervisor only
+> verifies, and the dashboard is a reader of city config, not a writer.
 
 This does not answer "can a worker close its own task bead?". It answers "can a captured request
 mutate `city.toml`'s API twin?". Different credential, different surface. The Gas Town finding
@@ -177,7 +206,23 @@ stands.
 ACP `SetMeta` stores session identity and drain state in an owner-only sidecar. The comment in
 `internal/runtime/acp/acp.go` states the threat directly: a reader can impersonate the session,
 and a writer can forge a drain acknowledgement. The directory is re-checked on every write.
-Source-read ✅ as a threat the code acknowledges. Not observed at runtime ⚠️.
+Source-read ✅ as a threat the code acknowledges. Not observed at runtime ⚠️. Unchanged at
+`6aa6be55d` (`acp.go:926-938`); the provider now also declares `LocalIdentitySidecar() = true` so
+the v2 inventory may treat the sidecar as a cheap local 0600 read — a trust declaration, not a
+new credential.
+
+### 6.3 Two more doors, and the project saying so (2026-10-20)
+
+`internal/eventfact/doc.go:12-13` (new in the range): *"under the user decision D-TRUST: until bd
+principals (BD-8) a fact's actor, subject and session are what the box asserts."* Worker-site
+events and conversation ops (`internal/opjournal`) are **new write paths into the bead ledger**,
+and the forgeable-actor finding of [`gas-town/02`](../gas-town/02-architecture.md) §5 is now
+upstream text. Alongside it, `internal/connect` mints **per-session HMAC bearers** into the
+`bd serve` token file (`gcb1.<session>.<generation>.<mac>`, revocable by re-render) — a transport
+principal per incarnation rather than one shared bearer, which identifies the connection and
+still not the row's actor. Session rows themselves are fenced: the generic bead API answers 422
+for them, and only the controller's own cache closes are trusted (#7783). Details in
+[99 §F.3](99-sources.md#f3-new-in-the-range-that-this-studys-axes-care-about).
 
 ## 7. What is infrastructure, stated as a rule
 

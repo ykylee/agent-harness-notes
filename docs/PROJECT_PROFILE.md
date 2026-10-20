@@ -33,11 +33,12 @@
 - Source and verification records: every `99-sources.md`; drift ledgers in `docs/99` §E and
   `strands/99` §6
 - Concept re-index: `ai-workflow/wiki/` (19 concepts)
-- Reference checkouts (outside this repo): **one** — `~/repos/harness-refs/agent-client-protocol`
-  (re-cloned 2026-10-20 `--filter=blob:none`, HEAD `ff7ef5169`). All other clones under
+- Reference checkouts (outside this repo): **two** — `~/repos/harness-refs/agent-client-protocol`
+  (re-cloned 2026-10-20 `--filter=blob:none`, HEAD `ff7ef5169`) and `~/repos/harness-refs/gascity`
+  (re-cloned 2026-10-20, HEAD `6aa6be55d`). All other clones under
   `~/repos/harness-refs/` were removed on the user's request; pinned commits stay recorded in each
   `99-sources.md`: `codex` (drift baseline `014489466`; loop files read at `1a35bc4cc`), `gascity`
-  (`3ef7fadd42`), `gastown` (`649b832b`), `rrsi` (`be50316e1d`), `strands-harness-sdk` (local
+  (study pin `3ef7fadd42`, drift baseline `6aa6be55d`), `gastown` (`649b832b`), `rrsi` (`be50316e1d`), `strands-harness-sdk` (local
   `a9a62d4e`; drift baseline `3bd98e618`), `agent-client-protocol` (study pin `9b26a3ea`, drift baseline `ff7ef5169`), `beads`
   (read at `4f9174e6b`, drift baseline `d0d9aa214`; gt pins `v1.0.5`). Re-clone (`--filter=blob:none`) at those commits when a drift pass
   needs source
@@ -115,7 +116,7 @@ default-mode check into CI.
     facts for drift, not collecting new ones.
   - **Current drift baselines (2026-10-20):** Codex `014489466` (generated schema 108 / 10 / 87 unchanged
     since `b1fd48c48`; `docs/99` §E.9), Strands `3bd98e618` (`strands/99` §6.3), Beads `d0d9aa214` (`gas-city/99` §C),
-    Gas City `3ef7fadd42`, ACP spec **`ff7ef5169`** (`agent-ux/10` §1.1; stable v1 moved once in `schema-v1.25.0`, permission RPC unchanged). Desktop builds read: Claude Desktop 2.42304.2 and
+    Gas City **`6aa6be55d`** (`gas-city/99` §F: one refutation, ACP permission relay reversal), ACP spec **`ff7ef5169`** (`agent-ux/10` §1.1; stable v1 moved once in `schema-v1.25.0`, permission RPC unchanged). Desktop builds read: Claude Desktop 2.42304.2 and
     ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
     Code 2.1.303 → drift-checked to **2.1.304 / Agent SDK 0.3.304** the same evening (`claude-code/99` §E),
     Codex 0.159.3 / 0.163.0, opencode 1.17.12, Gemini CLI 0.42.0.

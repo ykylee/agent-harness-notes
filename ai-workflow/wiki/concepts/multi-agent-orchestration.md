@@ -14,9 +14,9 @@ updated: 2026-10-20
 - Scope: the container and role taxonomy, durable work state, identity and attribution, dispatch
   under a capacity cap, liveness, and the control/execution split when workers are untrusted
 - Primary sources: `gastownhall/gastown` @ `649b832b76` (`v1.2.1-304-g649b832b`) and
-  `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30). Read from source and first-party design docs.
+  `gastownhall/gascity` @ `3ef7fadd42` (2026-09-30), re-checked at `6aa6be55d` (2026-10-20, `gas-city/99` §F). Read from source and first-party design docs.
   **Not run** — no binary executed, so every mechanism here is source-read, never observed
-- Updated: 2026-10-20 (`strands/99` §6.3 + `gas-city/99` §C pointer only — Strands `bd0b6a94` → `3bd98e618` (gate grep 0), Beads `4f9174e6b` → `d0d9aa214` (claim/SECURITY/serve untouched); nothing on this page changes). Previous: 2026-10-20 (§8 the mechanics were executed once — `gas-town/05` runtime observation: merge slot unreachable, `gt done` self-block, `stale-hooks` scope, four disagreeing stores). Previous: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
+- Updated: 2026-10-20 (Gas City drift pass `3ef7fadd42` → `6aa6be55d`: §10 rows for prefix isolation, the ACP permission RPC (reversed upstream 2026-10-11, now a relay) and city-write grants (minter sentence ❌ at the pin)). Previous: 2026-10-20 (`strands/99` §6.3 + `gas-city/99` §C pointer only — Strands `bd0b6a94` → `3bd98e618` (gate grep 0), Beads `4f9174e6b` → `d0d9aa214` (claim/SECURITY/serve untouched); nothing on this page changes). Previous: 2026-10-20 (§8 the mechanics were executed once — `gas-town/05` runtime observation: merge slot unreachable, `gt done` self-block, `stale-hooks` scope, four disagreeing stores). Previous: 2026-10-19 (night: `gas-city/02·04·99` prefix-filter correction traced to Gas City's topology page vs its read store; standalone Beads read (`gas-city/99` §C): forgeable ledger is a Beads property; prefix filter corrected; formula v2 is Gas City's; Beads ships its own merge slot). Previous: 2026-09-30 (Gas City ingest: platform extraction of the same axis)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -178,11 +178,11 @@ a toolkit. Two grades, both source-read at `3ef7fadd42`, neither executed:
 | The `gc` binary embeds the Gastown pack (mayor, deacon, witness, refinery, polecat) and polecat-named formulas | ✅ — "zero roles" is the type system, not the product |
 | v2 formulas (default **on**) split control beads from work beads. `ProcessControl` switches on eight `gc.kind` values | ✅ |
 | The process that runs control is a reconciled session, `control-dispatcher`, whose command is `gc convoy control --serve` | ✅ — "no agent" means no model |
-| One Dolt server per city; rigs isolate by `issue_prefix`. The April 2026 glossary's "own database per rig" is stale | ✅ |
+| One Dolt server per city; each scope resolves its **own database** from `metadata.json`; `issue_prefix` mints ids and names it, and filters nothing in the store (client-side fences only). The April 2026 glossary's "own database per rig" and the topology page's "hard query filter" are both stale | ✅ corrected 2026-10-19/20 |
 | `ObservationIncomplete` must not be read as absence. ACP and subprocess seams used to drop that third outcome | ✅ |
 | Workers must `gc hook --claim` because `bd ready` hides wisps (`ga-tmzjx6`) | ✅ first-party prompt + code comment |
-| ACP `Pending`/`Respond` return `ErrInteractionUnsupported`. The permission conformance test expects no client reply and a rejected tool | ✅ |
-| City-write grants (ed25519, single-use, request-bound) authorize **config** mutations. They do not close ledger writes | ✅ — does not replace §7 |
+| ACP `Pending`/`Respond` return `ErrInteractionUnsupported`; the conformance test expects no client reply and a rejected tool | ✅ at `3ef7fadd42` — **reversed upstream 2026-10-11** (#6598): the provider holds `session/request_permission` and relays one human/API decision (`allow_once` … `reject_always`, `cancelled` on interrupt); no auto-approve in gc. A relay, not a decision — [`gas-city/99` §F.2](../../../gas-city/99-sources.md#f2-upstream-reversal--the-acp-provider-answers-the-permission-rpc-since-2026-10-11) |
+| City-write grants (ed25519, single-use, request-bound) authorize **config** mutations. They do not close ledger writes | ✅ — does not replace §7. ❌ one derived sentence ("no minter, clients send only CSRF") was wrong at the pin: `cmd/gc-write-mint` + `clientgrant` `grant_command` mint per mutation; only the dashboard sends none (`99` §F.1). 2026-10-20: `eventfact/doc.go` states the asserted actor as D-TRUST; `internal/connect` adds per-session `bd serve` bearers (transport, not actor) |
 
 The five moves in §3 still stand. Gas City adds five that sit on top of them: judgment in the
 pack and control-flow in the bead kind; incomplete as a liveness result; one claim command;

@@ -12,7 +12,7 @@ updated: 2026-10-20
 - Purpose: the single most important structural boundary the managed Agents API draws.
 - Scope: the definition, the three pieces, what the boundary enables, key separation, and how browser agents split it three ways
 - Primary source: `developers.openai.com/api/docs/guides/agents-api/architecture` (raw Markdown)
-- Updated: 2026-10-20 (§5.6 observed note from `gas-town/05`: `BD_ACTOR` export is the whole forgery). Previous: 2026-10-19 (night: prefix isolation = database naming, `beads-topology.md` claim refuted; REPORT §Shipped artifacts mirrors §5.6; standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
+- Updated: 2026-10-20 (§5.6 addendum: Gas City `6aa6be55d` — D-TRUST asserted actor upstream, per-session `bd serve` bearers, city-write minter sentence ❌ at the pin). Previous: 2026-10-20 (§5.6 observed note from `gas-town/05`: `BD_ACTOR` export is the whole forgery). Previous: 2026-10-19 (night: prefix isolation = database naming, `beads-topology.md` claim refuted; REPORT §Shipped artifacts mirrors §5.6; standalone Beads read: the forgeable ledger is a substrate property — §5.6 addendum). Previous: 2026-09-30 (Dia planning relocated: local `agent-server` + Claude Code; model tokens still remote)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -133,6 +133,18 @@ night: Gas City's own read store picks one database **per scope** from `metadata
 (`internal/beads/doltlite_read_store.go:125-142`) — it is database separation, and the "query-layer
 filter" sentence in Gas City's `beads-topology.md` is a first-party doc claim contradicted by
 first-party source on both sides (`gas-city/99` §C).
+
+**Addendum 2026-10-20 — the embedder says so too, and one sentence here was wrong.** Gas City at
+`6aa6be55d` ([`gas-city/99`](../../../gas-city/99-sources.md) §F): `internal/eventfact/doc.go:12-13`
+*"under the user decision D-TRUST: until bd principals (BD-8) a fact's actor, subject and session are
+what the box asserts"* — two new write paths (`opjournal`, `eventfact`) carry an asserted actor by
+design. `internal/connect` mints **per-session HMAC bearers** into the `bd serve` token file: a
+transport principal per incarnation, revocable by re-render, which names the connection and not the
+row's actor — so "one shared bearer" narrows without the boundary moving. Session rows are fenced
+(generic API 422; only the controller's own cache closes trusted, #7783). ❌ The claim above that the
+city-write package "ships no minter … first-party clients send only CSRF" was wrong at the pin:
+`cmd/gc-write-mint` and `clientgrant` (`grant_command`) mint a grant per mutation for a configured
+`gc` context; only the dashboard sends none (`99` §F.1). The grant still covers config, never `bd`.
 
 
 > **Observed 2026-10-20** ([`gas-town/05`](../../../gas-town/05-runtime-observation.md) §8): in a

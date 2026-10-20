@@ -29,7 +29,7 @@
 | Agent | `fakeagent` preset: `{"command": "<script>", "args": [], "process_names": ["fakeagent","bash"], "prompt_mode": "arg", "ready_prompt_prefix": "> ", "ready_delay_ms": 1000}`; a second preset `fakeagent-stall` adds `"env": {"FAKEAGENT_NO_WORK": "1"}` so the worker never calls `gt done` |
 | Town | `~/.cache/gt-lab/town` (outside the repository). Logs: `fakeagent.log`, `sling-2.log`, `gt-done-1.log`, `healthcheck-2.log`, `feed-stranded.log`, `redispatch.log` in `~/.cache/gt-lab/` |
 
-**Version skew is the first runtime fact.** With the current `bd` (1.3.0, `4f9174e6b`) on `PATH`,
+**Version skew is the first runtime fact.** (Gas City met the same skew from the other side: 1.5 raised its floor to `bd` ≥ 1.3.0 and makes the Beads schema migration a manual operator step — [`gas-city/99` §F.3](../gas-city/99-sources.md#f3-new-in-the-range-that-this-studys-axes-care-about).) With the current `bd` (1.3.0, `4f9174e6b`) on `PATH`,
 `gt install` created the Dolt database at schema **v49** through the embedded library and the
 standalone `bd` then refused: "refusing to auto-apply 23 pending schema migrations to a shared
 server database (v49 -> v72): migrating would lock out every co-resident bd client". Even reads

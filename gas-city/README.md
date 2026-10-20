@@ -2,6 +2,7 @@
 
 > **What this is.** A study of [Gas City](https://github.com/gastownhall/gascity) (`gastownhall/gascity`,
 > MIT, Go), read from source at **`3ef7fadd42`** (2026-09-30, `fix(runtime): honest acp/subprocess
+> Re-checked 2026-10-20 at `6aa6be55d` (838 commits): one refutation, one upstream reversal (the ACP permission RPC is now relayed), the rest holds — [`99` §F](99-sources.md#f-drift-re-check-2026-10-20--3ef7fadd42--6aa6be55d).
 > listing and three-outcome liveness (#6879)`; the shallow clone also carried the moving tag
 > `edge`). First-party docs under `docs/` and `engdocs/architecture/` were read with the code, and
 > where they disagree the code wins. The disagreement is recorded, not smoothed.

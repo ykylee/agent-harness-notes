@@ -11,7 +11,7 @@ updated: 2026-10-20
 
 - Purpose: how human intervention was designed as **a protocol-level safety mechanism** rather than a UI convenience.
 - Scope: Codex's ten server→client requests, ACP's one permission RPC, the decision vocabulary, the managed API's counterpart, implementation obligations, and how browser agents and Strands extend it
-- Updated: 2026-10-20 (`strands/99` §6.3 + `gas-city/99` §C pointer only — Strands `bd0b6a94` → `3bd98e618` (gate grep 0), Beads `4f9174e6b` → `d0d9aa214` (claim/SECURITY/serve untouched); nothing on this page changes). Previous: 2026-10-20 (`docs/99` §E.9 pointer only — Codex `79a19cbb3` → `014489466`, stable 108 / 10 / 87 sha-identical, +1 experimental `thread/sample/cancel`; nothing on this page changes). Previous: 2026-10-20 (§7.7: ACP drift pass `9b26a3ea` → `ff7ef5169` — stable schema moved once, permission definitions byte-identical). Previous: 2026-10-20 (`docs/99` §E.8 pointer only — `runtime-agent-instance` unwired, agent-identity v1 recorded; nothing on this page changes). Previous: 2026-10-20 (`docs/99` §E.7 follow-up pointer only (incremental tools, `docs/16` §10.3); approval facts unchanged). Previous: 2026-10-20 (`docs/99` §E.7 drift `b1fd48c48`→`79a19cbb3`: every Codex approval type byte-identical (md5 per block); Guardian interrupted reviews now roll back admitted context (#55395); a served catalog entry may template the approved-prefix prose (`approved_prefixes`, #55366) — the decision path is untouched). Previous: 2026-10-19 (latest: §7.10 drift 0.3.304/2.1.304 — approval strings unchanged, `decider: "person"`, and the "shell ahead of engine" sentence corrected to "types lag the engine"; late: §7.8 `onFailure: "block"` addendum from the hooks reference re-read, and §7.10 "rendered" — the Desktop 2.42304.2 card drawn from `can_use_tool` fields (`agent-ux/02` §3.1); `claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
+- Updated: 2026-10-20 (§7.7: Gas City's ACP provider relays the permission RPC since 2026-10-11 (`gas-city/99` §F.2) — reversal of the 2026-09-30 observation, not a refutation). Previous: 2026-10-20 (`strands/99` §6.3 + `gas-city/99` §C pointer only — Strands `bd0b6a94` → `3bd98e618` (gate grep 0), Beads `4f9174e6b` → `d0d9aa214` (claim/SECURITY/serve untouched); nothing on this page changes). Previous: 2026-10-20 (`docs/99` §E.9 pointer only — Codex `79a19cbb3` → `014489466`, stable 108 / 10 / 87 sha-identical, +1 experimental `thread/sample/cancel`; nothing on this page changes). Previous: 2026-10-20 (§7.7: ACP drift pass `9b26a3ea` → `ff7ef5169` — stable schema moved once, permission definitions byte-identical). Previous: 2026-10-20 (`docs/99` §E.8 pointer only — `runtime-agent-instance` unwired, agent-identity v1 recorded; nothing on this page changes). Previous: 2026-10-20 (`docs/99` §E.7 follow-up pointer only (incremental tools, `docs/16` §10.3); approval facts unchanged). Previous: 2026-10-20 (`docs/99` §E.7 drift `b1fd48c48`→`79a19cbb3`: every Codex approval type byte-identical (md5 per block); Guardian interrupted reviews now roll back admitted context (#55395); a served catalog entry may template the approved-prefix prose (`approved_prefixes`, #55366) — the decision path is untouched). Previous: 2026-10-19 (latest: §7.10 drift 0.3.304/2.1.304 — approval strings unchanged, `decider: "person"`, and the "shell ahead of engine" sentence corrected to "types lag the engine"; late: §7.8 `onFailure: "block"` addendum from the hooks reference re-read, and §7.10 "rendered" — the Desktop 2.42304.2 card drawn from `can_use_tool` fields (`agent-ux/02` §3.1); `claude-code/02`: the second engine's gate at type level — §7.10; night: `gas-city` correction refinement; REPORT recs 12–13 reference the gate split; approval facts unchanged; evening: `gas-city/02·04·99` Beads corrections; approval facts unchanged; evening: `docs/02` §9 supplement — `approvalPolicy`/`approvalsReviewer`/`permissions` ⚗ listed; approval facts unchanged; drift 2026-10-19: approval surface unchanged, Guardian no longer pre-approves an escalated retry — §7.9 addendum). Previous: 2026-10-06 (Claude Code hook exit 2 blocks PreToolUse; a missing script does not)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -232,12 +232,21 @@ is not a transport-level concern, and #2223 did not move anything closer to it.*
 ([`strands/06`](../../../strands/06-multi-agent-and-exposure.md) §5.4,
 [`agent-ux/10`](../../../agent-ux/10-acp.md) §7). Source absence ✅; live ACP client ⚠️.
 
-**Gas City's ACP session provider** is a client of the same method and does not answer it.
-`Pending` and `Respond` return `ErrInteractionUnsupported`. `TestACPProtocolPermissionTimeoutRejects`
-(`gastownhall/gascity` @ `3ef7fadd42`) starts a fake agent with `--request-permission` and asserts
-the timeout path: the peek buffer contains `permission rejected`, and `responses.jsonl` has no
-client replies. Hosting the ACP wire is not implementing this gate
-([`gas-city/03`](../../../gas-city/03-roles-and-lifecycle.md) §6). Source ✅; not run ⚠️.
+**Gas City's ACP session provider** was, at `3ef7fadd42`, a client of the same method that did not
+answer it: `Pending`/`Respond` returned `ErrInteractionUnsupported` and
+`TestACPProtocolPermissionTimeoutRejects` asserted an empty client-reply log — hosting the wire
+without implementing the gate ([`gas-city/03`](../../../gas-city/03-roles-and-lifecycle.md) §6).
+**Reversed upstream 2026-10-11** (#6598, re-checked at `6aa6be55d` 2026-10-20): the provider now
+*holds* `session/request_permission` and relays one decision from the HTTP API, `gc session respond`
+or the worker handle — `approve → allow_once`, `deny_always → reject_always`, and `cancelled` on
+interrupt, agent cancel or turn end; a nudge is refused while one is pending; five round-trip tests
+assert exactly one reply. **gc applies no policy of its own** (the only `approve_always` strings are
+`permission_mode` presets that configure the agent CLI). So the third observation becomes: an
+orchestrator can implement this gate as a **relay** and still decide nothing — which is the shape §2
+asks for, and the opposite of launching the wrapped agent with approval off. The same window turned
+tmux approval prompts into `session.pending` events that hold lifecycle timers
+([`gas-city/99` §F.2](../../../gas-city/99-sources.md#f2-upstream-reversal--the-acp-provider-answers-the-permission-rpc-since-2026-10-11)).
+Source ✅; not run ⚠️.
 
 ## §7.8 Observation — a hook that blocks only when it runs  {#s7-8-claude-code}
 

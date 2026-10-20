@@ -6,6 +6,10 @@
 > this repository's existing evidence does with the change.
 >
 > Read from `gastownhall/gascity` @ `3ef7fadd42`. Nothing was executed.
+>
+> Re-checked 2026-10-20 at `6aa6be55d` ([99 §F](99-sources.md#f-drift-re-check-2026-10-20--3ef7fadd42--6aa6be55d)):
+> A1–A4 hold, A5 carries a correction that was wrong at the pin, and the Part B / Part C / card lines
+> about the ACP permission RPC describe the pin only — Gas City has relayed that RPC since 2026-10-11.
 
 ---
 
@@ -92,6 +96,10 @@ That is a client convention, graded as such.
 > so isolation is database naming, not a query filter. The caveat below — a client-side
 > filter is not a server-side grant — is now the whole statement: the Dolt server auto-started by
 > `bd` is `root` with no password by default (`docs/architecture/dolt.md:204-210`).
+>
+> **2026-10-20 addendum.** Gas City does run client-side prefix *fences* (cache event ownership,
+> pinned-id namespace, proxied-store prefix agreement — [02](02-architecture.md) §2) — conventions
+> in the embedder, not predicates in the store and not grants. The statement stands.
 
 ### A5. Config is code; bead text is data
 
@@ -100,7 +108,9 @@ trusted operator code. Bead titles, mail, formula vars, and PR text are untruste
 be interpolated into `sh -c`. Ambient secret-like environment variables are stripped on
 orchestrator-side helpers unless the operator passed the value explicitly. City config mutations
 can require an ed25519 single-use grant bound to the exact request (`internal/citywriteauth`);
-the dashboard does not hold the minting key.
+the dashboard does not hold the minting key — a `gc` CLI context with a configured `grant_command`
+does mint one per mutation through an out-of-tree signer (reference: `cmd/gc-write-mint`), which
+an earlier revision of this file denied ([99 §F.1](99-sources.md#f1-refutation--the-grant-minter-and-the-client-grant-path-existed-at-the-pin), ❌ wrong at the pin).
 
 **Why it transfers.** An orchestration ledger is full of attacker-controlled text the moment an
 agent reads a ticket or a review comment. The formula engine will substitute `{{var}}` into step
@@ -122,8 +132,8 @@ third door, acknowledged in a comment, owner-only files as the mitigation.
 | [`SYNTHESIS.md`](../SYNTHESIS.md) §7 — a check that can fail must not be counted as a clean negative | A2. `ObservationIncomplete` exists so a probe error is not "dead". The ACP/subprocess seam lost that bit and HEAD puts it back |
 | [`gas-town/04`](../gas-town/04-orchestration-techniques.md) A4 — propulsion needs a durable hook | A3. The hook is now a command, because the durable bead is invisible to the query a worker will otherwise write |
 | [`gas-town/04`](../gas-town/04-orchestration-techniques.md) A1 — the coordinator holds no thread | A1. v2 workflows: the plan is the bead graph, `workflow-finalize` closes the root, any control-dispatcher process can resume it. v1 molecules are still inert data worked inside one session |
-| [`control-plane-execution-plane`](../ai-workflow/wiki/concepts/control-plane-execution-plane.md) §5.6 — the plane boundary is a credential | A5, and it does not replace §5.6. City-write grants credential **config** mutations. A worker with ledger-write access can still forge a completed task, and can also strand a workflow by writing a control bead |
-| [`approval-gate`](../ai-workflow/wiki/concepts/approval-gate.md) §7.7 — ACP's one permission RPC | [`03`](03-roles-and-lifecycle.md) §6. Gas City's ACP provider does not answer `session/request_permission`. The conformance test expects timeout and a rejected tool, with an empty client-reply log. Same shape as "orchestrators launch the wrapped agent with approval off" |
+| [`control-plane-execution-plane`](../ai-workflow/wiki/concepts/control-plane-execution-plane.md) §5.6 — the plane boundary is a credential | A5, and it does not replace §5.6. City-write grants credential **config** mutations. A worker with ledger-write access can still forge a completed task, and can also strand a workflow by writing a control bead. **2026-10-20:** upstream now says so itself (`eventfact/doc.go:12-13`, "a fact's actor … are what the box asserts"), adds per-session `bd serve` bearers (`internal/connect`) that name the connection and not the actor, and fences session rows behind the controller (422 on the generic API) — [02](02-architecture.md) §6.3 |
+| [`approval-gate`](../ai-workflow/wiki/concepts/approval-gate.md) §7.7 — ACP's one permission RPC | [`03`](03-roles-and-lifecycle.md) §6. **At the pin** the provider did not answer `session/request_permission` (timeout, rejected tool, empty reply log) — the "wrapped agent with approval off" shape. **Since 2026-10-11 (#6598)** it holds the request and relays one human/API decision onto the wire (`allow_once` … `reject_always`, `cancelled` on interrupt or turn end), with no auto-approve in gc. The gate is now *implemented as a relay* and still not *decided* by the orchestrator — [99 §F.2](99-sources.md#f2-upstream-reversal--the-acp-provider-answers-the-permission-rpc-since-2026-10-11) |
 | Strands `sandbox: host`, Codex Windows sandbox | Unchanged. Gas City's trust doc says city config is trusted code that runs as shell. That is a host-scoped orchestrator by default. Providers (k8s, exec, ACP) move the session; they do not, by themselves, take the ledger credential away |
 
 ## Part C — What Gas City does that this evidence does not support
@@ -133,9 +143,12 @@ third door, acknowledged in a comment, owner-only files as the mitigation.
 - **"The orchestrator runs the graph with no agent involved."** No *model* executes control
   beads. A `gc convoy control --serve` session does, and it is a reconciled agent entry named
   `control-dispatcher`.
-- **ACP integration as an approval implementation.** The provider is a session transport. The
+- **ACP integration as an approval implementation.** The provider is a session transport. ~~The
   permission method is unimplemented on the client side, on purpose of the current code, and the
-  test locks that in.
+  test locks that in.~~ True at `3ef7fadd42`; since 2026-10-11 the method is held and relayed to a
+  human or API caller, and the orchestrator applies no policy of its own
+  ([99 §F.2](99-sources.md#f2-upstream-reversal--the-acp-provider-answers-the-permission-rpc-since-2026-10-11)).
+  The evidence now supports "ACP permission as a *relay*", still not "as a decision".
 - **Scale and cost.** "Hundreds of concurrent agents", "software factory", "Kubernetes for
   agents" — 📣, not measured. The reconciler is Kubernetes-shaped. The system is not thereby
   Kubernetes.
@@ -154,5 +167,6 @@ third door, acknowledged in a comment, owner-only files as the mitigation.
 4. **Prefix on a shared server is the default isolation.** It is a client filter, not a
    credential. Do not describe it as a trust boundary.
 5. **Three doors, three credentials.** Config mutations, ledger writes, session-meta sidecars.
-   A grant on one does not close the others. An unanswered ACP permission request closes none
-   of them; it only means the tool was rejected by timeout.
+   A grant on one does not close the others. An ACP permission request closes none of them
+   either — unanswered (the pin) it meant a tool rejected by timeout; relayed (since 2026-10-11) it
+   means one human decision forwarded, and nothing about who may write the ledger.

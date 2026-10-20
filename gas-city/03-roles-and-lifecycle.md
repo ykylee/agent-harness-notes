@@ -4,6 +4,9 @@
 > `docs/getting-started/coming-from-gastown.md`. The state machine is
 > `cmd/gc/session_reconciler.go` as described by `engdocs/architecture/health-patrol.md` and
 > checked against `internal/runtime/liveness.go`.
+>
+> Re-checked 2026-10-20 at `6aa6be55d` ([99 §F](99-sources.md#f-drift-re-check-2026-10-20--3ef7fadd42--6aa6be55d)):
+> §1–§5 hold (§5 strengthened); **§6 was true at the pin and is no longer true** — see its header.
 
 ## 1. There is no role taxonomy in the platform
 
@@ -43,6 +46,13 @@ are data. The data is on by default if you install the Gastown-shaped city. A ci
 imports the pack does not have a mayor, and the orchestrator does not notice.
 
 ## 3. Reconciliation
+
+> **2026-10-20.** This is the legacy tick reconciler, still the default; an opt-in keyed "v2"
+> reconciler exists and is refused for cities using `max_session_age`, `depends_on` or stall
+> timeouts ([02](02-architecture.md) §4 note). Legacy gained an *execution backstop* (claim held,
+> no `execution.step_started` evidence: 90 s → nudge → 3 min backoff ×3 → drain) whose own incident —
+> a seat waiting on a human approval drained 56 times — is why a pending approval now vetoes the
+> drain and holds lifecycle timers ([99 §F.3](99-sources.md#f3-new-in-the-range-that-this-studys-axes-care-about)).
 
 `reconcileSessionBeads` compares the desired set from config with `ListRunning()` plus liveness:
 
@@ -122,7 +132,24 @@ Gas Town cross-checked two stores because one store can go stale. Gas City refus
 "probe failed" into "not running" because the boolean API already did that. Both are instances
 of the false-zero rule in [`SYNTHESIS.md`](../SYNTHESIS.md) §7.
 
-## 6. ACP transport, permission unanswered
+**Strengthened at `6aa6be55d` (2026-10-20).** The passthrough is unchanged (`acp/cutover.go:138-142`,
+`subprocess/cutover.go:75-79`), and the rule now has more machinery behind it: `ServerDeathConfirmer`
+(`liveness.go:61-82`, tmux-only — an unavailable runtime counts as *gone* only when the tmux leaf
+attests its server dead, valid for one pass), a fresh liveness re-read before any heal, and in the v2
+reconciler five classes `unknown / alive / occupied / gone / dead` with "Unknown: Keep, and no grant"
+and absence re-proven through every composite hop before a destructive effect (#7254, #7346).
+
+## 6. ACP transport — permission unanswered at the pin, relayed since 2026-10-11
+
+> ⚠️ **Superseded upstream.** Everything below describes `3ef7fadd42` and was correct there. Commit
+> `ee24a477c` (#6598, 2026-10-11) made `Pending`/`Respond` (now `acp/permission.go`) hold
+> `session/request_permission` and answer it on the wire from the HTTP API, `gc session respond` or the
+> worker handle: `approve → allow_once`, `deny_always → reject_always`, and `cancelled` on interrupt,
+> agent cancel or turn end. The timeout test is deleted; five round-trip tests assert exactly one
+> client reply. **No auto-approve exists in gc.** So Gas City became a *relay* for the gate, not an
+> implementer of a decision — the orchestrator still decides nothing. `protocolVersion` stays 1 and the
+> spec's new `notice` / `compaction` updates are not decoded. Full record:
+> [99 §F.2](99-sources.md#f2-upstream-reversal--the-acp-provider-answers-the-permission-rpc-since-2026-10-11).
 
 `internal/runtime/acp` implements the provider seam over ACP JSON-RPC: start a process, send
 `session/prompt`, read `session/update` into the peek buffer.
