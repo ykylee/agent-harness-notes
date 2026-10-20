@@ -244,6 +244,16 @@ Implementation: `strands-cli/src/tui/acp/server.ts` on harness-sdk `a9a62d4e`, S
 `@agentclientprotocol/sdk` **1.3.0** (`strands-cli/package.json:62`). Transport: the SDK's
 `ndJsonStream` over stdin/stdout.
 
+> **Re-checked 2026-10-20 at harness-sdk `3bd98e618`** (0 commits past the Strands baseline): the pin
+> is still `1.3.0` (`package.json:59`, lockfile resolves `sdk-1.3.0.tgz`), three files import the
+> SDK (`acp/server.ts`, `acp/projection.ts`, `project/acp.ts`), and **none uses an API that SDK
+> 2.0.0 removed** — `server.ts:213-219` builds the agent with the app builder
+> `acp.agent({ name: 'strands' }).onRequest(...).onNotification(...)` and `:247` with `ndJsonStream`,
+> which is exactly what `MIGRATION_STABLE_UNSTABLE.md` names as the replacement for the deleted
+> `AgentSideConnection` (0 hits in `strands-cli`). Moving to 2.0.0 would be a dependency bump, not a
+> rewrite; nothing in §7.1–§7.2 changes. `agentInfo.version` is still the literal `'0.0.1'` (`:68`).
+> The registered-method list below now sits at `server.ts:213-219`.
+
 ### 7.1 What `createAcpApp` actually registers
 
 `server.ts:209-221` handles:
@@ -317,5 +327,5 @@ Stable v1 remains the wire to implement against today.
   enum ([08](08-primitives-rendered.md)); the RPC was not traced in those binaries this pass.
 - Source-agent `'deny'` vs spec `cancelled` / `reject_*`.
 - Unstable extras (`session/fork`, MCP-over-ACP, providers, subagents, system prompt) — unread beyond method names. NES is gone from the schema (2026-10-20), so it is no longer a question.
-- Strands CLI pin `@agentclientprotocol/sdk` 1.3.0 vs npm 2.0.0 — whether `strands --acp-server` has moved off the removed connection classes was not re-read this pass.
+- ~~Strands CLI pin `@agentclientprotocol/sdk` 1.3.0 vs npm 2.0.0 — whether `strands --acp-server` has moved off the removed connection classes~~ — re-read 2026-10-20 (§7): still 1.3.0, and it never used the removed classes.
 - Streamable HTTP transport — draft, unread.

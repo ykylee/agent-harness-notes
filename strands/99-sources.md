@@ -315,3 +315,8 @@ option list all stand without re-reading. **No new refutation.** Next baseline: 
   text); the account-date rule is the PR's claim about the provider, not verified here ⚠️.
 - **The other two:** a docs page on agent-foundation migration paths (#5152) and a `site/` dependency
   bump (#5229). Nothing under `harness-py`, `harness-ts`, `strands-cli`.
+- **Strands CLI ↔ ACP SDK 2.0.0 (asked by [`agent-ux/10`](../agent-ux/10-acp.md) §1.1, answered
+  the same day):** `strands-cli/package.json:59` still pins `@agentclientprotocol/sdk` `1.3.0`
+  (lockfile `sdk-1.3.0.tgz`); the three importing files use the app-builder API
+  (`acp.agent().onRequest(...)`, `ndJsonStream`) that 2.0.0 keeps, and never the removed
+  `AgentSideConnection` (code search 0). A bump is a dependency change, not a port.
