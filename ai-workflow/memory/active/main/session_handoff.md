@@ -6,7 +6,7 @@
 - Scope: current focus, task status, key changes, next actions, risks
 - Audience: AI agents, maintainers
 - Status: active
-- Updated: 2026-10-20 (5차: **드리프트 유입량 확인 + ACP 패스** `9b26a3ea`→`ff7ef5169` — 안정 v1 와이어가 `schema-v1.25.0` 에서 한 번 움직였고(notice·compaction·엄격 파싱) 승인 RPC 정의 8종은 바이트 동일. 다른 축 유입: Codex 10 커밋(전부 experimental), Strands 3(게이트 무관), beads 9, gascity **838**, gemini-cli·gastown·rrsi 0, Claude Code npm 동일. `~/repos/harness-refs/agent-client-protocol` 재클론 **존재**. 앞서 세션 말미 정리: **참조 체크아웃 전부 삭제**(`~/repos/harness-refs/` 없음 — 핀 커밋은 `docs/PROJECT_PROFILE.md` §환경과 각 `99-sources.md`, 드리프트 패스 전 `--filter=blob:none` 재클론 필요), `/tmp` 스크래치·`~/.cache/gt-lab`·`gt-build-tmp` 삭제. 같은 날 Gas Town **런타임 검증** `gas-town/05` 신설 — 모델 없는 스크립트 에이전트로 두 사이클 완주, 소스-런타임 불일치 3건. 앞서 같은 날 `harness-artifacts/04`·`05` 2차 패스. 다음 드리프트 기준: Codex `1a35bc4cc`(루프 파일)·0.163.0 / Claude Code SDK 0.3.304·CLI 2.1.304 / ChatGPT 26.1013.40934 / Gemini CLI `76e4d7c04` / Strands `bd0b6a94`)
+- Updated: 2026-10-20 (5차 후반: Codex 기준 `79a19cbb3`→**`014489466`** 전진, `docs/99` §E.9 — 안정 108/10/87 불변·실험 +1 `thread/sample/cancel`·`runtime-agent-instance` 여전히 미배선. 5차: **드리프트 유입량 확인 + ACP 패스** `9b26a3ea`→`ff7ef5169` — 안정 v1 와이어가 `schema-v1.25.0` 에서 한 번 움직였고(notice·compaction·엄격 파싱) 승인 RPC 정의 8종은 바이트 동일. 다른 축 유입: Codex 10 커밋(전부 experimental), Strands 3(게이트 무관), beads 9, gascity **838**, gemini-cli·gastown·rrsi 0, Claude Code npm 동일. `~/repos/harness-refs/agent-client-protocol` 재클론 **존재**. 앞서 세션 말미 정리: **참조 체크아웃 전부 삭제**(`~/repos/harness-refs/` 없음 — 핀 커밋은 `docs/PROJECT_PROFILE.md` §환경과 각 `99-sources.md`, 드리프트 패스 전 `--filter=blob:none` 재클론 필요), `/tmp` 스크래치·`~/.cache/gt-lab`·`gt-build-tmp` 삭제. 같은 날 Gas Town **런타임 검증** `gas-town/05` 신설 — 모델 없는 스크립트 에이전트로 두 사이클 완주, 소스-런타임 불일치 3건. 앞서 같은 날 `harness-artifacts/04`·`05` 2차 패스. 다음 드리프트 기준: Codex `1a35bc4cc`(루프 파일)·0.163.0 / Claude Code SDK 0.3.304·CLI 2.1.304 / ChatGPT 26.1013.40934 / Gemini CLI `76e4d7c04` / Strands `bd0b6a94`)
 - Related docs: [Project Profile](../../../docs/PROJECT_PROFILE.md), [PURPOSE](../PURPOSE.md), [SYNTHESIS](../../../SYNTHESIS.md), [state.json](./state.json), [backlog](./backlog/)
 
 ## Current Focus
@@ -46,6 +46,7 @@
 
 ## Work Status
 
+- TASK-2026-10-20-main-009 Codex 드리프트 `79a19cbb3`→`014489466`: done. 클론 없이 precomputed export 2종 + `common.rs` 대조. `docs/99` §E.9, `docs/02` 헤더·§6, 프로필, REPORT 영/한, wiki 6면 포인터
 - TASK-2026-10-20-main-008 ACP 드리프트 패스: done. `agent-ux/10` +77/−35, 99 +7, wiki 3면, 프로필. 구조 diff(`$defs`·`x-method`·정의별 JSON 동치)로 판정, 라이브 클라이언트 ⚠️ 그대로
 - TASK-2026-10-20-main-007 Gas Town 런타임 검증: done. `gas-town/05` 신설(251줄), README·99 §C·02 §8·03 §3 주석, SYNTHESIS 1문장, wiki 2면 관찰+인용 3면. **모델 실행 0, gt/bd/dolt 실행 있음**(이 저장소 최초의 오케스트레이션 실측)
 - TASK-2026-10-20-main-006 `harness-artifacts/04` §10 미검증 해소: done. ChatGPT Electron 업데이터 3플랫폼·apt 저장소(서명 검증)·Codex sigstore 검증·opencode/Superset/Paseo 업데이터 소스·Claude Code 30분. 04 +26줄, 99 §B 4행·§D 3행, SYNTHESIS §2.9, wiki provider-as-data §6.7+인용 3면. **실행 0건**
@@ -104,13 +105,13 @@
 
 **2026-10-20 5차 — 드리프트 유입량 (compare API, 클론 없음)**
 - [x] ~~ACP 패스~~ — TASK-008. 다음 기준 `ff7ef5169`. 남은 ⚠️: Strands CLI 의 `@agentclientprotocol/sdk` 1.3.0 핀이 npm 2.0.0(연결 클래스 제거)로 옮겼는지, 라이브 클라이언트
-- [ ] Codex `79a19cbb3`→`014489466` 10 커밋: 계약 변경은 **전부 experimental**(`thread/sample/cancel` 신설, `thread/fork.experimentalDisablePredictionMcp`, `ThreadSampleParams.disable_mcp`), 안정 스키마 미변경, `runtime-agent-instance` 역의존 여전히 0(소스 5 커밋 변경 #55410·#55413), 안정 태그 `rust-v0.163.0` 그대로(알파 0.164.0-alpha.6) → `docs/99` §E 에 한 행만 추가하면 됨
+- [x] ~~Codex `79a19cbb3`→`014489466` 10 커밋~~ — TASK-009, `docs/99` §E.9. 안정 export sha 동일(108/10/87), 실험 176→177. 다음 기준 `014489466`. 계약 변경은 **전부 experimental**(`thread/sample/cancel` 신설, `thread/fork.experimentalDisablePredictionMcp`, `ThreadSampleParams.disable_mcp`), 안정 스키마 미변경, `runtime-agent-instance` 역의존 여전히 0(소스 5 커밋 변경 #55410·#55413), 안정 태그 `rust-v0.163.0` 그대로(알파 0.164.0-alpha.6) → `docs/99` §E 에 한 행만 추가하면 됨
 - [ ] Strands `bd0b6a94`→`3bd98e618` 3 커밋(게이트 파일 0) · beads `4f9174e6b`→`d0d9aa214` 9 커밋(claim/security 무관) → 기준만 전진
 - [ ] **gascity `3ef7fadd42`→`6aa6be55d` 838 커밋** — `gas-city/` 전면 재검토 규모. 착수 여부는 사용자 결정
 - [ ] gemini-cli `76e4d7c04` · gastown `649b832b` · rrsi `be50316e1d` identical, Claude Code CLI 2.1.304 / SDK 0.3.304 동일 — 변동 없음
 
 **2026-10-20 세션 말미 (정리)**
-- [ ] 다음 드리프트 패스 전 재클론: `openai/codex`(기준 `79a19cbb3`, 루프 파일 `1a35bc4cc`), `strands-agents` 하네스(`bd0b6a94`), `gastownhall/{gastown,gascity,beads}`, `agent-client-protocol`(`9b26a3ea`) — 로컬 클론·분리 번들·추출물이 모두 지워졌다. 번들 재분리는 `scripts/bun_split.py`, 산출물 해시·URL 은 `harness-artifacts/99` §B
+- [ ] 다음 드리프트 패스 전 재클론: `openai/codex`(기준 `014489466`, 루프 파일 `1a35bc4cc`), `strands-agents` 하네스(`bd0b6a94`), `gastownhall/{gastown,gascity,beads}`, `agent-client-protocol`(`9b26a3ea`) — 로컬 클론·분리 번들·추출물이 모두 지워졌다. 번들 재분리는 `scripts/bun_split.py`, 산출물 해시·URL 은 `harness-artifacts/99` §B
 
 **2026-10-19 저녁 세션이 남긴 것 (harness-artifacts)**
 - [x] ~~`harness-artifacts/05` 후속: opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini 대화형 TUI 큐·에이전트 프레임워크, Claude Code 자동 압축 임계 상수, Codex 루프 탐지 부재의 보상 메커니즘~~ — TASK-2026-10-20-main-005 로 해소. 남은 ⚠️(05 §7): Claude Code 원격 플래그 `tengu_amber_*` 값·`clientDataAutoCompactWindow` 채움 시점, opencode 번들↔태그 리비전 대조, Gemini 원격/A2A 실행기·`fast-ack-helper` 모델 매핑, Codex 서버측 반복 억제

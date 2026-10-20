@@ -12,7 +12,7 @@ updated: 2026-10-20
 - Purpose: the three primitives Codex chose to express an agent loop as an API, and each one's lifecycle.
 - Scope: the boundaries between them, item lifecycle, thread unloading and eviction, the sticky semantics of turn parameters
 - Primary sources: the generated schemas under `codex-rs/app-server-protocol/schema/`, `config_toml.rs`
-- Updated: 2026-10-20 (§8.7: four meanings of "turn" and the continue signal across five engines, from `harness-artifacts/05`). Previous: 2026-10-20 (`docs/99` §E.8: `runtime-agent-instance` unwired; the live identity leg is `AuthMode::AgentIdentity` + attestation — §8.5 addendum corrected). Previous: 2026-10-20 (Codex drift `b1fd48c48`→`79a19cbb3`: counts unchanged, + experimental `thread/sample`, Thread/Turn types byte-identical — §8.5 addendum; 2026-10-19: `claude-code/01·03` drift 0.3.304/2.1.304 — no change to the flat wire; `keep_alive` gains an out-of-schema `startup_mark`, dialogs may have no deadline, context-usage rows get stable ids; §8.6 unchanged; `claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
+- Updated: 2026-10-20 (`docs/99` §E.9 pointer only — Codex `79a19cbb3` → `014489466`, stable 108 / 10 / 87 sha-identical, +1 experimental `thread/sample/cancel`; nothing on this page changes). Previous: 2026-10-20 (§8.7: four meanings of "turn" and the continue signal across five engines, from `harness-artifacts/05`). Previous: 2026-10-20 (`docs/99` §E.8: `runtime-agent-instance` unwired; the live identity leg is `AuthMode::AgentIdentity` + attestation — §8.5 addendum corrected). Previous: 2026-10-20 (Codex drift `b1fd48c48`→`79a19cbb3`: counts unchanged, + experimental `thread/sample`, Thread/Turn types byte-identical — §8.5 addendum; 2026-10-19: `claude-code/01·03` drift 0.3.304/2.1.304 — no change to the flat wire; `keep_alive` gains an out-of-schema `startup_mark`, dialogs may have no deadline, context-usage rows get stable ids; §8.6 unchanged; `claude-code/01·03`: the flat alternative to Thread/Turn/Item — §8.6; evening: `docs/02` §4 Item table and §9 27-field `ThreadStartParams` supplement; drift 2026-10-19 `b1fd48c48`: counts 108/10/87, turn lineage fields, read state, `codexErrorInfo` open set — §8.5). Previous: 2026-09-30 (date bump: generated-schema counts / catalog follow-up) (Codex drift re-check against `e72da2b538`)
 
 ## §1 TL;DR  {#s1-tldr}
 
@@ -140,7 +140,7 @@ listed as the full 27-field Rust definition with the 12 experimental fields mark
 engine-side half of the client's durable-host dialect (`environments`, `dynamicTools`,
 `selectedCapabilityRoots`, `experimentalRawEvents`).
 
-**2026-10-20, `b1fd48c48` → `79a19cbb3`** (`docs/99` §E.7, 46 commits, no tag): generated counts
+**2026-10-20, `b1fd48c48` → `79a19cbb3`** (`docs/99` §E.7, 46 commits, no tag; → `014489466` later the same day, §E.9: stable export sha-identical, +1 experimental `thread/sample/cancel`): generated counts
 108 / 10 / 87 unchanged; one experimental request `thread/sample` (`{thread_id, expected_turn_id, prompt,
 effort?, turn_trigger?}` — a sample against a thread without opening a turn); every approval and
 Thread/Turn type byte-identical; durable-host dialect still absent (fourth check). New outside the

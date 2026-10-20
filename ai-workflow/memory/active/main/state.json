@@ -36,6 +36,7 @@
     ],
     "planned_items": [],
     "recent_done_items": [
+      "TASK-2026-10-20-main-009 — Codex 드리프트 재확인 79a19cbb3 → 014489466 (10 커밋, 클론 없이 precomputed export 대조) — docs/99 §E.9, 기준 전진",
       "TASK-2026-10-20-main-008 — ACP 드리프트 패스 — 9b26a3ea → origin/main (schema-v1.25.0 이 session notices·compaction 을 stable 로 승격, 160 커밋), agent-ux/10 갱신",
       "TASK-2026-10-20-main-007 — Gas Town 런타임 검증 — 소규모 town 에서 sling→done→mq→post-merge→convoy 와 stalled→force-kill→stranded→redispatch 를 스크립트 에이전트로 관찰 (gas-town/05)",
       "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
@@ -44,15 +45,14 @@
       "TASK-2026-10-20-main-003 — runtime-agent-instance 크레이트가 app-server 에 배선되는지 — openai/codex origin/main 독해",
       "TASK-2026-10-20-main-002 — incremental_tools 가 Responses Lite 와이어에서 뜻하는 바 — Codex 79a19cbb3 소스 독해 (docs/16 보강)",
       "TASK-2026-10-20-main-001 — Codex 드리프트 패스 — b1fd48c48 → 79a19cbb3 (openai/codex origin/main, 2026-10-20)",
-      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)",
-      "TASK-2026-10-19-main-011 — 드리프트 패스 — Claude Code SDK 0.3.303→0.3.304 / CLI 2.1.303→2.1.304 (claude-code/ 기준선 갱신, untyped 6필드 추적)"
+      "TASK-2026-10-19-main-012 — OTA 역공학 — 레퍼런스 하네스들의 자동 업데이트 경로·업데이트 서버 구성을 REA 와 정적 독해로 복원 (harness-artifacts/04)"
     ],
     "unknown_status_items": [],
     "environment_constraints": []
   },
   "backlog": {
     "latest_backlog_path": "ai-workflow/memory/active/main/backlog/2026-10-20.md",
-    "task_count": 9,
+    "task_count": 10,
     "in_progress_items": [],
     "blocked_items": [],
     "done_items": [
@@ -64,7 +64,8 @@
       "TASK-2026-10-20-main-005 — harness-artifacts/05 §7 미검증 해소 — Claude Code 자동 압축 임계 상수, opencode 서버측 steer 경로·스텝 상한 삽입 문구, Gemini TUI 큐·에이전트 프레임워크·_recoverFromLoop, Codex 루프 탐지 부재의 보상 메커니즘",
       "TASK-2026-10-20-main-006 — harness-artifacts/04 §10 미검증 해소 — ChatGPT Electron 의 appcast 소비·apt, Sparkle 키 동일성, Codex sigstore 검증, opencode Tauri 키·자산 해시 전수, Antigravity/Conductor/Superset/Paseo 엔드포인트, Claude Code 확인 주기, rc 채널·UA 의존성",
       "TASK-2026-10-20-main-007 — Gas Town 런타임 검증 — 소규모 town 에서 sling→done→mq→post-merge→convoy 와 stalled→force-kill→stranded→redispatch 를 스크립트 에이전트로 관찰 (gas-town/05)",
-      "TASK-2026-10-20-main-008 — ACP 드리프트 패스 — 9b26a3ea → origin/main (schema-v1.25.0 이 session notices·compaction 을 stable 로 승격, 160 커밋), agent-ux/10 갱신"
+      "TASK-2026-10-20-main-008 — ACP 드리프트 패스 — 9b26a3ea → origin/main (schema-v1.25.0 이 session notices·compaction 을 stable 로 승격, 160 커밋), agent-ux/10 갱신",
+      "TASK-2026-10-20-main-009 — Codex 드리프트 재확인 79a19cbb3 → 014489466 (10 커밋, 클론 없이 precomputed export 대조) — docs/99 §E.9, 기준 전진"
     ]
   },
   "next_documents": [

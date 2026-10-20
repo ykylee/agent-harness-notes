@@ -679,7 +679,7 @@ baseline numbers reproduce exactly). **No refutation.**
 - **Not read:** `tui/` (TUI backend sessions #55381/#55304, title spinners), `file-search`,
   `thread-store`, `cloud-tasks`, `.github`. Live traffic ⚠️.
 
-**Next drift baseline: `79a19cbb3`.**
+**Next drift baseline: `79a19cbb3`** → superseded by §E.9 (`014489466`).
 
 ### E.8 Follow-up, 2026-10-20 — is `runtime-agent-instance` wired? No; the identity leg that *is* wired was unrecorded
 
@@ -748,3 +748,38 @@ identity; the drift baseline stays `79a19cbb3`). Method: reverse-dependency grep
   `agentIdentity`, `personalAccessToken`, `bedrockApiKey`, `bedrockAccessKeys`
   (`app-server-protocol/src/protocol/common.rs`); [02](02-app-server-protocol.md) never listed them —
   a gap, recorded here rather than patched into a 2026-09-30 reading.
+
+### E.9 Drift re-check, 2026-10-20 (later) — `79a19cbb3` → `014489466`
+
+10 commits (2026-10-19 23:56 → 10-20 05:25 UTC, #55406–#55463), 77 files; **no tag** (last stable is
+still `rust-v0.163.0`, 10-15; `rust-v0.164.0-alpha.6` 10-19). Method: no clone — the GitHub compare API
+for the commit and file lists, then the two **precomputed generated-schema exports**
+(`app-server-protocol/schema/precomputed/app-server-exports-{stable,experimental}.json.zst`) fetched at
+both revisions and counted the same way as §E.7, plus `common.rs` at both revisions. **No refutation.**
+
+| Count | `79a19cbb3` | `014489466` | Δ |
+|---|---|---|---|
+| Generated stable `ClientRequest.ts` / `ServerRequest.ts` / `ServerNotification.ts` | 108 / 10 / 87 | 108 / 10 / 87 | 0 — the decompressed stable export is **sha256-identical** (`0775ea21…`) |
+| Generated experimental union (same three) | 176 / 11 / 87 | **177** / 11 / 87 | +1 experimental request |
+| Client requests in `common.rs` | 176 | **177** | +1 |
+| `features/src/lib.rs` | — | — | not in the range (0 files) |
+
+- **Protocol: experimental only.** `thread/sample/cancel` (#55441, `ThreadSampleCancelParams
+  { request_id }`, empty response) cancels a §E.7 `thread/sample`; `ThreadSampleParams` gains
+  `disable_mcp: bool` and `thread/fork` gains `experimentalDisablePredictionMcp`
+  (`#[experimental("thread/fork.experimentalDisablePredictionMcp")]`, #55463) — all three excluded from
+  the stable schema by §E.2's rule, which the identical stable export confirms.
+- **`runtime-agent-instance` (§E.8): still unwired.** Five of the ten commits touch the crate
+  (credential sources tracked separately from auth owners #55410, runtime authentication shared across
+  requests and refreshes #55413, `actor.rs` / `manager.rs` / `registration.rs` / `runtime.rs`), but a
+  code search for the crate name in `Cargo.toml` files still returns only the workspace manifest and
+  its own; `app-server/Cargo.toml` does not mention it or `agent-identity`.
+- **TUI, not protocol:** daemon feature-override mismatch prompts (#55442, `tui/src/daemon_recovery.rs`),
+  TUI restart after a server shutdown refusal (#55409), Windows registry overrides for
+  `requirements.toml` (#55456), Noise-handshake tracing (#55406), API-key login message wording (#55407).
+- **Not read:** anything outside the compare file list; live traffic ⚠️. Scope is narrower than §E.7
+  (no source checkout): approval types were not re-hashed individually — the identical stable export
+  covers every generated approval type, and nothing under `protocol/v2/` changed except `thread.rs`
+  and `thread_sample.rs`.
+
+**Next drift baseline: `014489466`.**

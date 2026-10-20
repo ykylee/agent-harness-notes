@@ -12,6 +12,7 @@
 > 2026-09-30 reading except where marked *(2026-10-19)*. Re-counted at `79a19cbb3` (2026-10-20):
 > **108 / 10 / 87 unchanged**; one experimental request `thread/sample` added in source, every approval
 > type byte-identical, `PlanType` + `sci`/`sci_plus` — [99 §E.7](99-sources.md#e7-drift-re-check-2026-10-20--b1fd48c48--79a19cbb3).
+> Re-counted again at `014489466` (2026-10-20, later): stable export sha-identical, **108 / 10 / 87**; experimental 176 → 177 (`thread/sample/cancel`) — [99 §E.9](99-sources.md#e9-drift-re-check-2026-10-20-later--79a19cbb3--014489466).
 
 ## 1. Basic shape of the protocol
 
@@ -217,7 +218,7 @@ To see the actual JSON for a full turn:
 codex debug app-server send-message-v2 "run tests and summarize failures"
 ```
 
-## 6. Client → server methods (107 stable; 170 including experimental — 108 / 175 at `b1fd48c48`, 2026-10-19; 108 / 176 at `79a19cbb3`, 2026-10-20: + experimental `thread/sample`)
+## 6. Client → server methods (107 stable; 170 including experimental — 108 / 175 at `b1fd48c48`, 2026-10-19; 108 / 176 at `79a19cbb3`, 2026-10-20: + experimental `thread/sample`; 108 / 177 at `014489466`, 2026-10-20 later: + experimental `thread/sample/cancel`)
 
 The full *stable* `ClientRequest` list, grouped by domain. *(corrected 2026-09-26: the committed
 `schema/typescript/ClientRequest.ts` is generated without `#[experimental]` methods — 104 stable of

@@ -36,7 +36,7 @@
 - Reference checkouts (outside this repo): **one** — `~/repos/harness-refs/agent-client-protocol`
   (re-cloned 2026-10-20 `--filter=blob:none`, HEAD `ff7ef5169`). All other clones under
   `~/repos/harness-refs/` were removed on the user's request; pinned commits stay recorded in each
-  `99-sources.md`: `codex` (`origin/main` `1a35bc4cc`, docs baseline `79a19cbb3`), `gascity`
+  `99-sources.md`: `codex` (drift baseline `014489466`; loop files read at `1a35bc4cc`), `gascity`
   (`3ef7fadd42`), `gastown` (`649b832b`), `rrsi` (`be50316e1d`), `strands-harness-sdk` (local
   `a9a62d4e`; drift baseline `bd0b6a94`), `agent-client-protocol` (study pin `9b26a3ea`, drift baseline `ff7ef5169`), `beads`
   (`4f9174e6b`; gt pins `v1.0.5`). Re-clone (`--filter=blob:none`) at those commits when a drift pass
@@ -113,8 +113,8 @@ default-mode check into CI.
     2026-09-22/23; the Strands study reflects `strands-agents/harness-sdk` @ `15da9dc` (2026-09-25); the agent-client UX
     study reflects builds downloaded on 2026-09-26 (two products were renamed or merged that year). Both move fast. The first move of any re-investigation is checking the existing
     facts for drift, not collecting new ones.
-  - **Current drift baselines (2026-10-20):** Codex `79a19cbb3` (generated schema 108 / 10 / 87 unchanged
-    from `b1fd48c48`; `docs/99` §E.7), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
+  - **Current drift baselines (2026-10-20):** Codex `014489466` (generated schema 108 / 10 / 87 unchanged
+    since `b1fd48c48`; `docs/99` §E.9), Strands `bd0b6a94` (`strands/99` §6.2), Beads `4f9174e6b` (`gas-city/99` §C),
     Gas City `3ef7fadd42`, ACP spec **`ff7ef5169`** (`agent-ux/10` §1.1; stable v1 moved once in `schema-v1.25.0`, permission RPC unchanged). Desktop builds read: Claude Desktop 2.42304.2 and
     ChatGPT 26.1013.40934 (Linux debs), legacy ChatGPT macOS 1.2026.183. Shipped CLIs read: Claude
     Code 2.1.303 → drift-checked to **2.1.304 / Agent SDK 0.3.304** the same evening (`claude-code/99` §E),
